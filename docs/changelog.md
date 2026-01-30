@@ -9,6 +9,22 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- **Camera Recording**: Full recording workflow with countdown and real-time pose detection
+- **CameraService**: AVCaptureSession management with video/audio capture
+- **LivePoseDetector**: Real-time body pose detection on camera frames
+- **LiveSwingDetector**: Real-time swing detection using wrist velocity analysis
+- **RecordingView**: Recording UI with pose overlay, countdown, and PiP replay
+- **Camera Tab**: New Camera tab in MainTabView for recording
+- **Camera Permissions**: Added camera and microphone usage descriptions
+
+### Changed
+- **Tab Navigation**: Reordered tabs to Camera, History, Compare
+
+---
+
+## [0.3.0] - 2026-01-30
+
+### Added
 - **Auto-Detection Service**: SwingDetector using Vision framework body pose estimation
 - **Video Sync Engine**: VideoSyncEngine for automatic sync offset calculation
 - **Body Pose Analysis**: Tracks 8 key joints (wrists, elbows, shoulders, hips) for swing detection

@@ -8,9 +8,9 @@
 
 ## Current Phase
 
-**Phase**: Milestone 2 Auto-Detection Complete
+**Phase**: Milestone 3 Recording In Progress
 **Status**: On Track
-**Current Focus**: Testing and refinement of auto-detection
+**Current Focus**: Recording with real-time swing detection
 
 ---
 
@@ -43,15 +43,19 @@
 
 **Progress**: ██████████ 100%
 
-### Milestone 3: [Recording & Annotations] - Not Started
+### Milestone 3: [Recording & Annotations] - In Progress
 
 | Deliverable | Status | Notes |
 |-------------|--------|-------|
-| Camera recording | Not Started | |
+| Camera recording | Done | CameraService with AVCaptureSession |
+| Real-time pose detection | Done | LivePoseDetector using Vision |
+| Real-time swing detection | Done | LiveSwingDetector with velocity analysis |
+| Recording UI | Done | RecordingView with countdown, pose overlay |
+| PiP during replay | Done | Shows live feed during swing replay |
 | Drawing tools | Not Started | |
 | Annotation overlay | Not Started | |
 
-**Progress**: ░░░░░░░░░░ 0%
+**Progress**: ██████░░░░ 60%
 
 ### Milestone 4: [Monetization] - Not Started
 
@@ -66,6 +70,15 @@
 ---
 
 ## Recent Updates
+
+### 2026-01-30 (Milestone 3)
+- Created CameraService for AVCaptureSession management
+- Created LivePoseDetector for real-time body pose detection
+- Created LiveSwingDetector for real-time swing detection
+- Created RecordingViewModel state machine
+- Created RecordingView with countdown, pose overlay, PiP replay
+- Added Camera tab to MainTabView
+- Added camera/microphone permissions
 
 ### 2026-01-30 (Milestone 2)
 - Created SwingDetector service using Vision body pose
@@ -86,11 +99,12 @@
 
 ## Upcoming Work
 
-- [ ] Test auto-detection on real golf swing videos
-- [ ] Fine-tune velocity/acceleration thresholds
-- [ ] Test on various camera angles
-- [ ] Test audio detection in noisy environments
-- [ ] Begin Milestone 3: Recording & Annotations
+- [ ] Test recording on real device (simulator doesn't have camera)
+- [ ] Fine-tune real-time swing detection thresholds
+- [ ] Add swing clip extraction from recording buffer
+- [ ] Add recording review mode (Full Video / Swings Only)
+- [ ] Implement drawing tools for annotations
+- [ ] Add annotation overlay on video playback
 
 ---
 

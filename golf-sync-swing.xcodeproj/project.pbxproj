@@ -400,6 +400,8 @@
 				DEVELOPMENT_TEAM = J2R9272WYX;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Golf Sync Swing needs camera access to record your golf swings for analysis and comparison.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Golf Sync Swing needs microphone access to detect ball impact sounds for automatic swing detection.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Golf Sync Swing needs permission to save exported comparison videos to your photo library.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Golf Sync Swing needs access to your photo library to import golf swing videos for comparison.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -434,6 +436,8 @@
 				DEVELOPMENT_TEAM = J2R9272WYX;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Golf Sync Swing needs camera access to record your golf swings for analysis and comparison.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Golf Sync Swing needs microphone access to detect ball impact sounds for automatic swing detection.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Golf Sync Swing needs permission to save exported comparison videos to your photo library.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Golf Sync Swing needs access to your photo library to import golf swing videos for comparison.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
