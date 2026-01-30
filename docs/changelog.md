@@ -20,6 +20,9 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Changed
 - **Tab Navigation**: Reordered tabs to Camera, History, Compare
 
+### Fixed
+- **Recording Camera Position**: Front camera now used during countdown so users can see themselves to position correctly, then switches to back camera for recording
+
 ---
 
 ## [0.3.0] - 2026-01-30
