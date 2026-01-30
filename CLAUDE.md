@@ -105,7 +105,7 @@ Services/
 ├── SwingDetector.swift      # Pure logic, takes video → returns phases
 ├── VideoSyncEngine.swift    # Pure logic, takes phases → returns offset
 ├── VideoExporter.swift      # Takes config → produces file
-├── PurchaseService.swift    # Handles StoreKit, injected into views
+├── PurchaseService.swift    # Handles RevenueCat, injected into views
 └── AnalyticsService.swift   # Fire-and-forget tracking
 ```
 
@@ -134,9 +134,9 @@ App/
 │   ├── OnboardingFeature.swift    # Model: title, description, icon
 │   └── OnboardingPageView.swift   # Single page component
 ├── Paywall/
-│   ├── PaywallView.swift          # Full-screen purchase UI
+│   ├── PaywallView.swift          # Full-screen purchase UI (or use RevenueCat Paywalls)
 │   ├── PurchaseFeatureView.swift  # Single feature row
-│   └── PurchaseModel.swift        # StoreKit logic, state management
+│   └── PurchaseModel.swift        # RevenueCat entitlements, state management
 └── Services/
     └── PurchaseService.swift      # Actual purchase/restore logic
 ```

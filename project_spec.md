@@ -162,7 +162,7 @@ Play sequentially (not synced) → Paywall prompt for sync feature
 | Video | AVFoundation | Full control over playback, frame access |
 | Detection | Vision + Core ML | On-device pose estimation, custom model for phase detection |
 | Camera | AVCaptureSession | Custom recording UI with countdown |
-| Purchases | StoreKit 2 | Native, supports subscriptions + lifetime |
+| Purchases | RevenueCat | Paywall UI, analytics, A/B testing, easier subscription management |
 | Analytics | TelemetryDeck or Firebase | Privacy-focused or industry standard |
 
 ---
@@ -191,7 +191,7 @@ Play sequentially (not synced) → Paywall prompt for sync feature
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
 │                      Data Layer                             │
-│  SwiftData Models │ AVFoundation │ Vision │ StoreKit 2      │
+│  SwiftData Models │ AVFoundation │ Vision │ RevenueCat      │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -269,8 +269,8 @@ N/A - Fully offline app, no backend API.
 
 - **Video Privacy**: All videos stored locally, never uploaded
 - **No Account Required**: No user data collected beyond anonymous analytics
-- **StoreKit**: Apple handles all payment security
-- **Keychain**: Store purchase state in Keychain for tamper resistance
+- **RevenueCat**: Handles payment security, receipt validation server-side
+- **Entitlements**: RevenueCat manages purchase state, syncs across reinstalls
 
 ---
 
