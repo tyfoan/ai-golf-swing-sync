@@ -16,14 +16,32 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **RecordingView**: Recording UI with pose overlay, countdown, and PiP replay
 - **Camera Tab**: New Camera tab in MainTabView for recording
 - **Camera Permissions**: Added camera and microphone usage descriptions
+- **Fast Swing Detection Plan**: Documented approach for <500ms swing detection
 
 ### Changed
 - **Tab Navigation**: Reordered tabs to Camera, History, Compare
+- **LiveSwingDetector**: Rewritten for immediate impact detection (~300ms latency)
+  - Fires at velocity peak confirmation (2-3 frames) instead of waiting for follow-through
+  - Velocity smoothing with moving average filter for noise reduction
+  - Dual wrist tracking - auto-detects which hand is swinging
+  - Estimates end time instead of waiting for it
+- **LivePoseDetector**: Added adaptive frame processing
+  - Processes every frame during active swing tracking
+  - Falls back to every-2nd-frame when idle (battery saving)
+  - Added `leftWristPosition` and `rightWristPosition` properties
+- **RecordingViewModel**: Background pose processing for speed
+  - Dedicated processing queue avoids main thread blocking
+  - Passes both wrist positions to swing detector
+  - UI updates on main thread only
+- **CameraService**: Improved front camera resolution selection
+  - Prioritizes highest resolution format supporting target FPS
 
 ### Fixed
 - **Recording Camera Position**: Front camera now used during countdown so users can see themselves to position correctly, then switches to back camera for recording
 - **Swing Replay**: When swing detected, main view shows looping replay while PiP shows live recording continuing
 - **Swing Timestamps**: Now correctly file-relative by tracking recording start time
+- **Skeleton Mirroring**: PoseOverlayView now correctly mirrors skeleton on front camera
+- **Save/Delete Dialog**: Always shows after stopping recording (not just when swings detected)
 
 ---
 

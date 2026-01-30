@@ -10,6 +10,8 @@ import Vision
 
 struct PoseOverlayView: View {
     let pose: BodyPose?
+    /// Set to true when using front camera (preview is mirrored)
+    var isMirrored: Bool = false
 
     var body: some View {
         GeometryReader { geometry in
@@ -56,9 +58,11 @@ struct PoseOverlayView: View {
     }
 
     /// Convert Vision coordinates (origin bottom-left, 0-1) to view coordinates
+    /// When mirrored (front camera), flip x-coordinate to match mirrored preview
     private func convertPoint(_ point: CGPoint, to size: CGSize) -> CGPoint {
-        CGPoint(
-            x: point.x * size.width,
+        let x = isMirrored ? (1 - point.x) : point.x
+        return CGPoint(
+            x: x * size.width,
             y: (1 - point.y) * size.height
         )
     }

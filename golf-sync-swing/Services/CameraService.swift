@@ -41,7 +41,7 @@ final class CameraService: NSObject, ObservableObject {
     // MARK: - Configuration
 
     private var targetFrameRate: Double = 60
-    private var currentCameraPosition: AVCaptureDevice.Position = .back
+    @Published private(set) var currentCameraPosition: AVCaptureDevice.Position = .back
 
     // MARK: - Recording State
 
@@ -76,7 +76,8 @@ final class CameraService: NSObject, ObservableObject {
 
     private func configureSession(position: AVCaptureDevice.Position, frameRate: Double) {
         captureSession.beginConfiguration()
-        captureSession.sessionPreset = .high
+        // Use 1080p for better quality, especially on front camera
+        captureSession.sessionPreset = .hd1920x1080
 
         // Remove existing inputs
         captureSession.inputs.forEach { captureSession.removeInput($0) }
@@ -131,13 +132,14 @@ final class CameraService: NSObject, ObservableObject {
             captureSession.addOutput(videoOutput)
             videoDataOutput = videoOutput
 
-            // Set video orientation
+            // Set video orientation for pose detection
             if let connection = videoOutput.connection(with: .video) {
                 if connection.isVideoRotationAngleSupported(90) {
                     connection.videoRotationAngle = 90
                 }
-                if position == .front && connection.isVideoMirroringSupported {
-                    connection.isVideoMirrored = true
+                // DON'T mirror video data - it breaks pose detection coordinates
+                if connection.isVideoMirroringSupported {
+                    connection.isVideoMirrored = false
                 }
             }
         }
@@ -167,22 +169,32 @@ final class CameraService: NSObject, ObservableObject {
         do {
             try device.lockForConfiguration()
 
-            // Find the best format supporting target frame rate
+            // Find the best format: highest resolution that supports target frame rate
             var bestFormat: AVCaptureDevice.Format?
             var bestFrameRateRange: AVFrameRateRange?
+            var bestResolution: Int = 0
 
             for format in device.formats {
+                // Get format dimensions
+                let dimensions = CMVideoFormatDescriptionGetDimensions(format.formatDescription)
+                let resolution = Int(dimensions.width) * Int(dimensions.height)
+
+                // Only consider formats that support our target frame rate
                 for range in format.videoSupportedFrameRateRanges {
                     if range.maxFrameRate >= targetFPS {
-                        if bestFrameRateRange == nil || range.maxFrameRate < bestFrameRateRange!.maxFrameRate {
+                        // Prefer higher resolution formats
+                        if resolution > bestResolution {
                             bestFormat = format
                             bestFrameRateRange = range
+                            bestResolution = resolution
                         }
                     }
                 }
             }
 
             if let format = bestFormat, let range = bestFrameRateRange {
+                let dimensions = CMVideoFormatDescriptionGetDimensions(format.formatDescription)
+                print("Selected format: \(dimensions.width)x\(dimensions.height) @ \(range.maxFrameRate)fps")
                 device.activeFormat = format
                 let actualFPS = min(targetFPS, range.maxFrameRate)
                 device.activeVideoMinFrameDuration = CMTime(value: 1, timescale: CMTimeScale(actualFPS))

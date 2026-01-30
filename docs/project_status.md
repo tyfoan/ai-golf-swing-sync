@@ -71,6 +71,17 @@
 
 ## Recent Updates
 
+### 2026-01-30 (Fast Swing Detection)
+- Rewrote LiveSwingDetector for immediate impact detection (~300ms latency)
+- Added velocity smoothing with moving average filter
+- Added dual wrist tracking (auto-detects which hand is swinging)
+- Updated LivePoseDetector with adaptive frame processing
+- Moved pose processing to background queue for speed
+- Fixed skeleton mirroring on front camera
+- Fixed front camera resolution selection (now picks highest resolution)
+- Added save/delete dialog that always shows after recording stops
+- Created fast-swing-detection.md plan document
+
 ### 2026-01-30 (Milestone 3)
 - Created CameraService for AVCaptureSession management
 - Created LivePoseDetector for real-time body pose detection
@@ -117,3 +128,4 @@
 - Export watermark disabled (was causing issues)
 - Auto-detection accuracy depends on camera angle and lighting
 - Audio detection requires clear impact sound (may fail with background noise)
+- Fast swing detection still has bugs to fix (intermediate implementation)

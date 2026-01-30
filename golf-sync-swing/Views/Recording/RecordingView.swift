@@ -36,7 +36,7 @@ struct RecordingView: View {
 
                     // Pose overlay (only when not showing replay)
                     if viewModel.showPoseOverlay && viewModel.isRecording {
-                        PoseOverlayView(pose: viewModel.currentPose)
+                        PoseOverlayView(pose: viewModel.currentPose, isMirrored: viewModel.isFrontCamera)
                             .ignoresSafeArea()
                     }
                 }
@@ -74,7 +74,8 @@ struct RecordingView: View {
             Task {
                 let granted = await viewModel.cameraService.requestPermissions()
                 if granted {
-                    viewModel.cameraService.setupSession(position: .back, frameRate: 60)
+                    // Start with front camera so user can see themselves to position
+                    viewModel.cameraService.setupSession(position: .front, frameRate: 30)
                     viewModel.cameraService.startSession()
                 }
             }
@@ -87,7 +88,7 @@ struct RecordingView: View {
             isPresented: $viewModel.showSaveConfirmation,
             titleVisibility: .visible
         ) {
-            Button("Save Recording (\(viewModel.swingCount) Swings)") {
+            Button(viewModel.swingCount > 0 ? "Save Recording (\(viewModel.swingCount) Swings)" : "Save Recording") {
                 Task {
                     _ = await viewModel.saveRecording(to: modelContext)
                 }
@@ -244,7 +245,7 @@ struct RecordingView: View {
 
                     // Pose overlay on PiP
                     if viewModel.showPoseOverlay {
-                        PoseOverlayView(pose: viewModel.currentPose)
+                        PoseOverlayView(pose: viewModel.currentPose, isMirrored: viewModel.isFrontCamera)
                             .frame(width: 120, height: 160)
                     }
 

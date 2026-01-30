@@ -3,6 +3,7 @@
 //  golf-sync-swing
 //
 //  Real-time body pose detection using Vision framework
+//  Optimized for fast swing detection with adaptive frame processing
 //
 
 import Vision
@@ -22,10 +23,19 @@ struct BodyPose: Sendable {
         joints[jointName.rawValue.rawValue]
     }
 
-    /// Get wrist position (prefers right wrist)
-    nonisolated var wristPosition: CGPoint? {
+    /// Get left wrist position
+    nonisolated var leftWristPosition: CGPoint? {
+        joints[VNHumanBodyPoseObservation.JointName.leftWrist.rawValue.rawValue]
+    }
+
+    /// Get right wrist position
+    nonisolated var rightWristPosition: CGPoint? {
         joints[VNHumanBodyPoseObservation.JointName.rightWrist.rawValue.rawValue]
-            ?? joints[VNHumanBodyPoseObservation.JointName.leftWrist.rawValue.rawValue]
+    }
+
+    /// Get wrist position (prefers right wrist) - legacy compatibility
+    nonisolated var wristPosition: CGPoint? {
+        rightWristPosition ?? leftWristPosition
     }
 
     /// Joints for skeleton drawing
@@ -58,12 +68,18 @@ struct BodyPose: Sendable {
 }
 
 /// Real-time pose detector for camera frames
+/// Supports adaptive frame processing for battery efficiency
 final class LivePoseDetector: @unchecked Sendable {
 
     // MARK: - Configuration
 
     private let minConfidence: Float = 0.3
-    private let processEveryNthFrame: Int
+
+    /// Base frame skip rate (when not actively tracking)
+    private let baseFrameSkip: Int
+
+    /// Frame skip rate during active tracking (process every frame)
+    private let activeFrameSkip: Int = 1
 
     // MARK: - State
 
@@ -72,7 +88,10 @@ final class LivePoseDetector: @unchecked Sendable {
     private var lastPose: BodyPose?
     private let poseRequest = VNDetectHumanBodyPoseRequest()
 
-    // MARK: - Key joints to track
+    /// When true, processes every frame (used during active swing tracking)
+    private var isActiveTracking = false
+
+    // MARK: - Key joints to track (optimized set for swing detection)
 
     private let keyJoints: [VNHumanBodyPoseObservation.JointName] = [
         .nose,
@@ -98,9 +117,25 @@ final class LivePoseDetector: @unchecked Sendable {
     // MARK: - Init
 
     /// Initialize with frame skip rate
-    /// - Parameter processEveryNthFrame: Process every Nth frame (1 = all frames, 2 = every other, etc.)
+    /// - Parameter processEveryNthFrame: Process every Nth frame when idle (1 = all frames, 2 = every other, etc.)
     init(processEveryNthFrame: Int = 2) {
-        self.processEveryNthFrame = max(1, processEveryNthFrame)
+        self.baseFrameSkip = max(1, processEveryNthFrame)
+    }
+
+    // MARK: - Adaptive Processing Control
+
+    /// Enable active tracking mode (process every frame)
+    func setActiveTracking(_ active: Bool) {
+        lock.lock()
+        defer { lock.unlock() }
+        isActiveTracking = active
+    }
+
+    /// Check if active tracking is enabled
+    func getActiveTracking() -> Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        return isActiveTracking
     }
 
     // MARK: - Detection
@@ -114,11 +149,12 @@ final class LivePoseDetector: @unchecked Sendable {
         lock.lock()
         frameCount += 1
         let currentFrame = frameCount
-        let shouldProcess = currentFrame % processEveryNthFrame == 0
+        let frameSkip = isActiveTracking ? activeFrameSkip : baseFrameSkip
+        let shouldProcess = currentFrame % frameSkip == 0
         let cached = lastPose
         lock.unlock()
 
-        // Skip frames for performance
+        // Skip frames for performance (unless active tracking)
         guard shouldProcess else {
             return cached
         }
@@ -157,6 +193,7 @@ final class LivePoseDetector: @unchecked Sendable {
         defer { lock.unlock() }
         frameCount = 0
         lastPose = nil
+        isActiveTracking = false
     }
 
     // MARK: - Private

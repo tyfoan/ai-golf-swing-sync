@@ -3,6 +3,7 @@
 //  golf-sync-swing
 //
 //  State machine for recording workflow
+//  Optimized for fast swing detection with background processing
 //
 
 import SwiftUI
@@ -73,10 +74,21 @@ final class RecordingViewModel {
     private let poseDetector = LivePoseDetector(processEveryNthFrame: 2)
     private let swingDetector = LiveSwingDetector()
 
+    // MARK: - Background Processing
+
+    /// Dedicated queue for pose detection (avoid main thread blocking)
+    private let poseProcessingQueue = DispatchQueue(
+        label: "com.golfsync.pose.processing",
+        qos: .userInteractive
+    )
+
     // MARK: - Recording Timing
 
     /// Timestamp of first frame when recording started (for calculating file-relative times)
     private var recordingStartTimestamp: TimeInterval?
+
+    /// Flag to track if we're currently recording (thread-safe access)
+    private var isCurrentlyRecording: Bool = false
 
     // MARK: - Computed Properties
 
@@ -122,6 +134,10 @@ final class RecordingViewModel {
         detectedSwings.count
     }
 
+    var isFrontCamera: Bool {
+        cameraService.currentCameraPosition == .front
+    }
+
     // MARK: - Init
 
     init() {
@@ -129,10 +145,13 @@ final class RecordingViewModel {
     }
 
     private func setupCallbacks() {
-        // Frame processing callback
+        // Frame processing callback - process on background queue for speed
         cameraService.onFrameCaptured = { [weak self] pixelBuffer, timestamp in
-            Task { @MainActor [weak self] in
-                self?.processFrame(pixelBuffer, timestamp: timestamp)
+            guard let self else { return }
+
+            // Process on background queue to avoid blocking camera
+            self.poseProcessingQueue.async {
+                self.processFrameOnBackground(pixelBuffer, timestamp: timestamp)
             }
         }
 
@@ -145,7 +164,7 @@ final class RecordingViewModel {
             }
         }
 
-        // Swing detection callback
+        // Swing detection callback - fires immediately on detection
         swingDetector.onSwingDetected = { [weak self] bounds in
             Task { @MainActor [weak self] in
                 self?.handleSwingDetected(bounds)
@@ -153,11 +172,12 @@ final class RecordingViewModel {
         }
     }
 
-    // MARK: - Frame Processing
+    // MARK: - Frame Processing (Background Thread)
 
-    private func processFrame(_ pixelBuffer: CVPixelBuffer, timestamp: CMTime) {
+    /// Process frame on background queue for minimal latency
+    private func processFrameOnBackground(_ pixelBuffer: CVPixelBuffer, timestamp: CMTime) {
         // Only process during recording
-        guard isRecording else { return }
+        guard isCurrentlyRecording else { return }
 
         let frameTime = timestamp.seconds
 
@@ -169,14 +189,27 @@ final class RecordingViewModel {
         // Calculate file-relative timestamp
         let relativeTime = frameTime - (recordingStartTimestamp ?? 0)
 
-        // Detect pose
-        if let pose = poseDetector.detectPose(in: pixelBuffer, at: timestamp) {
-            self.currentPose = pose
+        // Update adaptive processing based on swing tracking state
+        poseDetector.setActiveTracking(swingDetector.isTrackingSwing)
 
-            // Feed wrist position to swing detector with file-relative timestamp
-            if let wristPos = pose.wristPosition {
-                swingDetector.addPose(timestamp: relativeTime, wristY: Double(wristPos.y))
-            }
+        // Detect pose (this is the heavy computation)
+        guard let pose = poseDetector.detectPose(in: pixelBuffer, at: timestamp) else {
+            return
+        }
+
+        // Feed BOTH wrist positions to swing detector for smart wrist selection
+        let leftWristY = pose.leftWristPosition.map { Double($0.y) }
+        let rightWristY = pose.rightWristPosition.map { Double($0.y) }
+
+        swingDetector.addPose(
+            timestamp: relativeTime,
+            leftWristY: leftWristY,
+            rightWristY: rightWristY
+        )
+
+        // Update UI on main thread (only pose display, not detection logic)
+        DispatchQueue.main.async { [weak self] in
+            self?.currentPose = pose
         }
     }
 
@@ -222,8 +255,8 @@ final class RecordingViewModel {
                 if state == .idle { return }
             }
 
-            // Switch to BACK camera for recording
-            cameraService.setupSession(position: .back, frameRate: 60)
+            // Use FRONT camera for recording at 30fps for better quality
+            cameraService.setupSession(position: .front, frameRate: 30)
 
             // Small delay for camera to initialize
             try? await Task.sleep(for: .milliseconds(300))
@@ -235,23 +268,21 @@ final class RecordingViewModel {
 
     private func beginRecording() {
         recordingStartTimestamp = nil // Will be set on first frame
+        isCurrentlyRecording = true
         recordingURL = cameraService.startRecording()
         detectedSwings.removeAll()
+        swingDetector.reset()
         state = .recording
     }
 
     func stopRecording() {
         guard isRecording else { return }
 
+        isCurrentlyRecording = false
         cameraService.stopRecording()
 
-        if detectedSwings.isEmpty {
-            // No swings detected - go back to idle
-            state = .idle
-        } else {
-            // Show save confirmation
-            showSaveConfirmation = true
-        }
+        // Always show save confirmation dialog
+        showSaveConfirmation = true
     }
 
     func dismissReplay() {
@@ -261,6 +292,7 @@ final class RecordingViewModel {
     }
 
     func cancel() {
+        isCurrentlyRecording = false
         cameraService.stopRecording()
         cameraService.stopSession()
         recordingURL = nil
@@ -343,6 +375,7 @@ final class RecordingViewModel {
     // MARK: - Cleanup
 
     func cleanup() {
+        isCurrentlyRecording = false
         cameraService.stopSession()
         currentPose = nil
         poseDetector.reset()
