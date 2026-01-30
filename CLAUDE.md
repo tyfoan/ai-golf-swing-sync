@@ -163,3 +163,33 @@ Build onboarding and paywall **once**, reuse across all apps. Parameterize:
 - [Project Status](docs/project_status.md) - Current progress
 
 Update files in the docs folder after major milestones and major additions to the project.
+
+---
+
+## Implementation Plans
+
+Detailed task breakdowns live in `plans/`:
+
+| Plan | Status | Description |
+|------|--------|-------------|
+| [Milestone 1: MVP](plans/milestone-1-mvp.md) | Not Started | Video player, import, side-by-side, manual sync, export |
+| [Milestone 2: Auto-Detection](plans/milestone-2-auto-detection.md) | Not Started | Vision pose detection, phase markers, auto-sync at impact |
+| [Milestone 3: Recording & Annotations](plans/milestone-3-recording-annotations.md) | Not Started | Camera with countdown, drawing tools |
+| [Milestone 4: Monetization](plans/milestone-4-monetization.md) | Not Started | RevenueCat, onboarding, paywall, analytics |
+
+### Working with Plans
+
+1. **Before starting work**: Read the relevant milestone plan
+2. **Check off tasks** as you complete them (mark `[x]`)
+3. **Update plan** if approach changes or new tasks discovered
+4. **Follow dependencies**: Milestones build on each other (1 → 2 → 3 → 4)
+
+### Current Focus
+
+Start with **Milestone 1** tasks in order:
+1. Project setup (folder structure, SPM packages)
+2. Video import
+3. Single video player
+4. Side-by-side comparison
+5. Basic export
+6. Home screen

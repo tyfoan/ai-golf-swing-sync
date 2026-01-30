@@ -2,8 +2,6 @@
 //  golf_sync_swingApp.swift
 //  golf-sync-swing
 //
-//  Created by aleksanderogurtsov on 30.01.2026.
-//
 
 import SwiftUI
 import SwiftData
@@ -12,7 +10,9 @@ import SwiftData
 struct golf_sync_swingApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
+            SwingVideo.self,
+            SwingMarker.self,
+            ComparisonSession.self,
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
@@ -25,7 +25,7 @@ struct golf_sync_swingApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MainTabView()
         }
         .modelContainer(sharedModelContainer)
     }
