@@ -73,6 +73,11 @@ final class RecordingViewModel {
     private let poseDetector = LivePoseDetector(processEveryNthFrame: 2)
     private let swingDetector = LiveSwingDetector()
 
+    // MARK: - Recording Timing
+
+    /// Timestamp of first frame when recording started (for calculating file-relative times)
+    private var recordingStartTimestamp: TimeInterval?
+
     // MARK: - Computed Properties
 
     var isCountingDown: Bool {
@@ -154,13 +159,23 @@ final class RecordingViewModel {
         // Only process during recording
         guard isRecording else { return }
 
+        let frameTime = timestamp.seconds
+
+        // Capture first frame timestamp for file-relative timing
+        if recordingStartTimestamp == nil {
+            recordingStartTimestamp = frameTime
+        }
+
+        // Calculate file-relative timestamp
+        let relativeTime = frameTime - (recordingStartTimestamp ?? 0)
+
         // Detect pose
         if let pose = poseDetector.detectPose(in: pixelBuffer, at: timestamp) {
             self.currentPose = pose
 
-            // Feed wrist position to swing detector
+            // Feed wrist position to swing detector with file-relative timestamp
             if let wristPos = pose.wristPosition {
-                swingDetector.addPose(timestamp: pose.timestamp, wristY: Double(wristPos.y))
+                swingDetector.addPose(timestamp: relativeTime, wristY: Double(wristPos.y))
             }
         }
     }
@@ -219,6 +234,7 @@ final class RecordingViewModel {
     }
 
     private func beginRecording() {
+        recordingStartTimestamp = nil // Will be set on first frame
         recordingURL = cameraService.startRecording()
         detectedSwings.removeAll()
         state = .recording
@@ -248,6 +264,7 @@ final class RecordingViewModel {
         cameraService.stopRecording()
         cameraService.stopSession()
         recordingURL = nil
+        recordingStartTimestamp = nil
         detectedSwings.removeAll()
         currentPose = nil
         state = .idle
@@ -313,6 +330,7 @@ final class RecordingViewModel {
             try? FileManager.default.removeItem(at: url)
         }
         recordingURL = nil
+        recordingStartTimestamp = nil
         detectedSwings.removeAll()
         state = .idle
     }

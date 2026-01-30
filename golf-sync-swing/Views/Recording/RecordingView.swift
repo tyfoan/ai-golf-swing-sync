@@ -20,14 +20,25 @@ struct RecordingView: View {
                 // Background
                 Color.black.ignoresSafeArea()
 
-                // Camera preview
-                CameraPreviewView(session: viewModel.cameraService.captureSession)
+                // Main content: either camera preview or swing replay
+                if viewModel.isShowingReplay, let swing = viewModel.currentReplaySwing, let url = viewModel.recordingURL {
+                    // Show swing replay as main content
+                    SwingReplayView(
+                        videoURL: url,
+                        startTime: swing.startTime,
+                        endTime: swing.endTime
+                    )
                     .ignoresSafeArea()
-
-                // Pose overlay
-                if viewModel.showPoseOverlay && viewModel.isRecording {
-                    PoseOverlayView(pose: viewModel.currentPose)
+                } else {
+                    // Show live camera preview
+                    CameraPreviewView(session: viewModel.cameraService.captureSession)
                         .ignoresSafeArea()
+
+                    // Pose overlay (only when not showing replay)
+                    if viewModel.showPoseOverlay && viewModel.isRecording {
+                        PoseOverlayView(pose: viewModel.currentPose)
+                            .ignoresSafeArea()
+                    }
                 }
 
                 // Main UI layers
@@ -41,9 +52,9 @@ struct RecordingView: View {
                     bottomControls
                 }
 
-                // PiP view during replay
+                // PiP view during replay (shows live camera + pose overlay)
                 if viewModel.isShowingReplay {
-                    pipView
+                    liveCameraPipView
                 }
 
                 // Countdown overlay
@@ -219,28 +230,30 @@ struct RecordingView: View {
         }
     }
 
-    // MARK: - PiP View
+    // MARK: - Live Camera PiP View (shown during replay)
 
-    private var pipView: some View {
+    private var liveCameraPipView: some View {
         VStack {
             HStack {
                 Spacer()
 
                 ZStack(alignment: .topLeading) {
+                    // Live camera feed
                     CameraPreviewView(session: viewModel.cameraService.captureSession)
                         .frame(width: 120, height: 160)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color.white.opacity(0.3), lineWidth: 1)
-                        )
 
-                    // Recording indicator
+                    // Pose overlay on PiP
+                    if viewModel.showPoseOverlay {
+                        PoseOverlayView(pose: viewModel.currentPose)
+                            .frame(width: 120, height: 160)
+                    }
+
+                    // Recording indicator badge
                     HStack(spacing: 4) {
                         Circle()
                             .fill(Color.red)
                             .frame(width: 8, height: 8)
-                        Text("LIVE")
+                        Text("REC")
                             .font(.caption2.bold())
                             .foregroundStyle(.white)
                     }
@@ -249,6 +262,16 @@ struct RecordingView: View {
                     .background(Color.black.opacity(0.6))
                     .clipShape(Capsule())
                     .padding(8)
+                }
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.green, lineWidth: 2)
+                )
+                .shadow(color: .black.opacity(0.5), radius: 8, x: 0, y: 4)
+                .onTapGesture {
+                    // Tap PiP to dismiss replay and return to live view
+                    viewModel.dismissReplay()
                 }
             }
             .padding()
@@ -264,15 +287,23 @@ struct RecordingView: View {
             Spacer()
 
             VStack(spacing: 8) {
-                Text("Swing Detected!")
-                    .font(.headline)
-                    .foregroundStyle(.white)
+                HStack(spacing: 8) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundStyle(.green)
+                    Text("Swing #\(viewModel.swingCount)")
+                        .font(.headline)
+                        .foregroundStyle(.white)
+                }
 
                 if let swing = viewModel.currentReplaySwing {
                     Text("Confidence: \(Int(swing.confidence * 100))%")
                         .font(.subheadline)
                         .foregroundStyle(.white.opacity(0.8))
                 }
+
+                Text("Tap live view to continue")
+                    .font(.caption)
+                    .foregroundStyle(.white.opacity(0.6))
             }
             .padding()
             .background(.ultraThinMaterial)
