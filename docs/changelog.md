@@ -22,6 +22,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 - **Recording Camera Position**: Front camera now used during countdown so users can see themselves to position correctly, then switches to back camera for recording
+- **Swing Replay**: When swing detected, main view shows looping replay while PiP shows live recording continuing
+- **Swing Timestamps**: Now correctly file-relative by tracking recording start time
 
 ---
 

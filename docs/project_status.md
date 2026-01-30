@@ -80,6 +80,8 @@
 - Added Camera tab to MainTabView
 - Added camera/microphone permissions
 - Fixed camera positioning: front camera for countdown (user positioning), back camera for recording
+- Added SwingReplayView for looping detected swings during recording
+- PiP shows live camera feed with pose overlay while replay plays
 
 ### 2026-01-30 (Milestone 2)
 - Created SwingDetector service using Vision body pose
