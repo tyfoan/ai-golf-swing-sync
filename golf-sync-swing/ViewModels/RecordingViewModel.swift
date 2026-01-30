@@ -194,8 +194,8 @@ final class RecordingViewModel {
         state = .countdown(remaining: 5)
 
         Task {
-            // Setup camera with back camera for countdown
-            cameraService.setupSession(position: .back, frameRate: 60)
+            // Setup FRONT camera for countdown (user sees themselves to position)
+            cameraService.setupSession(position: .front, frameRate: 30)
             cameraService.startSession()
 
             // Run countdown
@@ -206,6 +206,12 @@ final class RecordingViewModel {
                 // Check if cancelled
                 if state == .idle { return }
             }
+
+            // Switch to BACK camera for recording
+            cameraService.setupSession(position: .back, frameRate: 60)
+
+            // Small delay for camera to initialize
+            try? await Task.sleep(for: .milliseconds(300))
 
             // Start actual recording
             beginRecording()
