@@ -172,7 +172,7 @@ Detailed task breakdowns live in `plans/`:
 
 | Plan | Status | Description |
 |------|--------|-------------|
-| [Milestone 1: MVP](plans/milestone-1-mvp.md) | Not Started | Video player, import, side-by-side, manual sync, export |
+| [Milestone 1: MVP](plans/milestone-1-mvp.md) | ✅ Complete | Video player, import, side-by-side, manual sync, export |
 | [Milestone 2: Auto-Detection](plans/milestone-2-auto-detection.md) | Not Started | Vision pose detection, phase markers, auto-sync at impact |
 | [Milestone 3: Recording & Annotations](plans/milestone-3-recording-annotations.md) | Not Started | Camera with countdown, drawing tools |
 | [Milestone 4: Monetization](plans/milestone-4-monetization.md) | Not Started | RevenueCat, onboarding, paywall, analytics |
@@ -186,10 +186,7 @@ Detailed task breakdowns live in `plans/`:
 
 ### Current Focus
 
-Start with **Milestone 1** tasks in order:
-1. Project setup (folder structure, SPM packages)
-2. Video import
-3. Single video player
-4. Side-by-side comparison
-5. Basic export
-6. Home screen
+**Milestone 1 is complete.** Next up is **Milestone 2: Auto-Detection**:
+1. Vision framework pose estimation
+2. Swing phase detection algorithm
+3. Auto-sync at ball impact

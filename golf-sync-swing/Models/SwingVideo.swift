@@ -15,6 +15,10 @@ final class SwingVideo {
     var fps: Double
     var thumbnailData: Data?
 
+    // Auto-detection status
+    var hasBeenAnalyzed: Bool = false
+    var analysisDate: Date?
+
     @Relationship(deleteRule: .cascade) var swings: [SwingMarker] = []
 
     var localURL: URL {
@@ -26,5 +30,15 @@ final class SwingVideo {
         self.duration = duration
         self.fps = fps
         self.thumbnailData = thumbnailData
+    }
+
+    /// Get the primary detected impact time (first auto-detected swing)
+    var detectedImpactTime: TimeInterval? {
+        swings.first { $0.isAutoDetected }?.contactTime
+    }
+
+    /// Check if video has a high-confidence auto-detected swing
+    var hasHighConfidenceDetection: Bool {
+        swings.contains { $0.isAutoDetected && $0.detectionConfidence >= 0.7 }
     }
 }

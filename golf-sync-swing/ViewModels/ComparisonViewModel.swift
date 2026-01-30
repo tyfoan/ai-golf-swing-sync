@@ -127,6 +127,12 @@ final class ComparisonViewModel {
         seek(to: currentTime)
     }
 
+    func setSyncOffset(_ offset: TimeInterval) {
+        syncOffset = offset
+        // Re-sync to current position with new offset
+        seek(to: currentTime)
+    }
+
     var progress: Double {
         guard totalDuration > 0 else { return 0 }
         return currentTime / totalDuration

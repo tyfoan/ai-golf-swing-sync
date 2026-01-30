@@ -14,6 +14,15 @@ struct ComparisonView: View {
     @State private var exportProgress: Float = 0
     @State private var isExporting = false
 
+    // Auto-sync state
+    @State private var isAutoSyncing = false
+    @State private var autoSyncProgress: Float = 0
+    @State private var autoSyncStatus: String = ""
+    @State private var syncResult: SyncResult?
+    @State private var syncError: String?
+
+    private let syncEngine = VideoSyncEngine()
+
     var body: some View {
         VStack(spacing: 0) {
             if let viewModel = viewModel {
@@ -46,20 +55,8 @@ struct ComparisonView: View {
 
                 // Controls
                 VStack(spacing: 12) {
-                    // Sync offset indicator
-                    HStack {
-                        Text("Sync Offset:")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                        Text(String(format: "%+.2fs", viewModel.syncOffset))
-                            .font(.caption)
-                            .monospacedDigit()
-                            .foregroundStyle(.primary)
-                        Spacer()
-                        Text("Drag horizontally to adjust")
-                            .font(.caption2)
-                            .foregroundStyle(.tertiary)
-                    }
+                    // Sync controls
+                    syncControlsSection(viewModel: viewModel)
 
                     ComparisonTimelineSlider(viewModel: viewModel)
                     ComparisonControlsView(viewModel: viewModel, onExport: { showExportSheet = true })
@@ -97,6 +94,133 @@ struct ComparisonView: View {
                     progress: $exportProgress,
                     onDismiss: { showExportSheet = false }
                 )
+            }
+        }
+        .alert("Sync Error", isPresented: .init(
+            get: { syncError != nil },
+            set: { if !$0 { syncError = nil } }
+        )) {
+            Button("OK") { syncError = nil }
+        } message: {
+            Text(syncError ?? "Unknown error")
+        }
+    }
+
+    @ViewBuilder
+    private func syncControlsSection(viewModel: ComparisonViewModel) -> some View {
+        VStack(spacing: 8) {
+            if isAutoSyncing {
+                // Progress view
+                VStack(spacing: 4) {
+                    ProgressView(value: Double(autoSyncProgress))
+                        .progressViewStyle(.linear)
+
+                    HStack {
+                        ProgressView()
+                            .scaleEffect(0.7)
+                        Text(autoSyncStatus)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        Spacer()
+                        Text("\(Int(autoSyncProgress * 100))%")
+                            .font(.caption)
+                            .monospacedDigit()
+                            .foregroundStyle(.tertiary)
+                    }
+                }
+            } else {
+                HStack {
+                    // Sync offset display
+                    VStack(alignment: .leading, spacing: 2) {
+                        HStack(spacing: 4) {
+                            Text("Sync:")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                            Text(String(format: "%+.2fs", viewModel.syncOffset))
+                                .font(.caption)
+                                .fontWeight(.medium)
+                                .monospacedDigit()
+
+                            if let result = syncResult, result.isHighConfidence {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .font(.caption)
+                                    .foregroundStyle(.green)
+                            }
+                        }
+
+                        if let result = syncResult {
+                            Text(result.description)
+                                .font(.caption2)
+                                .foregroundStyle(.tertiary)
+                        } else {
+                            Text("Drag horizontally to adjust")
+                                .font(.caption2)
+                                .foregroundStyle(.tertiary)
+                        }
+                    }
+
+                    Spacer()
+
+                    // Auto-sync button
+                    Button {
+                        runAutoSync(viewModel: viewModel)
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "wand.and.stars")
+                            Text("Auto-Sync")
+                        }
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(Color.orange)
+                        .cornerRadius(8)
+                    }
+
+                    // Reset button
+                    if viewModel.syncOffset != 0 {
+                        Button {
+                            viewModel.setSyncOffset(0)
+                            syncResult = nil
+                        } label: {
+                            Image(systemName: "arrow.counterclockwise")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private func runAutoSync(viewModel: ComparisonViewModel) {
+        isAutoSyncing = true
+        autoSyncProgress = 0
+        autoSyncStatus = "Starting..."
+
+        Task {
+            do {
+                let result = try await syncEngine.calculateSyncOffset(
+                    video1: video1,
+                    video2: video2
+                ) { progress, status in
+                    Task { @MainActor in
+                        autoSyncProgress = progress
+                        autoSyncStatus = status
+                    }
+                }
+
+                await MainActor.run {
+                    syncResult = result
+                    viewModel.setSyncOffset(result.offset)
+                    isAutoSyncing = false
+                }
+            } catch {
+                await MainActor.run {
+                    isAutoSyncing = false
+                    syncError = error.localizedDescription
+                }
             }
         }
     }

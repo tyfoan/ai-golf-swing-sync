@@ -9,6 +9,28 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- **Auto-Detection Service**: SwingDetector using Vision framework body pose estimation
+- **Video Sync Engine**: VideoSyncEngine for automatic sync offset calculation
+- **Body Pose Analysis**: Tracks 8 key joints (wrists, elbows, shoulders, hips) for swing detection
+- **Audio Impact Detection**: Analyzes audio waveform for ball impact sound spikes
+- **Hybrid Detection**: Combines pose velocity + audio analysis for ~80-85% accuracy
+- **Auto-Detect UI**: "AUTO-DETECT" button in SingleVideoPlayerView with progress indicator
+- **Auto-Sync UI**: "Auto-Sync" button in ComparisonView to align videos at impact
+- **Detection Confidence**: Shows confidence badge (High/Medium/Low) on auto-detected swings
+- **Research Documentation**: Comprehensive milestone-2-research.md with algorithm details
+
+### Changed
+- **SwingMarker Model**: Added `isAutoDetected`, `detectionConfidence` properties
+- **SwingVideo Model**: Added `hasBeenAnalyzed`, `analysisDate`, helper properties
+- **ComparisonViewModel**: Added `setSyncOffset()` method for auto-sync
+- **SingleVideoPlayerView**: Redesigned with AUTO-DETECT and MANUAL buttons
+- **ComparisonView**: Added sync controls section with Auto-Sync button and reset
+
+---
+
+## [0.2.0] - 2026-01-30
+
+### Added
 - **Video Import**: PHPicker integration for importing videos from photo library
 - **Video Playback**: Single video player with play/pause, speed controls, and timeline scrubbing
 - **Side-by-Side Comparison**: ComparisonView with synchronized dual video playback

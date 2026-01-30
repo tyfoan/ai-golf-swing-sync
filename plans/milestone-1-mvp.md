@@ -2,56 +2,63 @@
 
 **Goal**: Side-by-side video playback with manual sync
 
-**Status**: Not Started
+**Status**: Complete ✅
 
 ---
 
 ## Tasks
 
 ### 1.1 Project Setup
-- [ ] Create folder structure (Models, Views, ViewModels, Services)
-- [ ] Add RevenueCat SDK via SPM
-- [ ] Configure app entitlements (Photo Library access)
-- [ ] Set up SwiftData container
+- [x] Create folder structure (Models, Views, ViewModels, Services)
+- [ ] Add RevenueCat SDK via SPM (deferred to Milestone 4)
+- [x] Configure app entitlements (Photo Library access)
+- [x] Set up SwiftData container
 
 ### 1.2 Video Import
-- [ ] Create `VideoPickerView` using PHPickerViewController
-- [ ] Create `SwingVideo` SwiftData model
-- [ ] Generate and cache thumbnails
-- [ ] Handle video copy to app sandbox
-- [ ] Create `VideoLibraryView` to show imported videos
+- [x] Create `VideoPickerView` using PHPickerViewController
+- [x] Create `SwingVideo` SwiftData model
+- [x] Generate and cache thumbnails
+- [x] Handle video copy to app sandbox
+- [x] Create `VideoLibraryView` to show imported videos
 
 ### 1.3 Single Video Player
-- [ ] Create `VideoPlayerView` with AVPlayer
-- [ ] Add play/pause button
-- [ ] Add timeline scrubber (seek bar)
-- [ ] Add slow-motion controls (0.25x, 0.5x, 1x)
-- [ ] Add frame-by-frame stepping (+/- buttons)
-- [ ] Handle video orientation correctly
+- [x] Create `VideoPlayerView` with AVPlayer
+- [x] Add play/pause button
+- [x] Add timeline scrubber (seek bar)
+- [x] Add slow-motion controls (0.25x, 0.5x, 1x)
+- [x] Add frame-by-frame stepping (+/- buttons)
+- [x] Handle video orientation correctly
 
 ### 1.4 Side-by-Side Comparison
-- [ ] Create `ComparisonView` with two video players
-- [ ] Sync play/pause across both videos
-- [ ] Add manual sync adjustment (drag gesture to offset)
-- [ ] Show sync offset value
-- [ ] Add swap left/right button
-- [ ] Create `ComparisonSession` SwiftData model
+- [x] Create `ComparisonView` with two video players
+- [x] Sync play/pause across both videos
+- [x] Add manual sync adjustment (drag gesture to offset)
+- [x] Show sync offset value
+- [x] Add swap left/right button
+- [x] Create `ComparisonSession` SwiftData model
 
 ### 1.5 Basic Export
-- [ ] Create `VideoExporter` service
-- [ ] Composite two videos side-by-side using AVMutableComposition
-- [ ] Add watermark overlay (for free tier)
-- [ ] Save to Photos library
-- [ ] Show export progress indicator
-- [ ] Share sheet integration
+- [x] Create `VideoExporter` service
+- [x] Composite two videos side-by-side using AVMutableComposition
+- [ ] Add watermark overlay (disabled - was causing issues)
+- [x] Save to Photos library
+- [x] Show export progress indicator
+- [x] Share sheet integration
 
 ### 1.6 Home Screen
-- [ ] Create `HomeView` with options:
+- [x] Create `HomeView` with options:
   - Import new video
   - View video library
   - Start comparison
-- [ ] Recent comparisons list
-- [ ] Empty state for new users
+- [ ] Recent comparisons list (not implemented)
+- [x] Empty state for new users
+
+### 1.7 Additional Features (Added)
+- [x] Create `SwingMarker` model for marking swing phases
+- [x] Create `SwingMarkerSlider` with 3 handles (start/contact/end)
+- [x] Create `SwingEditorSheet` for adding/editing swings
+- [x] Create `HistoryView` tab with video list and swing counts
+- [x] Create `MainTabView` with Compare and Recordings tabs
 
 ---
 
@@ -82,9 +89,11 @@ Output to temp file → Save to Photos
 ---
 
 ## Definition of Done
-- [ ] User can import video from Photos
-- [ ] User can play single video with slow-mo and scrubbing
-- [ ] User can view two videos side-by-side
-- [ ] User can manually adjust sync offset
-- [ ] User can export comparison video
-- [ ] All videos persist across app restarts
+- [x] User can import video from Photos
+- [x] User can play single video with slow-mo and scrubbing
+- [x] User can view two videos side-by-side
+- [x] User can manually adjust sync offset
+- [x] User can export comparison video
+- [x] All videos persist across app restarts
+- [x] User can mark swing phases (start, contact, end)
+- [x] User can view/edit swings in History tab

@@ -35,7 +35,7 @@ final class VideoStorageService {
 
     /// Get video metadata (duration, fps)
     func getVideoMetadata(from url: URL) async -> (duration: TimeInterval, fps: Double) {
-        let asset = AVAsset(url: url)
+        let asset = AVURLAsset(url: url)
 
         var duration: TimeInterval = 0
         var fps: Double = 30.0
