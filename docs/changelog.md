@@ -52,6 +52,10 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - Movie fragment interval set to 5 seconds (less data loss on crash)
 - **RecordingView**: Added scene phase handling and error alerts
   - `.id(swing.id)` modifier to fix swing switching in replay
+- **Tab Switching Performance**: Optimized camera pause/resume for fast tab switching
+  - Uses `pauseSession()`/`resumeSession()` instead of full session reconfiguration
+  - Tracks tab visibility to avoid resuming camera when on other tabs
+  - Session configured only once, then paused/resumed on tab switches
 
 ### Fixed
 - **Recording Camera Position**: Front camera now used during countdown so users can see themselves to position correctly, then switches to back camera for recording
@@ -62,6 +66,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Swing Switching**: Can now switch between multiple detected swings in replay view
 - **Memory Leak in Vision**: Fixed potential memory leak by adding autoreleasepool
 - **Tap Area on Swing Cards**: Added `.contentShape(Rectangle())` for better tap handling
+- **Tab Switching Lag**: Camera tab no longer freezes when switching between tabs
 
 ---
 

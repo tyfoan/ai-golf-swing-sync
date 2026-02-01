@@ -15,6 +15,8 @@ struct RecordingView: View {
     @State private var viewModel = RecordingViewModel()
     @State private var showingTips = false
     @State private var showingError = false
+    @State private var hasSetupCamera = false
+    @State private var isTabVisible = false
 
     var body: some View {
         GeometryReader { geometry in
@@ -76,17 +78,33 @@ struct RecordingView: View {
             }
         }
         .onAppear {
+            isTabVisible = true
+
             Task {
                 let granted = await viewModel.cameraService.requestPermissions()
                 if granted {
-                    // Start with front camera so user can see themselves to position
-                    viewModel.cameraService.setupSession(position: .front, frameRate: 30)
-                    viewModel.cameraService.startSession()
+                    if !hasSetupCamera {
+                        // First time setup - configure and start session
+                        viewModel.cameraService.setupSession(position: .front, frameRate: 30)
+                        hasSetupCamera = true
+                        // Small delay on first setup to let UI settle
+                        try? await Task.sleep(for: .milliseconds(100))
+                    }
+                    // Resume session if not running (quick operation)
+                    if !viewModel.cameraService.isSessionRunning && !viewModel.isRecording {
+                        viewModel.cameraService.resumeSession()
+                    }
                 }
             }
         }
         .onDisappear {
-            viewModel.cleanup()
+            isTabVisible = false
+
+            // Only pause (don't cleanup) when switching tabs
+            // This avoids expensive session reconfiguration
+            if !viewModel.isRecording {
+                viewModel.cameraService.pauseSession()
+            }
         }
         .confirmationDialog(
             "Save Recording",
@@ -146,8 +164,8 @@ struct RecordingView: View {
             // Note: If recording, the backgroundTask in CameraService handles it
 
         case .active:
-            // Resume camera when app becomes active
-            if !viewModel.cameraService.isSessionRunning && !viewModel.isRecording {
+            // Resume camera when app becomes active, but only if this tab is visible
+            if isTabVisible && !viewModel.cameraService.isSessionRunning && !viewModel.isRecording {
                 viewModel.cameraService.resumeSession()
             }
 

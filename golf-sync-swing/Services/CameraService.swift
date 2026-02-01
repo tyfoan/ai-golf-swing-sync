@@ -125,6 +125,8 @@ final class CameraService: NSObject {
     private var durationTimer: Timer?
     private var currentRecordingURL: URL?
     private var backgroundTask: UIBackgroundTaskIdentifier = .invalid
+    private var isAudioSessionConfigured = false
+    private var isSessionConfigured = false
 
     // MARK: - Constants
 
@@ -359,6 +361,8 @@ final class CameraService: NSObject {
     // MARK: - Audio Session Configuration
 
     func configureAudioSession() throws {
+        guard !isAudioSessionConfigured else { return }
+
         let audioSession = AVAudioSession.sharedInstance()
         try audioSession.setCategory(
             .playAndRecord,
@@ -366,10 +370,12 @@ final class CameraService: NSObject {
             options: [.defaultToSpeaker, .allowBluetoothA2DP, .mixWithOthers]
         )
         try audioSession.setActive(true)
+        isAudioSessionConfigured = true
     }
 
     func deactivateAudioSession() {
         try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
+        isAudioSessionConfigured = false
     }
 
     // MARK: - Disk Space Validation
@@ -514,6 +520,7 @@ final class CameraService: NSObject {
 
         captureSession.commitConfiguration()
         targetFrameRate = frameRate
+        isSessionConfigured = true
 
         DispatchQueue.main.async {
             self.sessionConfigurationId += 1
@@ -595,10 +602,13 @@ final class CameraService: NSObject {
         }
     }
 
+    /// Fully stop session (cleanup for app termination or view unload)
     func stopSession() {
         sessionQueue.async { [weak self] in
-            guard let self, self.captureSession.isRunning else { return }
-            self.captureSession.stopRunning()
+            guard let self else { return }
+            if self.captureSession.isRunning {
+                self.captureSession.stopRunning()
+            }
             DispatchQueue.main.async {
                 self.isSessionRunning = false
             }
@@ -606,8 +616,12 @@ final class CameraService: NSObject {
         deactivateAudioSession()
     }
 
-    /// Pause session (for app backgrounding)
+    /// Pause session (for tab switching or app backgrounding)
+    /// Does NOT deactivate audio session to allow fast resume
     func pauseSession() {
+        // Quick check before dispatching
+        guard captureSession.isRunning else { return }
+
         sessionQueue.async { [weak self] in
             guard let self, self.captureSession.isRunning else { return }
             self.captureSession.stopRunning()
@@ -617,7 +631,8 @@ final class CameraService: NSObject {
         }
     }
 
-    /// Resume session (for app foregrounding)
+    /// Resume session (for app foregrounding or tab switch)
+    /// This is optimized for fast resume - avoids redundant configuration
     func resumeSession() {
         // Check permissions first
         let permissions = checkPermissionState()
@@ -628,16 +643,23 @@ final class CameraService: NSObject {
             return
         }
 
+        // Quick check before dispatching to session queue
+        guard !captureSession.isRunning else { return }
+
         sessionQueue.async { [weak self] in
             guard let self, !self.captureSession.isRunning else { return }
 
-            // Reconfigure audio session
-            try? self.configureAudioSession()
+            // Only configure audio session if not already configured
+            // This makes tab switching much faster
+            if !self.isAudioSessionConfigured {
+                try? self.configureAudioSession()
+            }
 
             self.captureSession.startRunning()
             DispatchQueue.main.async {
                 self.isSessionRunning = self.captureSession.isRunning
                 self.currentError = nil
+                self.isInterrupted = false
             }
         }
     }

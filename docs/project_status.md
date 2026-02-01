@@ -72,6 +72,13 @@
 
 ## Recent Updates
 
+### 2026-02-01 (Tab Switching Performance)
+- Optimized camera pause/resume for fast tab switching
+- Added `isTabVisible` and `hasSetupCamera` flags to RecordingView
+- Camera session now configured once, then paused/resumed on tab switches
+- Audio session configuration cached to avoid redundant setup
+- Scene phase handling now respects tab visibility
+
 ### 2026-02-01 (Production Camera Fixes)
 - Complete rewrite of CameraService for production readiness
 - Added app lifecycle handling (pause session on background, resume on foreground)
