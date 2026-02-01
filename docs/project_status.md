@@ -2,7 +2,7 @@
 
 > Current progress for Golf Sync Swing
 
-**Last Updated**: 2026-01-30
+**Last Updated**: 2026-02-01
 
 ---
 
@@ -52,10 +52,11 @@
 | Real-time swing detection | Done | LiveSwingDetector with velocity analysis |
 | Recording UI | Done | RecordingView with countdown, pose overlay |
 | PiP during replay | Done | Shows live feed during swing replay |
+| **Production Camera Fixes** | Done | Lifecycle, interruptions, errors, memory |
 | Drawing tools | Not Started | |
 | Annotation overlay | Not Started | |
 
-**Progress**: ██████░░░░ 60%
+**Progress**: ███████░░░ 70%
 
 ### Milestone 4: [Monetization] - Not Started
 
@@ -70,6 +71,22 @@
 ---
 
 ## Recent Updates
+
+### 2026-02-01 (Production Camera Fixes)
+- Complete rewrite of CameraService for production readiness
+- Added app lifecycle handling (pause session on background, resume on foreground)
+- Added AVAudioSession configuration for video recording
+- Changed pixel format from BGRA to YUV420 (more efficient)
+- Fixed session preset conflict (now uses `.inputPriority`)
+- Added session interruption handling (phone calls, Siri, other apps)
+- Added disk space validation (requires 500MB+ before recording)
+- Added thermal state monitoring
+- Added CameraError enum with user-friendly error descriptions
+- Added background task for recording completion
+- Fixed memory leak in LivePoseDetector with autoreleasepool
+- Added interruption overlay UI in RecordingView
+- Fixed swing switching in replay view with `.id()` modifier
+- Created comprehensive camera optimization plan (`plans/camera-optimization-plan.md`)
 
 ### 2026-01-30 (Fast Swing Detection)
 - Rewrote LiveSwingDetector for immediate impact detection (~300ms latency)
@@ -128,4 +145,4 @@
 - Export watermark disabled (was causing issues)
 - Auto-detection accuracy depends on camera angle and lighting
 - Audio detection requires clear impact sound (may fail with background noise)
-- Fast swing detection still has bugs to fix (intermediate implementation)
+- ~Fast swing detection still has bugs to fix~ Fixed with production camera updates

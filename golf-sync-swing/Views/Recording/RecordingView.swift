@@ -11,8 +11,10 @@ import AVFoundation
 
 struct RecordingView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.scenePhase) private var scenePhase
     @State private var viewModel = RecordingViewModel()
     @State private var showingTips = false
+    @State private var showingError = false
 
     var body: some View {
         GeometryReader { geometry in
@@ -21,25 +23,8 @@ struct RecordingView: View {
                 Color.black.ignoresSafeArea()
 
                 // Main content: either camera preview or swing replay
-                if viewModel.isShowingReplay, let swing = viewModel.currentReplaySwing, let url = viewModel.recordingURL {
-                    // Show swing replay as main content
-                    SwingReplayView(
-                        videoURL: url,
-                        startTime: swing.startTime,
-                        endTime: swing.endTime
-                    )
+                mainContentView
                     .ignoresSafeArea()
-                } else {
-                    // Show live camera preview
-                    CameraPreviewView(session: viewModel.cameraService.captureSession)
-                        .ignoresSafeArea()
-
-                    // Pose overlay (only when not showing replay)
-                    if viewModel.showPoseOverlay && viewModel.isRecording {
-                        PoseOverlayView(pose: viewModel.currentPose, isMirrored: viewModel.isFrontCamera)
-                            .ignoresSafeArea()
-                    }
-                }
 
                 // Main UI layers
                 VStack(spacing: 0) {
@@ -48,13 +33,18 @@ struct RecordingView: View {
 
                     Spacer()
 
+                    // Swing attempts list (when swings detected)
+                    if viewModel.swingCount > 0 && viewModel.isRecording {
+                        swingAttemptsList
+                    }
+
                     // Bottom controls
                     bottomControls
                 }
 
-                // PiP view during replay (shows live camera + pose overlay)
-                if viewModel.isShowingReplay {
-                    liveCameraPipView
+                // PiP view during recording (shows alternate view)
+                if viewModel.isRecording && viewModel.swingCount > 0 {
+                    pipView
                 }
 
                 // Countdown overlay
@@ -64,9 +54,24 @@ struct RecordingView: View {
                     }
                 }
 
-                // Swing detected indicator
-                if viewModel.isShowingReplay {
-                    swingDetectedOverlay
+                // Processing swing overlay
+                if viewModel.isProcessingSwing {
+                    processingSwingOverlay
+                }
+
+                // Finalizing video overlay
+                if viewModel.isFinalizingVideo {
+                    finalizingVideoOverlay
+                }
+
+                // Current replay indicator
+                if viewModel.mainViewShowsReplay, let swing = viewModel.currentReplaySwing {
+                    replayIndicatorOverlay(swing: swing)
+                }
+
+                // Interruption overlay
+                if viewModel.cameraService.isInterrupted {
+                    interruptionOverlay
                 }
             }
         }
@@ -104,6 +109,84 @@ struct RecordingView: View {
         }
         .sheet(isPresented: $showingTips) {
             RecordingTipsSheet()
+        }
+        .alert("Camera Error", isPresented: $showingError) {
+            Button("OK") {
+                showingError = false
+            }
+            if viewModel.cameraService.currentError?.errorDescription?.contains("Settings") == true {
+                Button("Open Settings") {
+                    if let url = URL(string: UIApplication.openSettingsURLString) {
+                        UIApplication.shared.open(url)
+                    }
+                }
+            }
+        } message: {
+            Text(viewModel.cameraService.currentError?.errorDescription ?? "An unknown error occurred")
+        }
+        .onChange(of: scenePhase) { oldPhase, newPhase in
+            handleScenePhaseChange(from: oldPhase, to: newPhase)
+        }
+        .onChange(of: viewModel.cameraService.currentError) { _, newError in
+            if newError != nil {
+                showingError = true
+            }
+        }
+    }
+
+    // MARK: - Scene Phase Handling
+
+    private func handleScenePhaseChange(from oldPhase: ScenePhase, to newPhase: ScenePhase) {
+        switch newPhase {
+        case .background:
+            // Pause camera when app goes to background
+            if !viewModel.isRecording {
+                viewModel.cameraService.pauseSession()
+            }
+            // Note: If recording, the backgroundTask in CameraService handles it
+
+        case .active:
+            // Resume camera when app becomes active
+            if !viewModel.cameraService.isSessionRunning && !viewModel.isRecording {
+                viewModel.cameraService.resumeSession()
+            }
+
+        case .inactive:
+            // Transitioning - do nothing
+            break
+
+        @unknown default:
+            break
+        }
+    }
+
+    // MARK: - Main Content View
+
+    @ViewBuilder
+    private var mainContentView: some View {
+        if viewModel.mainViewShowsReplay,
+           let swing = viewModel.currentReplaySwing,
+           let url = viewModel.recordingURL {
+            // Show swing replay as main content
+            // Use swing.id to force view recreation when switching between swings
+            SwingReplayView(
+                videoURL: url,
+                startTime: swing.startTime,
+                endTime: swing.endTime
+            )
+            .id(swing.id)
+        } else {
+            // Show live camera preview
+            ZStack {
+                CameraPreviewView(session: viewModel.cameraService.captureSession)
+                    // Force recreate when session is reconfigured
+                    .id("main-camera-\(viewModel.cameraService.sessionConfigurationId)")
+
+                // Pose overlay
+                if viewModel.showPoseOverlay && viewModel.isRecording {
+                    PoseOverlayView(pose: viewModel.currentPose, isMirrored: viewModel.isFrontCamera)
+                }
+            }
         }
     }
 
@@ -157,6 +240,28 @@ struct RecordingView: View {
         .padding()
     }
 
+    // MARK: - Swing Attempts List
+
+    private var swingAttemptsList: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 12) {
+                ForEach(Array(viewModel.detectedSwings.enumerated()), id: \.element.id) { index, swing in
+                    SwingAttemptCard(
+                        swingNumber: index + 1,
+                        confidence: swing.confidence,
+                        isFavorite: swing.isFavorite,
+                        isSelected: viewModel.replayingSwingIndex == index && viewModel.mainViewShowsReplay
+                    )
+                    .onTapGesture {
+                        viewModel.showSwing(at: index)
+                    }
+                }
+            }
+            .padding(.horizontal)
+        }
+        .padding(.bottom, 12)
+    }
+
     // MARK: - Bottom Controls
 
     private var bottomControls: some View {
@@ -164,43 +269,60 @@ struct RecordingView: View {
             // Control buttons (only during recording)
             if viewModel.isRecording {
                 HStack(spacing: 24) {
+                    // Live camera button (when showing replay)
+                    if viewModel.mainViewShowsReplay {
+                        Button(action: viewModel.showLiveCamera) {
+                            Image(systemName: "video.fill")
+                                .font(.title2)
+                                .foregroundStyle(.white)
+                                .frame(width: 50, height: 50)
+                                .background(Color.blue.opacity(0.7))
+                                .clipShape(Circle())
+                        }
+                    }
+
                     // Speed selector
                     SpeedButton(speed: viewModel.playbackSpeed)
 
                     // Favorite button
                     Button(action: {
-                        if let index = viewModel.detectedSwings.indices.last {
+                        if let index = viewModel.replayingSwingIndex ?? viewModel.detectedSwings.indices.last {
                             viewModel.toggleFavorite(at: index)
                         }
                     }) {
-                        Image(systemName: viewModel.detectedSwings.last?.isFavorite == true ? "star.fill" : "star")
+                        let isFavorite = viewModel.currentReplaySwing?.isFavorite ?? viewModel.detectedSwings.last?.isFavorite ?? false
+                        Image(systemName: isFavorite ? "star.fill" : "star")
                             .font(.title2)
-                            .foregroundStyle(.white)
+                            .foregroundStyle(isFavorite ? .yellow : .white)
                             .frame(width: 50, height: 50)
                             .background(Color.gray.opacity(0.5))
                             .clipShape(Circle())
                     }
 
-                    // Pose toggle
-                    Button(action: viewModel.togglePoseOverlay) {
-                        Image(systemName: "figure.stand")
-                            .font(.title2)
-                            .foregroundStyle(viewModel.showPoseOverlay ? .green : .white)
-                            .frame(width: 50, height: 50)
-                            .background(Color.gray.opacity(0.5))
-                            .clipShape(Circle())
+                    // Pose toggle (only when showing live camera, not replay)
+                    if !viewModel.mainViewShowsReplay {
+                        Button(action: viewModel.togglePoseOverlay) {
+                            Image(systemName: "figure.stand")
+                                .font(.title2)
+                                .foregroundStyle(viewModel.showPoseOverlay ? .green : .white)
+                                .frame(width: 50, height: 50)
+                                .background(Color.gray.opacity(0.5))
+                                .clipShape(Circle())
+                        }
                     }
                 }
             }
 
-            // Start Recording / Stop button
+            // Start Recording / Stop button / Review buttons
             if viewModel.state == .idle {
                 startRecordingButton
             } else if viewModel.isRecording {
                 stopRecordingButton
+            } else if viewModel.isReviewing {
+                reviewingButtons
             }
         }
-        .padding(.bottom, 30)
+        .padding(.bottom, 100) // Increased padding to clear tab bar
     }
 
     private var startRecordingButton: some View {
@@ -231,32 +353,89 @@ struct RecordingView: View {
         }
     }
 
-    // MARK: - Live Camera PiP View (shown during replay)
+    private var reviewingButtons: some View {
+        HStack(spacing: 20) {
+            // Delete button
+            Button(action: viewModel.deleteRecording) {
+                Text("Delete")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 16)
+                    .background(Color.red.opacity(0.8))
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+            }
 
-    private var liveCameraPipView: some View {
+            // Save button
+            Button {
+                Task {
+                    _ = await viewModel.saveRecording(to: modelContext)
+                }
+            } label: {
+                Text(viewModel.swingCount > 0 ? "Save (\(viewModel.swingCount))" : "Save")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 16)
+                    .background(Color.green)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+            }
+        }
+        .padding(.horizontal, 40)
+    }
+
+    // MARK: - PiP View
+
+    private var pipView: some View {
         VStack {
             HStack {
                 Spacer()
 
                 ZStack(alignment: .topLeading) {
-                    // Live camera feed
-                    CameraPreviewView(session: viewModel.cameraService.captureSession)
-                        .frame(width: 120, height: 160)
+                    // Content based on display mode
+                    Group {
+                        if viewModel.pipDisplayMode == .liveCamera {
+                            // Live camera feed
+                            ZStack {
+                                CameraPreviewView(session: viewModel.cameraService.captureSession)
+                                    .id("pip-camera-\(viewModel.cameraService.sessionConfigurationId)")
 
-                    // Pose overlay on PiP
-                    if viewModel.showPoseOverlay {
-                        PoseOverlayView(pose: viewModel.currentPose, isMirrored: viewModel.isFrontCamera)
-                            .frame(width: 120, height: 160)
+                                // Pose overlay on PiP
+                                if viewModel.showPoseOverlay {
+                                    PoseOverlayView(pose: viewModel.currentPose, isMirrored: viewModel.isFrontCamera)
+                                }
+                            }
+                        } else if let lastSwing = viewModel.lastDetectedSwing,
+                                  let url = viewModel.recordingURL {
+                            // Last swing replay
+                            SwingReplayView(
+                                videoURL: url,
+                                startTime: lastSwing.startTime,
+                                endTime: lastSwing.endTime
+                            )
+                        }
                     }
+                    .frame(width: 120, height: 160)
 
-                    // Recording indicator badge
+                    // Badge indicating what PiP shows
                     HStack(spacing: 4) {
-                        Circle()
-                            .fill(Color.red)
-                            .frame(width: 8, height: 8)
-                        Text("REC")
-                            .font(.caption2.bold())
-                            .foregroundStyle(.white)
+                        if viewModel.pipDisplayMode == .liveCamera {
+                            Circle()
+                                .fill(Color.red)
+                                .frame(width: 8, height: 8)
+                            Text("REC")
+                                .font(.caption2.bold())
+                                .foregroundStyle(.white)
+                        } else {
+                            Image(systemName: "arrow.counterclockwise")
+                                .font(.caption2.bold())
+                                .foregroundStyle(.white)
+                            Text("REPLAY")
+                                .font(.caption2.bold())
+                                .foregroundStyle(.white)
+                        }
                     }
                     .padding(.horizontal, 6)
                     .padding(.vertical, 3)
@@ -267,12 +446,12 @@ struct RecordingView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 12))
                 .overlay(
                     RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color.green, lineWidth: 2)
+                        .stroke(viewModel.pipDisplayMode == .liveCamera ? Color.green : Color.orange, lineWidth: 2)
                 )
                 .shadow(color: .black.opacity(0.5), radius: 8, x: 0, y: 4)
                 .onTapGesture {
-                    // Tap PiP to dismiss replay and return to live view
-                    viewModel.dismissReplay()
+                    // Tap PiP to swap main and PiP content
+                    viewModel.swapMainAndPip()
                 }
             }
             .padding()
@@ -281,35 +460,113 @@ struct RecordingView: View {
         }
     }
 
-    // MARK: - Swing Detected Overlay
+    // MARK: - Processing Swing Overlay
 
-    private var swingDetectedOverlay: some View {
+    private var processingSwingOverlay: some View {
+        ZStack {
+            Color.black.opacity(0.5)
+                .ignoresSafeArea()
+
+            VStack(spacing: 16) {
+                ProgressView()
+                    .scaleEffect(1.5)
+                    .tint(.white)
+
+                Text("Detecting Swing...")
+                    .font(.headline)
+                    .foregroundStyle(.white)
+            }
+            .padding(32)
+            .background(.ultraThinMaterial)
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+        }
+    }
+
+    // MARK: - Finalizing Video Overlay
+
+    private var finalizingVideoOverlay: some View {
+        ZStack {
+            Color.black.opacity(0.7)
+                .ignoresSafeArea()
+
+            VStack(spacing: 16) {
+                ProgressView()
+                    .scaleEffect(1.5)
+                    .tint(.white)
+
+                Text("Saving Video...")
+                    .font(.headline)
+                    .foregroundStyle(.white)
+
+                Text("\(viewModel.swingCount) swing\(viewModel.swingCount == 1 ? "" : "s") detected")
+                    .font(.subheadline)
+                    .foregroundStyle(.white.opacity(0.7))
+            }
+            .padding(32)
+            .background(.ultraThinMaterial)
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+        }
+    }
+
+    // MARK: - Replay Indicator Overlay
+
+    private func replayIndicatorOverlay(swing: SwingClip) -> some View {
         VStack {
             Spacer()
 
             VStack(spacing: 8) {
                 HStack(spacing: 8) {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundStyle(.green)
-                    Text("Swing #\(viewModel.swingCount)")
+                    Image(systemName: "arrow.counterclockwise")
+                        .foregroundStyle(.orange)
+                    Text("Swing #\(viewModel.replayingSwingIndex.map { $0 + 1 } ?? viewModel.swingCount)")
                         .font(.headline)
                         .foregroundStyle(.white)
                 }
 
-                if let swing = viewModel.currentReplaySwing {
-                    Text("Confidence: \(Int(swing.confidence * 100))%")
-                        .font(.subheadline)
-                        .foregroundStyle(.white.opacity(0.8))
-                }
-
-                Text("Tap live view to continue")
-                    .font(.caption)
-                    .foregroundStyle(.white.opacity(0.6))
+                Text("Confidence: \(Int(swing.confidence * 100))%")
+                    .font(.subheadline)
+                    .foregroundStyle(.white.opacity(0.8))
             }
             .padding()
             .background(.ultraThinMaterial)
             .clipShape(RoundedRectangle(cornerRadius: 12))
-            .padding(.bottom, 150)
+            .padding(.bottom, 220) // Above the controls
+        }
+    }
+
+    // MARK: - Interruption Overlay
+
+    private var interruptionOverlay: some View {
+        ZStack {
+            Color.black.opacity(0.8)
+                .ignoresSafeArea()
+
+            VStack(spacing: 20) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .font(.system(size: 50))
+                    .foregroundStyle(.yellow)
+
+                Text("Recording Interrupted")
+                    .font(.title2.bold())
+                    .foregroundStyle(.white)
+
+                Text(viewModel.cameraService.currentError?.errorDescription ?? "Camera session was interrupted")
+                    .font(.body)
+                    .foregroundStyle(.white.opacity(0.8))
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+
+                Button("Resume") {
+                    viewModel.cameraService.resumeSession()
+                }
+                .font(.headline)
+                .foregroundStyle(.white)
+                .padding(.horizontal, 32)
+                .padding(.vertical, 12)
+                .background(Color.green)
+                .clipShape(Capsule())
+            }
+            .padding(32)
         }
     }
 
@@ -323,94 +580,12 @@ struct RecordingView: View {
     }
 }
 
-// MARK: - Speed Button
-
-struct SpeedButton: View {
-    let speed: Float
-
-    var body: some View {
-        Button(action: {}) {
-            Text(String(format: "%.1fx", speed))
-                .font(.subheadline.bold())
-                .foregroundStyle(.white)
-                .frame(width: 50, height: 50)
-                .background(Color.gray.opacity(0.5))
-                .clipShape(Circle())
-        }
-    }
-}
-
-// MARK: - Tips Sheet
-
-struct RecordingTipsSheet: View {
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 24) {
-                    TipCard(
-                        number: 1,
-                        title: "Camera Placement",
-                        description: "Place your phone on a tripod or stable surface, facing your swing. Ensure your full body is visible."
-                    )
-
-                    TipCard(
-                        number: 2,
-                        title: "Lighting",
-                        description: "Record in well-lit conditions. Natural daylight works best for pose detection."
-                    )
-
-                    TipCard(
-                        number: 3,
-                        title: "Distance",
-                        description: "Stand 8-12 feet from the camera for optimal pose tracking."
-                    )
-                }
-                .padding()
-            }
-            .navigationTitle("Recording Tips")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { dismiss() }
-                }
-            }
-        }
-    }
-}
-
-struct TipCard: View {
-    let number: Int
-    let title: String
-    let description: String
-
-    var body: some View {
-        HStack(alignment: .top, spacing: 16) {
-            Text("\(number)")
-                .font(.title2.bold())
-                .foregroundStyle(.white)
-                .frame(width: 40, height: 40)
-                .background(Color.green)
-                .clipShape(Circle())
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text(title)
-                    .font(.headline)
-
-                Text(description)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
-        }
-        .padding()
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.systemGray6))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
-    }
-}
+// MARK: - Preview
 
 #Preview {
     RecordingView()
         .modelContainer(for: [SwingVideo.self, SwingMarker.self], inMemory: true)
 }
+
+// Note: SwingAttemptCard, SpeedButton, RecordingTipsSheet, TipCard
+// are now in Views/Recording/Components/

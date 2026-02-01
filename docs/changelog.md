@@ -17,6 +17,14 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Camera Tab**: New Camera tab in MainTabView for recording
 - **Camera Permissions**: Added camera and microphone usage descriptions
 - **Fast Swing Detection Plan**: Documented approach for <500ms swing detection
+- **Camera Optimization Plan**: Comprehensive production-ready camera plan (`plans/camera-optimization-plan.md`)
+- **App Lifecycle Handling**: Camera session pauses on background, resumes on foreground
+- **Session Interruption Handling**: Handles phone calls, Siri, other camera apps
+- **Disk Space Validation**: Checks for 500MB+ free space before recording
+- **Thermal State Monitoring**: Detects device overheating conditions
+- **Audio Session Configuration**: Proper AVAudioSession setup for video recording
+- **Permission State Monitoring**: Checks permission status before session start
+- **Interruption Overlay UI**: Shows user-friendly message when recording interrupted
 
 ### Changed
 - **Tab Navigation**: Reordered tabs to Camera, History, Compare
@@ -29,12 +37,21 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - Processes every frame during active swing tracking
   - Falls back to every-2nd-frame when idle (battery saving)
   - Added `leftWristPosition` and `rightWristPosition` properties
+  - Wrapped Vision processing in autoreleasepool to prevent memory leaks
 - **RecordingViewModel**: Background pose processing for speed
   - Dedicated processing queue avoids main thread blocking
   - Passes both wrist positions to swing detector
   - UI updates on main thread only
-- **CameraService**: Improved front camera resolution selection
+  - Handles optional URL from startRecording() for error cases
+- **CameraService**: Complete rewrite for production readiness
   - Prioritizes highest resolution format supporting target FPS
+  - Uses YUV420 pixel format instead of BGRA (more efficient)
+  - Session preset set to `.inputPriority` to avoid conflicts
+  - Added CameraError enum with all error cases and user-friendly descriptions
+  - Added background task management for recording completion
+  - Movie fragment interval set to 5 seconds (less data loss on crash)
+- **RecordingView**: Added scene phase handling and error alerts
+  - `.id(swing.id)` modifier to fix swing switching in replay
 
 ### Fixed
 - **Recording Camera Position**: Front camera now used during countdown so users can see themselves to position correctly, then switches to back camera for recording
@@ -42,6 +59,9 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Swing Timestamps**: Now correctly file-relative by tracking recording start time
 - **Skeleton Mirroring**: PoseOverlayView now correctly mirrors skeleton on front camera
 - **Save/Delete Dialog**: Always shows after stopping recording (not just when swings detected)
+- **Swing Switching**: Can now switch between multiple detected swings in replay view
+- **Memory Leak in Vision**: Fixed potential memory leak by adding autoreleasepool
+- **Tap Area on Swing Cards**: Added `.contentShape(Rectangle())` for better tap handling
 
 ---
 

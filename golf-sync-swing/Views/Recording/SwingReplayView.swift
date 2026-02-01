@@ -16,6 +16,12 @@ struct SwingReplayView: View {
     @State private var player: AVPlayer?
     @State private var isLoading = true
     @State private var loadError: String?
+    @State private var retryCount = 0
+
+    /// Maximum retries if video isn't ready
+    private let maxRetries = 5
+    /// Delay between retries
+    private let retryDelay: UInt64 = 300_000_000 // 300ms in nanoseconds
 
     private var clipDuration: TimeInterval {
         endTime - startTime
@@ -48,24 +54,7 @@ struct SwingReplayView: View {
                 }
                 .padding()
             }
-
-            // Replay badge
-            VStack {
-                HStack {
-                    Label("REPLAY", systemImage: "arrow.counterclockwise")
-                        .font(.caption.bold())
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 5)
-                        .background(Color.green)
-                        .clipShape(Capsule())
-
-                    Spacer()
-                }
-                .padding()
-
-                Spacer()
-            }
+            // Note: Replay badge is shown by parent RecordingView
         }
         .task {
             await loadVideo()
@@ -77,8 +66,8 @@ struct SwingReplayView: View {
     }
 
     private func loadVideo() async {
-        // Small delay to let the video file be written
-        try? await Task.sleep(for: .milliseconds(200))
+        // Small initial delay
+        try? await Task.sleep(for: .milliseconds(100))
 
         guard FileManager.default.fileExists(atPath: videoURL.path) else {
             loadError = "Video file not found"
@@ -86,12 +75,20 @@ struct SwingReplayView: View {
             return
         }
 
-        let asset = AVURLAsset(url: videoURL)
+        // Create a fresh asset each attempt (don't cache stale duration)
+        let asset = AVURLAsset(url: videoURL, options: [AVURLAssetPreferPreciseDurationAndTimingKey: true])
 
         do {
             // Check if asset is playable
             let isPlayable = try await asset.load(.isPlayable)
             guard isPlayable else {
+                // Retry if not playable yet
+                if retryCount < maxRetries {
+                    retryCount += 1
+                    try? await Task.sleep(nanoseconds: retryDelay)
+                    await loadVideo()
+                    return
+                }
                 loadError = "Video not ready yet"
                 isLoading = false
                 return
@@ -100,9 +97,18 @@ struct SwingReplayView: View {
             let duration = try await asset.load(.duration)
             let videoDuration = CMTimeGetSeconds(duration)
 
-            // Validate times
+            // Check if video has enough content for the full swing
+            // If not, retry to let more frames be written
+            if videoDuration < endTime && retryCount < maxRetries {
+                retryCount += 1
+                try? await Task.sleep(nanoseconds: retryDelay)
+                await loadVideo()
+                return
+            }
+
+            // Validate times - use actual video duration
             let safeStartTime = max(0, min(startTime, videoDuration - 0.1))
-            let safeEndTime = max(safeStartTime + 0.1, min(endTime, videoDuration))
+            let safeEndTime = max(safeStartTime + 0.5, min(endTime, videoDuration))
 
             // Create player item
             let playerItem = AVPlayerItem(asset: asset)
@@ -117,6 +123,13 @@ struct SwingReplayView: View {
                 self.isLoading = false
             }
         } catch {
+            // Retry on error
+            if retryCount < maxRetries {
+                retryCount += 1
+                try? await Task.sleep(nanoseconds: retryDelay)
+                await loadVideo()
+                return
+            }
             await MainActor.run {
                 loadError = "Loading: \(error.localizedDescription)"
                 isLoading = false

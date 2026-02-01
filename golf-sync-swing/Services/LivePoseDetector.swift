@@ -9,6 +9,8 @@
 import Vision
 import AVFoundation
 import CoreImage
+import CoreVideo
+import Accelerate
 import Combine
 
 /// Body pose data for a single frame
@@ -36,6 +38,66 @@ struct BodyPose: Sendable {
     /// Get wrist position (prefers right wrist) - legacy compatibility
     nonisolated var wristPosition: CGPoint? {
         rightWristPosition ?? leftWristPosition
+    }
+
+    // MARK: - Shoulder Positions
+
+    /// Get left shoulder position
+    nonisolated var leftShoulderPosition: CGPoint? {
+        joints[VNHumanBodyPoseObservation.JointName.leftShoulder.rawValue.rawValue]
+    }
+
+    /// Get right shoulder position
+    nonisolated var rightShoulderPosition: CGPoint? {
+        joints[VNHumanBodyPoseObservation.JointName.rightShoulder.rawValue.rawValue]
+    }
+
+    /// Get shoulder center position (average of both shoulders)
+    nonisolated var shoulderCenterPosition: CGPoint? {
+        guard let left = leftShoulderPosition, let right = rightShoulderPosition else {
+            return leftShoulderPosition ?? rightShoulderPosition
+        }
+        return CGPoint(x: (left.x + right.x) / 2, y: (left.y + right.y) / 2)
+    }
+
+    // MARK: - Hip Positions
+
+    /// Get left hip position
+    nonisolated var leftHipPosition: CGPoint? {
+        joints[VNHumanBodyPoseObservation.JointName.leftHip.rawValue.rawValue]
+    }
+
+    /// Get right hip position
+    nonisolated var rightHipPosition: CGPoint? {
+        joints[VNHumanBodyPoseObservation.JointName.rightHip.rawValue.rawValue]
+    }
+
+    /// Get hip center position (average of both hips)
+    nonisolated var hipCenterPosition: CGPoint? {
+        guard let left = leftHipPosition, let right = rightHipPosition else {
+            return leftHipPosition ?? rightHipPosition
+        }
+        return CGPoint(x: (left.x + right.x) / 2, y: (left.y + right.y) / 2)
+    }
+
+    // MARK: - Body Metrics
+
+    /// Shoulder width (distance between shoulders, normalized)
+    nonisolated var shoulderWidth: CGFloat? {
+        guard let left = leftShoulderPosition, let right = rightShoulderPosition else {
+            return nil
+        }
+        let dx = right.x - left.x
+        let dy = right.y - left.y
+        return sqrt(dx * dx + dy * dy)
+    }
+
+    /// Hip-to-shoulder vertical distance (torso height indicator)
+    nonisolated var torsoHeight: CGFloat? {
+        guard let shoulder = shoulderCenterPosition, let hip = hipCenterPosition else {
+            return nil
+        }
+        return abs(shoulder.y - hip.y)
     }
 
     /// Joints for skeleton drawing
@@ -81,12 +143,23 @@ final class LivePoseDetector: @unchecked Sendable {
     /// Frame skip rate during active tracking (process every frame)
     private let activeFrameSkip: Int = 1
 
+    /// Target width for processing (smaller = faster, but less accurate)
+    /// Use smaller resolution in debug builds for better performance
+    #if DEBUG
+    private let targetProcessingWidth: Int = 360
+    #else
+    private let targetProcessingWidth: Int = 480
+    #endif
+
     // MARK: - State
 
     private let lock = NSLock()
     private var frameCount = 0
     private var lastPose: BodyPose?
     private let poseRequest = VNDetectHumanBodyPoseRequest()
+
+    /// CIContext for efficient image processing (reused)
+    private let ciContext = CIContext(options: [.useSoftwareRenderer: false])
 
     /// When true, processes every frame (used during active swing tracking)
     private var isActiveTracking = false
@@ -120,6 +193,32 @@ final class LivePoseDetector: @unchecked Sendable {
     /// - Parameter processEveryNthFrame: Process every Nth frame when idle (1 = all frames, 2 = every other, etc.)
     init(processEveryNthFrame: Int = 2) {
         self.baseFrameSkip = max(1, processEveryNthFrame)
+    }
+
+    /// Warm up the Vision model by running inference on a dummy frame
+    /// Call this during app startup to avoid first-frame lag
+    func warmup() {
+        // Create a small dummy pixel buffer (faster than full resolution)
+        let width = 480
+        let height = 640
+
+        var pixelBuffer: CVPixelBuffer?
+        let status = CVPixelBufferCreate(
+            kCFAllocatorDefault,
+            width,
+            height,
+            kCVPixelFormatType_32BGRA,
+            nil,
+            &pixelBuffer
+        )
+
+        guard status == kCVReturnSuccess, let buffer = pixelBuffer else {
+            return
+        }
+
+        // Run a dummy inference to warm up the model
+        let handler = VNImageRequestHandler(cvPixelBuffer: buffer, options: [:])
+        try? handler.perform([poseRequest])
     }
 
     // MARK: - Adaptive Processing Control
@@ -159,24 +258,38 @@ final class LivePoseDetector: @unchecked Sendable {
             return cached
         }
 
-        let handler = VNImageRequestHandler(cvPixelBuffer: pixelBuffer, options: [:])
+        // Wrap in autoreleasepool to prevent memory buildup from Vision processing
+        // This is critical for high frame rate video processing
+        return autoreleasepool {
+            // Use CIImage for efficient processing - Vision can handle it directly
+            let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
 
-        do {
-            try handler.perform([poseRequest])
+            // Downscale for faster processing
+            let originalWidth = CGFloat(CVPixelBufferGetWidth(pixelBuffer))
+            let scale = CGFloat(targetProcessingWidth) / originalWidth
+            let scaledImage = ciImage.transformed(by: CGAffineTransform(scaleX: scale, y: scale))
 
-            guard let observation = poseRequest.results?.first else {
+            let handler = VNImageRequestHandler(ciImage: scaledImage, options: [:])
+
+            do {
+                try handler.perform([poseRequest])
+
+                guard let observation = poseRequest.results?.first else {
+                    return nil
+                }
+
+                let pose = extractPose(from: observation, timestamp: timestamp.seconds)
+
+                lock.lock()
+                lastPose = pose
+                lock.unlock()
+
+                return pose
+            } catch {
+                // Clear results on error to release any retained references
+                // This prevents memory leaks when Vision throws
                 return nil
             }
-
-            let pose = extractPose(from: observation, timestamp: timestamp.seconds)
-
-            lock.lock()
-            lastPose = pose
-            lock.unlock()
-
-            return pose
-        } catch {
-            return nil
         }
     }
 
