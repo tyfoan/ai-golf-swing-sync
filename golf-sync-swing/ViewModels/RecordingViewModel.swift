@@ -65,11 +65,6 @@ final class RecordingViewModel {
     /// What the PiP shows when main view shows replay
     var pipDisplayMode: PipDisplayMode = .liveCamera
 
-    // MARK: - Detection Mode
-
-    /// Toggle between ML-based and heuristic swing detection (thread-safe)
-    nonisolated(unsafe) var useMLDetection: Bool = true
-
     // MARK: - Services
 
     let cameraService = CameraService()
@@ -80,9 +75,7 @@ final class RecordingViewModel {
     #else
     nonisolated(unsafe) private let poseDetector = LivePoseDetector(processEveryNthFrame: 2)
     #endif
-    nonisolated(unsafe) private let swingDetector = LiveSwingDetector()
-    nonisolated(unsafe) private let mlSwingDetector = MLSwingDetector()
-    nonisolated(unsafe) private let audioImpactDetector = AudioImpactDetector()
+    nonisolated(unsafe) private let swingDetector = MLSwingDetector()
 
     // MARK: - Background Processing
 
@@ -213,22 +206,6 @@ final class RecordingViewModel {
             }
         }
 
-        // Audio processing callback - for impact sound detection
-        cameraService.onAudioCaptured = { [weak self] sampleBuffer in
-            guard let self, self.isCurrentlyRecording else { return }
-            self.audioImpactDetector.processAudioBuffer(sampleBuffer)
-        }
-
-        // Audio impact detected - forward to swing detector for confirmation
-        audioImpactDetector.onImpactDetected = { [weak self] timestamp, _ in
-            guard let self else { return }
-            // Convert to file-relative time
-            if let startTime = self.recordingStartTimestamp {
-                let relativeTime = timestamp - startTime
-                self.swingDetector.confirmAudioImpact(at: relativeTime)
-            }
-        }
-
         // Recording finished callback - video file is now fully written
         cameraService.onRecordingFinished = { [weak self] url, error in
             Task { @MainActor [weak self] in
@@ -245,22 +222,15 @@ final class RecordingViewModel {
             }
         }
 
-        // Swing detection callback - fires immediately on detection (heuristic)
+        // ML swing detection callback
         swingDetector.onSwingDetected = { [weak self] bounds in
             Task { @MainActor [weak self] in
                 self?.handleSwingDetected(bounds)
             }
         }
 
-        // ML swing detection callback
-        mlSwingDetector.onSwingDetected = { [weak self] bounds in
-            Task { @MainActor [weak self] in
-                self?.handleSwingDetected(bounds)
-            }
-        }
-
         // ML phase change callback (for debugging/UI)
-        mlSwingDetector.onPhaseChanged = { phase, confidence in
+        swingDetector.onPhaseChanged = { phase, confidence in
             print("🎯 ML Phase: \(phase) (\(Int(confidence * 100))%)")
         }
     }
@@ -283,41 +253,15 @@ final class RecordingViewModel {
         // Calculate file-relative timestamp
         let relativeTime = frameTime - (recordingStartTimestamp ?? 0)
 
-        // ML detection mode: let MLSwingDetector handle its own pose detection
-        if useMLDetection {
-            mlSwingDetector.processFrame(pixelBuffer, at: relativeTime)
-        }
+        // ML swing detection - processes its own pose detection internally
+        swingDetector.processFrame(pixelBuffer, at: relativeTime)
 
-        // Always run pose detection for UI overlay (skeleton display)
-        // Also runs heuristic detector as fallback
-        poseDetector.setActiveTracking(swingDetector.isTrackingSwing || mlSwingDetector.isTrackingSwing)
+        // Run pose detection for UI overlay (skeleton display)
+        poseDetector.setActiveTracking(swingDetector.isTrackingSwing)
 
-        // Detect pose (this is the heavy computation)
+        // Detect pose for UI display
         guard let pose = poseDetector.detectPose(in: pixelBuffer, at: timestamp) else {
             return
-        }
-
-        // Build full pose frame with all joints for enhanced detection
-        let poseFrame = PoseFrame(
-            timestamp: relativeTime,
-            // Wrists
-            leftWristY: pose.leftWristPosition.map { Double($0.y) },
-            rightWristY: pose.rightWristPosition.map { Double($0.y) },
-            // Shoulders
-            leftShoulderY: pose.leftShoulderPosition.map { Double($0.y) },
-            rightShoulderY: pose.rightShoulderPosition.map { Double($0.y) },
-            leftShoulderX: pose.leftShoulderPosition.map { Double($0.x) },
-            rightShoulderX: pose.rightShoulderPosition.map { Double($0.x) },
-            // Hips
-            leftHipY: pose.leftHipPosition.map { Double($0.y) },
-            rightHipY: pose.rightHipPosition.map { Double($0.y) },
-            leftHipX: pose.leftHipPosition.map { Double($0.x) },
-            rightHipX: pose.rightHipPosition.map { Double($0.x) }
-        )
-
-        // Heuristic detection mode: use velocity-based detector
-        if !useMLDetection {
-            swingDetector.addPose(poseFrame)
         }
 
         // Update UI on main thread (only pose display, not detection logic)
@@ -405,8 +349,6 @@ final class RecordingViewModel {
         replayingSwingIndex = nil
         pipDisplayMode = .liveCamera
         swingDetector.reset()
-        mlSwingDetector.reset()
-        audioImpactDetector.reset()
         state = .recording
     }
 
@@ -597,7 +539,5 @@ final class RecordingViewModel {
         currentPose = nil
         poseDetector.reset()
         swingDetector.reset()
-        mlSwingDetector.reset()
-        audioImpactDetector.reset()
     }
 }

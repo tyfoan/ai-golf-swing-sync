@@ -27,6 +27,10 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Interruption Overlay UI**: Shows user-friendly message when recording interrupted
 
 ### Changed
+- **ML-Only Swing Detection**: Removed heuristic velocity-based detector, now exclusively uses Core ML Action Classifier
+  - Simplified frame processing pipeline
+  - Removed audio impact detector (ML model doesn't need audio confirmation)
+  - Cleaner codebase with single detection path
 - **Tab Navigation**: Reordered tabs to Camera, History, Compare
 - **LiveSwingDetector**: Rewritten for immediate impact detection (~300ms latency)
   - Fires at velocity peak confirmation (2-3 frames) instead of waiting for follow-through

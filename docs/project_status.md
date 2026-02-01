@@ -72,12 +72,13 @@
 
 ## Recent Updates
 
-### 2026-02-02 (ML Swing Detection)
+### 2026-02-02 (ML-Only Swing Detection)
 - Added GolfSwingClassifier.mlmodel (81% training / 79% validation accuracy)
 - Created MLSwingDetector service for Core ML-based swing phase detection
-- Integrated ML detector into RecordingViewModel with toggle support
+- Integrated ML detector into RecordingViewModel as sole detection method
 - ML detector tracks backswing → downswing → follow_through phases
-- Falls back to heuristic detection if model not available
+- Removed heuristic velocity-based detector for cleaner codebase
+- Removed audio impact detector (ML handles detection independently)
 
 ### 2026-02-01 (Tab Switching Performance)
 - Optimized camera pause/resume for fast tab switching
