@@ -13,67 +13,69 @@ struct SwingRowView: View {
     let onEdit: () -> Void
 
     var body: some View {
-        Button(action: onTap) {
-            HStack(spacing: 12) {
-                // Swing number
-                Text("\(index + 1)")
-                    .font(.headline)
-                    .frame(width: 30)
-                    .foregroundStyle(isSelected ? .white : .primary)
+        HStack(spacing: 12) {
+            // Swing number
+            Text("\(index + 1)")
+                .font(.headline)
+                .frame(width: 30)
+                .foregroundStyle(isSelected ? .white : .primary)
 
-                // Time markers
-                VStack(alignment: .leading, spacing: 2) {
-                    HStack(spacing: 4) {
-                        Circle()
-                            .fill(Color.green)
-                            .frame(width: 8, height: 8)
-                        Text(formatTime(swing.startTime))
-                            .font(.caption)
-                            .monospacedDigit()
+            // Time markers
+            VStack(alignment: .leading, spacing: 2) {
+                HStack(spacing: 4) {
+                    Circle()
+                        .fill(Color.green)
+                        .frame(width: 8, height: 8)
+                    Text(formatTime(swing.startTime))
+                        .font(.caption)
+                        .monospacedDigit()
 
-                        Text("→")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-
-                        Circle()
-                            .fill(Color.orange)
-                            .frame(width: 8, height: 8)
-                        Text(formatTime(swing.contactTime))
-                            .font(.caption)
-                            .monospacedDigit()
-
-                        Text("→")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-
-                        Circle()
-                            .fill(Color.green)
-                            .frame(width: 8, height: 8)
-                        Text(formatTime(swing.endTime))
-                            .font(.caption)
-                            .monospacedDigit()
-                    }
-
-                    Text("Duration: \(formatDuration(swing.duration))")
-                        .font(.caption2)
+                    Text("→")
+                        .font(.caption)
                         .foregroundStyle(.secondary)
+
+                    Circle()
+                        .fill(Color.orange)
+                        .frame(width: 8, height: 8)
+                    Text(formatTime(swing.contactTime))
+                        .font(.caption)
+                        .monospacedDigit()
+
+                    Text("→")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+
+                    Circle()
+                        .fill(Color.green)
+                        .frame(width: 8, height: 8)
+                    Text(formatTime(swing.endTime))
+                        .font(.caption)
+                        .monospacedDigit()
                 }
 
-                Spacer()
-
-                // Edit button
-                Button(action: onEdit) {
-                    Image(systemName: "pencil.circle")
-                        .font(.title3)
-                        .foregroundStyle(.secondary)
-                }
+                Text("Duration: \(formatDuration(swing.duration))")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-            .background(isSelected ? Color.accentColor : Color.secondary.opacity(0.1))
-            .cornerRadius(8)
+
+            Spacer()
+
+            // Edit button - separate hit target
+            Button(action: onEdit) {
+                Image(systemName: "pencil.circle")
+                    .font(.title3)
+                    .foregroundStyle(.secondary)
+            }
+            .buttonStyle(.borderless)
         }
-        .buttonStyle(.plain)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(isSelected ? Color.accentColor : Color.secondary.opacity(0.1))
+        .cornerRadius(8)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            onTap()
+        }
     }
 
     private func formatTime(_ time: TimeInterval) -> String {

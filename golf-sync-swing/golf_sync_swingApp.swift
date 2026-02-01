@@ -8,24 +8,44 @@ import SwiftData
 
 @main
 struct golf_sync_swingApp: App {
-    var sharedModelContainer: ModelContainer = {
+    @State private var showDataError = false
+    @State private var dataErrorMessage = ""
+
+    private let sharedModelContainer: ModelContainer
+
+    init() {
         let schema = Schema([
             SwingVideo.self,
             SwingMarker.self,
             ComparisonSession.self,
         ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
         do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
+            let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+            self.sharedModelContainer = try ModelContainer(for: schema, configurations: [modelConfiguration])
         } catch {
-            fatalError("Could not create ModelContainer: \(error)")
+            // Try in-memory fallback so app can still launch
+            print("⚠️ Failed to create persistent ModelContainer: \(error)")
+            print("⚠️ Falling back to in-memory storage")
+
+            do {
+                let fallbackConfig = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+                self.sharedModelContainer = try ModelContainer(for: schema, configurations: [fallbackConfig])
+            } catch {
+                // Last resort: crash with clear message
+                fatalError("Cannot create ModelContainer even in-memory: \(error)")
+            }
         }
-    }()
+    }
 
     var body: some Scene {
         WindowGroup {
             MainTabView()
+                .alert("Data Error", isPresented: $showDataError) {
+                    Button("OK") { }
+                } message: {
+                    Text(dataErrorMessage)
+                }
         }
         .modelContainer(sharedModelContainer)
     }

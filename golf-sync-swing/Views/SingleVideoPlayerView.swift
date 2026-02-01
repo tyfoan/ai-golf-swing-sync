@@ -35,7 +35,7 @@ struct SingleVideoPlayerView: View {
                 ProgressView()
             }
         }
-        .navigationTitle("Swings Only")
+        .navigationTitle("Recording")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -89,7 +89,15 @@ struct SingleVideoPlayerView: View {
     @ViewBuilder
     private func controlsSection(vm: VideoPlayerViewModel) -> some View {
         VStack(spacing: 12) {
-            TimelineSlider(viewModel: vm)
+            TimelineSlider(
+                viewModel: vm,
+                swings: video.swings,
+                onSwingTap: { swing in
+                    selectedSwingId = swing.id
+                    vm.seek(to: swing.startTime)
+                    vm.play()
+                }
+            )
             PlaybackControlsView(viewModel: vm)
         }
         .padding(.horizontal)

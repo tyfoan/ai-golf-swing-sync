@@ -7,6 +7,8 @@ import SwiftUI
 
 struct TimelineSlider: View {
     @Bindable var viewModel: VideoPlayerViewModel
+    var swings: [SwingMarker] = []
+    var onSwingTap: ((SwingMarker) -> Void)?
     @State private var isDragging = false
 
     var body: some View {
@@ -17,6 +19,11 @@ struct TimelineSlider: View {
                     RoundedRectangle(cornerRadius: 2)
                         .fill(Color.secondary.opacity(0.3))
                         .frame(height: 4)
+
+                    // Swing markers on timeline
+                    ForEach(Array(swings.enumerated()), id: \.element.id) { index, swing in
+                        swingMarker(swing: swing, index: index, width: geometry.size.width)
+                    }
 
                     // Progress fill
                     RoundedRectangle(cornerRadius: 2)
@@ -59,6 +66,34 @@ struct TimelineSlider: View {
                     .font(.caption2)
                     .monospacedDigit()
                     .foregroundStyle(.secondary)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func swingMarker(swing: SwingMarker, index: Int, width: CGFloat) -> some View {
+        let duration = viewModel.duration
+        if duration > 0 {
+            let startX = (swing.startTime / duration) * width
+            let endX = (swing.endTime / duration) * width
+            let markerWidth = max(4, endX - startX)
+            let impactX = (swing.contactTime / duration) * width
+
+            ZStack {
+                // Swing range highlight
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(Color.green.opacity(0.3))
+                    .frame(width: markerWidth, height: 12)
+                    .offset(x: startX + markerWidth / 2 - width / 2)
+
+                // Impact point marker (orange)
+                Circle()
+                    .fill(Color.orange)
+                    .frame(width: 8, height: 8)
+                    .offset(x: impactX - width / 2)
+            }
+            .onTapGesture {
+                onSwingTap?(swing)
             }
         }
     }
