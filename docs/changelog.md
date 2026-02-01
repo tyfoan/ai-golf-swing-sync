@@ -52,6 +52,10 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - Movie fragment interval set to 5 seconds (less data loss on crash)
 - **RecordingView**: Added scene phase handling and error alerts
   - `.id(swing.id)` modifier to fix swing switching in replay
+- **ML Swing Detection**: Added Core ML Action Classifier for swing phase detection
+  - GolfSwingClassifier.mlmodel trained with 81% training / 79% validation accuracy
+  - MLSwingDetector service with fallback to heuristic detection
+  - `useMLDetection` toggle to switch between ML and velocity-based detection
 - **Tab Switching Performance**: Optimized camera pause/resume for fast tab switching
   - Uses `pauseSession()`/`resumeSession()` instead of full session reconfiguration
   - Tracks tab visibility to avoid resuming camera when on other tabs

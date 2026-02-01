@@ -2,7 +2,7 @@
 
 > Current progress for Golf Sync Swing
 
-**Last Updated**: 2026-02-01
+**Last Updated**: 2026-02-02
 
 ---
 
@@ -71,6 +71,13 @@
 ---
 
 ## Recent Updates
+
+### 2026-02-02 (ML Swing Detection)
+- Added GolfSwingClassifier.mlmodel (81% training / 79% validation accuracy)
+- Created MLSwingDetector service for Core ML-based swing phase detection
+- Integrated ML detector into RecordingViewModel with toggle support
+- ML detector tracks backswing → downswing → follow_through phases
+- Falls back to heuristic detection if model not available
 
 ### 2026-02-01 (Tab Switching Performance)
 - Optimized camera pause/resume for fast tab switching

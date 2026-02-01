@@ -65,6 +65,11 @@ final class RecordingViewModel {
     /// What the PiP shows when main view shows replay
     var pipDisplayMode: PipDisplayMode = .liveCamera
 
+    // MARK: - Detection Mode
+
+    /// Toggle between ML-based and heuristic swing detection (thread-safe)
+    nonisolated(unsafe) var useMLDetection: Bool = true
+
     // MARK: - Services
 
     let cameraService = CameraService()
@@ -76,6 +81,7 @@ final class RecordingViewModel {
     nonisolated(unsafe) private let poseDetector = LivePoseDetector(processEveryNthFrame: 2)
     #endif
     nonisolated(unsafe) private let swingDetector = LiveSwingDetector()
+    nonisolated(unsafe) private let mlSwingDetector = MLSwingDetector()
     nonisolated(unsafe) private let audioImpactDetector = AudioImpactDetector()
 
     // MARK: - Background Processing
@@ -239,11 +245,23 @@ final class RecordingViewModel {
             }
         }
 
-        // Swing detection callback - fires immediately on detection
+        // Swing detection callback - fires immediately on detection (heuristic)
         swingDetector.onSwingDetected = { [weak self] bounds in
             Task { @MainActor [weak self] in
                 self?.handleSwingDetected(bounds)
             }
+        }
+
+        // ML swing detection callback
+        mlSwingDetector.onSwingDetected = { [weak self] bounds in
+            Task { @MainActor [weak self] in
+                self?.handleSwingDetected(bounds)
+            }
+        }
+
+        // ML phase change callback (for debugging/UI)
+        mlSwingDetector.onPhaseChanged = { phase, confidence in
+            print("🎯 ML Phase: \(phase) (\(Int(confidence * 100))%)")
         }
     }
 
@@ -265,8 +283,14 @@ final class RecordingViewModel {
         // Calculate file-relative timestamp
         let relativeTime = frameTime - (recordingStartTimestamp ?? 0)
 
-        // Update adaptive processing based on swing tracking state
-        poseDetector.setActiveTracking(swingDetector.isTrackingSwing)
+        // ML detection mode: let MLSwingDetector handle its own pose detection
+        if useMLDetection {
+            mlSwingDetector.processFrame(pixelBuffer, at: relativeTime)
+        }
+
+        // Always run pose detection for UI overlay (skeleton display)
+        // Also runs heuristic detector as fallback
+        poseDetector.setActiveTracking(swingDetector.isTrackingSwing || mlSwingDetector.isTrackingSwing)
 
         // Detect pose (this is the heavy computation)
         guard let pose = poseDetector.detectPose(in: pixelBuffer, at: timestamp) else {
@@ -291,8 +315,10 @@ final class RecordingViewModel {
             rightHipX: pose.rightHipPosition.map { Double($0.x) }
         )
 
-        // Feed full pose data to swing detector for multi-joint analysis
-        swingDetector.addPose(poseFrame)
+        // Heuristic detection mode: use velocity-based detector
+        if !useMLDetection {
+            swingDetector.addPose(poseFrame)
+        }
 
         // Update UI on main thread (only pose display, not detection logic)
         DispatchQueue.main.async { [weak self] in
@@ -379,6 +405,7 @@ final class RecordingViewModel {
         replayingSwingIndex = nil
         pipDisplayMode = .liveCamera
         swingDetector.reset()
+        mlSwingDetector.reset()
         audioImpactDetector.reset()
         state = .recording
     }
@@ -570,6 +597,7 @@ final class RecordingViewModel {
         currentPose = nil
         poseDetector.reset()
         swingDetector.reset()
+        mlSwingDetector.reset()
         audioImpactDetector.reset()
     }
 }
