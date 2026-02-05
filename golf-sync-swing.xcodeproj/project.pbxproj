@@ -6,6 +6,17 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		88649EED2F32386700DB5D4D /* changelog.md in Resources */ = {isa = PBXBuildFile; fileRef = 88649EE52F32386700DB5D4D /* changelog.md */; };
+		88649EEE2F32386700DB5D4D /* milestone-2-recording.md in Resources */ = {isa = PBXBuildFile; fileRef = 88649EE92F32386700DB5D4D /* milestone-2-recording.md */; };
+		88649EEF2F32386700DB5D4D /* CLAUDE.md in Resources */ = {isa = PBXBuildFile; fileRef = 88649EE32F32386700DB5D4D /* CLAUDE.md */; };
+		88649EF02F32386700DB5D4D /* architecture.md in Resources */ = {isa = PBXBuildFile; fileRef = 88649EE42F32386700DB5D4D /* architecture.md */; };
+		88649EF12F32386700DB5D4D /* camera-optimization-plan.md in Resources */ = {isa = PBXBuildFile; fileRef = 88649EE82F32386700DB5D4D /* camera-optimization-plan.md */; };
+		88649EF22F32386700DB5D4D /* milestone-3-monetization.md in Resources */ = {isa = PBXBuildFile; fileRef = 88649EEA2F32386700DB5D4D /* milestone-3-monetization.md */; };
+		88649EF32F32386700DB5D4D /* project_status.md in Resources */ = {isa = PBXBuildFile; fileRef = 88649EE62F32386700DB5D4D /* project_status.md */; };
+		88649EF42F32386700DB5D4D /* project_spec.md in Resources */ = {isa = PBXBuildFile; fileRef = 88649EEC2F32386700DB5D4D /* project_spec.md */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		88649A3E2F2C322500DB5D4D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,6 +38,14 @@
 		88649A2E2F2C322400DB5D4D /* golf-sync-swing.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "golf-sync-swing.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		88649A3D2F2C322500DB5D4D /* golf-sync-swingTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "golf-sync-swingTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		88649A472F2C322500DB5D4D /* golf-sync-swingUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "golf-sync-swingUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		88649EE32F32386700DB5D4D /* CLAUDE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CLAUDE.md; sourceTree = "<group>"; };
+		88649EE42F32386700DB5D4D /* architecture.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = architecture.md; sourceTree = "<group>"; };
+		88649EE52F32386700DB5D4D /* changelog.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = changelog.md; sourceTree = "<group>"; };
+		88649EE62F32386700DB5D4D /* project_status.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = project_status.md; sourceTree = "<group>"; };
+		88649EE82F32386700DB5D4D /* camera-optimization-plan.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "camera-optimization-plan.md"; sourceTree = "<group>"; };
+		88649EE92F32386700DB5D4D /* milestone-2-recording.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "milestone-2-recording.md"; sourceTree = "<group>"; };
+		88649EEA2F32386700DB5D4D /* milestone-3-monetization.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "milestone-3-monetization.md"; sourceTree = "<group>"; };
+		88649EEC2F32386700DB5D4D /* project_spec.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = project_spec.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -75,6 +94,10 @@
 		88649A252F2C322400DB5D4D = {
 			isa = PBXGroup;
 			children = (
+				88649EE32F32386700DB5D4D /* CLAUDE.md */,
+				88649EE72F32386700DB5D4D /* docs */,
+				88649EEB2F32386700DB5D4D /* plans */,
+				88649EEC2F32386700DB5D4D /* project_spec.md */,
 				88649A302F2C322400DB5D4D /* golf-sync-swing */,
 				88649A402F2C322500DB5D4D /* golf-sync-swingTests */,
 				88649A4A2F2C322500DB5D4D /* golf-sync-swingUITests */,
@@ -90,6 +113,26 @@
 				88649A472F2C322500DB5D4D /* golf-sync-swingUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		88649EE72F32386700DB5D4D /* docs */ = {
+			isa = PBXGroup;
+			children = (
+				88649EE42F32386700DB5D4D /* architecture.md */,
+				88649EE52F32386700DB5D4D /* changelog.md */,
+				88649EE62F32386700DB5D4D /* project_status.md */,
+			);
+			path = docs;
+			sourceTree = "<group>";
+		};
+		88649EEB2F32386700DB5D4D /* plans */ = {
+			isa = PBXGroup;
+			children = (
+				88649EE82F32386700DB5D4D /* camera-optimization-plan.md */,
+				88649EE92F32386700DB5D4D /* milestone-2-recording.md */,
+				88649EEA2F32386700DB5D4D /* milestone-3-monetization.md */,
+			);
+			path = plans;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -212,6 +255,14 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				88649EED2F32386700DB5D4D /* changelog.md in Resources */,
+				88649EEE2F32386700DB5D4D /* milestone-2-recording.md in Resources */,
+				88649EEF2F32386700DB5D4D /* CLAUDE.md in Resources */,
+				88649EF02F32386700DB5D4D /* architecture.md in Resources */,
+				88649EF12F32386700DB5D4D /* camera-optimization-plan.md in Resources */,
+				88649EF22F32386700DB5D4D /* milestone-3-monetization.md in Resources */,
+				88649EF32F32386700DB5D4D /* project_status.md in Resources */,
+				88649EF42F32386700DB5D4D /* project_spec.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

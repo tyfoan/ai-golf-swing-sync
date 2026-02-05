@@ -19,6 +19,23 @@ final class ComparisonViewModel {
     private(set) var playbackRate: Float = 1.0
     var syncOffset: TimeInterval = 0
 
+    /// Tempo adjustment for video2 (1.0 = same speed, >1.0 = faster, <1.0 = slower)
+    var video2TempoAdjustment: Float = 1.0
+
+    /// Whether tempo sync is enabled
+    var tempoSyncEnabled: Bool = false
+
+    /// Description of tempo adjustment for UI
+    var tempoDescription: String? {
+        guard tempoSyncEnabled && abs(video2TempoAdjustment - 1.0) > 0.05 else { return nil }
+        let percent = Int(abs(video2TempoAdjustment - 1.0) * 100)
+        if video2TempoAdjustment > 1.0 {
+            return "Video 2: +\(percent)% speed"
+        } else {
+            return "Video 2: -\(percent)% speed"
+        }
+    }
+
     private var timeObserver: Any?
     private var cancellables = Set<AnyCancellable>()
     private var isSwapped = false
@@ -79,7 +96,13 @@ final class ComparisonViewModel {
 
     func play() {
         player1.rate = playbackRate
-        player2.rate = playbackRate
+
+        // Apply tempo adjustment to video2 if enabled
+        let video2Rate = tempoSyncEnabled
+            ? playbackRate * video2TempoAdjustment
+            : playbackRate
+        player2.rate = video2Rate
+
         isPlaying = true
     }
 
@@ -105,7 +128,27 @@ final class ComparisonViewModel {
         playbackRate = rate
         if isPlaying {
             player1.rate = rate
-            player2.rate = rate
+            let video2Rate = tempoSyncEnabled ? rate * video2TempoAdjustment : rate
+            player2.rate = video2Rate
+        }
+    }
+
+    /// Apply sync result from VideoSyncEngine
+    func applySyncResult(_ result: SyncResult) {
+        syncOffset = result.offset
+        video2TempoAdjustment = result.video2PlaybackSpeed
+        // Don't time-warp videos automatically; keep tempo sync as an explicit user choice.
+        tempoSyncEnabled = false
+
+        // Re-sync to current position
+        seek(to: currentTime)
+    }
+
+    /// Toggle tempo sync on/off
+    func toggleTempoSync() {
+        tempoSyncEnabled.toggle()
+        if isPlaying {
+            setPlaybackRate(playbackRate)  // Reapply rates
         }
     }
 

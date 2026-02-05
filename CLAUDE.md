@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Golf Sync Swing is an iOS app for golf swing video comparison with automatic motion sync. The core feature is **automatic detection of swing phases** (start, ball impact, end) and **synchronized playback** of two videos aligned at the point of ball contact.
+Golf Sync Swing is an iOS app for golf swing video comparison with automatic motion sync. The core feature is **automatic detection of swing** and **synchronized playback** of two videos aligned at the point of ball contact.
 
 ### Target Feature Set (Reference: Golf Swing Cam)
 - Side-by-side video comparison with synchronized playback
@@ -32,28 +32,6 @@ xcodebuild -project golf-sync-swing.xcodeproj -scheme golf-sync-swing -destinati
 - **iOS 26.1+** / Swift 5.0 / SwiftUI
 - **SwiftData** for persistence
 - **AVFoundation** for video playback and export
-- **Vision framework** for swing detection (to be implemented)
-- **Core ML** for motion analysis models (to be implemented)
-
-## Architecture (Planned)
-
-```
-golf-sync-swing/
-├── Models/
-│   ├── SwingVideo.swift        # Video metadata + detected swing phases
-│   ├── SwingPhase.swift        # Enum: setup, backswing, downswing, impact, follow-through
-│   └── ComparisonSession.swift # Paired videos with sync offset
-├── Services/
-│   ├── SwingDetector.swift     # Vision/ML-based phase detection
-│   ├── VideoSyncEngine.swift   # Calculate sync offset from impact frames
-│   └── VideoExporter.swift     # Composite video export
-├── Views/
-│   ├── VideoPlayerView.swift   # Single video with scrubbing
-│   ├── ComparisonView.swift    # Side-by-side synced playback
-│   └── TimelineView.swift      # Visual swing phase markers
-└── ViewModels/
-    └── ComparisonViewModel.swift
-```
 
 ## Swing Detection Algorithm (Core Challenge)
 
@@ -67,14 +45,6 @@ Approaches to consider:
 - **Optical flow analysis** - Detect rapid motion changes at impact
 - **Audio detection** - Ball impact produces distinctive sound spike
 - **Core ML custom model** - Train on labeled swing datasets
-
-## Reference Implementation
-
-The existing `video-comparer` project at `~/Desktop/test/video-comparer` has reusable components:
-- `VideoPlayerView.swift` - AVPlayer wrapper with playback controls
-- `VideoExportService.swift` - Side-by-side video composition
-- `VideoTrimmer.swift` - Frame-accurate trimming UI
-- `DrawingShapes.swift` - Annotation overlay system
 
 ---
 
@@ -166,27 +136,9 @@ Update files in the docs folder after major milestones and major additions to th
 
 ---
 
-## Implementation Plans
-
-Detailed task breakdowns live in `plans/`:
-
-| Plan | Status | Description |
-|------|--------|-------------|
-| [Milestone 1: MVP](plans/milestone-1-mvp.md) | ✅ Complete | Video player, import, side-by-side, manual sync, export |
-| [Milestone 2: Auto-Detection](plans/milestone-2-auto-detection.md) | Not Started | Vision pose detection, phase markers, auto-sync at impact |
-| [Milestone 3: Recording & Annotations](plans/milestone-3-recording-annotations.md) | Not Started | Camera with countdown, drawing tools |
-| [Milestone 4: Monetization](plans/milestone-4-monetization.md) | Not Started | RevenueCat, onboarding, paywall, analytics |
-
 ### Working with Plans
 
 1. **Before starting work**: Read the relevant milestone plan
 2. **Check off tasks** as you complete them (mark `[x]`)
 3. **Update plan** if approach changes or new tasks discovered
 4. **Follow dependencies**: Milestones build on each other (1 → 2 → 3 → 4)
-
-### Current Focus
-
-**Milestone 1 is complete.** Next up is **Milestone 2: Auto-Detection**:
-1. Vision framework pose estimation
-2. Swing phase detection algorithm
-3. Auto-sync at ball impact

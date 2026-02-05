@@ -17,6 +17,7 @@ struct RecordingView: View {
     @State private var showingError = false
     @State private var hasSetupCamera = false
     @State private var isTabVisible = false
+    @State private var showTipsOverlay = true
 
     var body: some View {
         GeometryReader { geometry in
@@ -74,6 +75,16 @@ struct RecordingView: View {
                 // Interruption overlay
                 if viewModel.cameraService.isInterrupted {
                     interruptionOverlay
+                }
+
+                // Tips overlay (shown in idle state)
+                if viewModel.state == .idle && showTipsOverlay {
+                    VStack {
+                        Spacer()
+                        CameraTipsOverlay(isVisible: $showTipsOverlay)
+                            .padding(.bottom, 180) // Above the Start Recording button
+                    }
+                    .animation(.spring(response: 0.3, dampingFraction: 0.8), value: showTipsOverlay)
                 }
             }
         }
@@ -195,16 +206,9 @@ struct RecordingView: View {
             .id(swing.id)
         } else {
             // Show live camera preview
-            ZStack {
-                CameraPreviewView(session: viewModel.cameraService.captureSession)
-                    // Force recreate when session is reconfigured
-                    .id("main-camera-\(viewModel.cameraService.sessionConfigurationId)")
-
-                // Pose overlay
-                if viewModel.showPoseOverlay && viewModel.isRecording {
-                    PoseOverlayView(pose: viewModel.currentPose, isMirrored: viewModel.isFrontCamera)
-                }
-            }
+            CameraPreviewView(session: viewModel.cameraService.captureSession)
+                // Force recreate when session is reconfigured
+                .id("main-camera-\(viewModel.cameraService.sessionConfigurationId)")
         }
     }
 
@@ -212,7 +216,7 @@ struct RecordingView: View {
 
     private var topBar: some View {
         HStack {
-            // Close/Cancel button
+            // Close/Cancel button or Tips button
             if viewModel.isRecording || viewModel.isCountingDown {
                 Button(action: viewModel.cancel) {
                     Image(systemName: "xmark")
@@ -220,6 +224,20 @@ struct RecordingView: View {
                         .foregroundStyle(.white)
                         .frame(width: 44, height: 44)
                         .background(Color.green)
+                        .clipShape(Circle())
+                }
+            } else if viewModel.state == .idle && !showTipsOverlay {
+                // Tips button when overlay is hidden
+                Button {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        showTipsOverlay = true
+                    }
+                } label: {
+                    Image(systemName: "lightbulb.fill")
+                        .font(.title3)
+                        .foregroundStyle(.white)
+                        .frame(width: 44, height: 44)
+                        .background(Color.green.opacity(0.8))
                         .clipShape(Circle())
                 }
             }
@@ -316,18 +334,6 @@ struct RecordingView: View {
                             .background(Color.gray.opacity(0.5))
                             .clipShape(Circle())
                     }
-
-                    // Pose toggle (only when showing live camera, not replay)
-                    if !viewModel.mainViewShowsReplay {
-                        Button(action: viewModel.togglePoseOverlay) {
-                            Image(systemName: "figure.stand")
-                                .font(.title2)
-                                .foregroundStyle(viewModel.showPoseOverlay ? .green : .white)
-                                .frame(width: 50, height: 50)
-                                .background(Color.gray.opacity(0.5))
-                                .clipShape(Circle())
-                        }
-                    }
                 }
             }
 
@@ -416,15 +422,8 @@ struct RecordingView: View {
                     Group {
                         if viewModel.pipDisplayMode == .liveCamera {
                             // Live camera feed
-                            ZStack {
-                                CameraPreviewView(session: viewModel.cameraService.captureSession)
-                                    .id("pip-camera-\(viewModel.cameraService.sessionConfigurationId)")
-
-                                // Pose overlay on PiP
-                                if viewModel.showPoseOverlay {
-                                    PoseOverlayView(pose: viewModel.currentPose, isMirrored: viewModel.isFrontCamera)
-                                }
-                            }
+                            CameraPreviewView(session: viewModel.cameraService.captureSession)
+                                .id("pip-camera-\(viewModel.cameraService.sessionConfigurationId)")
                         } else if let lastSwing = viewModel.lastDetectedSwing,
                                   let url = viewModel.recordingURL {
                             // Last swing replay

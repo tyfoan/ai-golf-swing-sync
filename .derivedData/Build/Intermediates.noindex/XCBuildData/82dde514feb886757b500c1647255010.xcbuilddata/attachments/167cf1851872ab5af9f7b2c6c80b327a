@@ -1,0 +1,499 @@
+{
+  "" : {
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/golf-sync-swing-primary.dia",
+    "emit-module-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/golf-sync-swing-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/golf-sync-swing-primary-emit-module.dia",
+    "pch" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/golf-sync-swing-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/golf-sync-swing-primary.swiftdeps"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/DerivedSources/CoreMLGenerated/GolfSwingClassifier/GolfSwingClassifier.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/GolfSwingClassifier.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/GolfSwingClassifier.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/GolfSwingClassifier.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/GolfSwingClassifier.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/GolfSwingClassifier.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/GolfSwingClassifier.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/GolfSwingClassifier.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/GolfSwingClassifier~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/DerivedSources/CoreMLGenerated/SwingNet/SwingNet.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingNet.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingNet.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingNet.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingNet.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingNet.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingNet.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingNet.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingNet~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/DerivedSources/GeneratedAssetSymbols.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/GeneratedAssetSymbols.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/GeneratedAssetSymbols.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/GeneratedAssetSymbols.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/GeneratedAssetSymbols.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/GeneratedAssetSymbols.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/GeneratedAssetSymbols.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/GeneratedAssetSymbols.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/GeneratedAssetSymbols~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/golf-sync-swing/Models/ComparisonSession.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/ComparisonSession.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/ComparisonSession.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/ComparisonSession.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/ComparisonSession.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/ComparisonSession.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/ComparisonSession.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/ComparisonSession.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/ComparisonSession~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/golf-sync-swing/Models/RecordingTypes.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/RecordingTypes.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/RecordingTypes.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/RecordingTypes.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/RecordingTypes.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/RecordingTypes.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/RecordingTypes.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/RecordingTypes.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/RecordingTypes~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/golf-sync-swing/Models/SwingMarker.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingMarker.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingMarker.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingMarker.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingMarker.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingMarker.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingMarker.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingMarker.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingMarker~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/golf-sync-swing/Models/SwingVideo.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingVideo.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingVideo.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingVideo.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingVideo.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingVideo.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingVideo.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingVideo.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingVideo~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/golf-sync-swing/Services/AudioImpactDetector.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/AudioImpactDetector.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/AudioImpactDetector.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/AudioImpactDetector.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/AudioImpactDetector.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/AudioImpactDetector.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/AudioImpactDetector.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/AudioImpactDetector.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/AudioImpactDetector~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/golf-sync-swing/Services/CameraService.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/CameraService.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/CameraService.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/CameraService.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/CameraService.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/CameraService.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/CameraService.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/CameraService.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/CameraService~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/golf-sync-swing/Services/LivePoseDetector.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/LivePoseDetector.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/LivePoseDetector.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/LivePoseDetector.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/LivePoseDetector.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/LivePoseDetector.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/LivePoseDetector.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/LivePoseDetector.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/LivePoseDetector~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/golf-sync-swing/Services/LiveSwingDetector.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/LiveSwingDetector.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/LiveSwingDetector.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/LiveSwingDetector.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/LiveSwingDetector.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/LiveSwingDetector.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/LiveSwingDetector.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/LiveSwingDetector.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/LiveSwingDetector~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/golf-sync-swing/Services/MLSwingDetector.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/MLSwingDetector.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/MLSwingDetector.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/MLSwingDetector.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/MLSwingDetector.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/MLSwingDetector.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/MLSwingDetector.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/MLSwingDetector.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/MLSwingDetector~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/golf-sync-swing/Services/SwingDetector.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingDetector.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingDetector.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingDetector.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingDetector.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingDetector.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingDetector.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingDetector.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingDetector~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/golf-sync-swing/Services/SwingDetectorProtocol.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingDetectorProtocol.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingDetectorProtocol.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingDetectorProtocol.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingDetectorProtocol.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingDetectorProtocol.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingDetectorProtocol.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingDetectorProtocol.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingDetectorProtocol~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/golf-sync-swing/Services/SwingNetDetector.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingNetDetector.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingNetDetector.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingNetDetector.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingNetDetector.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingNetDetector.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingNetDetector.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingNetDetector.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingNetDetector~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/golf-sync-swing/Services/ThumbnailService.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/ThumbnailService.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/ThumbnailService.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/ThumbnailService.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/ThumbnailService.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/ThumbnailService.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/ThumbnailService.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/ThumbnailService.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/ThumbnailService~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/golf-sync-swing/Services/VideoExportService.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoExportService.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoExportService.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoExportService.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoExportService.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoExportService.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoExportService.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoExportService.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoExportService~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/golf-sync-swing/Services/VideoStorageService.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoStorageService.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoStorageService.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoStorageService.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoStorageService.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoStorageService.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoStorageService.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoStorageService.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoStorageService~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/golf-sync-swing/Services/VideoSyncEngine.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoSyncEngine.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoSyncEngine.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoSyncEngine.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoSyncEngine.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoSyncEngine.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoSyncEngine.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoSyncEngine.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoSyncEngine~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/golf-sync-swing/ViewModels/ComparisonViewModel.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/ComparisonViewModel.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/ComparisonViewModel.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/ComparisonViewModel.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/ComparisonViewModel.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/ComparisonViewModel.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/ComparisonViewModel.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/ComparisonViewModel.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/ComparisonViewModel~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/golf-sync-swing/ViewModels/CountdownManager.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/CountdownManager.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/CountdownManager.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/CountdownManager.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/CountdownManager.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/CountdownManager.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/CountdownManager.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/CountdownManager.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/CountdownManager~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/golf-sync-swing/ViewModels/RecordingViewModel.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/RecordingViewModel.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/RecordingViewModel.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/RecordingViewModel.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/RecordingViewModel.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/RecordingViewModel.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/RecordingViewModel.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/RecordingViewModel.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/RecordingViewModel~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/golf-sync-swing/ViewModels/SwingPlaybackManager.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingPlaybackManager.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingPlaybackManager.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingPlaybackManager.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingPlaybackManager.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingPlaybackManager.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingPlaybackManager.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingPlaybackManager.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingPlaybackManager~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/golf-sync-swing/ViewModels/VideoPlayerViewModel.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoPlayerViewModel.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoPlayerViewModel.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoPlayerViewModel.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoPlayerViewModel.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoPlayerViewModel.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoPlayerViewModel.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoPlayerViewModel.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoPlayerViewModel~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/golf-sync-swing/Views/ComparisonView.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/ComparisonView.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/ComparisonView.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/ComparisonView.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/ComparisonView.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/ComparisonView.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/ComparisonView.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/ComparisonView.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/ComparisonView~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/golf-sync-swing/Views/Components/ExportProgressView.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/ExportProgressView.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/ExportProgressView.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/ExportProgressView.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/ExportProgressView.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/ExportProgressView.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/ExportProgressView.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/ExportProgressView.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/ExportProgressView~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/golf-sync-swing/Views/Components/PlaybackControlsView.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/PlaybackControlsView.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/PlaybackControlsView.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/PlaybackControlsView.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/PlaybackControlsView.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/PlaybackControlsView.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/PlaybackControlsView.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/PlaybackControlsView.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/PlaybackControlsView~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/golf-sync-swing/Views/Components/SwingMarkerSlider.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingMarkerSlider.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingMarkerSlider.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingMarkerSlider.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingMarkerSlider.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingMarkerSlider.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingMarkerSlider.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingMarkerSlider.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingMarkerSlider~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/golf-sync-swing/Views/Components/SwingRowView.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingRowView.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingRowView.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingRowView.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingRowView.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingRowView.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingRowView.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingRowView.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingRowView~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/golf-sync-swing/Views/Components/TimelineSlider.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/TimelineSlider.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/TimelineSlider.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/TimelineSlider.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/TimelineSlider.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/TimelineSlider.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/TimelineSlider.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/TimelineSlider.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/TimelineSlider~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/golf-sync-swing/Views/Components/VideoRowView.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoRowView.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoRowView.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoRowView.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoRowView.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoRowView.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoRowView.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoRowView.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoRowView~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/golf-sync-swing/Views/HistoryView.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/HistoryView.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/HistoryView.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/HistoryView.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/HistoryView.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/HistoryView.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/HistoryView.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/HistoryView.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/HistoryView~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/golf-sync-swing/Views/HomeView.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/HomeView.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/HomeView.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/HomeView.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/HomeView.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/HomeView.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/HomeView.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/HomeView.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/HomeView~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/golf-sync-swing/Views/MainTabView.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/MainTabView.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/MainTabView.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/MainTabView.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/MainTabView.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/MainTabView.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/MainTabView.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/MainTabView.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/MainTabView~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/golf-sync-swing/Views/Recording/CameraPreviewView.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/CameraPreviewView.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/CameraPreviewView.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/CameraPreviewView.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/CameraPreviewView.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/CameraPreviewView.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/CameraPreviewView.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/CameraPreviewView.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/CameraPreviewView~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/golf-sync-swing/Views/Recording/Components/CameraTipsOverlay.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/CameraTipsOverlay.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/CameraTipsOverlay.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/CameraTipsOverlay.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/CameraTipsOverlay.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/CameraTipsOverlay.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/CameraTipsOverlay.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/CameraTipsOverlay.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/CameraTipsOverlay~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/golf-sync-swing/Views/Recording/Components/RecordingTipsSheet.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/RecordingTipsSheet.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/RecordingTipsSheet.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/RecordingTipsSheet.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/RecordingTipsSheet.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/RecordingTipsSheet.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/RecordingTipsSheet.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/RecordingTipsSheet.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/RecordingTipsSheet~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/golf-sync-swing/Views/Recording/Components/SpeedButton.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SpeedButton.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SpeedButton.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SpeedButton.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SpeedButton.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SpeedButton.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SpeedButton.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SpeedButton.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SpeedButton~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/golf-sync-swing/Views/Recording/Components/SwingAttemptCard.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingAttemptCard.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingAttemptCard.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingAttemptCard.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingAttemptCard.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingAttemptCard.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingAttemptCard.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingAttemptCard.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingAttemptCard~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/golf-sync-swing/Views/Recording/CountdownView.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/CountdownView.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/CountdownView.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/CountdownView.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/CountdownView.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/CountdownView.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/CountdownView.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/CountdownView.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/CountdownView~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/golf-sync-swing/Views/Recording/PoseOverlayView.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/PoseOverlayView.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/PoseOverlayView.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/PoseOverlayView.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/PoseOverlayView.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/PoseOverlayView.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/PoseOverlayView.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/PoseOverlayView.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/PoseOverlayView~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/golf-sync-swing/Views/Recording/RecordingView.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/RecordingView.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/RecordingView.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/RecordingView.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/RecordingView.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/RecordingView.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/RecordingView.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/RecordingView.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/RecordingView~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/golf-sync-swing/Views/Recording/SwingReplayView.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingReplayView.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingReplayView.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingReplayView.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingReplayView.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingReplayView.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingReplayView.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingReplayView.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingReplayView~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/golf-sync-swing/Views/SingleVideoPlayerView.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SingleVideoPlayerView.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SingleVideoPlayerView.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SingleVideoPlayerView.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SingleVideoPlayerView.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SingleVideoPlayerView.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SingleVideoPlayerView.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SingleVideoPlayerView.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SingleVideoPlayerView~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/golf-sync-swing/Views/SwingEditorSheet.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingEditorSheet.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingEditorSheet.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingEditorSheet.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingEditorSheet.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingEditorSheet.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingEditorSheet.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingEditorSheet.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/SwingEditorSheet~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/golf-sync-swing/Views/VideoLibraryView.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoLibraryView.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoLibraryView.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoLibraryView.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoLibraryView.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoLibraryView.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoLibraryView.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoLibraryView.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoLibraryView~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/golf-sync-swing/Views/VideoPickerView.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoPickerView.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoPickerView.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoPickerView.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoPickerView.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoPickerView.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoPickerView.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoPickerView.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoPickerView~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/golf-sync-swing/Views/VideoPlayerView.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoPlayerView.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoPlayerView.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoPlayerView.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoPlayerView.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoPlayerView.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoPlayerView.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoPlayerView.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/VideoPlayerView~partial.swiftmodule"
+  },
+  "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/golf-sync-swing/golf_sync_swingApp.swift" : {
+    "const-values" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/golf_sync_swingApp.swiftconstvalues",
+    "dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/golf_sync_swingApp.d",
+    "diagnostics" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/golf_sync_swingApp.dia",
+    "index-unit-output-path" : "/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/golf_sync_swingApp.o",
+    "llvm-bc" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/golf_sync_swingApp.bc",
+    "object" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/golf_sync_swingApp.o",
+    "swift-dependencies" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/golf_sync_swingApp.swiftdeps",
+    "swiftmodule" : "/Users/aleksanderogurtsov/Desktop/test/golf-sync-swing/.derivedData/Build/Intermediates.noindex/golf-sync-swing.build/Debug-iphoneos/golf-sync-swing.build/Objects-normal/arm64/golf_sync_swingApp~partial.swiftmodule"
+  }
+}

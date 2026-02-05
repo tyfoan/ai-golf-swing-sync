@@ -1,0 +1,2 @@
+Target dependency graph (1 target)
+Target 'golf-sync-swing' in project 'golf-sync-swing' (no dependencies)

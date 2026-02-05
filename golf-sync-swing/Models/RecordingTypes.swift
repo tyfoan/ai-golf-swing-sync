@@ -7,6 +7,37 @@
 
 import Foundation
 
+// MARK: - Swing Bounds
+
+/// Detected swing boundaries from ML/velocity detection
+@preconcurrency
+struct SwingBounds: Sendable {
+    nonisolated let id: UUID
+    nonisolated let startTime: TimeInterval
+    nonisolated let impactTime: TimeInterval
+    nonisolated let endTime: TimeInterval
+    nonisolated let confidence: Double
+    nonisolated let detectionTime: TimeInterval
+    nonisolated let audioConfirmed: Bool
+
+    nonisolated init(
+        startTime: TimeInterval,
+        impactTime: TimeInterval,
+        endTime: TimeInterval,
+        confidence: Double,
+        detectionTime: TimeInterval,
+        audioConfirmed: Bool = false
+    ) {
+        self.id = UUID()
+        self.startTime = startTime
+        self.impactTime = impactTime
+        self.endTime = endTime
+        self.confidence = confidence
+        self.detectionTime = detectionTime
+        self.audioConfirmed = audioConfirmed
+    }
+}
+
 // MARK: - PiP Display Mode
 
 /// What the PiP view is showing during recording

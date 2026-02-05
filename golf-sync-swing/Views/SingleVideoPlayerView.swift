@@ -21,6 +21,7 @@ struct SingleVideoPlayerView: View {
     @State private var analysisError: String?
     @State private var showAnalysisResult = false
     @State private var lastDetectionResult: SwingDetectionResult?
+    @State private var analysisStatus: String = ""
 
     private let syncEngine = VideoSyncEngine()
 
@@ -60,9 +61,12 @@ struct SingleVideoPlayerView: View {
         } message: {
             if let result = lastDetectionResult {
                 if result.hasValidDetection {
-                    Text("Swing detected with \(Int(result.impactConfidence * 100))% confidence")
+                    let impact = result.impactTime.map { String(format: "%.2fs", $0) } ?? "n/a"
+                    Text(
+                        "Model: SwingNet\nImpact: \(impact)\nConfidence: \(Int(result.impactConfidence * 100))%"
+                    )
                 } else {
-                    Text("Could not detect swing. Try adding markers manually.")
+                    Text("Model: SwingNet\nCould not detect swing. Try adding markers manually.")
                 }
             }
         }
@@ -158,7 +162,7 @@ struct SingleVideoPlayerView: View {
             HStack {
                 ProgressView()
                     .scaleEffect(0.8)
-                Text("Analyzing swing...")
+                Text(analysisStatus.isEmpty ? "Analyzing swing..." : analysisStatus)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
@@ -262,6 +266,7 @@ struct SingleVideoPlayerView: View {
     private func runAutoDetection() {
         isAnalyzing = true
         analysisProgress = 0
+        analysisStatus = "Analyzing with SwingNet..."
 
         Task {
             do {

@@ -45,13 +45,11 @@ final class RecordingViewModel {
     // MARK: - State
 
     var state: RecordingState = .idle
-    var currentPose: BodyPose?
     var detectedSwings: [SwingClip] = []
     var recordingURL: URL?
 
     // MARK: - UI State
 
-    var showPoseOverlay = true
     var playbackSpeed: Float = 1.0
     var showSaveConfirmation = false
     var errorMessage: String?
@@ -68,14 +66,11 @@ final class RecordingViewModel {
     // MARK: - Services
 
     let cameraService = CameraService()
-    // Skip more frames in debug builds for better performance
-    // These are nonisolated because they're accessed from background threads
-    #if DEBUG
-    nonisolated(unsafe) private let poseDetector = LivePoseDetector(processEveryNthFrame: 3)
-    #else
-    nonisolated(unsafe) private let poseDetector = LivePoseDetector(processEveryNthFrame: 2)
-    #endif
-    nonisolated(unsafe) private let swingDetector = MLSwingDetector()
+
+    // MARK: - Swing Detector (SwingNet only)
+
+    /// SwingNet-based detector (video event detection)
+    nonisolated(unsafe) private let swingDetector = SwingNetDetector()
 
     // MARK: - Background Processing
 
@@ -187,18 +182,28 @@ final class RecordingViewModel {
     // MARK: - Init
 
     init() {
+        print("═══════════════════════════════════════════════════════════════")
+        print("🔧 RecordingViewModel INITIALIZING")
+        print("═══════════════════════════════════════════════════════════════")
+
         setupCallbacks()
 
-        // Warm up Vision model on background thread to avoid first-frame lag
-        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-            self?.poseDetector.warmup()
-        }
+        print("✅ RecordingViewModel ready")
+        print("   Detector: SwingNet (GolfDB)")
+        print("═══════════════════════════════════════════════════════════════")
     }
 
     private func setupCallbacks() {
         // Frame processing callback - process on background queue for speed
         cameraService.onFrameCaptured = { [weak self] pixelBuffer, timestamp in
             guard let self else { return }
+
+            // Log first few frames to confirm callback is working
+            if timestamp.seconds < 2.0 && Int(timestamp.seconds * 10) % 5 == 0 {
+                let width = CVPixelBufferGetWidth(pixelBuffer)
+                let height = CVPixelBufferGetHeight(pixelBuffer)
+                print("📷 Frame: t=\(String(format: "%.2f", timestamp.seconds))s, \(width)x\(height), recording=\(self.isCurrentlyRecording)")
+            }
 
             // Process on background queue to avoid blocking camera
             self.poseProcessingQueue.async {
@@ -222,20 +227,26 @@ final class RecordingViewModel {
             }
         }
 
-        // ML swing detection callback
+        // Setup swing detector callbacks
+        setupSwingDetectorCallbacks()
+    }
+
+    private func setupSwingDetectorCallbacks() {
+        // SwingNet detector callbacks
         swingDetector.onSwingDetected = { [weak self] bounds in
             Task { @MainActor [weak self] in
                 self?.handleSwingDetected(bounds)
             }
         }
-
-        // ML phase change callback (for debugging/UI)
         swingDetector.onPhaseChanged = { phase, confidence in
-            print("🎯 ML Phase: \(phase) (\(Int(confidence * 100))%)")
+            print("🎯 SwingNet Phase: \(phase) (\(Int(confidence * 100))%)")
         }
     }
 
     // MARK: - Frame Processing (Background Thread)
+
+    /// Track frames processed for logging
+    nonisolated(unsafe) private var _frameProcessedCount: Int = 0
 
     /// Process frame on background queue for minimal latency
     /// This method is nonisolated because it runs on a background queue for performance
@@ -248,34 +259,36 @@ final class RecordingViewModel {
         // Capture first frame timestamp for file-relative timing
         if recordingStartTimestamp == nil {
             recordingStartTimestamp = frameTime
+            print("📹 RecordingVM: First frame at \(frameTime)s")
         }
 
         // Calculate file-relative timestamp
         let relativeTime = frameTime - (recordingStartTimestamp ?? 0)
 
-        // ML swing detection - processes its own pose detection internally
+        // Log frame processing periodically
+        _frameProcessedCount += 1
+        if _frameProcessedCount % 60 == 0 {
+            print("📹 RecordingVM: Processed \(_frameProcessedCount) frames, t=\(String(format: "%.2f", relativeTime))s")
+        }
+
+        // SwingNet operates directly on frames
         swingDetector.processFrame(pixelBuffer, at: relativeTime)
-
-        // Run pose detection for UI overlay (skeleton display)
-        poseDetector.setActiveTracking(swingDetector.isTrackingSwing)
-
-        // Detect pose for UI display
-        guard let pose = poseDetector.detectPose(in: pixelBuffer, at: timestamp) else {
-            return
-        }
-
-        // Update UI on main thread (only pose display, not detection logic)
-        DispatchQueue.main.async { [weak self] in
-            self?.currentPose = pose
-        }
     }
 
     // MARK: - Swing Detection
 
     private func handleSwingDetected(_ bounds: SwingBounds) {
+        print("🎯 RecordingVM: handleSwingDetected called!")
+        print("   - startTime: \(String(format: "%.2f", bounds.startTime))s")
+        print("   - impactTime: \(String(format: "%.2f", bounds.impactTime))s")
+        print("   - endTime: \(String(format: "%.2f", bounds.endTime))s")
+        print("   - confidence: \(Int(bounds.confidence * 100))%")
+
         // Create clip and add to list
         let clip = SwingClip(from: bounds)
         detectedSwings.append(clip)
+
+        print("🎯 RecordingVM: Total swings detected: \(detectedSwings.count)")
 
         // IMMEDIATELY switch to replay mode to avoid having two camera previews
         // (main + PiP both showing camera causes black screen issues)
@@ -333,6 +346,20 @@ final class RecordingViewModel {
     private func beginRecording() {
         recordingStartTimestamp = nil // Will be set on first frame
         isCurrentlyRecording = true
+        _frameProcessedCount = 0
+
+        print("═══════════════════════════════════════════════════════════════")
+        print("🎬 RECORDING STARTED")
+        print("═══════════════════════════════════════════════════════════════")
+        print("   Detector: SwingNet (GolfDB video event detection)")
+        print("   Camera: \(isFrontCamera ? "Front" : "Back")")
+        print("")
+        print("📝 What to look for in logs:")
+        print("   - '📹 SwingNet: X/64 frames' - buffer filling (need 64)")
+        print("   - '🎉 SwingNet: Buffer FULL' - ML can now run")
+        print("   - '📊 SwingNet ALL max probs:' - event probabilities")
+        print("   - '🎯 SwingNet events above threshold' - events detected")
+        print("═══════════════════════════════════════════════════════════════")
 
         // startRecording() now returns optional URL (nil if disk space error)
         guard let url = cameraService.startRecording() else {
@@ -426,14 +453,10 @@ final class RecordingViewModel {
         recordingURL = nil
         recordingStartTimestamp = nil
         detectedSwings.removeAll()
-        currentPose = nil
         mainViewShowsReplay = false
         replayingSwingIndex = nil
+        swingDetector.reset()
         state = .idle
-    }
-
-    func togglePoseOverlay() {
-        showPoseOverlay.toggle()
     }
 
     func toggleFavorite(at index: Int) {
@@ -536,8 +559,6 @@ final class RecordingViewModel {
     func cleanup() {
         isCurrentlyRecording = false
         cameraService.stopSession()
-        currentPose = nil
-        poseDetector.reset()
         swingDetector.reset()
     }
 }
