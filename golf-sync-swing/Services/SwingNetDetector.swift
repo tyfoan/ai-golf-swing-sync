@@ -56,12 +56,12 @@ final class SwingNetDetector: @unchecked Sendable {
     private let frameWidth: Int = 160
     private let frameHeight: Int = 160
 
-    /// Minimum confidence for impact detection (30% — person-crop boosts to ~35%;
-    /// set below peak to handle graceful fallback when pose detection misses)
-    private let impactConfidenceThreshold: Float = 0.30
+    /// Minimum confidence for impact detection (15% — lowered for live camera;
+    /// 5 other validation checks prevent false positives at this threshold)
+    private let impactConfidenceThreshold: Float = 0.15
 
     /// Minimum confidence for corroborating events (address or top-of-backswing)
-    private let corroboratingEventThreshold: Float = 0.15
+    private let corroboratingEventThreshold: Float = 0.10
 
     /// Minimum frames where noEvent must be the dominant class (out of 64)
     private let minNoEventDominantFrames: Int = 24
@@ -73,7 +73,7 @@ final class SwingNetDetector: @unchecked Sendable {
     private let minDetectionInterval: TimeInterval = 2.0
 
     /// Buffer before swing start for clip extraction
-    private let preSwingBuffer: TimeInterval = 0.5
+    private let preSwingBuffer: TimeInterval = 1.0
 
     /// Buffer after impact for clip extraction
     private let postImpactBuffer: TimeInterval = 1.0
@@ -417,6 +417,13 @@ final class SwingNetDetector: @unchecked Sendable {
         // Expand 30% for club arc
         let width = maxX - minX
         let height = maxY - minY
+
+        // Guard against degenerate bounding box (would cause division by zero in crop→scale)
+        guard width > 0.01, height > 0.01 else {
+            cachedPersonBounds = nil
+            return
+        }
+
         let expandX = width * 0.3
         let expandY = height * 0.3
 
@@ -650,11 +657,18 @@ final class SwingNetDetector: @unchecked Sendable {
             let addressFrame = analysis.eventPeaks[.address]?.frame ?? 0
             let addressTimestamp = frames[addressFrame].timestamp
 
-            // For end: use finish event if detected, otherwise fall back to fixed offset
-            let finishFrame = analysis.eventPeaks[.finish]?.frame ?? min(63, analysis.impactFrame + 15)
+            // For end: use finish event ONLY if it comes after impact (otherwise it's noise)
+            let rawFinishFrame = analysis.eventPeaks[.finish]?.frame ?? 0
+            let finishFrame: Int
+            if rawFinishFrame > analysis.impactFrame {
+                finishFrame = rawFinishFrame
+            } else {
+                // Finish peak is before impact — noise. Use fixed offset: ~0.5s after impact
+                finishFrame = min(63, analysis.impactFrame + 15)
+            }
             let finishTimestamp = frames[min(finishFrame, frames.count - 1)].timestamp
 
-            // Add buffers: 0.5s before address, 0.5s after finish
+            // Add buffers: 1.0s before address, 1.0s after finish
             let swing = SwingBounds(
                 startTime: max(0, addressTimestamp - preSwingBuffer),
                 impactTime: impactTimestamp,

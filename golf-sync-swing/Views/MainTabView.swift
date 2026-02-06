@@ -7,6 +7,7 @@ import SwiftUI
 import SwiftData
 
 struct MainTabView: View {
+    @Environment(\.modelContext) private var modelContext
     @State private var selectedTab = 0
 
     var body: some View {
@@ -30,6 +31,11 @@ struct MainTabView: View {
                 .tag(2)
         }
         .tint(.green)
+        #if DEBUG
+        .task {
+            await DevVideoPreloader.preloadIfNeeded(modelContext: modelContext)
+        }
+        #endif
     }
 }
 
