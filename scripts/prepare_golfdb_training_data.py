@@ -2,8 +2,16 @@
 """
 GolfDB -> Create ML Action Classifier training data pipeline.
 
-Converts GolfDB annotations + full-resolution videos into two-class
-(swing / idle) video clips suitable for Create ML Action Classification.
+Converts GolfDB annotations + full-resolution videos into 4-class
+video clips for Create ML Action Classification with impact detection.
+
+Classes:
+    backswing       - events[0] (address) to events[3] (top of backswing)
+    downswing       - events[3] (top) to events[5] (impact)
+    follow_through  - events[5] (impact) to events[8] (finish)
+    no_swing        - pre-swing idle + post-swing standing
+
+The downswing→follow_through transition = IMPACT FRAME (sync point).
 
 Input:
     - GolfDB annotations (.pkl or .mat)
@@ -11,8 +19,10 @@ Input:
 
 Output:
     training_data_action_classifier/
-        swing/          (~1400 clips, 1.5-4s each)
-        idle/           (~1400 clips from non-swing segments)
+        backswing/       (~1400 clips)
+        downswing/       (~1400 clips)
+        follow_through/  (~1400 clips)
+        no_swing/        (~1400 clips)
 
 Prerequisites:
     pip install scipy numpy opencv-python tqdm pandas
@@ -23,7 +33,7 @@ import sys
 import pickle
 import subprocess
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 
 # Paths
 SCRIPT_DIR = Path(__file__).parent
@@ -33,7 +43,7 @@ OUTPUT_DIR = ML_TRAINING_DIR / "training_data_action_classifier"
 
 # Video source priority:
 # 1. youtube_videos/ (full-resolution downloads)
-# 2. golfdb/videos_160/ (160x160 preprocessed -- fallback, not ideal for pose)
+# 2. golfdb/videos_160/ (160x160 preprocessed — fallback, less ideal for pose)
 YOUTUBE_VIDEOS_DIR = ML_TRAINING_DIR / "youtube_videos"
 VIDEOS_160_DIR = GOLFDB_DIR / "videos_160"
 
@@ -41,11 +51,23 @@ VIDEOS_160_DIR = GOLFDB_DIR / "videos_160"
 PKL_FILE = GOLFDB_DIR / "GolfDB.pkl"
 MAT_FILE = GOLFDB_DIR / "golfDB.mat"
 
+# GolfDB event indices (10 events total):
+#   [0] address  [1] toe-up  [2] mid-backswing  [3] top
+#   [4] mid-downswing  [5] impact  [6] mid-follow-through
+#   [7] finish  [8] end-of-swing  [9] end-frame
+
+# Phase boundaries (event indices):
+PHASES = {
+    "backswing":      (0, 3),   # address → top of backswing
+    "downswing":      (3, 5),   # top → impact (KEY: very short ~150ms)
+    "follow_through": (5, 8),   # impact → finish
+}
+
 # Config
-MIN_CLIP_DURATION = 0.5   # seconds -- Create ML minimum
-MAX_CLIP_DURATION = 6.0   # seconds -- cap very long swings
-IDLE_CLIP_DURATION = 2.5  # seconds for idle clips
-FPS_ASSUMED = 30           # GolfDB default
+MIN_CLIP_DURATION = 0.3   # seconds — Create ML minimum
+MAX_CLIP_DURATION = 6.0   # seconds — cap long clips
+NO_SWING_DURATION = 2.0   # seconds for idle clips
+FPS_ASSUMED = 30
 
 
 def load_annotations_pkl() -> List[Dict]:
@@ -74,12 +96,7 @@ def load_annotations_pkl() -> List[Dict]:
             if not isinstance(events, (list, tuple)):
                 events = list(events)
 
-            # Need at least address (index 0) and end (index 9) for swing bounds
-            if len(events) < 10:
-                continue
-
-            # Skip entries where events are all zeros
-            if all(e == 0 for e in events):
+            if len(events) < 10 or all(e == 0 for e in events):
                 continue
 
             annotations.append({
@@ -150,22 +167,13 @@ def load_annotations() -> List[Dict]:
 
 def find_video(video_id: int, youtube_id: str) -> Optional[Path]:
     """Find video file from available sources."""
-    # Priority 1: full-resolution youtube downloads
     if YOUTUBE_VIDEOS_DIR.exists():
         for ext in (".mp4", ".mkv", ".webm"):
-            # Try youtube_id-based naming
-            p = YOUTUBE_VIDEOS_DIR / f"{youtube_id}{ext}"
-            if p.exists():
-                return p
-            # Try video_id-based naming
-            p = YOUTUBE_VIDEOS_DIR / f"{video_id}{ext}"
-            if p.exists():
-                return p
-            p = YOUTUBE_VIDEOS_DIR / f"{video_id:04d}{ext}"
-            if p.exists():
-                return p
+            for name in (youtube_id, str(video_id), f"{video_id:04d}"):
+                p = YOUTUBE_VIDEOS_DIR / f"{name}{ext}"
+                if p.exists():
+                    return p
 
-    # Priority 2: 160x160 preprocessed (fallback)
     if VIDEOS_160_DIR.exists():
         for name in (f"{video_id}.mp4", f"{video_id:04d}.mp4"):
             p = VIDEOS_160_DIR / name
@@ -231,14 +239,13 @@ def extract_clip(
         return False
 
 
-def process_annotations(annotations: List[Dict]) -> Dict[str, int]:
-    """Extract swing and idle clips from annotated videos."""
-    swing_dir = OUTPUT_DIR / "swing"
-    idle_dir = OUTPUT_DIR / "idle"
-    swing_dir.mkdir(parents=True, exist_ok=True)
-    idle_dir.mkdir(parents=True, exist_ok=True)
+def process_annotations(annotations: List[Dict]) -> Dict:
+    """Extract 4-class clips from annotated videos."""
+    for phase in list(PHASES.keys()) + ["no_swing"]:
+        (OUTPUT_DIR / phase).mkdir(parents=True, exist_ok=True)
 
-    stats = {"swing": 0, "idle": 0, "skipped_no_video": 0, "skipped_slow": 0, "errors": 0}
+    stats = {phase: 0 for phase in list(PHASES.keys()) + ["no_swing"]}
+    stats.update({"skipped_no_video": 0, "skipped_slow": 0, "errors": 0})
     view_counts: Dict[str, int] = {}
 
     try:
@@ -255,7 +262,6 @@ def process_annotations(annotations: List[Dict]) -> Dict[str, int]:
         view = ann["view"]
         slow = ann["slow"]
 
-        # Skip slow-motion clips (different frame timing)
         if slow == 1:
             stats["skipped_slow"] += 1
             continue
@@ -267,36 +273,43 @@ def process_annotations(annotations: List[Dict]) -> Dict[str, int]:
 
         fps = get_video_fps(video_path)
 
-        # --- Swing clip: events[0] (address) to events[9] (end) ---
+        # Extract each swing phase
+        for phase_name, (start_evt, end_evt) in PHASES.items():
+            start_frame = events[start_evt]
+            end_frame = events[end_evt]
+
+            # Add small padding (2 frames) to avoid cutting exactly on boundaries
+            padded_start = max(0, start_frame - 2)
+            padded_end = end_frame + 2
+
+            output = OUTPUT_DIR / phase_name / f"golfdb_{video_id:04d}_{phase_name}.mp4"
+            if extract_clip(video_path, padded_start, padded_end, output, fps):
+                stats[phase_name] += 1
+                view_counts[view] = view_counts.get(view, 0) + 1
+            else:
+                stats["errors"] += 1
+
+        # Extract no_swing: pre-swing idle (before address)
         address_frame = events[0]
-        end_frame = events[9] if len(events) > 9 else events[-1]
-
-        swing_output = swing_dir / f"golfdb_{video_id:04d}_swing.mp4"
-        if extract_clip(video_path, address_frame, end_frame, swing_output, fps):
-            stats["swing"] += 1
-            view_counts[view] = view_counts.get(view, 0) + 1
-        else:
-            stats["errors"] += 1
-
-        # --- Idle clip: 2-3s before address (pre-swing setup) ---
-        idle_frames = int(IDLE_CLIP_DURATION * fps)
+        idle_frames = int(NO_SWING_DURATION * fps)
         idle_start = max(0, address_frame - idle_frames)
-        idle_end = max(0, address_frame - 3)  # end a few frames before swing
+        idle_end = max(0, address_frame - 3)
 
         if idle_end > idle_start:
-            idle_output = idle_dir / f"golfdb_{video_id:04d}_idle_pre.mp4"
-            if extract_clip(video_path, idle_start, idle_end, idle_output, fps):
-                stats["idle"] += 1
+            output = OUTPUT_DIR / "no_swing" / f"golfdb_{video_id:04d}_pre.mp4"
+            if extract_clip(video_path, idle_start, idle_end, output, fps):
+                stats["no_swing"] += 1
 
-        # --- Bonus idle: post-swing (after finish) ---
+        # Extract no_swing: post-swing standing (after finish)
         if len(events) > 9:
-            finish_frame = events[9]
-            post_idle_end = finish_frame + int(IDLE_CLIP_DURATION * fps)
-            post_output = idle_dir / f"golfdb_{video_id:04d}_idle_post.mp4"
-            if extract_clip(video_path, finish_frame + 5, post_idle_end, post_output, fps):
-                stats["idle"] += 1
+            finish_frame = events[8]
+            post_end = finish_frame + int(NO_SWING_DURATION * fps)
+            output = OUTPUT_DIR / "no_swing" / f"golfdb_{video_id:04d}_post.mp4"
+            if extract_clip(video_path, finish_frame + 5, post_end, output, fps):
+                stats["no_swing"] += 1
 
-    return {**stats, "views": view_counts}
+    stats["views"] = view_counts
+    return stats
 
 
 def print_stats(stats: Dict):
@@ -304,11 +317,11 @@ def print_stats(stats: Dict):
     print("\n" + "=" * 60)
     print("Extraction Statistics")
     print("=" * 60)
-    print(f"  Swing clips:        {stats.get('swing', 0)}")
-    print(f"  Idle clips:         {stats.get('idle', 0)}")
-    print(f"  Skipped (no video): {stats.get('skipped_no_video', 0)}")
-    print(f"  Skipped (slow-mo):  {stats.get('skipped_slow', 0)}")
-    print(f"  Errors:             {stats.get('errors', 0)}")
+    for phase in list(PHASES.keys()) + ["no_swing"]:
+        print(f"  {phase:20s}: {stats.get(phase, 0)}")
+    print(f"  {'skipped (no video)':20s}: {stats.get('skipped_no_video', 0)}")
+    print(f"  {'skipped (slow-mo)':20s}: {stats.get('skipped_slow', 0)}")
+    print(f"  {'errors':20s}: {stats.get('errors', 0)}")
 
     views = stats.get("views", {})
     if views:
@@ -330,7 +343,9 @@ def verify_ffmpeg() -> bool:
 
 def main():
     print("=" * 60)
-    print("GolfDB -> Create ML Action Classifier Pipeline")
+    print("GolfDB -> 4-Class Action Classifier Pipeline")
+    print("  Classes: backswing, downswing, follow_through, no_swing")
+    print("  Impact = downswing->follow_through transition")
     print("=" * 60)
 
     if not verify_ffmpeg():
@@ -343,12 +358,11 @@ def main():
         print(f"  {GOLFDB_DIR}")
         sys.exit(1)
 
-    # Show annotation summary
+    # Summary
     views = {}
     slow_count = 0
     for ann in annotations:
-        v = ann["view"]
-        views[v] = views.get(v, 0) + 1
+        views[ann["view"]] = views.get(ann["view"], 0) + 1
         if ann["slow"]:
             slow_count += 1
 
@@ -356,15 +370,14 @@ def main():
     print(f"  Slow-motion: {slow_count} (will skip)")
     print(f"  Views: {dict(sorted(views.items(), key=lambda x: -x[1]))}")
 
-    # Process
     stats = process_annotations(annotations)
     print_stats(stats)
 
     print("\nNext steps:")
-    print("1. Record 20-30 front-camera swings -> add to swing/ folder")
-    print("2. Record 20-30 front-camera idle clips -> add to idle/ folder")
-    print("3. Open Create ML -> Action Classification -> train on this data")
-    print("4. Export GolfSwingClassifier.mlmodel -> add to Xcode project")
+    print("1. Record 20-30 front-camera clips per class -> add to folders")
+    print("2. Open Create ML -> Action Classification -> train (300+ iterations)")
+    print("3. Export GolfSwingClassifier_v2.mlmodel -> add to Xcode project")
+    print("4. The downswing->follow_through transition = impact for sync")
 
 
 if __name__ == "__main__":
