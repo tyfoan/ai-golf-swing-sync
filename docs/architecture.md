@@ -71,18 +71,24 @@
 - Uses AVMutableComposition and AVAssetExportSession
 - Saves to Photos library
 
-**SwingDetector** (`Services/SwingDetector.swift`) ⭐ NEW
-- Extracts body poses using VNDetectHumanBodyPoseRequest
-- Tracks 8 key joints: wrists, elbows, shoulders, hips
-- Calculates wrist velocity and acceleration
-- Detects impact: max downward velocity + sudden deceleration
-- Detects swing start/end from movement thresholds
-- Returns SwingDetectionResult with confidence
+**SwingNetDetector** (`Services/SwingNetDetector.swift`) ⭐ REWRITTEN
+- GolfDB-pretrained SwingNet model: 64 frames × 3ch × 160×160 → 64 × 9 event probs
+- Pose-based person crop: VNDetectHumanBodyPoseRequest every 60 frames
+  - Bounding box from skeleton keypoints, expanded 30% for club arc
+  - Falls back to full frame when no pose detected
+- MotionGateService for adaptive classification stride (idle=30, active=8, peak=5)
+- 6-layer validation: confidence, edge filter, noEvent dominance, temporal order, corroboration
+- Exposes topOfBackswingTime/topOfBackswingConfidence for sync enrichment
+- ContiguousArray<UInt8> frame buffer, ImageNet normalization deferred to buildMLInput()
 
-**VideoSyncEngine** (`Services/VideoSyncEngine.swift`) ⭐ NEW
-- Uses SwingDetector to analyze both videos
+**MotionGateService** (`Services/MotionGateService.swift`) ⭐ NEW
+- Lightweight frame-to-frame motion detection using luminance comparison
+- Returns idle/active/peak state for adaptive processing decisions
+
+**VideoSyncEngine** (`Services/VideoSyncEngine.swift`)
+- Uses SwingNetDetector for offline video analysis
+- `analyzeAllSwings()` scans entire video, returns all detected swings
 - Calculates sync offset from impact times
-- Combines pose + audio detection for higher accuracy
 - Returns SyncResult with offset and confidence
 
 ### 3. ViewModels
@@ -125,20 +131,27 @@ PHPicker → VideoStorageService.copyVideoToStorage →
 ThumbnailService.generateThumbnail → SwingVideo model → SwiftData
 ```
 
-### Auto-Detection Flow ⭐ NEW
+### Auto-Detection Flow (SwingNet)
 ```
 SingleVideoPlayerView → "AUTO-DETECT" button
     ↓
-VideoSyncEngine.analyzeAndMarkSwing()
+VideoSyncEngine.analyzeAllSwings()
     ↓
-SwingDetector.analyzeVideo()
-    ├── extractPoses() → VNDetectHumanBodyPoseRequest × N frames
-    ├── detectImpactFromPoses() → velocity/acceleration analysis
-    └── detectImpactFromAudio() → amplitude spike detection
+SwingNetDetector.processFrame() × N frames (30fps sampling)
+    ├── extractRGBData()
+    │     ├── detectPersonPose() (every 60 frames) → cachedPersonBounds
+    │     ├── crop to person region (if pose detected)
+    │     └── scale to 160×160, extract UInt8 CHW data
+    ├── MotionGateService.update() → adaptive stride
+    └── runSwingNetClassification() (every stride frames)
+          ├── buildMLInput() → ImageNet-normalized Float32 tensor
+          ├── SwingNet.prediction() → 64×9 event probabilities
+          ├── analyzeFullOutput() → SwingNetAnalysis
+          └── validateSwingDetection() → 6-layer validation
     ↓
-combineImpactDetections() → final impact time + confidence
+detectedSwings: [SwingBounds] → [SwingDetectionResult]
     ↓
-SwingMarker(from: result) → SwiftData
+SwingMarker(from: result) × N → SwiftData
 ```
 
 ### Auto-Sync Flow ⭐ NEW
@@ -172,26 +185,38 @@ ComparisonView → VideoExportService.exportComparison →
 AVMutableComposition → AVAssetExportSession → Photos library
 ```
 
-## Impact Detection Algorithm
+## SwingNet Detection Algorithm
 
 ```
-Input: Video frames at sample intervals
+Input: 64 consecutive frames (160×160 RGB, ImageNet normalized)
 
-For each frame:
-  1. VNDetectHumanBodyPoseRequest → body joints
-  2. Extract wrist position (rightWrist or leftWrist)
-  3. Store in pose history
+SwingNet Model (GolfDB pretrained):
+  Output: 64 × 9 event probabilities
+  Events: address, toe_up, mid_backswing, top, mid_downswing,
+          impact, mid_follow_through, finish, no_event
 
-For each frame n (n >= 2):
-  1. velocity[n] = (wrist_y[n] - wrist_y[n-2]) / dt
-  2. acceleration[n] = (velocity[n] - velocity[n-1]) / dt
+Single-Pass Analysis (O(64×9)):
+  - Track peak (frame, probability) for each event
+  - Count frames where noEvent is dominant class
 
-Impact detected when:
-  - velocity < -THRESHOLD (fast downward)
-  - acceleration > THRESHOLD (sudden deceleration)
-  - wrist_y near lowest position
+6-Layer Validation Pipeline:
+  1. Impact confidence ≥ 30%
+  2. Impact frame position: high conf → frames 4-60, low conf → 17-47
+  3. NoEvent dominance: ≥ 24/64 frames (real swings are mostly idle)
+  4. Temporal order: address < top < impact
+  5. Corroboration: address OR top confidence ≥ 15%
 
-Confidence = f(|velocity|, acceleration, position)
+Pose-Based Person Crop (every 60 frames):
+  - VNDetectHumanBodyPoseRequest → skeleton keypoints (conf > 0.1)
+  - Bounding box from min/max of keypoint positions
+  - Expand 30% for club arc, clamp to image bounds
+  - Fallback: full frame when no pose detected
+
+Performance Budget (~3.4ms/frame amortized):
+  - Pose detection: ~15ms × 1/60 frames = ~0.25ms
+  - Motion gate: ~0.1ms
+  - CIImage crop+scale: ~2ms
+  - UInt8 extraction: ~1ms
 ```
 
 ## Related Documents

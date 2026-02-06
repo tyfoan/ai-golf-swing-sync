@@ -2,7 +2,7 @@
 
 > Current progress for Golf Sync Swing
 
-**Last Updated**: 2026-02-02
+**Last Updated**: 2026-02-06
 
 ---
 
@@ -53,10 +53,14 @@
 | Recording UI | Done | RecordingView with countdown, pose overlay |
 | PiP during replay | Done | Shows live feed during swing replay |
 | **Production Camera Fixes** | Done | Lifecycle, interruptions, errors, memory |
+| **SwingNet ML Detection** | Done | GolfDB pretrained, 6-layer validation |
+| **Pose-Based Person Crop** | Done | VNDetectHumanBodyPoseRequest, 30% expansion |
+| **Multi-Swing Detection** | Done | Full-video scan, returns all swings |
+| **Motion Gate** | Done | Adaptive stride, frame processing gate |
 | Drawing tools | Not Started | |
 | Annotation overlay | Not Started | |
 
-**Progress**: ███████░░░ 70%
+**Progress**: ████████░░ 80%
 
 ### Milestone 4: [Monetization] - Not Started
 
@@ -71,6 +75,19 @@
 ---
 
 ## Recent Updates
+
+### 2026-02-06 (SwingNet Overhaul + Pose-Based Person Crop)
+- Complete rewrite of SwingNetDetector with 6-layer validation pipeline
+- Added pose-based person crop using VNDetectHumanBodyPoseRequest (every 60 frames)
+- Bounding box from skeleton keypoints + 30% expansion for club arc
+- Impact confidence restored to 30% threshold (person crop boosts to ~35%)
+- Added MotionGateService for adaptive processing (idle/active/peak stride)
+- Frame buffer switched to ContiguousArray<UInt8> for memory efficiency
+- Added multi-swing detection: analyzeAllSwings() scans entire video
+- Top-of-backswing extraction for sync enrichment
+- Frame processing gate prevents OutOfBuffers from camera buffer exhaustion
+- Recording UX: swing replay in PiP instead of replacing camera view
+- PiP spring animation on appearance
 
 ### 2026-02-02 (ML-Only Swing Detection)
 - Added GolfSwingClassifier.mlmodel (81% training / 79% validation accuracy)

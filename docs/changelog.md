@@ -9,6 +9,41 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- **SwingNet ML Model**: GolfDB-pretrained SwingNet replaces heuristic detection for offline video analysis
+  - 64-frame sliding window with 9-event classification (address → impact → finish)
+  - ImageNet normalization for correct model input
+  - 6-layer validation pipeline: confidence, edge filter, noEvent dominance, temporal order, corroboration
+- **Pose-Based Person Crop**: VNDetectHumanBodyPoseRequest runs every 60 frames (~2x/sec)
+  - Computes bounding box from skeleton keypoints, expands 30% for club arc
+  - Crops frames before 160x160 resize — boosts model confidence from ~30% to ~35%
+  - Graceful fallback to full frame when no pose detected
+- **MotionGateService**: Lightweight motion detection gate for adaptive processing
+  - Compares frame luminance to detect idle/active/peak motion states
+  - Adaptive classification stride: idle=30, active=8, peak=5 frames
+- **Multi-Swing Detection**: `analyzeAllSwings()` scans entire video, returns all detected swings
+  - `detectedSwings` array accumulates validated swings during analysis
+  - SingleVideoPlayerView shows count of detected swings
+  - Old auto-detected markers removed before adding new ones
+- **Top-of-Backswing Extraction**: `topOfBackswingTime`/`topOfBackswingConfidence` for sync enrichment
+- **Frame Processing Gate**: Prevents OutOfBuffers by dropping frames when processing queue is busy
+- **PiP Animation**: Spring animation on PiP appearance during recording
+- **isMotionDetected**: Added to `RealTimeSwingDetector` protocol for UI feedback
+
+### Changed
+- **SwingNetDetector**: Complete rewrite of detection pipeline
+  - Person detection switched from `VNDetectHumanRectanglesRequest` to `VNDetectHumanBodyPoseRequest`
+  - Frame buffer uses `ContiguousArray<UInt8>` instead of `[Float]` (memory + perf)
+  - ImageNet normalization deferred to `buildMLInput()` (normalize once, not per-frame)
+  - Impact confidence threshold: 20% → 30% (person crop restores confidence)
+  - Pose detection interval: 30 → 60 frames (less frequent, amortized ~0.25ms/frame)
+- **VideoSyncEngine**: `analyzeAndMarkSwing()` → `analyzeAllSwings()` returning array
+  - Top-of-backswing time now extracted from SwingNet analysis
+- **RecordingViewModel**: Swing replay shows in PiP instead of replacing main camera view
+  - Recording continues seamlessly after swing detection (no `processingSwing` state)
+- **RecordingView**: Removed `processingSwingOverlay`, PiP border color logic updated
+
+### Fixed
+- **OutOfBuffers**: Added `_isProcessingFrame` gate to prevent camera buffer pool exhaustion
 - **Camera Recording**: Full recording workflow with countdown and real-time pose detection
 - **CameraService**: AVCaptureSession management with video/audio capture
 - **LivePoseDetector**: Real-time body pose detection on camera frames

@@ -20,6 +20,9 @@ protocol RealTimeSwingDetector: AnyObject, Sendable {
     /// Whether the detector is currently tracking a swing
     nonisolated var isTrackingSwing: Bool { get }
 
+    /// Whether motion is currently detected (for UI feedback, e.g. activity indicator)
+    nonisolated var isMotionDetected: Bool { get }
+
     /// Process a video frame for swing detection (called from background thread)
     nonisolated func processFrame(_ pixelBuffer: CVPixelBuffer, at timestamp: TimeInterval)
 

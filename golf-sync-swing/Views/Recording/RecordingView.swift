@@ -18,6 +18,7 @@ struct RecordingView: View {
     @State private var hasSetupCamera = false
     @State private var isTabVisible = false
     @State private var showTipsOverlay = true
+    @State private var pipVisible = false
 
     var body: some View {
         GeometryReader { geometry in
@@ -48,6 +49,11 @@ struct RecordingView: View {
                 // PiP view during recording (shows alternate view)
                 if viewModel.isRecording && viewModel.swingCount > 0 {
                     pipView
+                        .scaleEffect(pipVisible ? 1.0 : 0.5)
+                        .opacity(pipVisible ? 1.0 : 0)
+                        .animation(.spring(response: 0.4, dampingFraction: 0.7), value: pipVisible)
+                        .onAppear { pipVisible = true }
+                        .onDisappear { pipVisible = false }
                 }
 
                 // Countdown overlay
@@ -55,11 +61,6 @@ struct RecordingView: View {
                     CountdownView(count: viewModel.countdownValue) {
                         viewModel.cancel()
                     }
-                }
-
-                // Processing swing overlay
-                if viewModel.isProcessingSwing {
-                    processingSwingOverlay
                 }
 
                 // Finalizing video overlay
@@ -463,7 +464,7 @@ struct RecordingView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 12))
                 .overlay(
                     RoundedRectangle(cornerRadius: 12)
-                        .stroke(viewModel.pipDisplayMode == .liveCamera ? Color.green : Color.orange, lineWidth: 2)
+                        .stroke(viewModel.pipDisplayMode == .lastSwingReplay ? Color.orange : Color.green, lineWidth: 2)
                 )
                 .shadow(color: .black.opacity(0.5), radius: 8, x: 0, y: 4)
                 .onTapGesture {

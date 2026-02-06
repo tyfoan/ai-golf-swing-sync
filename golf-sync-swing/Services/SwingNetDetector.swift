@@ -6,10 +6,10 @@
 //  Detects 9 swing events including precise Impact frame (event index 5)
 //
 
-import Vision
 import CoreML
 import AVFoundation
 import CoreImage
+import Vision
 
 /// SwingNet event indices
 enum SwingNetEvent: Int, CaseIterable {
@@ -56,11 +56,18 @@ final class SwingNetDetector: @unchecked Sendable {
     private let frameWidth: Int = 160
     private let frameHeight: Int = 160
 
-    /// Minimum confidence for impact detection (20% to avoid false positives)
-    private let impactConfidenceThreshold: Float = 0.20
+    /// Minimum confidence for impact detection (30% — person-crop boosts to ~35%;
+    /// set below peak to handle graceful fallback when pose detection misses)
+    private let impactConfidenceThreshold: Float = 0.30
 
-    /// Minimum confidence for any swing event
-    private let swingEventThreshold: Float = 0.20
+    /// Minimum confidence for corroborating events (address or top-of-backswing)
+    private let corroboratingEventThreshold: Float = 0.15
+
+    /// Minimum frames where noEvent must be the dominant class (out of 64)
+    private let minNoEventDominantFrames: Int = 24
+
+    /// Events that must appear in temporal order for a valid swing
+    private let requiredTemporalEvents: [SwingNetEvent] = [.address, .top, .impact]
 
     /// Minimum interval between swing detections
     private let minDetectionInterval: TimeInterval = 2.0
@@ -71,8 +78,9 @@ final class SwingNetDetector: @unchecked Sendable {
     /// Buffer after impact for clip extraction
     private let postImpactBuffer: TimeInterval = 1.0
 
-    /// Process ML classification every N frames (higher = faster, lower = more responsive)
-    private let classificationInterval: Int = 20  // ~1.5x per second at 30fps
+    /// Adaptive classification stride based on motion state
+    private var classificationInterval: Int { adaptiveStride }
+    private var adaptiveStride: Int = 30  // Start conservative (idle)
 
     // MARK: - ML Model
 
@@ -83,22 +91,25 @@ final class SwingNetDetector: @unchecked Sendable {
 
     private struct FrameData {
         let timestamp: TimeInterval
-        let rgbData: [Float]  // Flattened RGB data (3 * 160 * 160)
+        let rgbData: ContiguousArray<UInt8>  // Raw 0-255 RGB data (3 * 160 * 160)
     }
 
-    private var frameBuffer: [FrameData] = []
+    private var frameBuffer: ContiguousArray<FrameData> = []
     private var frameCounter: Int = 0
 
     // MARK: - CIContext for image processing
 
     private let ciContext = CIContext(options: [.useSoftwareRenderer: false])
 
-    // MARK: - Person Detection for Cropping
+    // MARK: - Motion Gate (replaces Vision-based person detection)
 
-    /// Cached person bounding box (normalized 0-1 coordinates)
-    private var cachedPersonBounds: CGRect?
-    private var personDetectionCounter: Int = 0
-    private let personDetectionInterval: Int = 30  // Detect every N frames (less frequent = faster)
+    private let motionGate = MotionGateService()
+
+    // MARK: - Pose-Based Person Detection (infrequent, for spatial cropping)
+
+    private var cachedPersonBounds: CGRect?    // Normalized 0-1 coords (Vision bottom-left origin)
+    private var poseDetectionCounter: Int = 0
+    private let poseDetectionInterval: Int = 60  // ~2x/sec at 30fps
 
     // MARK: - ImageNet Normalization (CRITICAL for SwingNet!)
     // SwingNet was trained with ImageNet normalization, NOT simple 0-1 scaling
@@ -124,6 +135,9 @@ final class SwingNetDetector: @unchecked Sendable {
 
     /// Public tracking state
     private(set) var isTrackingSwing: Bool = false
+
+    /// All swings detected so far (for offline multi-swing scanning)
+    private(set) var detectedSwings: [SwingBounds] = []
 
     /// Frame count for logging
     private var totalFramesProcessed: Int = 0
@@ -151,7 +165,8 @@ final class SwingNetDetector: @unchecked Sendable {
             modelLoaded = true
             print("✅ SwingNetDetector: SwingNet loaded (GolfDB pretrained)")
             print("   - impactConfidenceThreshold: \(impactConfidenceThreshold)")
-            print("   - swingEventThreshold: \(swingEventThreshold)")
+            print("   - corroboratingEventThreshold: \(corroboratingEventThreshold)")
+            print("   - minNoEventDominantFrames: \(minNoEventDominantFrames)")
             print("   - windowSize: \(windowSize) frames (~\(String(format: "%.1f", Double(windowSize) / 30.0))s at 30fps)")
             print("   - frameSize: \(frameWidth)x\(frameHeight)")
             print("   - normalization: ImageNet (mean=\(imagenetMean), std=\(imagenetStd))")
@@ -165,6 +180,27 @@ final class SwingNetDetector: @unchecked Sendable {
 
     // MARK: - Public API
 
+    /// Top-of-backswing timestamp from the last validated analysis (for sync enrichment)
+    var topOfBackswingTime: TimeInterval? {
+        guard let analysis = lastAnalysis,
+              let topPeak = analysis.eventPeaks[.top],
+              topPeak.prob >= corroboratingEventThreshold else { return nil }
+        // We need frame timestamps — stored via lastAnalysisFrames
+        guard let frames = lastAnalysisFrames,
+              topPeak.frame < frames.count else { return nil }
+        return frames[topPeak.frame].timestamp
+    }
+
+    /// Top-of-backswing confidence from the last validated analysis
+    var topOfBackswingConfidence: Double {
+        guard let analysis = lastAnalysis,
+              let topPeak = analysis.eventPeaks[.top] else { return 0 }
+        return Double(topPeak.prob)
+    }
+
+    /// Whether motion is currently detected (for UI feedback)
+    private(set) var isMotionDetected: Bool = false
+
     /// Process a video frame for swing detection
     func processFrame(_ pixelBuffer: CVPixelBuffer, at timestamp: TimeInterval) {
         totalFramesProcessed += 1
@@ -172,6 +208,16 @@ final class SwingNetDetector: @unchecked Sendable {
         // Extract RGB data from pixel buffer (outside lock for performance)
         guard let rgbData = extractRGBData(from: pixelBuffer) else {
             return
+        }
+
+        // Update motion gate and adaptive stride
+        let motionState = motionGate.update(with: rgbData)
+        isMotionDetected = motionState != .idle
+
+        switch motionState {
+        case .idle:  adaptiveStride = 30  // ~1/sec at 30fps
+        case .active: adaptiveStride = 8  // ~3.75/sec
+        case .peak:  adaptiveStride = 5   // ~6/sec
         }
 
         lock.lock()
@@ -222,148 +268,164 @@ final class SwingNetDetector: @unchecked Sendable {
         isTrackingSwing = false
         swingSequenceStarted = false
         lastSwingEventTime = 0
+        detectedSwings.removeAll()
         totalFramesProcessed = 0
+        isMotionDetected = false
+        adaptiveStride = 30
+        motionGate.reset()
         cachedPersonBounds = nil
-        personDetectionCounter = 0
+        poseDetectionCounter = 0
+        lastAnalysis = nil
+        lastAnalysisFrames = nil
         print("🔄 SwingNetDetector: Reset")
     }
 
     // MARK: - Image Processing
 
-    private func extractRGBData(from pixelBuffer: CVPixelBuffer) -> [Float]? {
-        var ciImage = CIImage(cvPixelBuffer: pixelBuffer)
-        let imageWidth = CGFloat(CVPixelBufferGetWidth(pixelBuffer))
-        let imageHeight = CGFloat(CVPixelBufferGetHeight(pixelBuffer))
-
-        // Detect person periodically and cache bounds
-        personDetectionCounter += 1
-        if personDetectionCounter >= personDetectionInterval || cachedPersonBounds == nil {
-            personDetectionCounter = 0
-            detectPerson(in: pixelBuffer)
+    private func extractRGBData(from pixelBuffer: CVPixelBuffer) -> ContiguousArray<UInt8>? {
+        // Run pose detection every N frames to update person crop region
+        poseDetectionCounter += 1
+        if poseDetectionCounter >= poseDetectionInterval {
+            poseDetectionCounter = 0
+            detectPersonPose(from: pixelBuffer)
         }
 
-        // Crop to person if detected
-        if let bounds = cachedPersonBounds {
-            // Convert normalized bounds to pixel coordinates
-            // Vision returns bounds with origin at bottom-left, CIImage uses bottom-left too
-            let cropRect = CGRect(
-                x: bounds.minX * imageWidth,
-                y: bounds.minY * imageHeight,
-                width: bounds.width * imageWidth,
-                height: bounds.height * imageHeight
+        // Autoreleasepool drains CIImage intermediates each frame (prevents memory accumulation)
+        return autoreleasepool {
+            var ciImage = CIImage(cvPixelBuffer: pixelBuffer)
+
+            // Crop to person region if pose was detected
+            if let bounds = cachedPersonBounds {
+                let imgW = ciImage.extent.width
+                let imgH = ciImage.extent.height
+                // Vision coords: bottom-left origin, normalized 0-1
+                let cropRect = CGRect(
+                    x: bounds.origin.x * imgW,
+                    y: bounds.origin.y * imgH,
+                    width: bounds.width * imgW,
+                    height: bounds.height * imgH
+                ).integral
+                ciImage = ciImage.cropped(to: cropRect)
+                    .transformed(by: CGAffineTransform(
+                        translationX: -cropRect.origin.x,
+                        y: -cropRect.origin.y
+                    ))
+            }
+
+            // Scale (cropped or full) frame to 160x160
+            let currentWidth = ciImage.extent.width
+            let currentHeight = ciImage.extent.height
+            let scaleX = CGFloat(frameWidth) / currentWidth
+            let scaleY = CGFloat(frameHeight) / currentHeight
+            let scaled = ciImage.transformed(by: CGAffineTransform(scaleX: scaleX, y: scaleY))
+
+            // Fresh plain buffer each frame (no IOSurface — avoids GPU buffer pool exhaustion)
+            var outputBuffer: CVPixelBuffer?
+            CVPixelBufferCreate(
+                kCFAllocatorDefault,
+                frameWidth,
+                frameHeight,
+                kCVPixelFormatType_32BGRA,
+                nil,
+                &outputBuffer
             )
 
-            // Expand bounds by 20% to include club and ball
-            let expansion: CGFloat = 0.2
-            let expandedRect = cropRect.insetBy(
-                dx: -cropRect.width * expansion,
-                dy: -cropRect.height * expansion
-            )
+            guard let output = outputBuffer else { return nil }
 
-            // Clamp to image bounds
-            let clampedRect = expandedRect.intersection(CGRect(x: 0, y: 0, width: imageWidth, height: imageHeight))
+            ciContext.render(scaled, to: output)
 
-            if !clampedRect.isEmpty && clampedRect.width > 50 && clampedRect.height > 50 {
-                ciImage = ciImage.cropped(to: clampedRect)
-                // Reset origin after crop
-                ciImage = ciImage.transformed(by: CGAffineTransform(translationX: -clampedRect.minX, y: -clampedRect.minY))
+            // Extract raw UInt8 RGB data (normalization deferred to buildMLInput)
+            CVPixelBufferLockBaseAddress(output, .readOnly)
+            defer { CVPixelBufferUnlockBaseAddress(output, .readOnly) }
+
+            guard let baseAddress = CVPixelBufferGetBaseAddress(output) else { return nil }
+
+            let bytesPerRow = CVPixelBufferGetBytesPerRow(output)
+            let buffer = baseAddress.assumingMemoryBound(to: UInt8.self)
+
+            let pixelCount = frameWidth * frameHeight
+            var rgbData = ContiguousArray<UInt8>()
+            rgbData.reserveCapacity(3 * pixelCount)
+
+            // Extract in CHW order (channels first): R, G, B planes
+            // Store raw UInt8 values — ImageNet normalization happens in buildMLInput()
+
+            // R plane
+            for y in 0..<frameHeight {
+                for x in 0..<frameWidth {
+                    let offset = y * bytesPerRow + x * 4
+                    rgbData.append(buffer[offset + 2])  // R (BGRA format, R is at offset+2)
+                }
             }
-        }
-
-        // Scale to 160x160
-        let currentWidth = ciImage.extent.width
-        let currentHeight = ciImage.extent.height
-        let scaleX = CGFloat(frameWidth) / currentWidth
-        let scaleY = CGFloat(frameHeight) / currentHeight
-        let scaled = ciImage.transformed(by: CGAffineTransform(scaleX: scaleX, y: scaleY))
-
-        // Create output buffer
-        var outputBuffer: CVPixelBuffer?
-        CVPixelBufferCreate(
-            kCFAllocatorDefault,
-            frameWidth,
-            frameHeight,
-            kCVPixelFormatType_32BGRA,
-            nil,
-            &outputBuffer
-        )
-
-        guard let output = outputBuffer else { return nil }
-
-        ciContext.render(scaled, to: output)
-
-        // Extract RGB data
-        CVPixelBufferLockBaseAddress(output, .readOnly)
-        defer { CVPixelBufferUnlockBaseAddress(output, .readOnly) }
-
-        guard let baseAddress = CVPixelBufferGetBaseAddress(output) else { return nil }
-
-        let bytesPerRow = CVPixelBufferGetBytesPerRow(output)
-        let buffer = baseAddress.assumingMemoryBound(to: UInt8.self)
-
-        var rgbData: [Float] = []
-        rgbData.reserveCapacity(3 * frameWidth * frameHeight)
-
-        // Extract in CHW order (channels first): R, G, B planes
-        // CRITICAL: Apply ImageNet normalization! SwingNet was trained with:
-        //   normalized = (pixel/255.0 - mean) / std
-        // Without this normalization, the model outputs garbage.
-
-        // R plane
-        for y in 0..<frameHeight {
-            for x in 0..<frameWidth {
-                let offset = y * bytesPerRow + x * 4
-                let pixel = Float(buffer[offset + 2]) / 255.0  // R (BGRA format, R is at offset+2)
-                let normalized = (pixel - imagenetMean[0]) / imagenetStd[0]
-                rgbData.append(normalized)
+            // G plane
+            for y in 0..<frameHeight {
+                for x in 0..<frameWidth {
+                    let offset = y * bytesPerRow + x * 4
+                    rgbData.append(buffer[offset + 1])  // G
+                }
             }
-        }
-        // G plane
-        for y in 0..<frameHeight {
-            for x in 0..<frameWidth {
-                let offset = y * bytesPerRow + x * 4
-                let pixel = Float(buffer[offset + 1]) / 255.0  // G
-                let normalized = (pixel - imagenetMean[1]) / imagenetStd[1]
-                rgbData.append(normalized)
+            // B plane
+            for y in 0..<frameHeight {
+                for x in 0..<frameWidth {
+                    let offset = y * bytesPerRow + x * 4
+                    rgbData.append(buffer[offset])       // B
+                }
             }
-        }
-        // B plane
-        for y in 0..<frameHeight {
-            for x in 0..<frameWidth {
-                let offset = y * bytesPerRow + x * 4
-                let pixel = Float(buffer[offset]) / 255.0      // B
-                let normalized = (pixel - imagenetMean[2]) / imagenetStd[2]
-                rgbData.append(normalized)
-            }
-        }
 
-        return rgbData
+            return rgbData
+        }
     }
 
-    // MARK: - Person Detection
+    // MARK: - Pose-Based Person Detection
 
-    private func detectPerson(in pixelBuffer: CVPixelBuffer) {
-        let request = VNDetectHumanRectanglesRequest { [weak self] request, error in
-            guard let self = self else { return }
+    private func detectPersonPose(from pixelBuffer: CVPixelBuffer) {
+        let request = VNDetectHumanBodyPoseRequest()
+        let handler = VNImageRequestHandler(cvPixelBuffer: pixelBuffer, options: [:])
 
-            if let error = error {
-                print("⚠️ Person detection error: \(error.localizedDescription)")
-                return
-            }
-
-            guard let results = request.results as? [VNHumanObservation],
-                  let person = results.first else {
-                // No person detected, clear cache
-                self.cachedPersonBounds = nil
-                return
-            }
-
-            // Cache the detected bounds
-            self.cachedPersonBounds = person.boundingBox
+        do {
+            try handler.perform([request])
+        } catch {
+            cachedPersonBounds = nil
+            return
         }
 
-        let handler = VNImageRequestHandler(cvPixelBuffer: pixelBuffer, options: [:])
-        try? handler.perform([request])
+        guard let observation = request.results?.first else {
+            cachedPersonBounds = nil
+            return
+        }
+
+        // Collect all recognized keypoints with sufficient confidence
+        let allPoints = observation.availableJointNames.compactMap { jointName -> CGPoint? in
+            guard let point = try? observation.recognizedPoint(jointName),
+                  point.confidence > 0.1 else { return nil }
+            return point.location  // Normalized 0-1, Vision bottom-left origin
+        }
+
+        guard allPoints.count >= 3 else {
+            cachedPersonBounds = nil
+            return
+        }
+
+        // Compute bounding box from keypoints
+        let xs = allPoints.map(\.x)
+        let ys = allPoints.map(\.y)
+        let minX = xs.min()!
+        let maxX = xs.max()!
+        let minY = ys.min()!
+        let maxY = ys.max()!
+
+        // Expand 30% for club arc
+        let width = maxX - minX
+        let height = maxY - minY
+        let expandX = width * 0.3
+        let expandY = height * 0.3
+
+        cachedPersonBounds = CGRect(
+            x: max(0, minX - expandX),
+            y: max(0, minY - expandY),
+            width: min(1.0 - max(0, minX - expandX), width + 2 * expandX),
+            height: min(1.0 - max(0, minY - expandY), height + 2 * expandY)
+        )
     }
 
     // MARK: - ML Classification
@@ -406,15 +468,34 @@ final class SwingNetDetector: @unchecked Sendable {
             let pixelsPerChannel = frameWidth * frameHeight  // 25600
             let pixelsPerFrame = 3 * pixelsPerChannel        // 76800
 
+            // Pre-compute normalization constants: (pixel/255.0 - mean) / std = pixel * scale + bias
+            let scales: [Float] = [
+                1.0 / (255.0 * imagenetStd[0]),
+                1.0 / (255.0 * imagenetStd[1]),
+                1.0 / (255.0 * imagenetStd[2])
+            ]
+            let biases: [Float] = [
+                -imagenetMean[0] / imagenetStd[0],
+                -imagenetMean[1] / imagenetStd[1],
+                -imagenetMean[2] / imagenetStd[2]
+            ]
+
             // Use pointer for fast copying
             let ptr = UnsafeMutablePointer<Float>(OpaquePointer(input.dataPointer))
 
             for (frameIdx, frameData) in frames.enumerated() {
                 let frameOffset = frameIdx * pixelsPerFrame
 
-                // Copy all RGB data for this frame at once
-                for i in 0..<pixelsPerFrame {
-                    ptr[frameOffset + i] = frameData.rgbData[i]
+                // Normalize UInt8 → Float with ImageNet stats during copy
+                // CHW layout: R plane, G plane, B plane (each pixelsPerChannel)
+                for ch in 0..<3 {
+                    let channelOffset = frameOffset + ch * pixelsPerChannel
+                    let srcOffset = ch * pixelsPerChannel
+                    let scale = scales[ch]
+                    let bias = biases[ch]
+                    for i in 0..<pixelsPerChannel {
+                        ptr[channelOffset + i] = Float(frameData.rgbData[srcOffset + i]) * scale + bias
+                    }
                 }
             }
 
@@ -425,61 +506,171 @@ final class SwingNetDetector: @unchecked Sendable {
         }
     }
 
-    // MARK: - Output Processing
-    // Only detect impact event - use fixed offsets for start/end
+    // MARK: - Output Analysis
 
-    private func processSwingNetOutput(_ probabilities: MLMultiArray, frames: [FrameData]) {
-        // Shape: (1, 64, 9) - find frame with max impact probability
-        let impactEventIdx = SwingNetEvent.impact.rawValue
+    /// Parsed SwingNet output — single pass extracts everything needed for validation
+    private struct SwingNetAnalysis {
+        /// Per-event: (peakFrameIndex, peakProbability)
+        var eventPeaks: [SwingNetEvent: (frame: Int, prob: Float)] = [:]
 
-        var maxProb: Float = 0
-        var maxFrameIdx: Int = 0
+        /// Number of frames where noEvent is the dominant class
+        var noEventDominantFrameCount: Int = 0
+
+        /// Impact-specific convenience
+        var impactFrame: Int { eventPeaks[.impact]?.frame ?? 0 }
+        var impactProb: Float { eventPeaks[.impact]?.prob ?? 0 }
+
+        func impactTimestamp(in frames: [FrameData]) -> TimeInterval {
+            frames[impactFrame].timestamp
+        }
+    }
+
+    /// Last successful analysis (for top-of-backswing extraction by VideoSyncEngine)
+    private var lastAnalysis: SwingNetAnalysis?
+
+    /// Frame timestamps from the last successful analysis
+    private var lastAnalysisFrames: [FrameData]?
+
+    /// Single O(64×9) pass through the output tensor
+    private func analyzeFullOutput(_ probabilities: MLMultiArray) -> SwingNetAnalysis {
+        var analysis = SwingNetAnalysis()
+        let eventCount = 9 // 8 swing events + noEvent
+
+        // Initialize peaks with zero probability
+        for event in SwingNetEvent.allCases {
+            analysis.eventPeaks[event] = (frame: 0, prob: 0)
+        }
 
         for frameIdx in 0..<64 {
-            let prob = probabilities[[0, frameIdx, impactEventIdx] as [NSNumber]].floatValue
-            if prob > maxProb {
-                maxProb = prob
-                maxFrameIdx = frameIdx
+            var dominantEvent: Int = 0
+            var dominantProb: Float = -1
+
+            for eventIdx in 0..<eventCount {
+                let prob = probabilities[[0, frameIdx, eventIdx] as [NSNumber]].floatValue
+
+                // Track dominant class for this frame
+                if prob > dominantProb {
+                    dominantProb = prob
+                    dominantEvent = eventIdx
+                }
+
+                // Track per-event peak
+                guard let event = SwingNetEvent(rawValue: eventIdx) else { continue }
+                if prob > (analysis.eventPeaks[event]?.prob ?? 0) {
+                    analysis.eventPeaks[event] = (frame: frameIdx, prob: prob)
+                }
+            }
+
+            // Count noEvent-dominant frames
+            if dominantEvent == SwingNetEvent.noEvent.rawValue {
+                analysis.noEventDominantFrameCount += 1
             }
         }
 
-        let impactTimestamp = frames[maxFrameIdx].timestamp
+        return analysis
+    }
 
-        // Validate: impact confidence must be meaningful (>=20%)
-        guard maxProb >= impactConfidenceThreshold else { return }
+    // MARK: - Validation Pipeline
 
-        // Validate frame position based on confidence
-        // Higher confidence = more lenient position requirements
-        if maxProb >= 0.35 {
-            // High confidence: accept anywhere except extreme edges
-            guard maxFrameIdx > 3 && maxFrameIdx < 61 else { return }
-        } else {
-            // Lower confidence (20-35%): require middle of window
-            guard maxFrameIdx > 20 && maxFrameIdx < 45 else { return }
+    /// Returns nil if swing is valid, or a rejection reason string for logging
+    private func validateSwingDetection(_ analysis: SwingNetAnalysis) -> String? {
+        // 1. Impact confidence (person detection gate removed — using motion gate instead)
+        if analysis.impactProb < impactConfidenceThreshold {
+            return "impact confidence too low (\(Int(analysis.impactProb * 100))% < \(Int(impactConfidenceThreshold * 100))%)"
         }
 
-        print("📊 SwingNet: impact=\(String(format: "%.2f", impactTimestamp))s (\(Int(maxProb * 100))%)")
+        // 2. Impact frame position (edge artifact filter)
+        if analysis.impactProb >= 0.30 {
+            // Confident: accept frames 4-60
+            guard analysis.impactFrame > 3 && analysis.impactFrame < 61 else {
+                return "impact at edge frame \(analysis.impactFrame) (high conf)"
+            }
+        } else {
+            // Lower confidence: require middle of window (frames 17-47)
+            guard analysis.impactFrame > 16 && analysis.impactFrame < 48 else {
+                return "impact at edge frame \(analysis.impactFrame) (low conf)"
+            }
+        }
+
+        // 3. NoEvent dominance — real swings are mostly "nothing happening"
+        if analysis.noEventDominantFrameCount < minNoEventDominantFrames {
+            return "too few noEvent frames (\(analysis.noEventDominantFrameCount)/64, need \(minNoEventDominantFrames))"
+        }
+
+        // 4. Temporal event order: address < top < impact
+        let addressFrame = analysis.eventPeaks[.address]?.frame ?? 0
+        let topFrame = analysis.eventPeaks[.top]?.frame ?? 0
+        let impactFrame = analysis.impactFrame
+
+        if !(addressFrame < topFrame && topFrame < impactFrame) {
+            return "temporal order violated: address=\(addressFrame) top=\(topFrame) impact=\(impactFrame)"
+        }
+
+        // 5. Multi-event corroboration: at least address OR top must have meaningful probability
+        let addressProb = analysis.eventPeaks[.address]?.prob ?? 0
+        let topProb = analysis.eventPeaks[.top]?.prob ?? 0
+
+        if addressProb < corroboratingEventThreshold && topProb < corroboratingEventThreshold {
+            return "no corroborating events (address=\(Int(addressProb * 100))%, top=\(Int(topProb * 100))%)"
+        }
+
+        return nil // All checks passed
+    }
+
+    // MARK: - Output Processing
+
+    private func processSwingNetOutput(_ probabilities: MLMultiArray, frames: [FrameData]) {
+        // Full analysis: single pass extracts all event peaks + noEvent stats
+        let analysis = analyzeFullOutput(probabilities)
+
+        // Run 6-layer validation pipeline
+        if let rejection = validateSwingDetection(analysis) {
+            print("⛳ SwingNet: rejected: \(rejection)")
+            return
+        }
+
+        let impactTimestamp = analysis.impactTimestamp(in: frames)
+
+        let addressTs = frames[analysis.eventPeaks[.address]?.frame ?? 0].timestamp
+        let topTs = frames[analysis.eventPeaks[.top]?.frame ?? 0].timestamp
+        let finishTs = frames[min(analysis.eventPeaks[.finish]?.frame ?? 63, frames.count - 1)].timestamp
+        print("📊 SwingNet: VALIDATED impact=\(String(format: "%.2f", impactTimestamp))s (\(Int(analysis.impactProb * 100))%)")
+        print("   events: address=\(String(format: "%.2f", addressTs))s top=\(String(format: "%.2f", topTs))s impact=\(String(format: "%.2f", impactTimestamp))s finish=\(String(format: "%.2f", finishTs))s")
 
         lock.lock()
+
+        // Store analysis + frames for top-of-backswing extraction
+        lastAnalysis = analysis
+        lastAnalysisFrames = frames
+
         if impactTime == nil || abs(impactTimestamp - impactTime!) > minDetectionInterval {
             impactTime = impactTimestamp
 
-            // Use fixed offsets from impact
+            // Use actual detected event positions instead of fixed offsets
+            let addressFrame = analysis.eventPeaks[.address]?.frame ?? 0
+            let addressTimestamp = frames[addressFrame].timestamp
+
+            // For end: use finish event if detected, otherwise fall back to fixed offset
+            let finishFrame = analysis.eventPeaks[.finish]?.frame ?? min(63, analysis.impactFrame + 15)
+            let finishTimestamp = frames[min(finishFrame, frames.count - 1)].timestamp
+
+            // Add buffers: 0.5s before address, 0.5s after finish
             let swing = SwingBounds(
-                startTime: max(0, impactTimestamp - 1.5),
+                startTime: max(0, addressTimestamp - preSwingBuffer),
                 impactTime: impactTimestamp,
-                endTime: impactTimestamp + 1.5,
-                confidence: Double(maxProb),
+                endTime: finishTimestamp + postImpactBuffer,
+                confidence: Double(analysis.impactProb),
                 detectionTime: frames.last?.timestamp ?? impactTimestamp,
                 audioConfirmed: false
             )
 
+            detectedSwings.append(swing)
             lastDetectionTime = frames.last?.timestamp ?? impactTimestamp
             lock.unlock()
 
             print("🎯 SWING: \(String(format: "%.2f", swing.startTime))s → \(String(format: "%.2f", swing.impactTime))s → \(String(format: "%.2f", swing.endTime))s")
             onSwingDetected?(swing)
-            onPhaseChanged?("impact", Double(maxProb))
+            onPhaseChanged?("impact", Double(analysis.impactProb))
         } else {
             lock.unlock()
         }

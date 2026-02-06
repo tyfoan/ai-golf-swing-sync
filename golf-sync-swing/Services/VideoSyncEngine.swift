@@ -644,8 +644,8 @@ final class VideoSyncEngine {
         return SwingDetectionResult(
             impactTime: swing.impactTime,
             impactConfidence: swing.confidence,
-            topOfBackswingTime: nil,
-            topOfBackswingConfidence: 0,
+            topOfBackswingTime: detector.topOfBackswingTime,
+            topOfBackswingConfidence: detector.topOfBackswingConfidence,
             startTime: max(0, swing.startTime),
             endTime: min(duration, swing.endTime),
             phases: [],
@@ -653,27 +653,74 @@ final class VideoSyncEngine {
         )
     }
 
-    /// Analyze a video and mark swing if successful
-    func analyzeAndMarkSwing(
+    /// Analyze a video and return all detected swings
+    func analyzeAllSwings(
         for video: SwingVideo,
         model: AutoDetectModel = .swingNet,
         progress: @escaping (Float) -> Void
-    ) async throws -> SwingDetectionResult {
+    ) async throws -> [SwingDetectionResult] {
         print("🪄 AUTO-DETECT: model=SwingNet video=\(video.localURL.lastPathComponent)")
 
-        // Always use SwingNet for analysis
-        let result = try await analyzeWithSwingNet(at: video.localURL, progress: progress)
+        let results = try await analyzeAllSwingsWithSwingNet(at: video.localURL, progress: progress)
 
         video.hasBeenAnalyzed = true
         video.analysisDate = Date()
 
-        if let impact = result.impactTime {
-            print("🪄 AUTO-DETECT: impact=\(String(format: "%.2f", impact))s conf=\(Int(result.impactConfidence * 100))%")
+        if results.isEmpty {
+            print("🪄 AUTO-DETECT: no swings detected")
         } else {
-            print("🪄 AUTO-DETECT: no swing detected")
+            print("🪄 AUTO-DETECT: found \(results.count) swing(s)")
+            for (i, result) in results.enumerated() {
+                if let impact = result.impactTime {
+                    print("   swing \(i + 1): impact=\(String(format: "%.2f", impact))s conf=\(Int(result.impactConfidence * 100))%")
+                }
+            }
         }
 
-        return result
+        return results
+    }
+
+    // MARK: - Full-Video Multi-Swing Analysis
+
+    private func analyzeAllSwingsWithSwingNet(
+        at url: URL,
+        progress: @escaping (Float) -> Void
+    ) async throws -> [SwingDetectionResult] {
+        progress(0.0)
+
+        let asset = AVURLAsset(url: url)
+        let duration = try await asset.load(.duration).seconds
+        print("📹 SwingNet multi-swing analysis: video duration=\(String(format: "%.2f", duration))s")
+
+        let detector = SwingNetDetector()
+        var framesProcessed = 0
+
+        try await forEachVideoFrame(
+            at: url,
+            timeRangeSeconds: nil,
+            targetFPS: offlineTargetFPS,
+            progress: progress,
+            process: { pixelBuffer, timestamp in
+                framesProcessed += 1
+                detector.processFrame(pixelBuffer, at: timestamp)
+                return false  // Never stop early — scan entire video
+            }
+        )
+
+        print("📹 SwingNet: Processed \(framesProcessed) total frames, found \(detector.detectedSwings.count) swing(s)")
+
+        return detector.detectedSwings.map { swing in
+            SwingDetectionResult(
+                impactTime: swing.impactTime,
+                impactConfidence: swing.confidence,
+                topOfBackswingTime: nil,
+                topOfBackswingConfidence: 0,
+                startTime: max(0, swing.startTime),
+                endTime: min(duration, swing.endTime),
+                phases: [],
+                velocityProfile: []
+            )
+        }
     }
 }
 

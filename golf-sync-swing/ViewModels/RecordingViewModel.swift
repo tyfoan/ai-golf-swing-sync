@@ -80,6 +80,11 @@ final class RecordingViewModel {
         qos: .userInteractive
     )
 
+    /// Gate to prevent queuing frames while processing is busy.
+    /// Without this, camera delivers frames faster than they process,
+    /// captured CVPixelBuffers accumulate in the queue, exhausting the camera buffer pool → OutOfBuffers.
+    nonisolated(unsafe) private var _isProcessingFrame = false
+
     // MARK: - Recording Timing (Thread-Safe)
 
     /// Lock for thread-safe access to recording state from background threads
@@ -205,8 +210,14 @@ final class RecordingViewModel {
                 print("📷 Frame: t=\(String(format: "%.2f", timestamp.seconds))s, \(width)x\(height), recording=\(self.isCurrentlyRecording)")
             }
 
-            // Process on background queue to avoid blocking camera
+            // Gate: drop frame if processing queue is busy.
+            // This prevents camera pixel buffers from accumulating in the queue
+            // (which exhausts the buffer pool → OutOfBuffers → temporal distortion).
+            guard !self._isProcessingFrame else { return }
+            self._isProcessingFrame = true
+
             self.poseProcessingQueue.async {
+                defer { self._isProcessingFrame = false }
                 self.processFrameOnBackground(pixelBuffer, timestamp: timestamp)
             }
         }
@@ -290,26 +301,11 @@ final class RecordingViewModel {
 
         print("🎯 RecordingVM: Total swings detected: \(detectedSwings.count)")
 
-        // IMMEDIATELY switch to replay mode to avoid having two camera previews
-        // (main + PiP both showing camera causes black screen issues)
+        // Keep camera as main view — show detected swing in PiP (smooth, non-jarring)
         replayingSwingIndex = detectedSwings.count - 1
-        mainViewShowsReplay = true
-        pipDisplayMode = .liveCamera
-
-        // Show processing state while waiting for video frames
-        state = .processingSwing
-
-        // Wait for video file to have all frames, then transition to recording state
-        Task {
-            // Calculate wait time: endTime - detectionTime + buffer
-            // This ensures the video file has all frames from start to end
-            let waitMs = Int(clip.requiredWaitTime * 1000)
-            try? await Task.sleep(for: .milliseconds(waitMs))
-
-            await MainActor.run {
-                self.state = .recording
-            }
-        }
+        mainViewShowsReplay = false
+        pipDisplayMode = .lastSwingReplay
+        // No state change — recording continues seamlessly
     }
 
     // MARK: - Actions

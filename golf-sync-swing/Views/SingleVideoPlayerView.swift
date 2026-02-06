@@ -20,7 +20,7 @@ struct SingleVideoPlayerView: View {
     @State private var analysisProgress: Float = 0
     @State private var analysisError: String?
     @State private var showAnalysisResult = false
-    @State private var lastDetectionResult: SwingDetectionResult?
+    @State private var lastDetectionResults: [SwingDetectionResult] = []
     @State private var analysisStatus: String = ""
 
     private let syncEngine = VideoSyncEngine()
@@ -59,15 +59,16 @@ struct SingleVideoPlayerView: View {
         .alert("Analysis Complete", isPresented: $showAnalysisResult) {
             Button("OK") { }
         } message: {
-            if let result = lastDetectionResult {
-                if result.hasValidDetection {
-                    let impact = result.impactTime.map { String(format: "%.2fs", $0) } ?? "n/a"
-                    Text(
-                        "Model: SwingNet\nImpact: \(impact)\nConfidence: \(Int(result.impactConfidence * 100))%"
-                    )
-                } else {
-                    Text("Model: SwingNet\nCould not detect swing. Try adding markers manually.")
-                }
+            let valid = lastDetectionResults.filter { $0.hasValidDetection }
+            if valid.isEmpty {
+                Text("Model: SwingNet\nCould not detect swing. Try adding markers manually.")
+            } else if valid.count == 1, let result = valid.first {
+                let impact = result.impactTime.map { String(format: "%.2fs", $0) } ?? "n/a"
+                Text(
+                    "Model: SwingNet\nImpact: \(impact)\nConfidence: \(Int(result.impactConfidence * 100))%"
+                )
+            } else {
+                Text("Model: SwingNet\nDetected \(valid.count) swings")
             }
         }
         .alert("Analysis Error", isPresented: .init(
@@ -270,17 +271,24 @@ struct SingleVideoPlayerView: View {
 
         Task {
             do {
-                let result = try await syncEngine.analyzeAndMarkSwing(for: video) { progress in
+                let results = try await syncEngine.analyzeAllSwings(for: video) { progress in
                     Task { @MainActor in
                         analysisProgress = progress
                     }
                 }
 
                 await MainActor.run {
-                    lastDetectionResult = result
+                    lastDetectionResults = results
 
-                    if result.hasValidDetection {
-                        // Create swing marker from detection
+                    // Remove previous auto-detected markers
+                    let autoDetected = video.swings.filter { $0.isAutoDetected }
+                    for swing in autoDetected {
+                        video.swings.removeAll { $0.id == swing.id }
+                        modelContext.delete(swing)
+                    }
+
+                    // Add new markers for each valid detection
+                    for result in results where result.hasValidDetection {
                         let swing = SwingMarker(from: result)
                         swing.video = video
                         video.swings.append(swing)
