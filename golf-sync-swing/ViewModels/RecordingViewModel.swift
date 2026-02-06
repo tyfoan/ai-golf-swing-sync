@@ -67,10 +67,16 @@ final class RecordingViewModel {
 
     let cameraService = CameraService()
 
-    // MARK: - Swing Detector (SwingNet only)
+    // MARK: - Swing Detectors
 
-    /// SwingNet-based detector (video event detection)
-    nonisolated(unsafe) private let swingDetector = SwingNetDetector()
+    /// Action Classifier — pose-based, works from any camera angle (default for live)
+    nonisolated(unsafe) private let actionClassifier = ActionClassifierDetector()
+
+    /// SwingNet — video event detection, best for side-view offline sync
+    nonisolated(unsafe) private let swingNetDetector = SwingNetDetector()
+
+    /// The active detector used for live recording (Action Classifier by default)
+    nonisolated(unsafe) private var activeDetector: any RealTimeSwingDetector
 
     // MARK: - Background Processing
 
@@ -187,14 +193,18 @@ final class RecordingViewModel {
     // MARK: - Init
 
     init() {
+        // Default to Action Classifier (angle-independent)
+        activeDetector = actionClassifier
+
         print("═══════════════════════════════════════════════════════════════")
-        print("🔧 RecordingViewModel INITIALIZING")
+        print("RecordingViewModel INITIALIZING")
         print("═══════════════════════════════════════════════════════════════")
 
         setupCallbacks()
 
-        print("✅ RecordingViewModel ready")
-        print("   Detector: SwingNet (GolfDB)")
+        print("RecordingViewModel ready")
+        print("   Live detector: Action Classifier (pose-based, any angle)")
+        print("   Offline sync:  SwingNet (GolfDB)")
         print("═══════════════════════════════════════════════════════════════")
     }
 
@@ -243,14 +253,24 @@ final class RecordingViewModel {
     }
 
     private func setupSwingDetectorCallbacks() {
-        // SwingNet detector callbacks
-        swingDetector.onSwingDetected = { [weak self] bounds in
+        // Action Classifier callbacks (default live detector)
+        actionClassifier.onSwingDetected = { [weak self] bounds in
             Task { @MainActor [weak self] in
                 self?.handleSwingDetected(bounds)
             }
         }
-        swingDetector.onPhaseChanged = { phase, confidence in
-            print("🎯 SwingNet Phase: \(phase) (\(Int(confidence * 100))%)")
+        actionClassifier.onPhaseChanged = { phase, confidence in
+            print("ActionClassifier Phase: \(phase) (\(Int(confidence * 100))%)")
+        }
+
+        // SwingNet callbacks (available as alternative / offline)
+        swingNetDetector.onSwingDetected = { [weak self] bounds in
+            Task { @MainActor [weak self] in
+                self?.handleSwingDetected(bounds)
+            }
+        }
+        swingNetDetector.onPhaseChanged = { phase, confidence in
+            print("SwingNet Phase: \(phase) (\(Int(confidence * 100))%)")
         }
     }
 
@@ -282,8 +302,8 @@ final class RecordingViewModel {
             print("📹 RecordingVM: Processed \(_frameProcessedCount) frames, t=\(String(format: "%.2f", relativeTime))s")
         }
 
-        // SwingNet operates directly on frames
-        swingDetector.processFrame(pixelBuffer, at: relativeTime)
+        // Route to active detector
+        activeDetector.processFrame(pixelBuffer, at: relativeTime)
     }
 
     // MARK: - Swing Detection
@@ -344,17 +364,15 @@ final class RecordingViewModel {
         isCurrentlyRecording = true
         _frameProcessedCount = 0
 
+        let detectorName = activeDetector is ActionClassifierDetector
+            ? "Action Classifier (pose-based, any angle)"
+            : "SwingNet (GolfDB video events)"
+
         print("═══════════════════════════════════════════════════════════════")
-        print("🎬 RECORDING STARTED")
+        print("RECORDING STARTED")
         print("═══════════════════════════════════════════════════════════════")
-        print("   Detector: SwingNet (GolfDB video event detection)")
+        print("   Detector: \(detectorName)")
         print("   Camera: \(isFrontCamera ? "Front" : "Back")")
-        print("")
-        print("📝 What to look for in logs:")
-        print("   - '📹 SwingNet: X/64 frames' - buffer filling (need 64)")
-        print("   - '🎉 SwingNet: Buffer FULL' - ML can now run")
-        print("   - '📊 SwingNet ALL max probs:' - event probabilities")
-        print("   - '🎯 SwingNet events above threshold' - events detected")
         print("═══════════════════════════════════════════════════════════════")
 
         // startRecording() now returns optional URL (nil if disk space error)
@@ -371,7 +389,7 @@ final class RecordingViewModel {
         mainViewShowsReplay = false
         replayingSwingIndex = nil
         pipDisplayMode = .liveCamera
-        swingDetector.reset()
+        activeDetector.reset()
         state = .recording
     }
 
@@ -451,7 +469,7 @@ final class RecordingViewModel {
         detectedSwings.removeAll()
         mainViewShowsReplay = false
         replayingSwingIndex = nil
-        swingDetector.reset()
+        activeDetector.reset()
         state = .idle
     }
 
@@ -555,6 +573,6 @@ final class RecordingViewModel {
     func cleanup() {
         isCurrentlyRecording = false
         cameraService.stopSession()
-        swingDetector.reset()
+        activeDetector.reset()
     }
 }

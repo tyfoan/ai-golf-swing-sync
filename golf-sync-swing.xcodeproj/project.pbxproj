@@ -12,7 +12,7 @@
 		88649EEF2F32386700DB5D4D /* CLAUDE.md in Resources */ = {isa = PBXBuildFile; fileRef = 88649EE32F32386700DB5D4D /* CLAUDE.md */; };
 		88649EF02F32386700DB5D4D /* architecture.md in Resources */ = {isa = PBXBuildFile; fileRef = 88649EE42F32386700DB5D4D /* architecture.md */; };
 		88649EF12F32386700DB5D4D /* camera-optimization-plan.md in Resources */ = {isa = PBXBuildFile; fileRef = 88649EE82F32386700DB5D4D /* camera-optimization-plan.md */; };
-		88649EF22F32386700DB5D4D /* milestone-3-monetization.md in Resources */ = {isa = PBXBuildFile; fileRef = 88649EEA2F32386700DB5D4D /* milestone-3-monetization.md */; };
+		88649EF22F32386700DB5D4D /* milestone-4-monetization.md in Resources */ = {isa = PBXBuildFile; fileRef = 88649EEA2F32386700DB5D4D /* milestone-4-monetization.md */; };
 		88649EF32F32386700DB5D4D /* project_status.md in Resources */ = {isa = PBXBuildFile; fileRef = 88649EE62F32386700DB5D4D /* project_status.md */; };
 		88649EF42F32386700DB5D4D /* project_spec.md in Resources */ = {isa = PBXBuildFile; fileRef = 88649EEC2F32386700DB5D4D /* project_spec.md */; };
 /* End PBXBuildFile section */
@@ -44,7 +44,7 @@
 		88649EE62F32386700DB5D4D /* project_status.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = project_status.md; sourceTree = "<group>"; };
 		88649EE82F32386700DB5D4D /* camera-optimization-plan.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "camera-optimization-plan.md"; sourceTree = "<group>"; };
 		88649EE92F32386700DB5D4D /* milestone-2-recording.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "milestone-2-recording.md"; sourceTree = "<group>"; };
-		88649EEA2F32386700DB5D4D /* milestone-3-monetization.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "milestone-3-monetization.md"; sourceTree = "<group>"; };
+		88649EEA2F32386700DB5D4D /* milestone-4-monetization.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "milestone-4-monetization.md"; sourceTree = "<group>"; };
 		88649EEC2F32386700DB5D4D /* project_spec.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = project_spec.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -130,7 +130,7 @@
 			children = (
 				88649EE82F32386700DB5D4D /* camera-optimization-plan.md */,
 				88649EE92F32386700DB5D4D /* milestone-2-recording.md */,
-				88649EEA2F32386700DB5D4D /* milestone-3-monetization.md */,
+				88649EEA2F32386700DB5D4D /* milestone-4-monetization.md */,
 			);
 			path = plans;
 			sourceTree = "<group>";
@@ -260,7 +260,7 @@
 				88649EEF2F32386700DB5D4D /* CLAUDE.md in Resources */,
 				88649EF02F32386700DB5D4D /* architecture.md in Resources */,
 				88649EF12F32386700DB5D4D /* camera-optimization-plan.md in Resources */,
-				88649EF22F32386700DB5D4D /* milestone-3-monetization.md in Resources */,
+				88649EF22F32386700DB5D4D /* milestone-4-monetization.md in Resources */,
 				88649EF32F32386700DB5D4D /* project_status.md in Resources */,
 				88649EF42F32386700DB5D4D /* project_spec.md in Resources */,
 			);

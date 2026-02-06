@@ -2,25 +2,28 @@
 //  AutoDetectModel.swift
 //  golf-sync-swing
 //
-//  Model selection for offline swing analysis (AUTO-DETECT / Auto-Sync)
-//  Simplified to SwingNet-only implementation
+//  Model selection for swing detection (live recording + offline sync)
 //
 
 import Foundation
 
 enum AutoDetectModel: String, CaseIterable, Identifiable, Sendable {
+    case actionClassifier = "Action Classifier"
     case swingNet = "SwingNet (GolfDB)"
 
     var id: String { rawValue }
 
     var shortName: String {
-        return "SwingNet"
+        switch self {
+        case .actionClassifier: return "Classifier"
+        case .swingNet: return "SwingNet"
+        }
     }
 
     var description: String {
-        return "GolfDB SwingNet video event detector"
+        switch self {
+        case .actionClassifier: return "Pose-based swing classifier (any angle)"
+        case .swingNet: return "GolfDB SwingNet video event detector"
+        }
     }
 }
-
-
- 

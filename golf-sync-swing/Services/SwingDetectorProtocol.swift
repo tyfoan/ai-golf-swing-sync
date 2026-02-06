@@ -33,3 +33,4 @@ protocol RealTimeSwingDetector: AnyObject, Sendable {
 // MARK: - Protocol Conformance
 
 extension SwingNetDetector: RealTimeSwingDetector {}
+extension ActionClassifierDetector: RealTimeSwingDetector {}
