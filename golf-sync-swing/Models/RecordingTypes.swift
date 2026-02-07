@@ -7,6 +7,28 @@
 
 import Foundation
 
+// MARK: - Recording State
+
+enum RecordingState: Equatable {
+    case idle
+    case countdown(remaining: Int)
+    case recording
+    case processingSwing
+    case finalizingVideo
+    case saving
+    case reviewing
+
+    static func == (lhs: RecordingState, rhs: RecordingState) -> Bool {
+        switch (lhs, rhs) {
+        case (.idle, .idle), (.recording, .recording),
+             (.processingSwing, .processingSwing), (.finalizingVideo, .finalizingVideo),
+             (.saving, .saving), (.reviewing, .reviewing): return true
+        case (.countdown(let a), .countdown(let b)): return a == b
+        default: return false
+        }
+    }
+}
+
 // MARK: - Swing Bounds
 
 /// Detected swing boundaries from ML/velocity detection

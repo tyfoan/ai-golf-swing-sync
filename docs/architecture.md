@@ -6,34 +6,74 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                         CLIENT                               │
-│                    SwiftUI Views Layer                       │
-│   MainTabView → HomeView / HistoryView → SingleVideoPlayer   │
-│                     ↓              ↓                         │
-│            ComparisonView    SwingEditorSheet                │
+│                     VIEWS (SwiftUI)                          │
+│   MainTabView → HomeView / HistoryView → SingleVideoPlayer  │
+│   ComparisonView ← ComparisonTimelineSlider                 │
+│                    ← ComparisonControlsView                  │
+│   RecordingView  ← RecordingTopBar, RecordingControlsView   │
+│                  ← RecordingPiPView, RecordingOverlayView   │
+│   SingleVideoPlayerView ← SwingDetectionPanel               │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                      VIEW MODELS                             │
-│              State Management & Business Logic               │
-│         VideoPlayerViewModel │ ComparisonViewModel           │
+│                      VIEW MODELS                            │
+│  RecordingViewModel (orchestrator)                          │
+│    ├── FrameProcessingGate   (thread-safe frame gating)     │
+│    └── RecordingSaveService  (save to SwiftData)            │
+│  VideoPlayerViewModel │ ComparisonViewModel                 │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                        SERVICES                              │
-│  VideoStorage │ Thumbnail │ VideoExport │ SwingDetector     │
-│                     │              │                         │
-│               VideoSyncEngine ←────┘                         │
+│                   SERVICES (Orchestrators)                   │
+│                                                             │
+│  CameraService (facade)                                     │
+│    ├── CameraPermissionManager                              │
+│    ├── CaptureSessionConfigurator                           │
+│    ├── RecordingCoordinator                                 │
+│    └── CameraNotificationHandler                            │
+│                                                             │
+│  ActionClassifierDetector (orchestrator)                     │
+│    ├── PoseExtractor → PhaseClassifier                      │
+│    ├── PoseFrameBuffer (thread-safe ring buffer)            │
+│    └── ImpactDetectionChain (4 strategy objects)            │
+│                                                             │
+│  SwingNetDetector (orchestrator, deprecated)                │
+│    ├── PersonCropper → SwingNetPredictor                    │
+│    ├── RGBFrameBuffer (thread-safe ring buffer)             │
+│    └── SwingValidationPipeline (5 rule objects)             │
+│                                                             │
+│  VideoSyncEngine (orchestrator)                             │
+│    ├── VideoFrameIterator                                   │
+│    ├── TempoAnalyzer                                        │
+│    ├── SyncStrategySelector                                 │
+│    └── CrossCorrelationRefiner                              │
+│                                                             │
+│  VideoImportService │ VideoStorageService │ VideoExport     │
+│  DetectorFactory │ ThumbnailService │ MotionGateService     │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                      DATA LAYER                              │
-│       SwiftData │ AVFoundation │ Vision │ Photos            │
+│                      DATA LAYER                             │
+│       SwiftData │ AVFoundation │ Vision │ CoreML │ Photos  │
 └─────────────────────────────────────────────────────────────┘
 ```
+
+## Design Patterns
+
+**Strategy Pattern** — Impact detection uses 4 interchangeable strategies in a chain of responsibility:
+  `DownswingToFollowThroughStrategy`, `BackswingToFollowThroughStrategy`, `DownswingDecayStrategy`, `BackswingDecayStrategy`
+
+**Composite Pattern** — Swing validation uses 5 rules in a pipeline:
+  `ImpactConfidenceRule`, `EdgeArtifactRule`, `NoEventDominanceRule`, `TemporalOrderRule`, `MultiEventCorroborationRule`
+
+**Facade Pattern** — CameraService exposes a simple interface while delegating to 5 collaborators.
+
+**Orchestrator Pattern** — ActionClassifierDetector, SwingNetDetector, VideoSyncEngine, RecordingViewModel are slim orchestrators that wire collaborators together.
+
+**Factory Pattern** — DetectorFactory centralizes detector instantiation.
 
 ## Components
 
@@ -71,56 +111,81 @@
 - Uses AVMutableComposition and AVAssetExportSession
 - Saves to Photos library
 
-**SwingNetDetector** (`Services/SwingNetDetector.swift`) ⭐ REWRITTEN
-- GolfDB-pretrained SwingNet model: 64 frames × 3ch × 160×160 → 64 × 9 event probs
-- Pose-based person crop: VNDetectHumanBodyPoseRequest every 60 frames
-  - Bounding box from skeleton keypoints, expanded 30% for club arc
-  - Falls back to full frame when no pose detected
-- MotionGateService for adaptive classification stride (idle=30, active=8, peak=5)
-- 6-layer validation: confidence, edge filter, noEvent dominance, temporal order, corroboration
-- Exposes topOfBackswingTime/topOfBackswingConfidence for sync enrichment
-- ContiguousArray<UInt8> frame buffer, ImageNet normalization deferred to buildMLInput()
+**VideoImportService** (`Services/VideoImportService.swift`)
+- Imports video from URL into SwiftData (used by HomeView + HistoryView)
 
-**MotionGateService** (`Services/MotionGateService.swift`) ⭐ NEW
-- Lightweight frame-to-frame motion detection using luminance comparison
-- Returns idle/active/peak state for adaptive processing decisions
+**RecordingSaveService** (`Services/RecordingSaveService.swift`)
+- Saves recorded video + detected swings to SwiftData
 
-**ActionClassifierDetector** (`Services/ActionClassifierDetector.swift`) ⭐ REWRITTEN
-- 4-class Action Classifier (backswing, downswing, follow_through, no_swing)
-- Pose-based input: VNDetectHumanBodyPoseRequest → 60-frame sliding window (2s at 30fps)
-- Adaptive classification stride: idle=15, active=8 frames
-- 4-strategy impact detection:
-  1. Phase transition: downswing→follow_through probability crossover
-  2. Backswing fallback: backswing→follow_through (downswing too brief)
-  3. Downswing decay: downswing→no_swing (follow_through not detected)
-  4. Backswing decay: backswing→no_swing with residual swing signal
+**DetectorFactory** (`Services/Detection/DetectorFactory.swift`)
+- Centralized detector instantiation for ActionClassifier and SwingNet
 
-**VideoSyncEngine** (`Services/VideoSyncEngine.swift`)
-- Uses SwingNetDetector for offline video analysis
-- `analyzeAllSwings()` scans entire video, returns all detected swings
-- Calculates sync offset from impact times
-- Returns SyncResult with offset and confidence
+#### Camera Service (Facade)
+
+**CameraService** (`Services/CameraService.swift`) — facade over:
+- `CameraPermissionManager` — Permission requests and state checks
+- `CaptureSessionConfigurator` — Session setup and format negotiation
+- `RecordingCoordinator` — Recording lifecycle and duration timer
+- `CameraNotificationHandler` — Session interruption/error notifications
+- `CameraError` — Error types for camera operations
+
+#### ActionClassifierDetector (Orchestrator)
+
+**ActionClassifierDetector** (`Services/ActionClassifierDetector.swift`) — orchestrates:
+- `PoseExtractor` — VNDetectHumanBodyPoseRequest → MLMultiArray keypoints
+- `PhaseClassifier` — CoreML GolfSwingClassifier v3 model wrapper
+- `PoseFrameBuffer` — Thread-safe ring buffer for pose frames (NSLock)
+- `ImpactDetectionChain` → 4 strategies in priority order:
+  1. `DownswingToFollowThroughStrategy` — phase transition crossover
+  2. `BackswingToFollowThroughStrategy` — fast swing fallback
+  3. `DownswingDecayStrategy` — front camera (no follow_through)
+  4. `BackswingDecayStrategy` — very fast swings
+
+#### SwingNetDetector (Orchestrator, Deprecated)
+
+**SwingNetDetector** (`Services/SwingNetDetector.swift`) — orchestrates:
+- `RGBFrameBuffer` — Thread-safe ring buffer for RGB frame data
+- `PersonCropper` — Pose-based person detection + bounding box crop
+- `SwingNetPredictor` — CoreML SwingNet model + ImageNet normalization
+- `SwingValidationPipeline` → 5 rules:
+  1. `ImpactConfidenceRule`, 2. `EdgeArtifactRule`, 3. `NoEventDominanceRule`, 4. `TemporalOrderRule`, 5. `MultiEventCorroborationRule`
+
+**MotionGateService** (`Services/MotionGateService.swift`)
+- Lightweight motion detection for adaptive processing stride
+
+#### VideoSyncEngine (Orchestrator)
+
+**VideoSyncEngine** (`Services/VideoSyncEngine.swift`) — orchestrates:
+- `VideoFrameIterator` — Async frame extraction from video files
+- `TempoAnalyzer` — Swing tempo comparison
+- `SyncStrategySelector` — Best sync point selection (4 cases)
+- `CrossCorrelationRefiner` — Sub-frame alignment via velocity cross-correlation
 
 ### 3. ViewModels
+
+**RecordingViewModel** (`ViewModels/RecordingViewModel.swift`) — orchestrator
+- Composes: FrameProcessingGate, RecordingSaveService, CameraService, ActionClassifierDetector
+- State machine: idle → countdown → recording → finalizingVideo → reviewing → saving
+
+**FrameProcessingGate** (`ViewModels/Recording/FrameProcessingGate.swift`)
+- Thread-safe NSLock-based frame gating (prevents OutOfBuffers)
+- Tracks recording timestamps for relative timing
 
 **VideoPlayerViewModel** (`ViewModels/VideoPlayerViewModel.swift`)
 - Wraps AVPlayer with @Observable
 - Provides play/pause, seek, speed control
-- Tracks current time and duration
 
 **ComparisonViewModel** (`ViewModels/ComparisonViewModel.swift`)
-- Manages two VideoPlayerViewModels
-- Synchronizes playback with offset
-- setSyncOffset() for auto-sync integration
-- Handles swap functionality
+- Manages two VideoPlayerViewModels with synchronized playback
 
 ### 4. Views
 
-**MainTabView** - Tab container (Compare, Recordings)
+**MainTabView** - Tab container (Camera, Compare, Recordings)
 **HomeView** - Video library with selection for comparison
 **HistoryView** - All videos with swing counts
-**ComparisonView** - Side-by-side playback + Auto-Sync button
-**SingleVideoPlayerView** - Video player + AUTO-DETECT button
+**ComparisonView** → ComparisonTimelineSlider + ComparisonControlsView
+**SingleVideoPlayerView** → SwingDetectionPanel (auto-detect + swing list)
+**RecordingView** → RecordingTopBar + RecordingControlsView + RecordingPiPView + RecordingOverlayView
 **SwingEditorSheet** - Add/edit swing markers with 3-handle slider
 
 ### 5. Components
@@ -132,6 +197,13 @@
 **SwingMarkerSlider** - 3-handle slider for swing phases
 **SwingRowView** - Single swing display with edit button
 **ExportProgressView** - Export progress and share UI
+**SwingDetectionPanel** - Auto-detect button, progress, swing list
+**ComparisonTimelineSlider** - Timeline for comparison view
+**ComparisonControlsView** - Playback controls for comparison
+**RecordingTopBar** - Cancel, timer, swing count badge
+**RecordingControlsView** - Record/stop/save buttons
+**RecordingPiPView** - Picture-in-picture overlay
+**RecordingOverlayView** - State-dependent overlays (finalizing, replay, interruption)
 
 ## Data Flow
 

@@ -9,6 +9,19 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- **Sandi Metz OOP Decomposition**: Major refactoring of 11 files exceeding 200-line class limit
+  - 41 new focused files created, all under 200 lines
+  - Strategy pattern: 4 impact detection strategies as polymorphic chain of responsibility
+  - Composite pattern: 5 swing validation rules in pipeline
+  - Facade pattern: CameraService delegates to 5 collaborators
+  - Orchestrator pattern: VideoSyncEngine, RecordingViewModel delegate to focused collaborators
+- **New Services**: PoseExtractor, PhaseClassifier, PoseFrameBuffer, RGBFrameBuffer, PersonCropper, SwingNetPredictor, ImpactDetectionChain, SwingValidationPipeline, FrameProcessingGate, RecordingSaveService, VideoImportService, CameraNotificationHandler
+- **New Camera Collaborators**: CameraPermissionManager, CaptureSessionConfigurator, RecordingCoordinator, CameraError (extracted)
+- **New Sync Collaborators**: TempoAnalyzer, CrossCorrelationRefiner, SyncStrategySelector, VideoFrameIterator (extracted)
+- **New View Components**: SwingDetectionPanel, ComparisonTimelineSlider, ComparisonControlsView, RecordingTopBar, RecordingControlsView, RecordingPiPView, RecordingOverlayView
+- **DetectorFactory**: Centralized detector instantiation
+- **SyncTypes.swift**: Extracted model types (SwingDetectionResult, SyncResult, etc.)
+- **RecordingTypes.swift**: RecordingState enum moved from RecordingViewModel
 - **GolfSwingClassifier v3**: Retrained 4-class model with fixed phase boundaries (backswing=toe_up→top, longer no_swing windows)
 - **Positioning Guide Overlay**: Full-screen dark overlay with best practice rules shown on camera during idle state
   - 4 rules with SF Symbol icons: full body in frame, no other people, face light source, keep phone steady
@@ -43,6 +56,15 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **isMotionDetected**: Added to `RealTimeSwingDetector` protocol for UI feedback
 
 ### Changed
+- **ActionClassifierDetector**: Decomposed from 667→187 lines; orchestrates PoseExtractor, PhaseClassifier, PoseFrameBuffer, ImpactDetectionChain
+- **SwingNetDetector**: Decomposed from 693→233 lines; orchestrates RGBFrameBuffer, PersonCropper, SwingNetPredictor, SwingValidationPipeline
+- **CameraService**: Decomposed from 824→313 lines; facade over CameraPermissionManager, CaptureSessionConfigurator, RecordingCoordinator, CameraNotificationHandler
+- **VideoSyncEngine**: Decomposed from 796→248 lines; orchestrates VideoFrameIterator, TempoAnalyzer, SyncStrategySelector, CrossCorrelationRefiner
+- **RecordingViewModel**: Decomposed from 579→263 lines; delegates to FrameProcessingGate, RecordingSaveService
+- **RecordingView**: Decomposed from 593→203 lines; uses RecordingTopBar, RecordingControlsView, RecordingPiPView, RecordingOverlayView
+- **ComparisonView**: Decomposed from 366→194 lines; extracted ComparisonTimelineSlider, ComparisonControlsView
+- **SingleVideoPlayerView**: Decomposed from 339→204 lines; extracted SwingDetectionPanel
+- **HomeView/HistoryView**: Duplicate `importVideo` replaced with VideoImportService
 - **ActionClassifierDetector**: Upgraded from v2 to v3 model, removed v2 model from bundle
 - **RecordingView**: Replaced CameraTipsOverlay with PositioningGuideOverlay in idle state
 - **SwingNetDetector**: Complete rewrite of detection pipeline

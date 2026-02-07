@@ -65,6 +65,21 @@
 
 **Progress**: █████████░ 85%
 
+### Code Quality: [Sandi Metz Decomposition] - Complete ✅
+
+| Deliverable | Status | Notes |
+|-------------|--------|-------|
+| ActionClassifierDetector decomposition | Done | 667→187 lines, 9 new files |
+| SwingNetDetector decomposition | Done | 693→233 lines, 9 new files (deprecated) |
+| CameraService decomposition | Done | 824→313 lines, 5 new files |
+| VideoSyncEngine decomposition | Done | 796→248 lines, 4 new files |
+| RecordingViewModel decomposition | Done | 579→263 lines, 2 new files |
+| View decomposition | Done | 6 views reduced, 7 new components |
+| Service extraction | Done | VideoImportService, RecordingSaveService, DetectorFactory |
+| Build verification | Done | All 41 new files compile clean |
+
+**Progress**: ██████████ 100%
+
 ### Milestone 4: [Monetization] - Not Started
 
 | Deliverable | Status | Notes |
@@ -78,6 +93,19 @@
 ---
 
 ## Recent Updates
+
+### 2026-02-08 (Sandi Metz OOP Decomposition)
+- Major refactoring: 11 files exceeding 200-line Sandi Metz limit decomposed
+- 41 new focused files created, largest is 193 lines (CaptureSessionConfigurator)
+- Strategy pattern for impact detection: 4 strategies as chain of responsibility
+- Composite pattern for swing validation: 5 rules in pipeline
+- Facade pattern for CameraService (5 collaborators)
+- Orchestrator pattern for VideoSyncEngine, RecordingViewModel
+- Key reductions: CameraService 824→313, VideoSyncEngine 796→248, ActionClassifierDetector 667→187
+- Extracted shared services: VideoImportService, RecordingSaveService, DetectorFactory
+- Extracted view components: SwingDetectionPanel, ComparisonTimelineSlider, ComparisonControlsView, 4 RecordingView components
+- SwingNetDetector marked as deprecated (will be removed)
+- All changes verified with successful build
 
 ### 2026-02-07 (v3 Model + 4-Strategy Detection + Recording UX)
 - Trained GolfSwingClassifier v3 with fixed phase boundaries (backswing=toe_up→top)

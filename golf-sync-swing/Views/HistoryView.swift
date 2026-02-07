@@ -60,12 +60,7 @@ struct HistoryView: View {
     private func importVideo(from url: URL) {
         Task {
             do {
-                let localURL = try VideoStorageService.shared.copyVideoToStorage(from: url)
-                let video = await VideoStorageService.shared.createSwingVideo(from: localURL)
-                await MainActor.run {
-                    modelContext.insert(video)
-                }
-                try? FileManager.default.removeItem(at: url)
+                try await VideoImportService().importVideo(from: url, into: modelContext)
             } catch {
                 print("Error importing video: \(error)")
             }
