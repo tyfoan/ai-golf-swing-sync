@@ -61,14 +61,14 @@ struct SingleVideoPlayerView: View {
         } message: {
             let valid = lastDetectionResults.filter { $0.hasValidDetection }
             if valid.isEmpty {
-                Text("Model: SwingNet\nCould not detect swing. Try adding markers manually.")
+                Text("Could not detect swing. Try adding markers manually.")
             } else if valid.count == 1, let result = valid.first {
                 let impact = result.impactTime.map { String(format: "%.2fs", $0) } ?? "n/a"
                 Text(
-                    "Model: SwingNet\nImpact: \(impact)\nConfidence: \(Int(result.impactConfidence * 100))%"
+                    "Impact: \(impact)\nConfidence: \(Int(result.impactConfidence * 100))%"
                 )
             } else {
-                Text("Model: SwingNet\nDetected \(valid.count) swings")
+                Text("Detected \(valid.count) swings")
             }
         }
         .alert("Analysis Error", isPresented: .init(
@@ -267,11 +267,14 @@ struct SingleVideoPlayerView: View {
     private func runAutoDetection() {
         isAnalyzing = true
         analysisProgress = 0
-        analysisStatus = "Analyzing with SwingNet..."
+        analysisStatus = "Analyzing with Action Classifier..."
 
         Task {
             do {
-                let results = try await syncEngine.analyzeAllSwings(for: video) { progress in
+                let results = try await syncEngine.analyzeAllSwings(
+                    for: video,
+                    model: .actionClassifier
+                ) { progress in
                     Task { @MainActor in
                         analysisProgress = progress
                     }

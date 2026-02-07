@@ -659,9 +659,15 @@ final class VideoSyncEngine {
         model: AutoDetectModel = .swingNet,
         progress: @escaping (Float) -> Void
     ) async throws -> [SwingDetectionResult] {
-        print("🪄 AUTO-DETECT: model=SwingNet video=\(video.localURL.lastPathComponent)")
+        print("🪄 AUTO-DETECT: model=\(model.shortName) video=\(video.localURL.lastPathComponent)")
 
-        let results = try await analyzeAllSwingsWithSwingNet(at: video.localURL, progress: progress)
+        let results: [SwingDetectionResult]
+        switch model {
+        case .actionClassifier:
+            results = try await analyzeAllSwingsWithActionClassifier(at: video.localURL, progress: progress)
+        case .swingNet:
+            results = try await analyzeAllSwingsWithSwingNet(at: video.localURL, progress: progress)
+        }
 
         video.hasBeenAnalyzed = true
         video.analysisDate = Date()
@@ -680,7 +686,55 @@ final class VideoSyncEngine {
         return results
     }
 
-    // MARK: - Full-Video Multi-Swing Analysis
+    // MARK: - Full-Video Multi-Swing Analysis (Action Classifier)
+
+    private func analyzeAllSwingsWithActionClassifier(
+        at url: URL,
+        progress: @escaping (Float) -> Void
+    ) async throws -> [SwingDetectionResult] {
+        progress(0.0)
+
+        let asset = AVURLAsset(url: url)
+        let duration = try await asset.load(.duration).seconds
+        print("📹 ActionClassifier multi-swing analysis: video duration=\(String(format: "%.2f", duration))s")
+
+        let detector = ActionClassifierDetector()
+        var detectedSwings: [SwingBounds] = []
+        var framesProcessed = 0
+
+        detector.onSwingDetected = { bounds in
+            detectedSwings.append(bounds)
+        }
+
+        try await forEachVideoFrame(
+            at: url,
+            timeRangeSeconds: nil,
+            targetFPS: offlineTargetFPS,
+            progress: progress,
+            process: { pixelBuffer, timestamp in
+                framesProcessed += 1
+                detector.processFrame(pixelBuffer, at: timestamp)
+                return false  // Scan entire video
+            }
+        )
+
+        print("📹 ActionClassifier: Processed \(framesProcessed) total frames, found \(detectedSwings.count) swing(s)")
+
+        return detectedSwings.map { swing in
+            SwingDetectionResult(
+                impactTime: swing.impactTime,
+                impactConfidence: swing.confidence,
+                topOfBackswingTime: nil,
+                topOfBackswingConfidence: 0,
+                startTime: max(0, swing.startTime),
+                endTime: min(duration, swing.endTime),
+                phases: [],
+                velocityProfile: []
+            )
+        }
+    }
+
+    // MARK: - Full-Video Multi-Swing Analysis (SwingNet)
 
     private func analyzeAllSwingsWithSwingNet(
         at url: URL,

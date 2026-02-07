@@ -85,6 +85,16 @@
 - Lightweight frame-to-frame motion detection using luminance comparison
 - Returns idle/active/peak state for adaptive processing decisions
 
+**ActionClassifierDetector** (`Services/ActionClassifierDetector.swift`) ⭐ REWRITTEN
+- 4-class Action Classifier (backswing, downswing, follow_through, no_swing)
+- Pose-based input: VNDetectHumanBodyPoseRequest → 60-frame sliding window (2s at 30fps)
+- Adaptive classification stride: idle=15, active=8 frames
+- 4-strategy impact detection:
+  1. Phase transition: downswing→follow_through probability crossover
+  2. Backswing fallback: backswing→follow_through (downswing too brief)
+  3. Downswing decay: downswing→no_swing (follow_through not detected)
+  4. Backswing decay: backswing→no_swing with residual swing signal
+
 **VideoSyncEngine** (`Services/VideoSyncEngine.swift`)
 - Uses SwingNetDetector for offline video analysis
 - `analyzeAllSwings()` scans entire video, returns all detected swings

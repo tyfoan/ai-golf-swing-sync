@@ -17,7 +17,6 @@ struct RecordingView: View {
     @State private var showingError = false
     @State private var hasSetupCamera = false
     @State private var isTabVisible = false
-    @State private var showTipsOverlay = true
     @State private var pipVisible = false
 
     var body: some View {
@@ -29,6 +28,13 @@ struct RecordingView: View {
                 // Main content: either camera preview or swing replay
                 mainContentView
                     .ignoresSafeArea()
+
+                // Best practice rules overlay (idle state, behind controls)
+                if viewModel.state == .idle && !viewModel.mainViewShowsReplay {
+                    PositioningGuideOverlay()
+                        .transition(.opacity)
+                        .animation(.easeOut(duration: 0.3), value: viewModel.state)
+                }
 
                 // Main UI layers
                 VStack(spacing: 0) {
@@ -78,15 +84,6 @@ struct RecordingView: View {
                     interruptionOverlay
                 }
 
-                // Tips overlay (shown in idle state)
-                if viewModel.state == .idle && showTipsOverlay {
-                    VStack {
-                        Spacer()
-                        CameraTipsOverlay(isVisible: $showTipsOverlay)
-                            .padding(.bottom, 180) // Above the Start Recording button
-                    }
-                    .animation(.spring(response: 0.3, dampingFraction: 0.8), value: showTipsOverlay)
-                }
             }
         }
         .onAppear {
@@ -225,20 +222,6 @@ struct RecordingView: View {
                         .foregroundStyle(.white)
                         .frame(width: 44, height: 44)
                         .background(Color.green)
-                        .clipShape(Circle())
-                }
-            } else if viewModel.state == .idle && !showTipsOverlay {
-                // Tips button when overlay is hidden
-                Button {
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                        showTipsOverlay = true
-                    }
-                } label: {
-                    Image(systemName: "lightbulb.fill")
-                        .font(.title3)
-                        .foregroundStyle(.white)
-                        .frame(width: 44, height: 44)
-                        .background(Color.green.opacity(0.8))
                         .clipShape(Circle())
                 }
             }

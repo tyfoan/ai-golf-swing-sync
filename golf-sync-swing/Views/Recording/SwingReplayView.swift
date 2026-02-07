@@ -17,6 +17,8 @@ struct SwingReplayView: View {
     @State private var isLoading = true
     @State private var loadError: String?
     @State private var retryCount = 0
+    @State private var isPlaying = true
+    @State private var isMuted = true
 
     /// Maximum retries if video isn't ready
     private let maxRetries = 5
@@ -33,8 +35,9 @@ struct SwingReplayView: View {
 
             if let player {
                 VideoPlayer(player: player)
-                    .disabled(true) // No controls
+                    .disabled(true) // No native controls
                     .onAppear {
+                        player.isMuted = isMuted
                         setupLooping()
                         player.play()
                     }
@@ -54,6 +57,15 @@ struct SwingReplayView: View {
                 }
                 .padding()
             }
+
+            // Floating replay controls
+            if player != nil {
+                VStack {
+                    Spacer()
+                    replayControls
+                        .padding(.bottom, 12)
+                }
+            }
             // Note: Replay badge is shown by parent RecordingView
         }
         .task {
@@ -64,6 +76,47 @@ struct SwingReplayView: View {
             player = nil
         }
     }
+
+    // MARK: - Replay Controls
+
+    private var replayControls: some View {
+        HStack(spacing: 16) {
+            Button {
+                togglePlayback()
+            } label: {
+                Image(systemName: isPlaying ? "pause.fill" : "play.fill")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .frame(width: 32, height: 32)
+                    .background(.ultraThinMaterial)
+                    .clipShape(Circle())
+            }
+
+            Button {
+                isMuted.toggle()
+                player?.isMuted = isMuted
+            } label: {
+                Image(systemName: isMuted ? "speaker.slash.fill" : "speaker.wave.2.fill")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .frame(width: 32, height: 32)
+                    .background(.ultraThinMaterial)
+                    .clipShape(Circle())
+            }
+        }
+    }
+
+    private func togglePlayback() {
+        guard let player else { return }
+        if isPlaying {
+            player.pause()
+        } else {
+            player.play()
+        }
+        isPlaying.toggle()
+    }
+
+    // MARK: - Video Loading
 
     private func loadVideo() async {
         // Small initial delay
@@ -146,6 +199,7 @@ struct SwingReplayView: View {
             object: player.currentItem,
             queue: .main
         ) { [weak player] _ in
+            guard self.isPlaying else { return }
             let seekTime = CMTime(seconds: startTime, preferredTimescale: 600)
             player?.seek(to: seekTime) { _ in
                 player?.play()

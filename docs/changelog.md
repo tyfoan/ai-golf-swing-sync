@@ -9,6 +9,19 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- **GolfSwingClassifier v3**: Retrained 4-class model with fixed phase boundaries (backswing=toe_up→top, longer no_swing windows)
+- **Positioning Guide Overlay**: Full-screen dark overlay with best practice rules shown on camera during idle state
+  - 4 rules with SF Symbol icons: full body in frame, no other people, face light source, keep phone steady
+  - Automatically dismissed when recording starts
+- **Swing Replay Controls**: Play/pause + mute floating buttons on SwingReplayView during recording
+  - 32pt circular buttons with `.ultraThinMaterial` background
+  - Pause stops looping; play resumes it
+- **4-Strategy Swing Detection**: Expanded ActionClassifierDetector from 2 to 4 detection strategies
+  - Strategy 1: downswing→follow_through phase transition (best accuracy)
+  - Strategy 2: backswing→follow_through fallback (downswing too brief)
+  - Strategy 3: downswing→no_swing decay (follow_through not detected, common from front camera)
+  - Strategy 4: backswing→no_swing decay with residual swing signal (very fast swings)
+- **v3 Training Pipeline**: `scripts/prepare_golfdb_v3_training_data.py` for GolfDB data preparation
 - **SwingNet ML Model**: GolfDB-pretrained SwingNet replaces heuristic detection for offline video analysis
   - 64-frame sliding window with 9-event classification (address → impact → finish)
   - ImageNet normalization for correct model input
@@ -30,6 +43,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **isMotionDetected**: Added to `RealTimeSwingDetector` protocol for UI feedback
 
 ### Changed
+- **ActionClassifierDetector**: Upgraded from v2 to v3 model, removed v2 model from bundle
+- **RecordingView**: Replaced CameraTipsOverlay with PositioningGuideOverlay in idle state
 - **SwingNetDetector**: Complete rewrite of detection pipeline
   - Person detection switched from `VNDetectHumanRectanglesRequest` to `VNDetectHumanBodyPoseRequest`
   - Frame buffer uses `ContiguousArray<UInt8>` instead of `[Float]` (memory + perf)

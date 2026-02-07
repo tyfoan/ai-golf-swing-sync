@@ -2,7 +2,7 @@
 
 > Current progress for Golf Sync Swing
 
-**Last Updated**: 2026-02-06
+**Last Updated**: 2026-02-07
 
 ---
 
@@ -57,10 +57,13 @@
 | **Pose-Based Person Crop** | Done | VNDetectHumanBodyPoseRequest, 30% expansion |
 | **Multi-Swing Detection** | Done | Full-video scan, returns all swings |
 | **Motion Gate** | Done | Adaptive stride, frame processing gate |
+| **4-Strategy Detection** | Done | Phase transition, backswing fallback, downswing decay, backswing decay |
+| **Positioning Guide** | Done | Best practice rules overlay on camera |
+| **Replay Controls** | Done | Play/pause + mute on swing replay |
 | Drawing tools | Not Started | |
 | Annotation overlay | Not Started | |
 
-**Progress**: ████████░░ 80%
+**Progress**: █████████░ 85%
 
 ### Milestone 4: [Monetization] - Not Started
 
@@ -75,6 +78,16 @@
 ---
 
 ## Recent Updates
+
+### 2026-02-07 (v3 Model + 4-Strategy Detection + Recording UX)
+- Trained GolfSwingClassifier v3 with fixed phase boundaries (backswing=toe_up→top)
+- Expanded ActionClassifierDetector to 4 detection strategies for robust swing detection
+  - Added downswing-decay (Strategy 3) for front-camera where follow_through isn't recognized
+  - Added backswing-decay (Strategy 4) for very fast swings that skip downswing phase
+- Added PositioningGuideOverlay: best practice rules shown on camera during idle state
+- Added play/pause + mute controls on SwingReplayView
+- Removed CameraTipsOverlay (replaced by positioning guide)
+- Deleted v2 model from bundle, v3 is now the default
 
 ### 2026-02-06 (SwingNet Overhaul + Pose-Based Person Crop)
 - Complete rewrite of SwingNetDetector with 6-layer validation pipeline

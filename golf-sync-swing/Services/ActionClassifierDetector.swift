@@ -41,13 +41,13 @@ final class ActionClassifierDetector: @unchecked Sendable {
     private var classificationStride: Int = 15
 
     /// Minimum downswing probability to consider a prediction "has downswing"
-    private let downswingThreshold: Double = 0.25
+    private let downswingThreshold: Double = 0.30
 
     /// Minimum follow_through probability for transition detection
-    private let followThroughThreshold: Double = 0.35
+    private let followThroughThreshold: Double = 0.30
 
     /// Minimum combined swing confidence (downswing + follow_through) for valid detection
-    private let minSwingConfidence: Double = 0.50
+    private let minSwingConfidence: Double = 0.40
 
     /// Minimum interval between swing detections
     private let minDetectionInterval: TimeInterval = 3.0
@@ -125,26 +125,20 @@ final class ActionClassifierDetector: @unchecked Sendable {
             let config = MLModelConfiguration()
             config.computeUnits = .all
 
-            // Try v2 first (better model: 89% accuracy, 86% downswing precision)
-            if let url = Bundle.main.url(forResource: "GolfSwingClassifier_v2", withExtension: "mlmodelc") {
-                model = try MLModel(contentsOf: url, configuration: config)
-                modelLoaded = true
-                print("  Loaded GolfSwingClassifier_v2")
-                logModelInfo()
-                return
-            }
-
-            // Fall back to v1
-            if let url = Bundle.main.url(forResource: "GolfSwingClassifier", withExtension: "mlmodelc") {
-                model = try MLModel(contentsOf: url, configuration: config)
-                modelLoaded = true
-                print("  Loaded GolfSwingClassifier")
-                logModelInfo()
-                return
+            // Model preference order: v3 (fixed boundaries) > v2 > v1
+            let modelNames = ["GolfSwingClassifier_v3", "GolfSwingClassifier_v2", "GolfSwingClassifier"]
+            for name in modelNames {
+                if let url = Bundle.main.url(forResource: name, withExtension: "mlmodelc") {
+                    model = try MLModel(contentsOf: url, configuration: config)
+                    modelLoaded = true
+                    print("  Loaded \(name)")
+                    logModelInfo()
+                    return
+                }
             }
 
             print("  No Action Classifier model in bundle")
-            print("  Add GolfSwingClassifier_v2.mlmodel to the Xcode target")
+            print("  Add GolfSwingClassifier_v3.mlmodel to the Xcode target")
             modelLoaded = false
         } catch {
             print("  FAILED: \(error.localizedDescription)")
@@ -166,10 +160,21 @@ final class ActionClassifierDetector: @unchecked Sendable {
     // MARK: - Public API
 
     func processFrame(_ pixelBuffer: CVPixelBuffer, at timestamp: TimeInterval) {
+        guard modelLoaded else {
+            if totalFramesProcessed == 0 {
+                print("ActionClassifier: skipping frames — model not loaded")
+            }
+            totalFramesProcessed += 1
+            return
+        }
+
         totalFramesProcessed += 1
 
         guard let poseArray = detectPose(from: pixelBuffer) else {
             consecutiveNoPoseFrames += 1
+            if consecutiveNoPoseFrames == 1 || consecutiveNoPoseFrames % 60 == 0 {
+                print("ActionClassifier: no pose detected (\(consecutiveNoPoseFrames) consecutive)")
+            }
             if consecutiveNoPoseFrames > noPoseIdleThreshold {
                 isMotionDetected = false
                 classificationStride = idleStride
@@ -177,6 +182,9 @@ final class ActionClassifierDetector: @unchecked Sendable {
             return
         }
 
+        if consecutiveNoPoseFrames > 10 {
+            print("ActionClassifier: pose recovered after \(consecutiveNoPoseFrames) frames")
+        }
         consecutiveNoPoseFrames = 0
         isMotionDetected = true
 
@@ -193,6 +201,11 @@ final class ActionClassifierDetector: @unchecked Sendable {
         guard timestamp - lastDetectionTime > minDetectionInterval else {
             lock.unlock()
             return
+        }
+
+        // Log buffer fill progress once
+        if poseBuffer.count == predictionWindow && frameCounter == 0 && classificationCount == 0 {
+            print("ActionClassifier: pose buffer full (\(predictionWindow) frames), starting classification")
         }
 
         // Run classification periodically when buffer is full
@@ -249,10 +262,14 @@ final class ActionClassifierDetector: @unchecked Sendable {
 
     // MARK: - Classification
 
+    private var classificationCount: Int = 0
+    private var classificationErrors: Int = 0
+
     private func runClassification(frames: [PoseFrame]) {
         guard modelLoaded, let model else { return }
 
         guard let inputArray = buildPredictionInput(from: frames) else {
+            print("ActionClassifier: failed to build prediction input (frames=\(frames.count))")
             return
         }
 
@@ -261,10 +278,12 @@ final class ActionClassifierDetector: @unchecked Sendable {
                 dictionary: ["poses": MLFeatureValue(multiArray: inputArray)]
             )
             let prediction = try model.prediction(from: inputFeatures)
+            classificationCount += 1
             processPrediction(prediction, frames: frames)
         } catch {
-            if totalFramesProcessed % 300 == 0 {
-                print("ActionClassifier: prediction failed: \(error.localizedDescription)")
+            classificationErrors += 1
+            if classificationErrors <= 3 || classificationErrors % 10 == 0 {
+                print("ActionClassifier: prediction FAILED (\(classificationErrors)x): \(error.localizedDescription)")
             }
         }
     }
@@ -272,11 +291,25 @@ final class ActionClassifierDetector: @unchecked Sendable {
     private func buildPredictionInput(from frames: [PoseFrame]) -> MLMultiArray? {
         guard frames.count == predictionWindow else { return nil }
 
+        // Vision's keypointsMultiArray() returns shape (1, 3, 18)
+        // — 1 pose × 3 components (x, y, confidence) × 18 joints.
+        // The model expects (60, 3, 18) — strip the leading 1 dimension.
         let firstShape = frames[0].keypointsArray.shape
-        guard firstShape.count == 2 else { return nil }
+        let numComponents: Int
+        let numJoints: Int
 
-        let numComponents = firstShape[0].intValue  // 3
-        let numJoints = firstShape[1].intValue       // 18
+        if firstShape.count == 3 {
+            // Shape: (1, 3, 18) — typical Vision output
+            numComponents = firstShape[1].intValue
+            numJoints = firstShape[2].intValue
+        } else if firstShape.count == 2 {
+            // Shape: (3, 18)
+            numComponents = firstShape[0].intValue
+            numJoints = firstShape[1].intValue
+        } else {
+            print("ActionClassifier: unexpected pose shape \(firstShape)")
+            return nil
+        }
 
         do {
             let result = try MLMultiArray(
@@ -293,6 +326,7 @@ final class ActionClassifierDetector: @unchecked Sendable {
                 let src = frame.keypointsArray
                 let dstOffset = frameIdx * frameStride
 
+                // For (1, 3, 18) shape, data is contiguous — same layout as (3, 18)
                 if src.dataType == .double {
                     let doubleSrc = UnsafeMutablePointer<Double>(OpaquePointer(src.dataPointer))
                     for i in 0..<frameStride {
@@ -308,6 +342,7 @@ final class ActionClassifierDetector: @unchecked Sendable {
 
             return result
         } catch {
+            print("ActionClassifier: MLMultiArray creation failed: \(error)")
             return nil
         }
     }
@@ -345,37 +380,36 @@ final class ActionClassifierDetector: @unchecked Sendable {
         }
         lock.unlock()
 
-        // Update tracking state + adaptive stride
-        let isSwingPhase = (label == backswingLabel || label == downswingLabel || label == followThroughLabel)
-        isTrackingSwing = isSwingPhase
-        classificationStride = isSwingPhase ? activeStride : idleStride
-
         // Report phase for UI
         let confidence = probabilities[label] ?? 0
         onPhaseChanged?(label, confidence)
 
-        // Log periodically
-        if totalFramesProcessed % 90 == 0 {
-            let pDown = probabilities[downswingLabel] ?? 0
-            let pFollow = probabilities[followThroughLabel] ?? 0
-            let pBack = probabilities[backswingLabel] ?? 0
-            print("ActionClassifier: \(label) (\(Int(confidence * 100))%)  back=\(Int(pBack * 100)) down=\(Int(pDown * 100)) follow=\(Int(pFollow * 100))")
-        }
+        // Update tracking state + adaptive stride
+        let isActiveSwing = (label == downswingLabel || label == followThroughLabel || label == backswingLabel)
+        isTrackingSwing = isActiveSwing
+        classificationStride = isActiveSwing ? activeStride : idleStride
+
+        // Log every classification
+        let pDown = probabilities[downswingLabel] ?? 0
+        let pFollow = probabilities[followThroughLabel] ?? 0
+        let pBack = probabilities[backswingLabel] ?? 0
+        print("🧠 ActionClassifier[\(classificationCount)]: \(label) (\(Int(confidence * 100))%)  back=\(Int(pBack * 100)) down=\(Int(pDown * 100)) follow=\(Int(pFollow * 100))")
 
         // Check for impact transition
         checkForImpact()
     }
 
-    /// Analyze prediction history for downswing→follow_through transition.
+    /// Detect swing impact using three strategies (in priority order):
     ///
-    /// Impact = the moment the club hits the ball = transition from downswing to follow_through.
-    ///
-    /// We look for a prediction that recently had high downswing probability,
-    /// followed by a prediction with high follow_through probability.
-    /// The impact timestamp is estimated from the probability crossover.
+    /// 1. **Phase transition**: downswing→follow_through probability crossover (best accuracy)
+    /// 2. **Backswing fallback**: backswing→follow_through when downswing too brief (~150ms)
+    /// 3. **Downswing decay**: backswing→downswing→no_swing when follow_through never fires
+    ///    (common from front-facing camera where follow_through pose isn't recognized)
+    /// 4. **Backswing decay**: backswing→no_swing when both downswing AND follow_through
+    ///    are skipped (very fast swing from certain angles)
     private func checkForImpact() {
         lock.lock()
-        let history = Array(predictionHistory.suffix(8))
+        let history = Array(predictionHistory.suffix(10))
         let currentTime = history.last?.timestamp ?? 0
 
         guard currentTime - lastDetectionTime > minDetectionInterval else {
@@ -384,10 +418,45 @@ final class ActionClassifierDetector: @unchecked Sendable {
         }
         lock.unlock()
 
-        guard history.count >= 2 else { return }
+        guard history.count >= 3 else { return }
 
-        // Scan for the pattern: ...downswing-heavy... → ...follow_through-heavy...
-        // Find the last prediction with significant downswing, followed by follow_through
+        // Strategy 1: downswing→follow_through transition
+        if let swing = detectPhaseTransition(history: history) {
+            fireSwingDetection(swing, method: "phase-transition")
+            return
+        }
+
+        // Strategy 2: backswing→follow_through (downswing too brief)
+        if let swing = detectBackswingToFollow(history: history) {
+            fireSwingDetection(swing, method: "backswing-fallback")
+            return
+        }
+
+        // Strategy 3: downswing→no_swing decay (follow_through not detected)
+        if let swing = detectDownswingDecay(history: history) {
+            fireSwingDetection(swing, method: "downswing-decay")
+            return
+        }
+
+        // Strategy 4: backswing→no_swing decay (very fast swing, no downswing/follow detected)
+        if let swing = detectBackswingDecay(history: history) {
+            fireSwingDetection(swing, method: "backswing-decay")
+            return
+        }
+    }
+
+    private func fireSwingDetection(_ swing: SwingBounds, method: String) {
+        lock.lock()
+        lastDetectionTime = swing.detectionTime
+        predictionHistory.removeAll()
+        lock.unlock()
+
+        print("⛳ ActionClassifier SWING [\(method)]: \(String(format: "%.2f", swing.startTime))s -> impact=\(String(format: "%.2f", swing.impactTime))s -> \(String(format: "%.2f", swing.endTime))s  conf=\(Int(swing.confidence * 100))%")
+        onSwingDetected?(swing)
+    }
+
+    /// Strategy 1: Find downswing→follow_through probability transition
+    private func detectPhaseTransition(history: [PredictionRecord]) -> SwingBounds? {
         var lastDownswingRecord: PredictionRecord?
         var firstFollowThroughRecord: PredictionRecord?
 
@@ -396,69 +465,158 @@ final class ActionClassifierDetector: @unchecked Sendable {
             let pFollow = record.probabilities[followThroughLabel] ?? 0
 
             if pDown >= downswingThreshold {
-                // This prediction has significant downswing — track it
                 lastDownswingRecord = record
-                firstFollowThroughRecord = nil  // Reset: need follow_through AFTER this
+                firstFollowThroughRecord = nil
             } else if pFollow >= followThroughThreshold && lastDownswingRecord != nil {
-                // Follow_through after downswing — transition found
                 if firstFollowThroughRecord == nil {
                     firstFollowThroughRecord = record
                 }
             }
         }
 
-        // Also detect backswing→follow_through (downswing too brief to catch explicitly)
-        if lastDownswingRecord == nil {
-            var lastBackswingRecord: PredictionRecord?
-            for record in history {
-                let pBack = record.probabilities[backswingLabel] ?? 0
-                let pFollow = record.probabilities[followThroughLabel] ?? 0
+        guard let downPred = lastDownswingRecord,
+              let followPred = firstFollowThroughRecord else { return nil }
 
-                if pBack >= 0.4 {
-                    lastBackswingRecord = record
-                    firstFollowThroughRecord = nil
-                } else if pFollow >= followThroughThreshold && lastBackswingRecord != nil {
-                    if firstFollowThroughRecord == nil {
-                        lastDownswingRecord = lastBackswingRecord  // Use backswing as proxy
-                        firstFollowThroughRecord = record
-                    }
+        let peakDown = downPred.probabilities[downswingLabel] ?? 0
+        let peakFollow = followPred.probabilities[followThroughLabel] ?? 0
+        guard (peakDown + peakFollow) >= minSwingConfidence else { return nil }
+
+        let impactTime = estimateImpactTime(downswingPred: downPred, followPred: followPred)
+        let swingStart = findSwingStart(in: history, before: downPred.timestamp)
+
+        return SwingBounds(
+            startTime: max(0, swingStart - preSwingBuffer),
+            impactTime: impactTime,
+            endTime: followPred.timestamp + postSwingBuffer,
+            confidence: (peakDown + peakFollow) / 2.0,
+            detectionTime: followPred.timestamp,
+            audioConfirmed: false
+        )
+    }
+
+    /// Strategy 2: Find backswing→follow_through (skipping downswing)
+    private func detectBackswingToFollow(history: [PredictionRecord]) -> SwingBounds? {
+        var lastBackswingRecord: PredictionRecord?
+        var firstFollowRecord: PredictionRecord?
+
+        for record in history {
+            let pBack = record.probabilities[backswingLabel] ?? 0
+            let pFollow = record.probabilities[followThroughLabel] ?? 0
+
+            if pBack >= 0.4 {
+                lastBackswingRecord = record
+                firstFollowRecord = nil
+            } else if pFollow >= followThroughThreshold && lastBackswingRecord != nil {
+                if firstFollowRecord == nil {
+                    firstFollowRecord = record
                 }
             }
         }
 
-        guard let downswingPred = lastDownswingRecord,
-              let followPred = firstFollowThroughRecord else {
-            return
-        }
+        guard let backPred = lastBackswingRecord,
+              let followPred = firstFollowRecord else { return nil }
 
-        // Validate: combined confidence should be meaningful
-        let peakDownswing = downswingPred.probabilities[downswingLabel] ?? 0
         let peakFollow = followPred.probabilities[followThroughLabel] ?? 0
-        guard (peakDownswing + peakFollow) >= minSwingConfidence else { return }
+        guard peakFollow >= followThroughThreshold else { return nil }
 
-        // Estimate impact timestamp from the transition
-        let impactTime = estimateImpactTime(downswingPred: downswingPred, followPred: followPred)
+        // Impact is roughly at the transition point
+        let impactTime = (backPred.timestamp + followPred.windowStart) / 2.0
 
-        // Find swing start: look for earliest backswing in history
-        let swingStartTime = findSwingStart(in: history, before: downswingPred.timestamp)
-
-        let swing = SwingBounds(
-            startTime: max(0, swingStartTime - preSwingBuffer),
+        return SwingBounds(
+            startTime: max(0, backPred.windowStart - preSwingBuffer),
             impactTime: impactTime,
             endTime: followPred.timestamp + postSwingBuffer,
-            confidence: Double(peakDownswing + peakFollow) / 2.0,
+            confidence: peakFollow * 0.7,
             detectionTime: followPred.timestamp,
             audioConfirmed: false
         )
+    }
 
-        lock.lock()
-        lastDetectionTime = followPred.timestamp
-        // Clear history to prevent re-detecting the same swing
-        predictionHistory.removeAll()
-        lock.unlock()
+    /// Strategy 3: Detect backswing→downswing→no_swing pattern.
+    ///
+    /// When the model sees a clear downswing that decays to no_swing (without follow_through
+    /// ever reaching threshold), this is still a valid swing — common from front-facing cameras
+    /// where the follow_through pose isn't recognized.
+    /// Requires at least one no_swing after the downswing to confirm the swing ended.
+    private func detectDownswingDecay(history: [PredictionRecord]) -> SwingBounds? {
+        var lastDownswingRecord: PredictionRecord?
+        var confirmedByNoSwing = false
 
-        print("ActionClassifier IMPACT: \(String(format: "%.2f", swing.startTime))s -> impact=\(String(format: "%.2f", swing.impactTime))s -> \(String(format: "%.2f", swing.endTime))s  (down=\(Int(peakDownswing * 100))% follow=\(Int(peakFollow * 100))%)")
-        onSwingDetected?(swing)
+        for record in history {
+            let pDown = record.probabilities[downswingLabel] ?? 0
+            let pBack = record.probabilities[backswingLabel] ?? 0
+
+            if pDown >= downswingThreshold {
+                lastDownswingRecord = record
+                confirmedByNoSwing = false
+            } else if lastDownswingRecord != nil && record.label == noSwingLabel && pBack < 0.3 {
+                // no_swing after downswing (and not just returning to backswing)
+                confirmedByNoSwing = true
+            }
+        }
+
+        guard let downPred = lastDownswingRecord, confirmedByNoSwing else { return nil }
+
+        let peakDown = downPred.probabilities[downswingLabel] ?? 0
+        guard peakDown >= 0.40 else { return nil }
+
+        // Impact is near the end of the downswing window
+        let impactTime = downPred.timestamp - 0.2
+        let swingStart = findSwingStart(in: history, before: downPred.timestamp)
+
+        return SwingBounds(
+            startTime: max(0, swingStart - preSwingBuffer),
+            impactTime: impactTime,
+            endTime: downPred.timestamp + postSwingBuffer,
+            confidence: peakDown * 0.6,
+            detectionTime: downPred.timestamp + 1.0,
+            audioConfirmed: false
+        )
+    }
+
+    /// Strategy 4: Detect backswing→no_swing when the swing is too fast for the model
+    /// to register downswing or follow_through.
+    ///
+    /// To reduce false positives (e.g. just raising arms), we require:
+    /// - Strong backswing (>= 50%)
+    /// - Subsequent no_swing with some residual swing signal (downswing or follow_through >= 5%)
+    private func detectBackswingDecay(history: [PredictionRecord]) -> SwingBounds? {
+        var lastBackswingRecord: PredictionRecord?
+        var confirmingRecord: PredictionRecord?
+
+        for record in history {
+            let pBack = record.probabilities[backswingLabel] ?? 0
+            let pDown = record.probabilities[downswingLabel] ?? 0
+            let pFollow = record.probabilities[followThroughLabel] ?? 0
+
+            if pBack >= 0.50 {
+                lastBackswingRecord = record
+                confirmingRecord = nil
+            } else if lastBackswingRecord != nil && record.label == noSwingLabel {
+                // Look for residual swing signal — confirms a swing actually happened
+                let swingResidual = pDown + pFollow
+                if swingResidual >= 0.05 && confirmingRecord == nil {
+                    confirmingRecord = record
+                }
+            }
+        }
+
+        guard let backPred = lastBackswingRecord,
+              let confirmPred = confirmingRecord else { return nil }
+
+        let peakBack = backPred.probabilities[backswingLabel] ?? 0
+
+        // Impact is roughly between backswing end and confirming prediction
+        let impactTime = (backPred.timestamp + confirmPred.windowStart) / 2.0
+
+        return SwingBounds(
+            startTime: max(0, backPred.windowStart - preSwingBuffer),
+            impactTime: impactTime,
+            endTime: confirmPred.timestamp + postSwingBuffer,
+            confidence: peakBack * 0.5,
+            detectionTime: confirmPred.timestamp,
+            audioConfirmed: false
+        )
     }
 
     /// Estimate the impact timestamp from the downswing→follow_through transition.
