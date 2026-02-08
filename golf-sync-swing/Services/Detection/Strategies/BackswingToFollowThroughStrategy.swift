@@ -14,8 +14,9 @@ struct BackswingToFollowThroughStrategy: ImpactDetectionStrategy {
 
     private let backswingThreshold: Double = 0.40
     private let followThroughThreshold: Double = 0.30
-    private let preSwingBuffer: TimeInterval = 1.5
-    private let postSwingBuffer: TimeInterval = 1.5
+    private let preSwingBuffer: TimeInterval = 0.8
+    private let postSwingBuffer: TimeInterval = 0.8
+    private let maxHalfDuration: TimeInterval = 2.0
 
     func detectImpact(in history: [PredictionRecord]) -> ImpactCandidate? {
         var lastBackswingRecord: PredictionRecord?
@@ -43,10 +44,13 @@ struct BackswingToFollowThroughStrategy: ImpactDetectionStrategy {
 
         let impactTime = (backPred.timestamp + followPred.windowStart) / 2.0
 
+        let clampedStart = max(impactTime - maxHalfDuration, backPred.windowStart - preSwingBuffer)
+        let clampedEnd = min(impactTime + maxHalfDuration, followPred.timestamp + postSwingBuffer)
+
         let bounds = SwingBounds(
-            startTime: max(0, backPred.windowStart - preSwingBuffer),
+            startTime: max(0, clampedStart),
             impactTime: impactTime,
-            endTime: followPred.timestamp + postSwingBuffer,
+            endTime: clampedEnd,
             confidence: peakFollow * 0.7,
             detectionTime: followPred.timestamp,
             audioConfirmed: false

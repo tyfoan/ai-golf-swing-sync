@@ -40,6 +40,7 @@ final class RecordingViewModel {
     nonisolated(unsafe) private let detector = ActionClassifierDetector()
     nonisolated(unsafe) private let frameGate = FrameProcessingGate()
 
+    private var countdownTask: Task<Void, Never>?
     private let saveService = RecordingSaveService()
     nonisolated(unsafe) private let poseProcessingQueue = DispatchQueue(
         label: "com.golfsync.pose.processing", qos: .userInteractive
@@ -119,9 +120,10 @@ final class RecordingViewModel {
 
     func startRecording() {
         guard state == .idle else { return }
+        countdownTask?.cancel()
         state = .countdown(remaining: 5)
 
-        Task {
+        countdownTask = Task {
             if !cameraService.captureSession.isRunning {
                 cameraService.setupSession(position: .front, frameRate: 30)
                 cameraService.startSession()
@@ -129,9 +131,10 @@ final class RecordingViewModel {
             }
 
             for i in stride(from: 5, through: 1, by: -1) {
+                guard !Task.isCancelled else { return }
                 state = .countdown(remaining: i)
                 try? await Task.sleep(for: .seconds(1))
-                if state == .idle { return }
+                guard !Task.isCancelled else { return }
             }
 
             beginRecording()
@@ -244,6 +247,8 @@ final class RecordingViewModel {
     }
 
     func cancel() {
+        countdownTask?.cancel()
+        countdownTask = nil
         frameGate.isCurrentlyRecording = false
         cameraService.stopRecording()
         cameraService.stopSession()

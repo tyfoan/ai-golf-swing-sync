@@ -14,8 +14,9 @@ struct DownswingDecayStrategy: ImpactDetectionStrategy {
 
     private let downswingThreshold: Double = 0.30
     private let minPeakDownswing: Double = 0.40
-    private let preSwingBuffer: TimeInterval = 1.5
-    private let postSwingBuffer: TimeInterval = 1.5
+    private let preSwingBuffer: TimeInterval = 0.8
+    private let postSwingBuffer: TimeInterval = 0.8
+    private let maxHalfDuration: TimeInterval = 2.0
 
     func detectImpact(in history: [PredictionRecord]) -> ImpactCandidate? {
         var lastDownswingRecord: PredictionRecord?
@@ -41,10 +42,13 @@ struct DownswingDecayStrategy: ImpactDetectionStrategy {
         let impactTime = downPred.timestamp - 0.2
         let swingStart = findSwingStart(in: history, before: downPred.timestamp)
 
+        let clampedStart = max(impactTime - maxHalfDuration, swingStart - preSwingBuffer)
+        let clampedEnd = min(impactTime + maxHalfDuration, downPred.timestamp + postSwingBuffer)
+
         let bounds = SwingBounds(
-            startTime: max(0, swingStart - preSwingBuffer),
+            startTime: max(0, clampedStart),
             impactTime: impactTime,
-            endTime: downPred.timestamp + postSwingBuffer,
+            endTime: clampedEnd,
             confidence: peakDown * 0.6,
             detectionTime: downPred.timestamp + 1.0,
             audioConfirmed: false

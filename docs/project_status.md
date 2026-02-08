@@ -94,6 +94,11 @@
 
 ## Recent Updates
 
+### 2026-02-08 (Swing Detection & Recording UX Fixes)
+- Fixed countdown lag when cancelling and re-starting recording (Task cancellation)
+- Tightened swing bounds: pre/post buffers 1.5s→0.8s, max half-duration 2.0s cap
+- Removed wasted bottom space in SwingDetectionPanel (Spacer removal)
+
 ### 2026-02-08 (Sandi Metz OOP Decomposition)
 - Major refactoring: 11 files exceeding 200-line Sandi Metz limit decomposed
 - 41 new focused files created, largest is 193 lines (CaptureSessionConfigurator)

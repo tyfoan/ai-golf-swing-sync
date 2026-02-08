@@ -30,7 +30,6 @@ struct SwingDetectionPanel: View {
             } else {
                 swingsList
             }
-            Spacer()
         }
     }
 

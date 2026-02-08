@@ -8,6 +8,11 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Fixed
+- **Countdown lag on cancel→re-start**: Stored countdown Task reference; `cancel()` now cancels the running Task immediately instead of waiting for the next 1-second sleep to complete
+- **Bloated swing bounds**: Reduced pre/post swing buffers from 1.5s→0.8s across all 4 impact detection strategies; added `maxHalfDuration=2.0s` cap to prevent swing bounds exceeding ~4s total (real golf swings are 1.5-3s)
+- **Wasted bottom space in SwingDetectionPanel**: Removed `Spacer()` that pushed swing list upward, leaving empty space below
+
 ### Added
 - **Sandi Metz OOP Decomposition**: Major refactoring of 11 files exceeding 200-line class limit
   - 41 new focused files created, all under 200 lines
