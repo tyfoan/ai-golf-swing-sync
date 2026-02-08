@@ -2,8 +2,8 @@
 //  SwingDetectionPanel.swift
 //  golf-sync-swing
 //
-//  Swing detection UI: auto-detect button, progress, swing list.
-//  Extracted from SingleVideoPlayerView.
+//  Swing section below the video player.
+//  Header with edit/add actions, right-aligned thumbnail strip.
 //
 
 import SwiftUI
@@ -14,131 +14,113 @@ struct SwingDetectionPanel: View {
     let isAnalyzing: Bool
     let analysisProgress: Float
     let analysisStatus: String
-
-    var onAutoDetect: () -> Void
-    var onManualAdd: () -> Void
+    var onAddNew: () -> Void
+    var onEditSelected: () -> Void
     var onSwingTap: (SwingMarker) -> Void
-    var onSwingEdit: (SwingMarker) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             header
-            if isAnalyzing {
-                analysisProgressView
-            } else if video.swings.isEmpty {
-                emptySwingsView
-            } else {
-                swingsList
-            }
+            content
         }
     }
 
-    @ViewBuilder
+    // MARK: - Header
+
     private var header: some View {
-        HStack {
+        HStack(spacing: 12) {
             Text("Swings")
-                .font(.headline)
+                .font(.subheadline).fontWeight(.semibold)
+                .foregroundStyle(.white)
 
             Spacer()
 
-            if !isAnalyzing {
-                Button("AUTO-DETECT") { onAutoDetect() }
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.orange)
-                    .padding(.trailing, 8)
+            if selectedSwingId != nil && !video.swings.isEmpty {
+                Button { onEditSelected() } label: {
+                    Label("EDIT", systemImage: "pencil")
+                        .font(.caption).fontWeight(.semibold)
+                        .foregroundColor(.appTeal)
+                }
+            }
 
-                Button("MANUAL") { onManualAdd() }
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.accentColor)
+            Button { onAddNew() } label: {
+                Label("ADD", systemImage: "plus")
+                    .font(.caption).fontWeight(.semibold)
+                    .foregroundColor(.appTeal)
             }
         }
         .padding(.horizontal)
-        .padding(.top, 8)
     }
 
+    // MARK: - Content
+
     @ViewBuilder
+    private var content: some View {
+        if isAnalyzing {
+            analysisProgressView
+        } else if video.swings.isEmpty {
+            emptySwingsView
+        } else {
+            swingThumbnailStrip
+        }
+    }
+
+    // MARK: - Thumbnail Strip
+
+    private var swingThumbnailStrip: some View {
+        ScrollViewReader { proxy in
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    Spacer(minLength: 0)
+                    ForEach(Array(video.swings.enumerated()), id: \.element.id) { index, swing in
+                        SwingThumbnailView(
+                            video: video,
+                            swing: swing,
+                            index: index + 1,
+                            isSelected: selectedSwingId == swing.id,
+                            selectionNumber: index + 1
+                        )
+                        .id(swing.id)
+                        .onTapGesture { onSwingTap(swing) }
+                    }
+                }
+                .padding(.horizontal)
+            }
+            .onChange(of: selectedSwingId) { _, newId in
+                guard let id = newId else { return }
+                withAnimation(.easeInOut(duration: 0.25)) {
+                    proxy.scrollTo(id, anchor: .trailing)
+                }
+            }
+        }
+    }
+
+    // MARK: - Empty State
+
+    private var emptySwingsView: some View {
+        Text("No swings detected. Tap \u{201C}+ ADD\u{201D} to mark one manually.")
+            .font(.caption)
+            .foregroundStyle(.white.opacity(0.4))
+            .multilineTextAlignment(.center)
+            .padding(.horizontal, 24)
+            .padding(.vertical, 12)
+            .frame(maxWidth: .infinity)
+    }
+
+    // MARK: - Analysis Progress
+
     private var analysisProgressView: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 6) {
             ProgressView(value: Double(analysisProgress))
                 .progressViewStyle(.linear)
+                .tint(.appTeal)
 
-            HStack {
-                ProgressView()
-                    .scaleEffect(0.8)
+            HStack(spacing: 6) {
+                ProgressView().scaleEffect(0.7)
                 Text(analysisStatus.isEmpty ? "Analyzing swing..." : analysisStatus)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
-
-            Text("\(Int(analysisProgress * 100))%")
-                .font(.caption)
-                .monospacedDigit()
-                .foregroundStyle(.tertiary)
-        }
-        .padding()
-        .frame(maxWidth: .infinity)
-    }
-
-    @ViewBuilder
-    private var emptySwingsView: some View {
-        VStack(spacing: 12) {
-            Image(systemName: "wand.and.stars")
-                .font(.largeTitle)
-                .foregroundStyle(.orange)
-
-            Text("No swings detected")
-                .font(.headline)
-
-            Text("Tap AUTO-DETECT to analyze the video, or add markers manually.")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-
-            if video.hasBeenAnalyzed {
-                Text("Previously analyzed - no swing found")
-                    .font(.caption2)
-                    .foregroundStyle(.tertiary)
+                    .font(.caption).foregroundStyle(.white.opacity(0.5))
             }
         }
-        .padding()
-        .frame(maxWidth: .infinity)
-    }
-
-    @ViewBuilder
-    private var swingsList: some View {
-        ScrollView {
-            LazyVStack(spacing: 8) {
-                ForEach(Array(video.swings.enumerated()), id: \.element.id) { (item: (offset: Int, element: SwingMarker)) in
-                    swingRow(swing: item.element, index: item.offset)
-                }
-            }
-            .padding(.horizontal)
-        }
-    }
-
-    @ViewBuilder
-    private func swingRow(swing: SwingMarker, index: Int) -> some View {
-        VStack(spacing: 0) {
-            SwingRowView(
-                swing: swing,
-                index: index,
-                isSelected: selectedSwingId == swing.id,
-                onTap: { onSwingTap(swing) },
-                onEdit: { onSwingEdit(swing) }
-            )
-
-            if swing.isAutoDetected {
-                HStack {
-                    Image(systemName: "wand.and.stars")
-                        .font(.caption2)
-                    Text("Auto-detected \u{2022} \(swing.confidenceDescription) confidence")
-                        .font(.caption2)
-                }
-                .foregroundStyle(swing.detectionConfidence >= 0.7 ? .green : .orange)
-                .padding(.top, 4)
-            }
-        }
+        .padding(.horizontal)
     }
 }

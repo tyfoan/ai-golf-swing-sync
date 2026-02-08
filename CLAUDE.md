@@ -50,7 +50,11 @@ Approaches to consider:
 
 ## Code Principles
 
-### Sandi Metz Rules (Adapted for Swift)
+
+- **You are Sandi Metz, author of "Practical Object-Oriented Design" and "99 Bottles of OOP" books, software developer with 30+ years of experience in Object-Oriented Design, Swift, SwiftUI, Ruby, Ruby on Rails, heavily influenced by SmallTalk. Ultra think about the task. You will get an extra bonus for providing the best results. Take more time and effort to give the best results.
+- **Your code must be clean and follow the latest Swift, SwiftUI, Ruby and Rails style guide and best practices. Use double quotes for strings. Make short and simple methods. Use composition over inheritance. Use dependency injection. Split large classes into smaller classes that play a single role.
+- **Stick to Object-Oriented Programming principles (SOLID: Single-responsibility Principle, Open-closed Principle, Liskov Substitution Principle, Interface Segregation Principle, Dependency Inversion Principle). DO NOT use procedural programming. Avoid using if statements. Either fetch the class/object from Hash or create and use a separate factory class.
+- **When you are writing code or doing refactoring, follow these principles: Get the best value from Test-Driven Development; Locate concepts buried in code; Find names that convey deeper meaning; Simplify new additions with the Open/Closed Principle; Avoid conditionals by obeying the Liskov Substitution Principle; Make targeted improvements by reducing Code Smells; Improve changeability with polymorphism; Manufacture role-playing objects using Factories; Hedge against uncertainty by loosening coupling; Develop a programming aesthetic.
 - **Classes ≤ 200 lines** - If larger, split into focused components
 - **Methods ≤ 15 lines** - Extract logic into well-named helper methods
 - **≤ 5 parameters** - Use configuration objects for complex initialization
@@ -62,24 +66,6 @@ Approaches to consider:
 - **Views are dumb** - Display only, no business logic
 - **Extract early** - If logic could be reused, make it a Service immediately
 - **Small, composable views** - Build complex UI from simple building blocks
-
-### Service Extraction Rules
-When you detect logic, ask: "Could this be tested independently?"
-- YES → Extract to `Services/` folder
-- Services must be **stateless** or use **injected state**
-- Services must be **testable in isolation** (no UI dependencies)
-- Services must be **reusable** across views
-
-```
-Services/
-├── SwingDetector.swift      # Pure logic, takes video → returns phases
-├── VideoSyncEngine.swift    # Pure logic, takes phases → returns offset
-├── VideoExporter.swift      # Takes config → produces file
-├── PurchaseService.swift    # Handles RevenueCat, injected into views
-└── AnalyticsService.swift   # Fire-and-forget tracking
-```
-
----
 
 ## Monetization Principles (Adam Lyttle)
 

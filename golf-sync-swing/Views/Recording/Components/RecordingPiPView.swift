@@ -14,6 +14,7 @@ struct RecordingPiPView: View {
     let captureSession: AVCaptureSession
     let lastSwing: SwingClip?
     let recordingURL: URL?
+    let playbackSpeed: Float
     let onTap: () -> Void
 
     var body: some View {
@@ -31,7 +32,7 @@ struct RecordingPiPView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 12))
                 .overlay(
                     RoundedRectangle(cornerRadius: 12)
-                        .stroke(pipDisplayMode == .lastSwingReplay ? Color.orange : Color.green, lineWidth: 2)
+                        .stroke(pipDisplayMode == .lastSwingReplay ? Color.sand : Color.fairwayGreen, lineWidth: 2)
                 )
                 .shadow(color: .black.opacity(0.5), radius: 8, x: 0, y: 4)
                 .onTapGesture(perform: onTap)
@@ -48,7 +49,7 @@ struct RecordingPiPView: View {
             CameraPreviewView(session: captureSession)
                 .id("pip-camera-\(sessionConfigurationId)")
         } else if let swing = lastSwing, let url = recordingURL {
-            SwingReplayView(videoURL: url, startTime: swing.startTime, endTime: swing.endTime)
+            SwingReplayView(videoURL: url, startTime: swing.startTime, endTime: swing.endTime, playbackSpeed: playbackSpeed)
         }
     }
 

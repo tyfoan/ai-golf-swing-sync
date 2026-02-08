@@ -30,7 +30,7 @@ struct RecordingView: View {
 
                 mainContentView.ignoresSafeArea()
 
-                if viewModel.state == .idle && !viewModel.mainViewShowsReplay {
+                if viewModel.state == .idle {
                     PositioningGuideOverlay()
                         .transition(.opacity)
                         .animation(.easeOut(duration: 0.3), value: viewModel.state)
@@ -60,10 +60,12 @@ struct RecordingView: View {
                         pipDisplayMode: viewModel.pipDisplayMode,
                         sessionConfigurationId: viewModel.cameraService.sessionConfigurationId,
                         captureSession: viewModel.cameraService.captureSession,
-                        lastSwing: viewModel.lastDetectedSwing,
+                        lastSwing: viewModel.pipSwing,
                         recordingURL: viewModel.recordingURL,
+                        playbackSpeed: viewModel.playbackSpeed,
                         onTap: viewModel.swapMainAndPip
                     )
+                    .id(viewModel.pipSwing?.id)
                     .scaleEffect(pipVisible ? 1.0 : 0.5)
                     .opacity(pipVisible ? 1.0 : 0)
                     .animation(.spring(response: 0.4, dampingFraction: 0.7), value: pipVisible)
@@ -79,13 +81,6 @@ struct RecordingView: View {
                     FinalizingVideoOverlay(swingCount: viewModel.swingCount)
                 }
 
-                if viewModel.mainViewShowsReplay, let swing = viewModel.currentReplaySwing {
-                    ReplayIndicatorOverlay(
-                        swingNumber: (viewModel.replayingSwingIndex ?? viewModel.swingCount - 1) + 1,
-                        confidence: swing.confidence
-                    )
-                }
-
                 if viewModel.cameraService.isInterrupted {
                     InterruptionOverlay(
                         errorDescription: viewModel.cameraService.currentError?.errorDescription,
@@ -96,12 +91,8 @@ struct RecordingView: View {
         }
         .onAppear { handleAppear() }
         .onDisappear { handleDisappear() }
-        .confirmationDialog("Save Recording", isPresented: $viewModel.showSaveConfirmation, titleVisibility: .visible) {
-            Button(viewModel.swingCount > 0 ? "Save Recording (\(viewModel.swingCount) Swings)" : "Save Recording") {
-                Task { _ = await viewModel.saveRecording(to: modelContext) }
-            }
-            Button("Delete Recording", role: .destructive) { viewModel.deleteRecording() }
-            Button("Cancel", role: .cancel) { viewModel.enterReviewMode() }
+        .fullScreenCover(item: $viewModel.savedVideo) { video in
+            SingleVideoPlayerView(video: video)
         }
         .sheet(isPresented: $showingTips) { RecordingTipsSheet() }
         .alert("Camera Error", isPresented: $showingError) {
@@ -126,17 +117,9 @@ struct RecordingView: View {
 
     // MARK: - Main Content
 
-    @ViewBuilder
     private var mainContentView: some View {
-        if viewModel.mainViewShowsReplay,
-           let swing = viewModel.currentReplaySwing,
-           let url = viewModel.recordingURL {
-            SwingReplayView(videoURL: url, startTime: swing.startTime, endTime: swing.endTime)
-                .id(swing.id)
-        } else {
-            CameraPreviewView(session: viewModel.cameraService.captureSession)
-                .id("main-camera-\(viewModel.cameraService.sessionConfigurationId)")
-        }
+        CameraPreviewView(session: viewModel.cameraService.captureSession)
+            .id("main-camera-\(viewModel.cameraService.sessionConfigurationId)")
     }
 
     // MARK: - Swing Attempts
@@ -149,7 +132,7 @@ struct RecordingView: View {
                         swingNumber: index + 1,
                         confidence: swing.confidence,
                         isFavorite: swing.isFavorite,
-                        isSelected: viewModel.replayingSwingIndex == index && viewModel.mainViewShowsReplay
+                        isSelected: viewModel.replayingSwingIndex == index
                     )
                     .onTapGesture { viewModel.showSwing(at: index) }
                 }

@@ -17,7 +17,7 @@ struct SwingAttemptCard: View {
         VStack(spacing: 4) {
             ZStack {
                 RoundedRectangle(cornerRadius: 8)
-                    .fill(isSelected ? Color.green : Color.gray.opacity(0.3))
+                    .fill(isSelected ? Color.fairwayGreen : Color.gray.opacity(0.3))
                     .frame(width: 60, height: 60)
 
                 VStack(spacing: 2) {
@@ -37,7 +37,7 @@ struct SwingAttemptCard: View {
             HStack(spacing: 2) {
                 ForEach(0..<3) { i in
                     Circle()
-                        .fill(confidence > Double(i) * 0.33 ? Color.green : Color.gray.opacity(0.3))
+                        .fill(confidence > Double(i) * 0.33 ? Color.fairwayGreen : Color.gray.opacity(0.3))
                         .frame(width: 6, height: 6)
                 }
             }

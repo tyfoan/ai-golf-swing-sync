@@ -33,18 +33,7 @@ struct RecordingControlsView: View {
 
     private var actionButtons: some View {
         HStack(spacing: 24) {
-            if viewModel.mainViewShowsReplay {
-                Button(action: viewModel.showLiveCamera) {
-                    Image(systemName: "video.fill")
-                        .font(.title2)
-                        .foregroundStyle(.white)
-                        .frame(width: 50, height: 50)
-                        .background(Color.blue.opacity(0.7))
-                        .clipShape(Circle())
-                }
-            }
-
-            SpeedButton(speed: viewModel.playbackSpeed)
+            SpeedButton(speed: viewModel.playbackSpeed, onTap: viewModel.cyclePlaybackSpeed)
 
             Button {
                 if let index = viewModel.replayingSwingIndex ?? viewModel.detectedSwings.indices.last {
@@ -73,7 +62,7 @@ struct RecordingControlsView: View {
                 .foregroundStyle(.white)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
-                .background(Color.green)
+                .background(Color.fairwayGreen)
                 .clipShape(RoundedRectangle(cornerRadius: 16))
         }
         .padding(.horizontal, 40)
@@ -86,7 +75,7 @@ struct RecordingControlsView: View {
                     .stroke(Color.white, lineWidth: 4)
                     .frame(width: 70, height: 70)
                 RoundedRectangle(cornerRadius: 6)
-                    .fill(Color.red)
+                    .fill(Color.flagRed)
                     .frame(width: 30, height: 30)
             }
         }
@@ -101,7 +90,7 @@ struct RecordingControlsView: View {
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
-                    .background(Color.red.opacity(0.8))
+                    .background(Color.flagRed.opacity(0.8))
                     .clipShape(RoundedRectangle(cornerRadius: 16))
             }
 
@@ -114,7 +103,7 @@ struct RecordingControlsView: View {
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
-                    .background(Color.green)
+                    .background(Color.fairwayGreen)
                     .clipShape(RoundedRectangle(cornerRadius: 16))
             }
         }

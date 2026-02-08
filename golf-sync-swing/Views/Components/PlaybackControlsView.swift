@@ -2,6 +2,8 @@
 //  PlaybackControlsView.swift
 //  golf-sync-swing
 //
+//  Compact playback controls: frame step, play/pause, speed.
+//
 
 import SwiftUI
 
@@ -9,67 +11,76 @@ struct PlaybackControlsView: View {
     @Bindable var viewModel: VideoPlayerViewModel
 
     var body: some View {
-        HStack(spacing: 24) {
-            // Frame step backward
-            Button {
-                viewModel.stepFrame(forward: false)
-            } label: {
-                Image(systemName: "backward.frame.fill")
-                    .font(.title2)
-            }
-
-            // Play/Pause
-            Button {
-                viewModel.togglePlayPause()
-            } label: {
-                Image(systemName: viewModel.isPlaying ? "pause.fill" : "play.fill")
-                    .font(.title)
-            }
-
-            // Frame step forward
-            Button {
-                viewModel.stepFrame(forward: true)
-            } label: {
-                Image(systemName: "forward.frame.fill")
-                    .font(.title2)
-            }
-
+        HStack(spacing: 0) {
+            transportControls
             Spacer()
+            speedPill
+        }
+    }
 
-            // Speed picker
-            Menu {
-                ForEach(VideoPlayerViewModel.playbackRates, id: \.self) { rate in
-                    Button {
-                        viewModel.setPlaybackRate(rate)
-                    } label: {
-                        HStack {
-                            Text(formatRate(rate))
-                            if rate == viewModel.playbackRate {
-                                Image(systemName: "checkmark")
-                            }
+    // MARK: - Transport
+
+    private var transportControls: some View {
+        HStack(spacing: 16) {
+            frameStepButton(forward: false)
+            playPauseButton
+            frameStepButton(forward: true)
+        }
+    }
+
+    private func frameStepButton(forward: Bool) -> some View {
+        Button { viewModel.stepFrame(forward: forward) } label: {
+            Image(systemName: forward ? "forward.frame.fill" : "backward.frame.fill")
+                .font(.body)
+                .foregroundStyle(.white.opacity(0.8))
+                .frame(width: 40, height: 40)
+                .background(Color.white.opacity(0.1))
+                .clipShape(Circle())
+        }
+    }
+
+    private var playPauseButton: some View {
+        Button { viewModel.togglePlayPause() } label: {
+            Image(systemName: viewModel.isPlaying ? "pause.fill" : "play.fill")
+                .font(.title3)
+                .foregroundStyle(.white)
+                .frame(width: 48, height: 48)
+                .background(Color.white.opacity(0.15))
+                .clipShape(Circle())
+        }
+    }
+
+    // MARK: - Speed Pill
+
+    private var speedPill: some View {
+        Menu {
+            ForEach(VideoPlayerViewModel.playbackRates, id: \.self) { rate in
+                Button {
+                    viewModel.setPlaybackRate(rate)
+                } label: {
+                    HStack {
+                        Text(formatRate(rate))
+                        if rate == viewModel.playbackRate {
+                            Image(systemName: "checkmark")
                         }
                     }
                 }
-            } label: {
-                Text(formatRate(viewModel.playbackRate))
-                    .font(.caption)
-                    .fontWeight(.semibold)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(Color.secondary.opacity(0.2))
-                    .cornerRadius(4)
             }
+        } label: {
+            Text(formatRate(viewModel.playbackRate))
+                .font(.subheadline).fontWeight(.semibold)
+                .foregroundStyle(.white)
+                .padding(.horizontal, 12).padding(.vertical, 6)
+                .background(Color.white.opacity(0.1))
+                .clipShape(RoundedRectangle(cornerRadius: 14))
         }
-        .foregroundStyle(.primary)
     }
 
+    // MARK: - Formatting
+
     private func formatRate(_ rate: Float) -> String {
-        if rate == 1.0 {
-            return "1x"
-        } else if rate >= 0.5 {
-            return String(format: "%.1fx", rate)
-        } else {
-            return String(format: "%.3fx", rate)
-        }
+        rate == 1.0
+            ? "1x"
+            : (rate >= 0.5 ? String(format: "%.1fx", rate) : String(format: "%.3fx", rate))
     }
 }

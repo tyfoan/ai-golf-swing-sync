@@ -12,6 +12,7 @@ struct SwingReplayView: View {
     let videoURL: URL
     let startTime: TimeInterval
     let endTime: TimeInterval
+    var playbackSpeed: Float = 1.0
 
     @State private var player: AVPlayer?
     @State private var isLoading = true
@@ -38,8 +39,8 @@ struct SwingReplayView: View {
                     .disabled(true) // No native controls
                     .onAppear {
                         player.isMuted = isMuted
+                        player.rate = playbackSpeed
                         setupLooping()
-                        player.play()
                     }
             } else if isLoading {
                 ProgressView()
@@ -111,7 +112,7 @@ struct SwingReplayView: View {
         if isPlaying {
             player.pause()
         } else {
-            player.play()
+            player.rate = playbackSpeed
         }
         isPlaying.toggle()
     }
@@ -202,7 +203,7 @@ struct SwingReplayView: View {
             guard self.isPlaying else { return }
             let seekTime = CMTime(seconds: startTime, preferredTimescale: 600)
             player?.seek(to: seekTime) { _ in
-                player?.play()
+                player?.rate = self.playbackSpeed
             }
         }
     }

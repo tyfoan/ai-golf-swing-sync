@@ -18,6 +18,9 @@ final class SwingMarker {
     var isAutoDetected: Bool = false
     var detectionConfidence: Double = 1.0  // 0.0 to 1.0
 
+    // User metadata
+    var isFavorite: Bool = false
+
     @Relationship(inverse: \SwingVideo.swings) var video: SwingVideo?
 
     // MARK: - Init

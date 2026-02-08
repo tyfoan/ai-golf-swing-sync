@@ -2,6 +2,8 @@
 //  HomeView.swift
 //  golf-sync-swing
 //
+//  Compare tab: date-grouped swing selection for side-by-side comparison.
+//
 
 import SwiftUI
 import SwiftData
@@ -11,51 +13,29 @@ struct HomeView: View {
     @Query(sort: \SwingVideo.createdAt, order: .reverse) private var videos: [SwingVideo]
 
     @State private var showVideoPicker = false
-    @State private var selectedVideos: Set<UUID> = []
+    @State private var selectedSwings: [SwingSelection] = []
     @State private var navigationPath = NavigationPath()
 
     var body: some View {
         NavigationStack(path: $navigationPath) {
             VStack(spacing: 0) {
-                // Instructions when videos exist
-                if !videos.isEmpty && selectedVideos.isEmpty {
-                    Text("Tap videos to select for comparison, or tap play to view")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .padding(.horizontal)
-                        .padding(.top, 8)
-                }
-
-                VideoLibraryView(
-                    videos: videos,
-                    selectedVideos: selectedVideos,
-                    onVideoSelect: toggleSelection,
-                    onVideoPlay: playVideo,
-                    onVideoDelete: deleteVideo
+                header
+                SwingSelectionListView(
+                    groups: groupedVideos,
+                    selectedSwings: selectedSwings,
+                    onSwingTap: toggleSwingSelection
                 )
-
-                // Bottom bar
-                bottomBar
+                bottomCTA
             }
-            .navigationTitle("Golf Sync Swing")
+            .background(Color.sandLight)
+            .preferredColorScheme(.light)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        showVideoPicker = true
-                    } label: {
+                    Button { showVideoPicker = true } label: {
                         Image(systemName: "plus")
                     }
                 }
-
-                ToolbarItem(placement: .topBarLeading) {
-                    if !selectedVideos.isEmpty {
-                        Button("Clear") {
-                            withAnimation {
-                                selectedVideos.removeAll()
-                            }
-                        }
-                    }
-                }
+                ToolbarItem(placement: .topBarLeading) { clearButton }
             }
             .sheet(isPresented: $showVideoPicker) {
                 VideoPickerView(isPresented: $showVideoPicker) { url in
@@ -65,65 +45,132 @@ struct HomeView: View {
             .navigationDestination(for: SwingVideo.self) { video in
                 SingleVideoPlayerView(video: video)
             }
-            .navigationDestination(for: ComparisonDestination.self) { destination in
-                ComparisonView(video1: destination.video1, video2: destination.video2)
+            .navigationDestination(for: ComparisonDestination.self) { dest in
+                ComparisonView(
+                    video1: dest.video1, video2: dest.video2,
+                    contactTime1: dest.contactTime1, contactTime2: dest.contactTime2
+                )
             }
         }
     }
+}
 
-    private var bottomBar: some View {
-        Group {
-            if selectedVideos.count == 2 {
-                Button {
-                    startComparison()
-                } label: {
-                    Text("Compare Videos")
-                        .font(.headline)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.accentColor)
-                        .foregroundStyle(.white)
-                        .cornerRadius(12)
-                }
+// MARK: - Header
+
+private extension HomeView {
+    var header: some View {
+        VStack(spacing: 8) {
+            Text("Compare Swings")
+                .font(.largeTitle).fontWeight(.bold)
+                .foregroundStyle(Color.pineGreen)
+            Text("Select 2 swings to compare side-by-side.")
+                .font(.subheadline).foregroundStyle(Color.charcoal.opacity(0.6))
+                .multilineTextAlignment(.center)
+        }
+        .padding(.top)
+        .padding(.horizontal)
+    }
+}
+
+// MARK: - Bottom CTA
+
+private extension HomeView {
+    @ViewBuilder
+    var bottomCTA: some View {
+        if selectedSwings.count == 2 {
+            compareButton
+        } else if selectedSwings.count == 1 {
+            Text("Select one more swing to compare")
+                .font(.subheadline).foregroundStyle(Color.charcoal.opacity(0.6))
                 .padding()
-            } else if selectedVideos.count == 1 {
-                Text("Select one more video to compare")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .padding()
-            }
         }
     }
 
-    private func playVideo(_ video: SwingVideo) {
-        navigationPath.append(video)
+    var compareButton: some View {
+        Button { startComparison() } label: {
+            Text("Compare 2 Swings")
+                .font(.headline).fontWeight(.bold)
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color.appTeal)
+                .clipShape(RoundedRectangle(cornerRadius: 28))
+        }
+        .padding()
     }
 
-    private func toggleSelection(_ video: SwingVideo) {
+    @ViewBuilder
+    var clearButton: some View {
+        if !selectedSwings.isEmpty {
+            Button("Clear") {
+                withAnimation { selectedSwings.removeAll() }
+            }
+        }
+    }
+}
+
+// MARK: - Selection Logic
+
+private extension HomeView {
+    func toggleSwingSelection(_ swing: SwingMarker, in video: SwingVideo) {
         withAnimation(.easeInOut(duration: 0.2)) {
-            if selectedVideos.contains(video.id) {
-                selectedVideos.remove(video.id)
-            } else {
-                if selectedVideos.count < 2 {
-                    selectedVideos.insert(video.id)
-                }
+            if let idx = selectedSwings.firstIndex(where: { $0.swingId == swing.id }) {
+                selectedSwings.remove(at: idx)
+            } else if selectedSwings.count < 2 {
+                selectedSwings.append(
+                    SwingSelection(videoId: video.id, swingId: swing.id, contactTime: swing.contactTime)
+                )
             }
         }
     }
 
-    private func startComparison() {
-        let selectedVideosList = videos.filter { selectedVideos.contains($0.id) }
-        guard selectedVideosList.count == 2 else { return }
+    func startComparison() {
+        guard selectedSwings.count == 2 else { return }
 
-        let destination = ComparisonDestination(
-            video1: selectedVideosList[0],
-            video2: selectedVideosList[1]
-        )
-        navigationPath.append(destination)
-        selectedVideos.removeAll()
+        let sel1 = selectedSwings[0]
+        let sel2 = selectedSwings[1]
+
+        guard let v1 = videos.first(where: { $0.id == sel1.videoId }),
+              let v2 = videos.first(where: { $0.id == sel2.videoId }) else { return }
+
+        navigationPath.append(ComparisonDestination(
+            video1: v1, video2: v2,
+            contactTime1: sel1.contactTime, contactTime2: sel2.contactTime
+        ))
+        selectedSwings.removeAll()
     }
+}
 
-    private func importVideo(from url: URL) {
+// MARK: - Grouping
+
+private extension HomeView {
+    private static let dayFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateStyle = .long
+        f.timeStyle = .none
+        return f
+    }()
+
+    var groupedVideos: [VideoDateGroup] {
+        let calendar = Calendar.current
+        let groups = Dictionary(grouping: videos) {
+            calendar.startOfDay(for: $0.createdAt)
+        }
+
+        return groups
+            .map { VideoDateGroup(
+                date: Self.dayFormatter.string(from: $0.key),
+                sortDate: $0.key,
+                videos: $0.value
+            ) }
+            .sorted { $0.sortDate > $1.sortDate }
+    }
+}
+
+// MARK: - Import
+
+private extension HomeView {
+    func importVideo(from url: URL) {
         Task {
             do {
                 try await VideoImportService().importVideo(from: url, into: modelContext)
@@ -132,16 +179,29 @@ struct HomeView: View {
             }
         }
     }
+}
 
-    private func deleteVideo(_ video: SwingVideo) {
-        VideoStorageService.shared.deleteVideo(at: video.localURL)
-        modelContext.delete(video)
-    }
+// MARK: - Supporting Types
+
+struct SwingSelection: Hashable {
+    let videoId: UUID
+    let swingId: UUID
+    let contactTime: TimeInterval
+}
+
+struct VideoDateGroup: Identifiable {
+    let date: String
+    let sortDate: Date
+    let videos: [SwingVideo]
+
+    var id: String { date }
 }
 
 struct ComparisonDestination: Hashable {
     let video1: SwingVideo
     let video2: SwingVideo
+    let contactTime1: TimeInterval?
+    let contactTime2: TimeInterval?
 }
 
 #Preview {

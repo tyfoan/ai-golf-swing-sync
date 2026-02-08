@@ -2,62 +2,113 @@
 //  ComparisonControlsView.swift
 //  golf-sync-swing
 //
-//  Playback controls for the comparison view.
+//  Dark circular playback controls for the comparison view.
 //
 
 import SwiftUI
 
 struct ComparisonControlsView: View {
     @Bindable var viewModel: ComparisonViewModel
-    let onExport: () -> Void
 
     var body: some View {
-        HStack(spacing: 24) {
-            Button { viewModel.stepFrame(forward: false) } label: {
-                Image(systemName: "backward.frame.fill").font(.title2)
-            }
-
-            Button { viewModel.togglePlayPause() } label: {
-                Image(systemName: viewModel.isPlaying ? "pause.fill" : "play.fill").font(.title)
-            }
-
-            Button { viewModel.stepFrame(forward: true) } label: {
-                Image(systemName: "forward.frame.fill").font(.title2)
-            }
-
+        HStack(spacing: 20) {
+            speedPill
             Spacer()
+            frameStepButton(forward: false)
+            playPauseButton
+            frameStepButton(forward: true)
+            Spacer()
+            poseToggle
+        }
+    }
 
-            Menu {
-                ForEach(ComparisonViewModel.playbackRates, id: \.self) { rate in
-                    Button {
-                        viewModel.setPlaybackRate(rate)
-                    } label: {
-                        HStack {
-                            Text(formatRate(rate))
-                            if rate == viewModel.playbackRate {
-                                Image(systemName: "checkmark")
-                            }
+    // MARK: - Speed Pill
+
+    private var speedPill: some View {
+        Menu {
+            ForEach(ComparisonViewModel.playbackRates, id: \.self) { rate in
+                Button {
+                    viewModel.setPlaybackRate(rate)
+                } label: {
+                    HStack {
+                        Text(formatRate(rate))
+                        if rate == viewModel.playbackRate {
+                            Image(systemName: "checkmark")
                         }
                     }
                 }
-            } label: {
-                Text(formatRate(viewModel.playbackRate))
-                    .font(.caption).fontWeight(.semibold)
-                    .padding(.horizontal, 8).padding(.vertical, 4)
-                    .background(Color.secondary.opacity(0.2))
-                    .cornerRadius(4)
             }
-
-            Button(action: onExport) {
-                Image(systemName: "square.and.arrow.up").font(.title2)
-            }
+        } label: {
+            Text(formatRate(viewModel.playbackRate))
+                .font(.subheadline).fontWeight(.semibold)
+                .foregroundStyle(.white)
+                .padding(.horizontal, 14).padding(.vertical, 8)
+                .background(Color(.systemGray5))
+                .clipShape(RoundedRectangle(cornerRadius: 16))
         }
-        .foregroundStyle(.primary)
     }
 
+    // MARK: - Transport Buttons
+
+    private func frameStepButton(forward: Bool) -> some View {
+        Button { viewModel.stepFrame(forward: forward) } label: {
+            Image(systemName: forward ? "forward.frame.fill" : "backward.frame.fill")
+                .font(.title2)
+                .foregroundStyle(.white)
+                .frame(width: 48, height: 48)
+                .background(Color(.systemGray5))
+                .clipShape(Circle())
+        }
+    }
+
+    private var playPauseButton: some View {
+        Button { viewModel.togglePlayPause() } label: {
+            Image(systemName: viewModel.isPlaying ? "pause.fill" : "play.fill")
+                .font(.title)
+                .foregroundStyle(.white)
+                .frame(width: 56, height: 56)
+                .background(Color(.systemGray5))
+                .clipShape(Circle())
+        }
+    }
+
+    // MARK: - Pose Toggle
+
+    private var poseToggle: some View {
+        let available = FeatureAccess.isUnlocked(.poseEstimation)
+        return Button {
+            guard available else { return }
+            viewModel.showPoseOverlay.toggle()
+        } label: {
+            Image(systemName: "figure.stand")
+                .font(.title2)
+                .foregroundStyle(poseButtonTint(available: available))
+                .frame(width: 48, height: 48)
+                .background(Color(.systemGray5))
+                .clipShape(Circle())
+                .overlay(poseActiveBorder)
+        }
+        .disabled(!available)
+    }
+
+    private func poseButtonTint(available: Bool) -> Color {
+        guard available else { return .white.opacity(0.3) }
+        return viewModel.showPoseOverlay ? Color.appTeal : .white.opacity(0.6)
+    }
+
+    @ViewBuilder
+    private var poseActiveBorder: some View {
+        if viewModel.showPoseOverlay {
+            Circle()
+                .strokeBorder(Color.appTeal, lineWidth: 2)
+        }
+    }
+
+    // MARK: - Formatting
+
     private func formatRate(_ rate: Float) -> String {
-        if rate == 1.0 { return "1x" }
-        else if rate >= 0.5 { return String(format: "%.1fx", rate) }
-        else { return String(format: "%.3fx", rate) }
+        rate == 1.0
+            ? "1x"
+            : (rate >= 0.5 ? String(format: "%.1fx", rate) : String(format: "%.3fx", rate))
     }
 }

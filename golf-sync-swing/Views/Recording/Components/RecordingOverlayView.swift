@@ -48,7 +48,7 @@ struct ReplayIndicatorOverlay: View {
             VStack(spacing: 8) {
                 HStack(spacing: 8) {
                     Image(systemName: "arrow.counterclockwise")
-                        .foregroundStyle(.orange)
+                        .foregroundStyle(Color.sand)
                     Text("Swing #\(swingNumber)")
                         .font(.headline)
                         .foregroundStyle(.white)
@@ -95,7 +95,7 @@ struct InterruptionOverlay: View {
                     .foregroundStyle(.white)
                     .padding(.horizontal, 32)
                     .padding(.vertical, 12)
-                    .background(Color.green)
+                    .background(Color.fairwayGreen)
                     .clipShape(Capsule())
             }
             .padding(32)

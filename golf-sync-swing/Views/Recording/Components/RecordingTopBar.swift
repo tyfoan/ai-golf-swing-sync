@@ -23,7 +23,7 @@ struct RecordingTopBar: View {
                         .font(.title2.bold())
                         .foregroundStyle(.white)
                         .frame(width: 44, height: 44)
-                        .background(Color.green)
+                        .background(Color.fairwayGreen)
                         .clipShape(Circle())
                 }
             }
@@ -33,7 +33,7 @@ struct RecordingTopBar: View {
             if isRecording {
                 HStack(spacing: 8) {
                     Circle()
-                        .fill(Color.red)
+                        .fill(Color.flagRed)
                         .frame(width: 12, height: 12)
 
                     Text(formatDuration(recordedDuration))
@@ -48,12 +48,12 @@ struct RecordingTopBar: View {
 
             Spacer()
 
-            if swingCount > 0 {
+            if swingCount > 0 && isRecording {
                 Text("\(swingCount)")
                     .font(.headline.bold())
                     .foregroundStyle(.white)
                     .frame(width: 32, height: 32)
-                    .background(Color.green)
+                    .background(Color.fairwayGreen)
                     .clipShape(Circle())
             }
         }

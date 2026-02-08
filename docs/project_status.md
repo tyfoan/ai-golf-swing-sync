@@ -94,6 +94,18 @@
 
 ## Recent Updates
 
+### 2026-02-08 (10 Bug Fixes + Player UI Overhaul)
+- Fixed 10 bugs in post-swing-detection flow:
+  - Favorites lost on save, no navigation after save, redundant save confirmation dialog
+  - Re-analysis wiping live-detected swings, SpeedButton non-functional
+  - Comparison ignoring selected swing contact times, HomeView date grouping wrong sort order
+  - Swing replay not looping, PiP showing wrong swing after swap, DateFormatter per render
+- Fixed timeline swing markers rendering at wrong position (ZStack width issue)
+- SingleVideoPlayerView: removed 16:9 constraint, video fills available space
+- PlaybackControlsView: smaller buttons, subtler styling, transport left-aligned
+- SwingDetectionPanel: split EDIT MANUALLY into EDIT (pencil) + ADD (plus) actions
+- SwingThumbnailView: shrunk to 72x96, right-aligned with ScrollViewReader auto-scroll
+
 ### 2026-02-08 (Swing Detection & Recording UX Fixes)
 - Fixed countdown lag when cancelling and re-starting recording (Task cancellation)
 - Tightened swing bounds: pre/post buffers 1.5s→0.8s, max half-duration 2.0s cap

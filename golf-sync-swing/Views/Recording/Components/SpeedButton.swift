@@ -9,10 +9,11 @@ import SwiftUI
 
 struct SpeedButton: View {
     let speed: Float
+    let onTap: () -> Void
 
     var body: some View {
-        Button(action: {}) {
-            Text(String(format: "%.1fx", speed))
+        Button(action: onTap) {
+            Text(String(format: "%.2gx", speed))
                 .font(.subheadline.bold())
                 .foregroundStyle(.white)
                 .frame(width: 50, height: 50)
@@ -24,9 +25,9 @@ struct SpeedButton: View {
 
 #Preview {
     HStack {
-        SpeedButton(speed: 0.5)
-        SpeedButton(speed: 1.0)
-        SpeedButton(speed: 2.0)
+        SpeedButton(speed: 0.25) {}
+        SpeedButton(speed: 0.5) {}
+        SpeedButton(speed: 1.0) {}
     }
     .padding()
     .background(Color.black)

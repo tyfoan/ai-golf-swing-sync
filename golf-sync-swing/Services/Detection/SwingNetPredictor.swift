@@ -15,11 +15,34 @@ struct SwingNetAnalysis {
     var eventPeaks: [SwingNetEvent: (frame: Int, prob: Float)] = [:]
     var noEventDominantFrameCount: Int = 0
 
+    /// Raw impact probabilities for all 64 frames (enables sub-frame interpolation)
+    var impactProbabilities: [Float] = []
+
     var impactFrame: Int { eventPeaks[.impact]?.frame ?? 0 }
     var impactProb: Float { eventPeaks[.impact]?.prob ?? 0 }
 
+    /// Probability-weighted centroid timestamp around the peak impact frame.
+    /// Uses ±2 frames to interpolate sub-frame precision (~8ms at 30fps).
     func impactTimestamp(in frames: [RGBFrameData]) -> TimeInterval {
-        frames[impactFrame].timestamp
+        let peak = impactFrame
+        guard !frames.isEmpty, peak < frames.count else { return 0 }
+        guard impactProbabilities.count == 64 else { return frames[peak].timestamp }
+
+        let radius = 2
+        let lo = max(0, peak - radius)
+        let hi = min(frames.count - 1, peak + radius)
+
+        var weightedTime: Double = 0
+        var totalWeight: Double = 0
+
+        for i in lo...hi {
+            let w = Double(max(0, impactProbabilities[i]))
+            weightedTime += w * frames[i].timestamp
+            totalWeight += w
+        }
+
+        guard totalWeight > 0 else { return frames[peak].timestamp }
+        return weightedTime / totalWeight
     }
 }
 
@@ -108,6 +131,7 @@ final class SwingNetPredictor: SwingNetPredicting, @unchecked Sendable {
     private func analyzeOutput(_ probabilities: MLMultiArray) -> SwingNetAnalysis {
         var analysis = SwingNetAnalysis()
         let eventCount = 9
+        var impactProbs = [Float](repeating: 0, count: 64)
 
         for event in SwingNetEvent.allCases {
             analysis.eventPeaks[event] = (frame: 0, prob: 0)
@@ -129,6 +153,10 @@ final class SwingNetPredictor: SwingNetPredicting, @unchecked Sendable {
                 if prob > (analysis.eventPeaks[event]?.prob ?? 0) {
                     analysis.eventPeaks[event] = (frame: frameIdx, prob: prob)
                 }
+
+                if eventIdx == SwingNetEvent.impact.rawValue {
+                    impactProbs[frameIdx] = prob
+                }
             }
 
             if dominantEvent == SwingNetEvent.noEvent.rawValue {
@@ -136,6 +164,7 @@ final class SwingNetPredictor: SwingNetPredicting, @unchecked Sendable {
             }
         }
 
+        analysis.impactProbabilities = impactProbs
         return analysis
     }
 }

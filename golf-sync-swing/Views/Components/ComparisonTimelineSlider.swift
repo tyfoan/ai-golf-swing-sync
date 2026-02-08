@@ -2,7 +2,7 @@
 //  ComparisonTimelineSlider.swift
 //  golf-sync-swing
 //
-//  Timeline scrubber for the comparison view.
+//  Dark-themed timeline scrubber for the comparison view.
 //
 
 import SwiftUI
@@ -13,44 +13,68 @@ struct ComparisonTimelineSlider: View {
 
     var body: some View {
         VStack(spacing: 4) {
-            GeometryReader { geometry in
-                ZStack(alignment: .leading) {
-                    RoundedRectangle(cornerRadius: 2)
-                        .fill(Color.secondary.opacity(0.3))
-                        .frame(height: 4)
+            trackView
+            timeLabels
+        }
+    }
 
-                    RoundedRectangle(cornerRadius: 2)
-                        .fill(Color.accentColor)
-                        .frame(width: geometry.size.width * viewModel.progress, height: 4)
+    // MARK: - Track
 
-                    Circle()
-                        .fill(Color.white)
-                        .frame(width: isDragging ? 16 : 12, height: isDragging ? 16 : 12)
-                        .shadow(radius: 2)
-                        .offset(x: geometry.size.width * viewModel.progress - (isDragging ? 8 : 6))
-                }
-                .frame(height: 20)
-                .contentShape(Rectangle())
-                .gesture(
-                    DragGesture(minimumDistance: 0)
-                        .onChanged { value in
-                            isDragging = true
-                            let progress = max(0, min(1, value.location.x / geometry.size.width))
-                            viewModel.seekToProgress(progress)
-                        }
-                        .onEnded { _ in isDragging = false }
-                )
+    private var trackView: some View {
+        GeometryReader { geometry in
+            ZStack(alignment: .leading) {
+                trackBackground
+                trackProgress(width: geometry.size.width)
+                handle(containerWidth: geometry.size.width)
             }
             .frame(height: 20)
-
-            HStack {
-                Text(formatTime(viewModel.currentTime))
-                    .font(.caption2).monospacedDigit().foregroundStyle(.secondary)
-                Spacer()
-                Text(formatTime(viewModel.totalDuration))
-                    .font(.caption2).monospacedDigit().foregroundStyle(.secondary)
-            }
+            .contentShape(Rectangle())
+            .gesture(dragGesture(containerWidth: geometry.size.width))
         }
+        .frame(height: 20)
+    }
+
+    private var trackBackground: some View {
+        RoundedRectangle(cornerRadius: 2)
+            .fill(Color.white.opacity(0.2))
+            .frame(height: 4)
+    }
+
+    private func trackProgress(width: CGFloat) -> some View {
+        RoundedRectangle(cornerRadius: 2)
+            .fill(Color.appTeal)
+            .frame(width: width * viewModel.progress, height: 4)
+    }
+
+    private func handle(containerWidth: CGFloat) -> some View {
+        Circle()
+            .fill(Color.white)
+            .frame(width: isDragging ? 14 : 10, height: isDragging ? 14 : 10)
+            .shadow(radius: 2)
+            .offset(x: containerWidth * viewModel.progress - (isDragging ? 7 : 5))
+    }
+
+    private func dragGesture(containerWidth: CGFloat) -> some Gesture {
+        DragGesture(minimumDistance: 0)
+            .onChanged { value in
+                isDragging = true
+                let progress = max(0, min(1, value.location.x / containerWidth))
+                viewModel.seekToProgress(progress)
+            }
+            .onEnded { _ in isDragging = false }
+    }
+
+    // MARK: - Time Labels
+
+    private var timeLabels: some View {
+        HStack {
+            Text(formatTime(viewModel.currentTime))
+            Spacer()
+            Text(formatTime(viewModel.totalDuration))
+        }
+        .font(.caption2).monospacedDigit()
+        .foregroundStyle(.white.opacity(isDragging ? 0.5 : 0.3))
+        .animation(.easeInOut(duration: 0.2), value: isDragging)
     }
 
     private func formatTime(_ time: TimeInterval) -> String {

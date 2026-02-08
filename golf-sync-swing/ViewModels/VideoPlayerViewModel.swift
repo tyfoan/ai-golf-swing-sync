@@ -16,6 +16,9 @@ final class VideoPlayerViewModel {
     private(set) var currentTime: TimeInterval = 0
     private(set) var duration: TimeInterval = 0
     private(set) var playbackRate: Float = 1.0
+    private(set) var isMuted = false
+
+    var activeSwingBounds: (start: TimeInterval, end: TimeInterval)?
 
     private var timeObserver: Any?
     private var cancellables = Set<AnyCancellable>()
@@ -37,10 +40,14 @@ final class VideoPlayerViewModel {
         }
     }
 
+    // MARK: - Time Observer
+
     private func setupTimeObserver() {
         let interval = CMTime(seconds: 0.01, preferredTimescale: 600)
         timeObserver = player.addPeriodicTimeObserver(forInterval: interval, queue: .main) { [weak self] time in
-            self?.currentTime = CMTimeGetSeconds(time)
+            guard let self else { return }
+            self.currentTime = CMTimeGetSeconds(time)
+            self.enforceSwingBounds()
         }
     }
 
@@ -53,14 +60,17 @@ final class VideoPlayerViewModel {
             .store(in: &cancellables)
     }
 
+    private func enforceSwingBounds() {
+        guard let bounds = activeSwingBounds, isPlaying else { return }
+        guard currentTime >= bounds.end else { return }
+        seek(to: bounds.start)
+        play()
+    }
+
     // MARK: - Playback Controls
 
     func togglePlayPause() {
-        if isPlaying {
-            pause()
-        } else {
-            play()
-        }
+        isPlaying ? pause() : play()
     }
 
     func play() {
@@ -81,9 +91,7 @@ final class VideoPlayerViewModel {
 
     func setPlaybackRate(_ rate: Float) {
         playbackRate = rate
-        if isPlaying {
-            player.rate = rate
-        }
+        if isPlaying { player.rate = rate }
     }
 
     func stepFrame(forward: Bool) {
@@ -93,6 +101,27 @@ final class VideoPlayerViewModel {
             : max(currentTime - frameDuration, 0)
         seek(to: newTime)
     }
+
+    // MARK: - Mute
+
+    func toggleMute() {
+        isMuted.toggle()
+        player.isMuted = isMuted
+    }
+
+    // MARK: - Swing Playback
+
+    func playSwing(_ swing: SwingMarker) {
+        activeSwingBounds = (swing.startTime, swing.endTime)
+        seek(to: swing.startTime)
+        play()
+    }
+
+    func clearSwingBounds() {
+        activeSwingBounds = nil
+    }
+
+    // MARK: - Progress
 
     var progress: Double {
         guard duration > 0 else { return 0 }

@@ -2,6 +2,8 @@
 //  TimelineSlider.swift
 //  golf-sync-swing
 //
+//  Dark-themed timeline with swing range markers and impact dots.
+//
 
 import SwiftUI
 
@@ -13,60 +15,55 @@ struct TimelineSlider: View {
 
     var body: some View {
         VStack(spacing: 4) {
-            GeometryReader { geometry in
-                ZStack(alignment: .leading) {
-                    // Track background
-                    RoundedRectangle(cornerRadius: 2)
-                        .fill(Color.secondary.opacity(0.3))
-                        .frame(height: 4)
+            trackView
+            timeLabels
+        }
+    }
 
-                    // Swing markers on timeline
-                    ForEach(Array(swings.enumerated()), id: \.element.id) { index, swing in
-                        swingMarker(swing: swing, index: index, width: geometry.size.width)
-                    }
+    // MARK: - Track
 
-                    // Progress fill
-                    RoundedRectangle(cornerRadius: 2)
-                        .fill(Color.accentColor)
-                        .frame(width: geometry.size.width * viewModel.progress, height: 4)
-
-                    // Thumb
-                    Circle()
-                        .fill(Color.white)
-                        .frame(width: isDragging ? 16 : 12, height: isDragging ? 16 : 12)
-                        .shadow(radius: 2)
-                        .offset(x: geometry.size.width * viewModel.progress - (isDragging ? 8 : 6))
-                }
-                .frame(height: 20)
-                .contentShape(Rectangle())
-                .gesture(
-                    DragGesture(minimumDistance: 0)
-                        .onChanged { value in
-                            isDragging = true
-                            let progress = max(0, min(1, value.location.x / geometry.size.width))
-                            viewModel.seekToProgress(progress)
-                        }
-                        .onEnded { _ in
-                            isDragging = false
-                        }
-                )
+    private var trackView: some View {
+        GeometryReader { geometry in
+            ZStack(alignment: .leading) {
+                trackBackground
+                swingMarkers(width: geometry.size.width)
+                progressFill(width: geometry.size.width)
+                handle(width: geometry.size.width)
             }
             .frame(height: 20)
+            .contentShape(Rectangle())
+            .gesture(dragGesture(width: geometry.size.width))
+        }
+        .frame(height: 20)
+    }
 
-            // Time labels
-            HStack {
-                Text(formatTime(viewModel.currentTime))
-                    .font(.caption2)
-                    .monospacedDigit()
-                    .foregroundStyle(.secondary)
+    private var trackBackground: some View {
+        RoundedRectangle(cornerRadius: 2)
+            .fill(Color.white.opacity(0.2))
+            .frame(height: 4)
+    }
 
-                Spacer()
+    private func progressFill(width: CGFloat) -> some View {
+        RoundedRectangle(cornerRadius: 2)
+            .fill(Color.appTeal)
+            .frame(width: width * viewModel.progress, height: 4)
+    }
 
-                Text(formatTime(viewModel.duration))
-                    .font(.caption2)
-                    .monospacedDigit()
-                    .foregroundStyle(.secondary)
-            }
+    private func handle(width: CGFloat) -> some View {
+        let size: CGFloat = isDragging ? 14 : 10
+        return Circle()
+            .fill(Color.white)
+            .frame(width: size, height: size)
+            .shadow(radius: 2)
+            .offset(x: width * viewModel.progress - size / 2)
+    }
+
+    // MARK: - Swing Markers
+
+    @ViewBuilder
+    private func swingMarkers(width: CGFloat) -> some View {
+        ForEach(Array(swings.enumerated()), id: \.element.id) { index, swing in
+            swingMarker(swing: swing, index: index, width: width)
         }
     }
 
@@ -80,23 +77,52 @@ struct TimelineSlider: View {
             let impactX = (swing.contactTime / duration) * width
 
             ZStack {
-                // Swing range highlight
                 RoundedRectangle(cornerRadius: 2)
-                    .fill(Color.green.opacity(0.3))
+                    .fill(Color.mintMist)
                     .frame(width: markerWidth, height: 12)
                     .offset(x: startX + markerWidth / 2 - width / 2)
 
-                // Impact point marker (orange)
                 Circle()
-                    .fill(Color.orange)
+                    .fill(Color.sand)
                     .frame(width: 8, height: 8)
                     .offset(x: impactX - width / 2)
             }
-            .onTapGesture {
-                onSwingTap?(swing)
-            }
+            .frame(width: width)
+            .onTapGesture { onSwingTap?(swing) }
         }
     }
+
+    // MARK: - Time Labels
+
+    private var timeLabels: some View {
+        HStack {
+            Text(formatTime(viewModel.currentTime))
+                .font(.caption2).monospacedDigit()
+                .foregroundStyle(.white.opacity(isDragging ? 0.5 : 0.3))
+
+            Spacer()
+
+            Text(formatTime(viewModel.duration))
+                .font(.caption2).monospacedDigit()
+                .foregroundStyle(.white.opacity(isDragging ? 0.5 : 0.3))
+        }
+    }
+
+    // MARK: - Gesture
+
+    private func dragGesture(width: CGFloat) -> some Gesture {
+        DragGesture(minimumDistance: 0)
+            .onChanged { value in
+                isDragging = true
+                let progress = max(0, min(1, value.location.x / width))
+                viewModel.seekToProgress(progress)
+            }
+            .onEnded { _ in
+                isDragging = false
+            }
+    }
+
+    // MARK: - Formatting
 
     private func formatTime(_ time: TimeInterval) -> String {
         let minutes = Int(time) / 60

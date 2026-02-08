@@ -72,7 +72,7 @@ struct CameraTipsOverlay: View {
             HStack(spacing: 8) {
                 ForEach(0..<tips.count, id: \.self) { index in
                     Circle()
-                        .fill(index == currentPage ? Color.green : Color.gray.opacity(0.3))
+                        .fill(index == currentPage ? Color.fairwayGreen : Color.gray.opacity(0.3))
                         .frame(width: 8, height: 8)
                 }
             }
@@ -117,12 +117,12 @@ struct TipPageCard: View {
                     Spacer()
                     ZStack {
                         RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.green, lineWidth: 2)
+                            .stroke(Color.fairwayGreen, lineWidth: 2)
                             .frame(width: 80, height: 120)
 
                         Image(systemName: tip.systemIcon)
                             .font(.system(size: 36))
-                            .foregroundStyle(.green)
+                            .foregroundStyle(Color.fairwayGreen)
                     }
                     Spacer()
                 }

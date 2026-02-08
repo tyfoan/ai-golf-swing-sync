@@ -9,9 +9,26 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Fixed
+- **Favorites lost on save**: RecordingSaveService now copies `isFavorite` from SwingClip to SwingMarker
+- **Re-analysis wipes live-detected swings**: Videos saved with swings now marked `hasBeenAnalyzed = true` to skip redundant auto-detection
+- **No navigation after save**: Recording save now opens SingleVideoPlayerView via `fullScreenCover(item:)` instead of showing a confirmation dialog
+- **Comparison ignores selected swing**: HomeView passes selected swing contact times to ComparisonView for precise sync offset
+- **HomeView date grouping sorts wrong**: Changed from string-based sort to `Calendar.startOfDay` + `Date` comparison
+- **Swing replay doesn't loop**: `enforceSwingBounds` now seeks back to start and resumes playback instead of pausing
+- **PiP shows wrong swing after swap**: `swapMainAndPip` preserves existing `replayingSwingIndex` instead of always resetting to last
+- **SpeedButton non-functional**: Added `onTap` callback, wired `cyclePlaybackSpeed()` with [0.25x, 0.5x, 1.0x] speeds through PiP to SwingReplayView
+- **DateFormatter created per render**: Extracted to `static let dateFormatter` in HistoryView
+- **Timeline swing markers at wrong position**: Added `.frame(width: width)` to inner ZStack so offset calculations reference correct center
 - **Countdown lag on cancel→re-start**: Stored countdown Task reference; `cancel()` now cancels the running Task immediately instead of waiting for the next 1-second sleep to complete
 - **Bloated swing bounds**: Reduced pre/post swing buffers from 1.5s→0.8s across all 4 impact detection strategies; added `maxHalfDuration=2.0s` cap to prevent swing bounds exceeding ~4s total (real golf swings are 1.5-3s)
 - **Wasted bottom space in SwingDetectionPanel**: Removed `Spacer()` that pushed swing list upward, leaving empty space below
+
+### Changed
+- **SingleVideoPlayerView layout**: Removed 16:9 aspect ratio constraint — video fills available space, reduced spacing for compact layout
+- **PlaybackControlsView**: Smaller buttons (40/48px), subtler backgrounds, transport left-aligned with speed pill right-aligned
+- **SwingDetectionPanel**: Split EDIT MANUALLY into separate EDIT (pencil, for selected swing) and ADD (plus, for new swing) actions
+- **SwingThumbnailView**: Shrunk from 100x140 to 72x96, right-aligned with auto-scroll to selected thumbnail
+- **Redundant save confirmation removed**: Recording save flow goes directly to video player instead of showing dialog
 
 ### Added
 - **Sandi Metz OOP Decomposition**: Major refactoring of 11 files exceeding 200-line class limit

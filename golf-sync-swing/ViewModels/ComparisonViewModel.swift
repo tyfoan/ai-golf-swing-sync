@@ -2,6 +2,10 @@
 //  ComparisonViewModel.swift
 //  golf-sync-swing
 //
+//  Orchestrates dual-player synchronized playback.
+//  Player1 is the time reference; player2 follows at (time - syncOffset).
+//  A periodic re-sync corrects drift during playback.
+//
 
 import Foundation
 import AVFoundation
@@ -18,6 +22,9 @@ final class ComparisonViewModel {
     private(set) var currentTime: TimeInterval = 0
     private(set) var playbackRate: Float = 1.0
     var syncOffset: TimeInterval = 0
+    var comparisonMode: ComparisonMode = .sideBySide
+    var onionSkinOpacity: Double = 0.5
+    var showPoseOverlay: Bool = false
 
     /// Tempo adjustment for video2 (1.0 = same speed, >1.0 = faster, <1.0 = slower)
     var video2TempoAdjustment: Float = 1.0
@@ -27,18 +34,19 @@ final class ComparisonViewModel {
 
     /// Description of tempo adjustment for UI
     var tempoDescription: String? {
-        guard tempoSyncEnabled && abs(video2TempoAdjustment - 1.0) > 0.05 else { return nil }
+        guard abs(video2TempoAdjustment - 1.0) > 0.05 else { return nil }
         let percent = Int(abs(video2TempoAdjustment - 1.0) * 100)
-        if video2TempoAdjustment > 1.0 {
-            return "Video 2: +\(percent)% speed"
-        } else {
-            return "Video 2: -\(percent)% speed"
-        }
+        return video2TempoAdjustment > 1.0
+            ? "Video 2: +\(percent)% speed"
+            : "Video 2: -\(percent)% speed"
     }
 
     private var timeObserver: Any?
     private var cancellables = Set<AnyCancellable>()
     private var isSwapped = false
+
+    /// Drift threshold (seconds) before forcing a re-sync of player2
+    private let maxDrift: TimeInterval = 0.04
 
     static let playbackRates: [Float] = [0.125, 0.25, 0.5, 1.0]
 
@@ -67,11 +75,27 @@ final class ComparisonViewModel {
         }
     }
 
+    // MARK: - Time Observer (with drift correction)
+
     private func setupTimeObserver() {
         let interval = CMTime(seconds: 0.01, preferredTimescale: 600)
         timeObserver = player1.addPeriodicTimeObserver(forInterval: interval, queue: .main) { [weak self] time in
-            self?.currentTime = CMTimeGetSeconds(time)
+            guard let self else { return }
+            let t1 = CMTimeGetSeconds(time)
+            self.currentTime = t1
+            self.correctDriftIfNeeded(player1Time: t1)
         }
+    }
+
+    private func correctDriftIfNeeded(player1Time t1: TimeInterval) {
+        guard isPlaying else { return }
+        let expectedTime2 = max(0, t1 - syncOffset)
+        let actualTime2 = CMTimeGetSeconds(player2.currentTime())
+        let drift = abs(actualTime2 - expectedTime2)
+
+        guard drift > maxDrift else { return }
+        let cmTarget = CMTime(seconds: expectedTime2, preferredTimescale: 600)
+        player2.seek(to: cmTarget, toleranceBefore: .zero, toleranceAfter: .zero)
     }
 
     private func setupNotifications() {
@@ -87,22 +111,20 @@ final class ComparisonViewModel {
     // MARK: - Playback Controls
 
     func togglePlayPause() {
-        if isPlaying {
-            pause()
-        } else {
-            play()
-        }
+        isPlaying ? pause() : play()
     }
 
     func play() {
-        player1.rate = playbackRate
+        // Sync player2 to correct position before starting playback
+        let expectedTime2 = max(0, currentTime - syncOffset)
+        let cmTarget = CMTime(seconds: expectedTime2, preferredTimescale: 600)
+        player2.seek(to: cmTarget, toleranceBefore: .zero, toleranceAfter: .zero)
 
-        // Apply tempo adjustment to video2 if enabled
+        player1.rate = playbackRate
         let video2Rate = tempoSyncEnabled
             ? playbackRate * video2TempoAdjustment
             : playbackRate
         player2.rate = video2Rate
-
         isPlaying = true
     }
 
@@ -116,7 +138,6 @@ final class ComparisonViewModel {
         let cmTime1 = CMTime(seconds: time, preferredTimescale: 600)
         player1.seek(to: cmTime1, toleranceBefore: .zero, toleranceAfter: .zero)
 
-        // Apply sync offset to second video
         let time2 = max(0, time - syncOffset)
         let cmTime2 = CMTime(seconds: time2, preferredTimescale: 600)
         player2.seek(to: cmTime2, toleranceBefore: .zero, toleranceAfter: .zero)
@@ -126,30 +147,25 @@ final class ComparisonViewModel {
 
     func setPlaybackRate(_ rate: Float) {
         playbackRate = rate
-        if isPlaying {
-            player1.rate = rate
-            let video2Rate = tempoSyncEnabled ? rate * video2TempoAdjustment : rate
-            player2.rate = video2Rate
-        }
+        guard isPlaying else { return }
+        player1.rate = rate
+        let video2Rate = tempoSyncEnabled ? rate * video2TempoAdjustment : rate
+        player2.rate = video2Rate
     }
 
     /// Apply sync result from VideoSyncEngine
     func applySyncResult(_ result: SyncResult) {
         syncOffset = result.offset
         video2TempoAdjustment = result.video2PlaybackSpeed
-        // Don't time-warp videos automatically; keep tempo sync as an explicit user choice.
         tempoSyncEnabled = false
-
-        // Re-sync to current position
         seek(to: currentTime)
     }
 
     /// Toggle tempo sync on/off
     func toggleTempoSync() {
         tempoSyncEnabled.toggle()
-        if isPlaying {
-            setPlaybackRate(playbackRate)  // Reapply rates
-        }
+        guard isPlaying else { return }
+        setPlaybackRate(playbackRate)
     }
 
     func stepFrame(forward: Bool) {
@@ -166,15 +182,24 @@ final class ComparisonViewModel {
 
     func adjustSyncOffset(by delta: TimeInterval) {
         syncOffset += delta
-        // Re-sync to current position with new offset
         seek(to: currentTime)
     }
 
     func setSyncOffset(_ offset: TimeInterval) {
         syncOffset = offset
-        // Re-sync to current position with new offset
         seek(to: currentTime)
     }
+
+    // MARK: - Seek to Impact
+
+    /// Seek both players to the impact alignment point.
+    /// Contact times are absolute timestamps within each video.
+    func seekToImpact(contactTime1: TimeInterval?, contactTime2: TimeInterval?) {
+        guard let c1 = contactTime1 else { return }
+        seek(to: c1)
+    }
+
+    // MARK: - Progress
 
     var progress: Double {
         guard totalDuration > 0 else { return 0 }

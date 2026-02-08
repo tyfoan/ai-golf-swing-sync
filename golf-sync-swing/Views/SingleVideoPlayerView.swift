@@ -2,8 +2,8 @@
 //  SingleVideoPlayerView.swift
 //  golf-sync-swing
 //
-//  Video playback with swing detection and marking.
-//  Delegates swing UI to SwingDetectionPanel.
+//  Dark immersive video player with mode picker,
+//  floating actions, and swing thumbnail strip.
 //
 
 import SwiftUI
@@ -11,177 +11,179 @@ import SwiftData
 
 struct SingleVideoPlayerView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.dismiss) private var dismiss
     @Bindable var video: SwingVideo
 
     @State private var viewModel: VideoPlayerViewModel?
+    @State private var playbackMode: VideoPlaybackMode = .swingsOnly
+    @State private var selectedSwingId: UUID?
     @State private var showSwingEditor = false
     @State private var editingSwing: SwingMarker?
-    @State private var selectedSwingId: UUID?
-
-    // Auto-detection state
-    @State private var isAnalyzing = false
-    @State private var analysisProgress: Float = 0
-    @State private var analysisError: String?
-    @State private var showAnalysisResult = false
-    @State private var lastDetectionResults: [SwingDetectionResult] = []
-    @State private var analysisStatus: String = ""
-
-    private let syncEngine = VideoSyncEngine()
+    @State private var detector = SwingAutoDetectionRunner()
 
     var body: some View {
-        VStack(spacing: 0) {
-            if let vm = viewModel {
-                videoPlayerSection(vm: vm)
-                controlsSection(vm: vm)
-                Divider().padding(.top, 12)
-                SwingDetectionPanel(
-                    video: video,
-                    selectedSwingId: selectedSwingId,
-                    isAnalyzing: isAnalyzing,
-                    analysisProgress: analysisProgress,
-                    analysisStatus: analysisStatus,
-                    onAutoDetect: { runAutoDetection() },
-                    onManualAdd: { editingSwing = nil; showSwingEditor = true },
-                    onSwingTap: { swing in
-                        selectedSwingId = swing.id
-                        vm.seek(to: swing.startTime)
-                        vm.play()
-                    },
-                    onSwingEdit: { swing in
-                        editingSwing = swing
-                        showSwingEditor = true
-                    }
-                )
-            } else {
-                ProgressView()
-            }
+        ZStack {
+            Color.black.ignoresSafeArea()
+            mainContent
         }
-        .navigationTitle("Recording")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    // TODO: Export functionality
-                } label: {
-                    Image(systemName: "square.and.arrow.up")
-                }
-            }
-        }
-        .onAppear { viewModel = VideoPlayerViewModel(video: video) }
+        .preferredColorScheme(.dark)
+        .toolbar(.hidden, for: .navigationBar)
+        .toolbar(.hidden, for: .tabBar)
+        .onAppear(perform: handleAppear)
         .onDisappear { viewModel?.pause() }
         .sheet(isPresented: $showSwingEditor) { swingEditorSheet }
-        .alert("Analysis Complete", isPresented: $showAnalysisResult) {
-            Button("OK") { }
-        } message: {
-            analysisResultMessage
-        }
-        .alert("Analysis Error", isPresented: .init(
-            get: { analysisError != nil },
-            set: { if !$0 { analysisError = nil } }
-        )) {
-            Button("OK") { analysisError = nil }
-        } message: {
-            Text(analysisError ?? "Unknown error")
+    }
+}
+
+// MARK: - Layout
+
+private extension SingleVideoPlayerView {
+    @ViewBuilder
+    var mainContent: some View {
+        if let vm = viewModel {
+            VStack(spacing: 0) {
+                PlayerTopBarView(
+                    playbackMode: playbackMode,
+                    onDismiss: { dismiss() },
+                    onSwitchMode: switchMode
+                )
+                videoArea(vm: vm)
+                controlsSection(vm: vm)
+                swingsSection(vm: vm)
+            }
+        } else {
+            ProgressView().tint(.white)
         }
     }
 
-    @ViewBuilder
-    private func videoPlayerSection(vm: VideoPlayerViewModel) -> some View {
-        VideoPlayerView(player: vm.player)
-            .aspectRatio(16/9, contentMode: .fit)
-            .background(Color.black)
-            .onTapGesture { vm.togglePlayPause() }
+    func videoArea(vm: VideoPlayerViewModel) -> some View {
+        ZStack {
+            VideoPlayerView(player: vm.player)
+                .background(Color.black)
+                .onTapGesture { vm.togglePlayPause() }
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer()
+                    VideoFloatingActionsView(
+                        isFavorite: selectedSwing?.isFavorite ?? false,
+                        isMuted: vm.isMuted,
+                        showFavorite: playbackMode == .swingsOnly,
+                        onToggleFavorite: { selectedSwing?.isFavorite.toggle() },
+                        onToggleMute: { vm.toggleMute() }
+                    )
+                }
+                .padding(.trailing, 4)
+            }
+            AnalysisOverlayView(
+                isAnalyzing: detector.isAnalyzing,
+                progress: detector.progress,
+                status: detector.status
+            )
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .padding(.horizontal, 12)
     }
 
-    @ViewBuilder
-    private func controlsSection(vm: VideoPlayerViewModel) -> some View {
-        VStack(spacing: 12) {
+    func controlsSection(vm: VideoPlayerViewModel) -> some View {
+        VStack(spacing: 6) {
+            PlaybackControlsView(viewModel: vm)
             TimelineSlider(
                 viewModel: vm,
                 swings: video.swings,
-                onSwingTap: { swing in
-                    selectedSwingId = swing.id
-                    vm.seek(to: swing.startTime)
-                    vm.play()
-                }
+                onSwingTap: { swing in selectSwing(swing, vm: vm) }
             )
-            PlaybackControlsView(viewModel: vm)
         }
-        .padding(.horizontal)
-        .padding(.top, 12)
+        .padding(.horizontal, 16)
+        .padding(.top, 8)
     }
 
     @ViewBuilder
-    private var analysisResultMessage: some View {
-        let valid = lastDetectionResults.filter { $0.hasValidDetection }
-        if valid.isEmpty {
-            Text("Could not detect swing. Try adding markers manually.")
-        } else if valid.count == 1, let result = valid.first {
-            let impact = result.impactTime.map { String(format: "%.2fs", $0) } ?? "n/a"
-            Text("Impact: \(impact)\nConfidence: \(Int(result.impactConfidence * 100))%")
-        } else {
-            Text("Detected \(valid.count) swings")
+    func swingsSection(vm: VideoPlayerViewModel) -> some View {
+        if playbackMode == .swingsOnly {
+            SwingDetectionPanel(
+                video: video,
+                selectedSwingId: selectedSwingId,
+                isAnalyzing: detector.isAnalyzing,
+                analysisProgress: detector.progress,
+                analysisStatus: detector.status,
+                onAddNew: { editingSwing = nil; showSwingEditor = true },
+                onEditSelected: { editSelectedSwing() },
+                onSwingTap: { swing in selectSwing(swing, vm: vm) }
+            )
+            .padding(.top, 6)
+            .padding(.bottom, 16)
         }
     }
 
     @ViewBuilder
-    private var swingEditorSheet: some View {
-        let deleteAction: (() -> Void)? = editingSwing != nil ? { deleteCurrentSwing() } : nil
+    var swingEditorSheet: some View {
         SwingEditorSheet(
             video: video,
             existingSwing: editingSwing,
             onSave: saveSwing,
             onCancel: { showSwingEditor = false; editingSwing = nil },
-            onDelete: deleteAction
+            onDelete: editingSwing != nil ? { deleteCurrentSwing() } : nil
         )
         .presentationDetents([.large])
     }
+}
 
-    // MARK: - Actions
+// MARK: - Actions
 
-    private func runAutoDetection() {
-        isAnalyzing = true
-        analysisProgress = 0
-        analysisStatus = "Analyzing with Action Classifier..."
+private extension SingleVideoPlayerView {
+    func handleAppear() {
+        let vm = VideoPlayerViewModel(video: video)
+        viewModel = vm
+        playbackMode = video.swings.isEmpty ? .fullVideo : .swingsOnly
 
+        // Always start playing so the user sees the video immediately
+        vm.play()
+
+        guard !video.hasBeenAnalyzed else { return }
         Task {
-            do {
-                let results = try await syncEngine.analyzeAllSwings(
-                    for: video, model: .actionClassifier
-                ) { progress in
-                    Task { @MainActor in analysisProgress = progress }
-                }
-
-                await MainActor.run {
-                    lastDetectionResults = results
-                    let autoDetected = video.swings.filter { $0.isAutoDetected }
-                    for swing in autoDetected {
-                        video.swings.removeAll { $0.id == swing.id }
-                        modelContext.delete(swing)
-                    }
-                    for result in results where result.hasValidDetection {
-                        let swing = SwingMarker(from: result)
-                        swing.video = video
-                        video.swings.append(swing)
-                        modelContext.insert(swing)
-                    }
-                    isAnalyzing = false
-                    showAnalysisResult = true
-                }
-            } catch {
-                await MainActor.run {
-                    isAnalyzing = false
-                    analysisError = error.localizedDescription
-                }
+            let swings = await detector.analyze(video: video, context: modelContext)
+            guard let first = swings.first else {
+                playbackMode = .fullVideo
+                return
             }
+            playbackMode = .swingsOnly
+            selectSwing(first, vm: vm)
         }
     }
 
-    private func saveSwing(start: TimeInterval, contact: TimeInterval, end: TimeInterval) {
+    func switchMode(to mode: VideoPlaybackMode) {
+        playbackMode = mode
+        guard let vm = viewModel else { return }
+
+        switch mode {
+        case .swingsOnly:
+            guard let first = video.swings.first else { return }
+            selectSwing(first, vm: vm)
+        case .fullVideo:
+            vm.clearSwingBounds()
+            selectedSwingId = nil
+        }
+    }
+
+    func selectSwing(_ swing: SwingMarker, vm: VideoPlayerViewModel) {
+        selectedSwingId = swing.id
+        vm.playSwing(swing)
+    }
+
+    var selectedSwing: SwingMarker? {
+        guard let id = selectedSwingId else { return nil }
+        return video.swings.first { $0.id == id }
+    }
+
+    func editSelectedSwing() {
+        editingSwing = selectedSwing
+        showSwingEditor = true
+    }
+
+    func saveSwing(start: TimeInterval, contact: TimeInterval, end: TimeInterval) {
         if let existing = editingSwing {
-            existing.startTime = start
-            existing.contactTime = contact
-            existing.endTime = end
+            existing.updateTimes(start: start, contact: contact, end: end)
             existing.isAutoDetected = false
         } else {
             let swing = SwingMarker(startTime: start, contactTime: contact, endTime: end)
@@ -193,12 +195,19 @@ struct SingleVideoPlayerView: View {
         editingSwing = nil
     }
 
-    private func deleteCurrentSwing() {
+    func deleteCurrentSwing() {
         guard let swing = editingSwing else { return }
-        let swingId = swing.id
-        video.swings.removeAll { (s: SwingMarker) -> Bool in s.id == swingId }
+        video.swings.removeAll { $0.id == swing.id }
         modelContext.delete(swing)
         showSwingEditor = false
         editingSwing = nil
+        selectedSwingId = video.swings.first?.id
     }
+}
+
+// MARK: - Playback Mode
+
+enum VideoPlaybackMode: String, CaseIterable {
+    case swingsOnly = "Swings Only"
+    case fullVideo = "Full Video"
 }

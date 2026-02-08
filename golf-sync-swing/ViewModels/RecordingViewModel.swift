@@ -28,7 +28,7 @@ final class RecordingViewModel {
     // MARK: - UI State
 
     var playbackSpeed: Float = 1.0
-    var showSaveConfirmation = false
+    var savedVideo: SwingVideo?
     var errorMessage: String?
     var mainViewShowsReplay: Bool = false
     var replayingSwingIndex: Int? = nil
@@ -64,6 +64,8 @@ final class RecordingViewModel {
         return detectedSwings[index]
     }
 
+    var pipSwing: SwingClip? { currentReplaySwing ?? lastDetectedSwing }
+
     // MARK: - Init
 
     init() {
@@ -85,10 +87,11 @@ final class RecordingViewModel {
                 guard let self else { return }
                 if let error {
                     self.errorMessage = error.localizedDescription
+                    self.mainViewShowsReplay = false
+                    self.replayingSwingIndex = nil
                     self.state = .idle
                 } else {
                     self.state = .reviewing
-                    self.showSaveConfirmation = true
                 }
             }
         }
@@ -109,6 +112,7 @@ final class RecordingViewModel {
     // MARK: - Swing Detection
 
     private func handleSwingDetected(_ bounds: SwingBounds) {
+        guard isRecording else { return }
         let clip = SwingClip(from: bounds)
         detectedSwings.append(clip)
         replayingSwingIndex = detectedSwings.count - 1
@@ -164,6 +168,8 @@ final class RecordingViewModel {
     func stopRecording() {
         guard isRecording else { return }
         frameGate.isCurrentlyRecording = false
+        mainViewShowsReplay = false
+        replayingSwingIndex = nil
         state = .finalizingVideo
         cameraService.stopRecording()
     }
@@ -180,21 +186,17 @@ final class RecordingViewModel {
     }
 
     func swapMainAndPip() {
-        if mainViewShowsReplay {
-            mainViewShowsReplay = false
-            if lastDetectedSwing != nil { pipDisplayMode = .lastSwingReplay }
-        } else if let lastIndex = detectedSwings.indices.last {
-            replayingSwingIndex = lastIndex
-            mainViewShowsReplay = true
-            pipDisplayMode = .liveCamera
+        guard !detectedSwings.isEmpty else { return }
+        if replayingSwingIndex == nil {
+            replayingSwingIndex = detectedSwings.indices.last
         }
+        pipDisplayMode = .lastSwingReplay
     }
 
     func showSwing(at index: Int) {
         guard detectedSwings.indices.contains(index) else { return }
         replayingSwingIndex = index
-        mainViewShowsReplay = true
-        pipDisplayMode = .liveCamera
+        pipDisplayMode = .lastSwingReplay
     }
 
     func showLiveCamera() {
@@ -206,6 +208,16 @@ final class RecordingViewModel {
     func toggleFavorite(at index: Int) {
         guard detectedSwings.indices.contains(index) else { return }
         detectedSwings[index].isFavorite.toggle()
+    }
+
+    private static let speeds: [Float] = [0.25, 0.5, 1.0]
+
+    func cyclePlaybackSpeed() {
+        guard let nextIndex = Self.speeds.firstIndex(of: playbackSpeed).map({ $0 + 1 }) else {
+            playbackSpeed = Self.speeds[0]
+            return
+        }
+        playbackSpeed = Self.speeds[nextIndex % Self.speeds.count]
     }
 
     // MARK: - Save & Delete
@@ -221,9 +233,12 @@ final class RecordingViewModel {
                 expectedDuration: cameraService.recordedDuration,
                 modelContext: modelContext
             )
-            state = .idle
             recordingURL = nil
             detectedSwings.removeAll()
+            mainViewShowsReplay = false
+            replayingSwingIndex = nil
+            savedVideo = video
+            state = .idle
             return video
         } catch {
             errorMessage = error.localizedDescription
@@ -239,11 +254,6 @@ final class RecordingViewModel {
         mainViewShowsReplay = false
         replayingSwingIndex = nil
         state = .idle
-    }
-
-    func enterReviewMode() {
-        showSaveConfirmation = false
-        state = .reviewing
     }
 
     func cancel() {

@@ -56,7 +56,7 @@ struct TipCard: View {
                 .font(.title2.bold())
                 .foregroundStyle(.white)
                 .frame(width: 40, height: 40)
-                .background(Color.green)
+                .background(Color.fairwayGreen)
                 .clipShape(Circle())
 
             VStack(alignment: .leading, spacing: 4) {

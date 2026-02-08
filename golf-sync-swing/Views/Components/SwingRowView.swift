@@ -24,7 +24,7 @@ struct SwingRowView: View {
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 4) {
                     Circle()
-                        .fill(Color.green)
+                        .fill(Color.fairwayGreen)
                         .frame(width: 8, height: 8)
                     Text(formatTime(swing.startTime))
                         .font(.caption)
@@ -35,7 +35,7 @@ struct SwingRowView: View {
                         .foregroundStyle(.secondary)
 
                     Circle()
-                        .fill(Color.orange)
+                        .fill(Color.sand)
                         .frame(width: 8, height: 8)
                     Text(formatTime(swing.contactTime))
                         .font(.caption)
@@ -46,7 +46,7 @@ struct SwingRowView: View {
                         .foregroundStyle(.secondary)
 
                     Circle()
-                        .fill(Color.green)
+                        .fill(Color.fairwayGreen)
                         .frame(width: 8, height: 8)
                     Text(formatTime(swing.endTime))
                         .font(.caption)
@@ -70,7 +70,7 @@ struct SwingRowView: View {
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
-        .background(isSelected ? Color.accentColor : Color.secondary.opacity(0.1))
+        .background(isSelected ? Color.fairwayGreen : Color.secondary.opacity(0.1))
         .cornerRadius(8)
         .contentShape(Rectangle())
         .onTapGesture {

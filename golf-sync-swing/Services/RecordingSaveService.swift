@@ -34,8 +34,14 @@ struct RecordingSaveService {
             )
             marker.isAutoDetected = true
             marker.detectionConfidence = clip.confidence
+            marker.isFavorite = clip.isFavorite
             marker.video = video
             video.swings.append(marker)
+        }
+
+        if !swings.isEmpty {
+            video.hasBeenAnalyzed = true
+            video.analysisDate = Date()
         }
 
         modelContext.insert(video)

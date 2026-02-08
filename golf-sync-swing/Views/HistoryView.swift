@@ -29,10 +29,14 @@ struct HistoryView: View {
                             }
                         }
                         .onDelete(perform: deleteVideos)
+                        .listRowBackground(Color.sandLight)
                     }
                     .listStyle(.plain)
+                    .scrollContentBackground(.hidden)
                 }
             }
+            .background(Color.sandLight)
+            .preferredColorScheme(.light)
             .navigationTitle("Recordings")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -91,7 +95,7 @@ struct VideoHistoryRow: View {
                     .clipShape(RoundedRectangle(cornerRadius: 6))
             } else {
                 RoundedRectangle(cornerRadius: 6)
-                    .fill(Color.secondary.opacity(0.2))
+                    .fill(Color.ivory)
                     .frame(width: 80, height: 60)
                     .overlay {
                         Image(systemName: "video.fill")
@@ -104,6 +108,7 @@ struct VideoHistoryRow: View {
                 Text(formatDate(video.createdAt))
                     .font(.subheadline)
                     .fontWeight(.medium)
+                    .foregroundStyle(Color.pineGreen)
 
                 HStack(spacing: 8) {
                     Label(formatDuration(video.duration), systemImage: "clock")
@@ -112,7 +117,7 @@ struct VideoHistoryRow: View {
 
                     Label("\(video.swings.count) swing\(video.swings.count == 1 ? "" : "s")", systemImage: "figure.golf")
                         .font(.caption)
-                        .foregroundColor(video.swings.isEmpty ? .secondary : .green)
+                        .foregroundColor(video.swings.isEmpty ? .secondary : .fairwayGreen)
                 }
             }
 
@@ -126,18 +131,22 @@ struct VideoHistoryRow: View {
                     .foregroundStyle(.white)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
-                    .background(Color.green)
+                    .background(Color.fairwayGreen)
                     .clipShape(Capsule())
             }
         }
         .padding(.vertical, 4)
     }
 
+    private static let dateFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateStyle = .medium
+        f.timeStyle = .short
+        return f
+    }()
+
     private func formatDate(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        formatter.timeStyle = .short
-        return formatter.string(from: date)
+        Self.dateFormatter.string(from: date)
     }
 
     private func formatDuration(_ duration: TimeInterval) -> String {

@@ -28,17 +28,21 @@ final class VideoSyncEngine {
     func calculateSyncOffset(
         video1: SwingVideo,
         video2: SwingVideo,
+        approximateContact1: TimeInterval? = nil,
+        approximateContact2: TimeInterval? = nil,
         progress: @escaping (Float, String) -> Void
     ) async throws -> SyncResult {
         progress(0.0, "Analyzing first video...")
-        let result1 = try await analyzeVideo(video1, progress: { p in
-            progress(p * 0.40, "Analyzing first video...")
-        })
+        let result1 = try await analyzeVideoFresh(
+            video1, nearTime: approximateContact1,
+            progress: { p in progress(p * 0.40, "Analyzing first video...") }
+        )
 
         progress(0.40, "Analyzing second video...")
-        let result2 = try await analyzeVideo(video2, progress: { p in
-            progress(0.40 + p * 0.40, "Analyzing second video...")
-        })
+        let result2 = try await analyzeVideoFresh(
+            video2, nearTime: approximateContact2,
+            progress: { p in progress(0.40 + p * 0.40, "Analyzing second video...") }
+        )
 
         progress(0.80, "Calculating optimal sync...")
         let syncResult = calculateMultiPointSync(result1: result1, result2: result2)
@@ -81,7 +85,24 @@ final class VideoSyncEngine {
 
     // MARK: - Private: Video Analysis
 
-    private func analyzeVideo(
+    /// Fresh SwingNet analysis focused on a narrow window around the approximate contact time.
+    /// Skips the cache — always runs SwingNet for precise frame-level + interpolated impact detection.
+    private func analyzeVideoFresh(
+        _ video: SwingVideo,
+        nearTime: TimeInterval?,
+        progress: @escaping (Float) -> Void
+    ) async throws -> SwingDetectionResult {
+        let windowRadius: TimeInterval = 3.0
+        let timeRange: ClosedRange<TimeInterval>? = nearTime.map { t in
+            max(0, t - windowRadius)...(t + windowRadius)
+        }
+        return try await analyzeWithSwingNet(
+            at: video.localURL, timeRange: timeRange, progress: progress
+        )
+    }
+
+    /// Cached analysis for library auto-detection (ActionClassifier times acceptable)
+    private func analyzeVideoCached(
         _ video: SwingVideo,
         progress: @escaping (Float) -> Void
     ) async throws -> SwingDetectionResult {
@@ -99,7 +120,9 @@ final class VideoSyncEngine {
     }
 
     private func analyzeWithSwingNet(
-        at url: URL, progress: @escaping (Float) -> Void
+        at url: URL,
+        timeRange: ClosedRange<TimeInterval>? = nil,
+        progress: @escaping (Float) -> Void
     ) async throws -> SwingDetectionResult {
         let asset = AVURLAsset(url: url)
         let duration = try await asset.load(.duration).seconds
@@ -110,7 +133,7 @@ final class VideoSyncEngine {
         detector.onSwingDetected = { bounds in detected = bounds }
 
         try await frameIterator.forEachFrame(
-            at: url, timeRangeSeconds: nil, targetFPS: offlineTargetFPS,
+            at: url, timeRangeSeconds: timeRange, targetFPS: offlineTargetFPS,
             progress: progress
         ) { pixelBuffer, timestamp in
             framesProcessed += 1

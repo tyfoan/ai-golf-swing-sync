@@ -30,7 +30,7 @@ struct MainTabView: View {
                 }
                 .tag(2)
         }
-        .tint(.green)
+        .tint(.appTeal)
         #if DEBUG
         .task {
             await DevVideoPreloader.preloadIfNeeded(modelContext: modelContext)

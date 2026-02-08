@@ -36,12 +36,12 @@ struct SwingMarkerSlider: View {
                 let startX = (startTime / duration) * width
                 let endX = (endTime / duration) * width
                 RoundedRectangle(cornerRadius: trackHeight / 2)
-                    .fill(Color.green.opacity(0.3))
+                    .fill(Color.mintMist)
                     .frame(width: endX - startX, height: trackHeight)
                     .offset(x: startX + handleSize / 2)
 
                 // Start handle (green)
-                handleView(color: .green, position: startTime / duration * width)
+                handleView(color: .fairwayGreen, position: startTime / duration * width)
                     .gesture(
                         DragGesture()
                             .onChanged { value in
@@ -54,7 +54,7 @@ struct SwingMarkerSlider: View {
                     )
 
                 // Contact handle (red/orange)
-                handleView(color: .orange, position: contactTime / duration * width)
+                handleView(color: .sand, position: contactTime / duration * width)
                     .gesture(
                         DragGesture()
                             .onChanged { value in
@@ -67,7 +67,7 @@ struct SwingMarkerSlider: View {
                     )
 
                 // End handle (green)
-                handleView(color: .green, position: endTime / duration * width)
+                handleView(color: .fairwayGreen, position: endTime / duration * width)
                     .gesture(
                         DragGesture()
                             .onChanged { value in

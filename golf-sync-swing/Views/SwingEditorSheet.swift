@@ -105,7 +105,7 @@ struct SwingEditorSheet: View {
                 HStack {
                     VStack {
                         Circle()
-                            .fill(Color.green)
+                            .fill(Color.fairwayGreen)
                             .frame(width: 10, height: 10)
                         Text("Start")
                             .font(.caption2)
@@ -118,7 +118,7 @@ struct SwingEditorSheet: View {
 
                     VStack {
                         Circle()
-                            .fill(Color.orange)
+                            .fill(Color.sand)
                             .frame(width: 10, height: 10)
                         Text("Contact")
                             .font(.caption2)
@@ -131,7 +131,7 @@ struct SwingEditorSheet: View {
 
                     VStack {
                         Circle()
-                            .fill(Color.green)
+                            .fill(Color.fairwayGreen)
                             .frame(width: 10, height: 10)
                         Text("End")
                             .font(.caption2)
@@ -153,7 +153,7 @@ struct SwingEditorSheet: View {
                             .font(.headline)
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(Color.green)
+                            .background(Color.fairwayGreen)
                             .foregroundStyle(.white)
                             .cornerRadius(12)
                     }

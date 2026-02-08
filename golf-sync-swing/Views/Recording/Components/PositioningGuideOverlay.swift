@@ -48,7 +48,7 @@ struct PositioningGuideOverlay: View {
         HStack(spacing: 16) {
             Image(systemName: icon)
                 .font(.title2.weight(.semibold))
-                .foregroundStyle(.green)
+                .foregroundStyle(Color.fairwayGreen)
                 .frame(width: 36)
 
             Text(text)
