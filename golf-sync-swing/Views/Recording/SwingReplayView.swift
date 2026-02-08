@@ -20,6 +20,7 @@ struct SwingReplayView: View {
     @State private var retryCount = 0
     @State private var isPlaying = true
     @State private var isMuted = true
+    @State private var loopObserver: NSObjectProtocol?
 
     /// Maximum retries if video isn't ready
     private let maxRetries = 5
@@ -73,6 +74,10 @@ struct SwingReplayView: View {
             await loadVideo()
         }
         .onDisappear {
+            if let observer = loopObserver {
+                NotificationCenter.default.removeObserver(observer)
+                loopObserver = nil
+            }
             player?.pause()
             player = nil
         }
@@ -194,8 +199,7 @@ struct SwingReplayView: View {
     private func setupLooping() {
         guard let player else { return }
 
-        // Loop the clip by observing when playback ends
-        NotificationCenter.default.addObserver(
+        loopObserver = NotificationCenter.default.addObserver(
             forName: .AVPlayerItemDidPlayToEndTime,
             object: player.currentItem,
             queue: .main

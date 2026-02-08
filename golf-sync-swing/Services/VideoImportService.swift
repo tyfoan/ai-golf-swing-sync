@@ -14,8 +14,9 @@ struct VideoImportService {
     func importVideo(from url: URL, into modelContext: ModelContext) async throws {
         let localURL = try VideoStorageService.shared.copyVideoToStorage(from: url)
         let video = await VideoStorageService.shared.createSwingVideo(from: localURL)
-        await MainActor.run {
+        try await MainActor.run {
             modelContext.insert(video)
+            try modelContext.save()
         }
         try? FileManager.default.removeItem(at: url)
     }

@@ -8,6 +8,7 @@
 
 import AVFoundation
 import UIKit
+import os
 
 final class CaptureSessionConfigurator {
 
@@ -187,7 +188,7 @@ final class CaptureSessionConfigurator {
 
             device.unlockForConfiguration()
         } catch {
-            print("Failed to configure device format: \(error)")
+            AppLogger.camera.error("Failed to configure device format: \(error.localizedDescription)")
         }
     }
 }

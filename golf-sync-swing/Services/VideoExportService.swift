@@ -7,6 +7,7 @@ import Foundation
 import AVFoundation
 import UIKit
 import Photos
+import os
 
 final class VideoExportService {
 
@@ -258,7 +259,7 @@ final class VideoExportService {
         return transform
     }
 
-    /// Save video to Photos library
+    /// Save video to Photos library, cleaning up the temp file on success.
     static func saveToPhotos(url: URL, completion: @escaping (Result<Void, ExportError>) -> Void) {
         PHPhotoLibrary.requestAuthorization(for: .addOnly) { status in
             guard status == .authorized || status == .limited else {
@@ -271,6 +272,9 @@ final class VideoExportService {
             PHPhotoLibrary.shared().performChanges {
                 PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: url)
             } completionHandler: { success, error in
+                if success {
+                    try? FileManager.default.removeItem(at: url)
+                }
                 DispatchQueue.main.async {
                     if success {
                         completion(.success(()))
@@ -280,5 +284,22 @@ final class VideoExportService {
                 }
             }
         }
+    }
+
+    /// Remove orphaned export files from the temp directory.
+    /// Called at app launch to reclaim disk space.
+    static func cleanupOrphanedExports() {
+        let tempDir = FileManager.default.temporaryDirectory
+        guard let contents = try? FileManager.default.contentsOfDirectory(
+            at: tempDir, includingPropertiesForKeys: nil
+        ) else { return }
+
+        let exports = contents.filter { $0.lastPathComponent.hasPrefix("export_") && $0.pathExtension == "mp4" }
+        for file in exports {
+            try? FileManager.default.removeItem(at: file)
+        }
+
+        guard !exports.isEmpty else { return }
+        AppLogger.storage.info("Cleaned up \(exports.count) orphaned export(s)")
     }
 }

@@ -5,6 +5,7 @@
 
 import SwiftUI
 import SwiftData
+import os
 
 struct HistoryView: View {
     @Environment(\.modelContext) private var modelContext
@@ -66,7 +67,7 @@ struct HistoryView: View {
             do {
                 try await VideoImportService().importVideo(from: url, into: modelContext)
             } catch {
-                print("Error importing video: \(error)")
+                AppLogger.storage.error("Error importing video: \(error.localizedDescription)")
             }
         }
     }

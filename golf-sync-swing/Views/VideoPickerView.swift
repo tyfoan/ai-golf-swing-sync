@@ -6,6 +6,7 @@
 import SwiftUI
 import PhotosUI
 import UniformTypeIdentifiers
+import os
 
 struct VideoPickerView: UIViewControllerRepresentable {
     @Binding var isPresented: Bool
@@ -59,7 +60,7 @@ struct VideoPickerView: UIViewControllerRepresentable {
                 guard let self = self else { return }
 
                 guard let url = url, error == nil else {
-                    print("Error loading video: \(error?.localizedDescription ?? "Unknown error")")
+                    AppLogger.storage.error("Error loading video: \(error?.localizedDescription ?? "Unknown error")")
                     DispatchQueue.main.async {
                         self.parent.isPresented = false
                     }
@@ -78,7 +79,7 @@ struct VideoPickerView: UIViewControllerRepresentable {
                         self.parent.isPresented = false
                     }
                 } catch {
-                    print("Error copying video: \(error)")
+                    AppLogger.storage.error("Error copying video: \(error.localizedDescription)")
                     DispatchQueue.main.async {
                         self.parent.isPresented = false
                     }

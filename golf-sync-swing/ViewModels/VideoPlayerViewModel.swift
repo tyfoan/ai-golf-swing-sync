@@ -7,6 +7,7 @@ import Foundation
 import AVFoundation
 import Combine
 
+@MainActor
 @Observable
 final class VideoPlayerViewModel {
     let player: AVPlayer
@@ -35,8 +36,12 @@ final class VideoPlayerViewModel {
     }
 
     deinit {
-        if let observer = timeObserver {
-            player.removeTimeObserver(observer)
+        player.pause()
+        MainActor.assumeIsolated {
+            if let observer = timeObserver {
+                player.removeTimeObserver(observer)
+            }
+            cancellables.removeAll()
         }
     }
 

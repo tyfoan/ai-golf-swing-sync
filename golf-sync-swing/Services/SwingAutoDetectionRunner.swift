@@ -25,7 +25,7 @@ final class SwingAutoDetectionRunner {
 
         do {
             let results = try await syncEngine.analyzeAllSwings(
-                for: video, model: .actionClassifier
+                for: video
             ) { [weak self] p in
                 // Ensure visible progress even on first frames (2%-100%)
                 let adjusted = 0.02 + p * 0.98

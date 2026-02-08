@@ -14,6 +14,7 @@
 import AVFoundation
 import Observation
 import UIKit
+import os
 
 @Observable
 final class CameraService: NSObject {
@@ -229,7 +230,7 @@ final class CameraService: NSObject {
             try audioSession.setActive(true)
             isAudioSessionConfigured = true
         } catch {
-            print("Failed to configure audio session: \(error)")
+            AppLogger.camera.error("Failed to configure audio session: \(error.localizedDescription)")
         }
     }
 

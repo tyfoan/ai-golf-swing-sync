@@ -2,15 +2,15 @@
 
 > Current progress for Golf Sync Swing
 
-**Last Updated**: 2026-02-07
+**Last Updated**: 2026-02-09
 
 ---
 
 ## Current Phase
 
-**Phase**: Milestone 3 Recording In Progress
+**Phase**: Deployment Preparation
 **Status**: On Track
-**Current Focus**: Recording with real-time swing detection
+**Current Focus**: Bug fixes, thread safety, production hardening
 
 ---
 
@@ -80,6 +80,23 @@
 
 **Progress**: ██████████ 100%
 
+### Deployment Preparation - Complete ✅
+
+| Deliverable | Status | Notes |
+|-------------|--------|-------|
+| Relative path migration | Done | Prevents data loss on reinstall/restore |
+| Thread safety (detectors) | Done | NSLock on PersonCropper, MotionGateService, wrapped state in both detectors |
+| Save-before-delete | Done | RecordingSaveService, VideoImportService |
+| Resource leak fixes | Done | ComparisonViewModel deinit, notification observer, savedVideo, export cleanup |
+| @MainActor on ViewModels | Done | VideoPlayerViewModel, ComparisonViewModel |
+| os.Logger migration | Done | 39 print() → AppLogger across 15 files |
+| Dead code removal | Done | SwingPlaybackManager, CountdownManager deleted |
+| FeatureAccess unlock | Done | All features free until paywall |
+| Timer thread fix | Done | RecordingCoordinator timer on main run loop |
+| Force unwrap guards | Done | CrossCorrelationRefiner |
+
+**Progress**: ██████████ 100%
+
 ### Milestone 4: [Monetization] - Not Started
 
 | Deliverable | Status | Notes |
@@ -93,6 +110,14 @@
 ---
 
 ## Recent Updates
+
+### 2026-02-09 (Deployment Preparation — 20 Issues Fixed)
+- Fixed 5 critical issues: relative path storage (data loss on reinstall), race conditions in 4 detector/service classes
+- Fixed 5 high issues: ComparisonViewModel deinit leak, save-before-delete in 2 services, notification leak in SwingReplayView, savedVideo never cleared
+- Fixed 6 medium issues: FeatureAccess always false in Release, @MainActor on ViewModels, export temp file cleanup, dead code removal, print→os.Logger, timer thread
+- Fixed 4 low issues: force unwraps in CrossCorrelationRefiner, seekToImpact using contactTime2
+- New services: AppLogger (unified os.Logger), VideoPathMigrationService (one-time path migration)
+- Deleted: SwingPlaybackManager.swift, CountdownManager.swift (unused dead code)
 
 ### 2026-02-08 (10 Bug Fixes + Player UI Overhaul)
 - Fixed 10 bugs in post-swing-detection flow:
@@ -234,5 +259,5 @@
 - VideoExportService uses deprecated AVFoundation APIs (iOS 18/26 deprecations)
 - Export watermark disabled (was causing issues)
 - Auto-detection accuracy depends on camera angle and lighting
-- Audio detection requires clear impact sound (may fail with background noise)
-- ~Fast swing detection still has bugs to fix~ Fixed with production camera updates
+- CrossCorrelation refinement is effectively dead code (velocity profiles always empty)
+- Accessibility labels missing on custom controls (timeline, playback, recording)

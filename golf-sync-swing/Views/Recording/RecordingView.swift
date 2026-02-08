@@ -91,7 +91,7 @@ struct RecordingView: View {
         }
         .onAppear { handleAppear() }
         .onDisappear { handleDisappear() }
-        .fullScreenCover(item: $viewModel.savedVideo) { video in
+        .fullScreenCover(item: $viewModel.savedVideo, onDismiss: { viewModel.savedVideo = nil }) { video in
             SingleVideoPlayerView(video: video)
         }
         .sheet(isPresented: $showingTips) { RecordingTipsSheet() }

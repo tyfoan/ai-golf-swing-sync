@@ -80,7 +80,8 @@
 ### 1. Models
 
 **SwingVideo** (`Models/SwingVideo.swift`)
-- Stores video metadata: localURL, duration, fps, thumbnail
+- Stores video path relative to Documents directory (survives reinstall/restore)
+- Resolves legacy absolute paths for backwards compatibility
 - Tracks analysis status: hasBeenAnalyzed, analysisDate
 - Has relationship to SwingMarker array
 - Helper: detectedImpactTime, hasHighConfidenceDetection
@@ -113,9 +114,19 @@
 
 **VideoImportService** (`Services/VideoImportService.swift`)
 - Imports video from URL into SwiftData (used by HomeView + HistoryView)
+- Saves context before deleting source file
 
 **RecordingSaveService** (`Services/RecordingSaveService.swift`)
 - Saves recorded video + detected swings to SwiftData
+- Saves context before deleting source file
+
+**AppLogger** (`Services/AppLogger.swift`)
+- Unified `os.Logger` with 6 subsystem categories: detection, storage, camera, sync, general, ui
+- Debug/info messages stripped in Release builds
+
+**VideoPathMigrationService** (`Services/VideoPathMigrationService.swift`)
+- One-time migration: converts absolute paths to relative paths in SwingVideo records
+- Guarded by UserDefaults flag, runs at app launch
 
 **DetectorFactory** (`Services/Detection/DetectorFactory.swift`)
 - Centralized detector instantiation for ActionClassifier and SwingNet
@@ -172,11 +183,11 @@
 - Tracks recording timestamps for relative timing
 
 **VideoPlayerViewModel** (`ViewModels/VideoPlayerViewModel.swift`)
-- Wraps AVPlayer with @Observable
+- @MainActor, wraps AVPlayer with @Observable
 - Provides play/pause, seek, speed control
 
 **ComparisonViewModel** (`ViewModels/ComparisonViewModel.swift`)
-- Manages two VideoPlayerViewModels with synchronized playback
+- @MainActor, manages dual-player synchronized playback with drift correction
 
 ### 4. Views
 

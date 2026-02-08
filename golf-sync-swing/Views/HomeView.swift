@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import os
 
 struct HomeView: View {
     @Environment(\.modelContext) private var modelContext
@@ -175,7 +176,7 @@ private extension HomeView {
             do {
                 try await VideoImportService().importVideo(from: url, into: modelContext)
             } catch {
-                print("Error importing video: \(error)")
+                AppLogger.storage.error("Error importing video: \(error.localizedDescription)")
             }
         }
     }

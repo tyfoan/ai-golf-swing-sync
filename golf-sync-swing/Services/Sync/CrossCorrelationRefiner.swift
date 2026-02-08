@@ -45,7 +45,11 @@ struct CrossCorrelationRefiner {
 
         let centerIndex = correlation.count / 2
         let frameOffset = peakIndex - centerIndex
-        let avgFrameDuration = (window1.last!.timestamp - window1.first!.timestamp) / Double(window1.count - 1)
+        guard let firstTimestamp = window1.first?.timestamp,
+              let lastTimestamp = window1.last?.timestamp else {
+            return baseResult
+        }
+        let avgFrameDuration = (lastTimestamp - firstTimestamp) / Double(window1.count - 1)
         let refinementOffset = Double(frameOffset) * avgFrameDuration
 
         let peakCorrelation = correlation[peakIndex]

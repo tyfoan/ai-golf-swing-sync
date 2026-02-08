@@ -21,7 +21,6 @@ struct VideoFloatingActionsView: View {
                 favoriteButton
             }
             muteButton
-            poseButton
         }
         .padding(8)
     }
@@ -43,15 +42,6 @@ struct VideoFloatingActionsView: View {
             action: onToggleMute
         )
     }
-
-    private var poseButton: some View {
-        FloatingCircleButton(
-            icon: "figure.stand",
-            tint: .white.opacity(0.3),
-            action: {}
-        )
-        .disabled(true)
-    }
 }
 
 // MARK: - Reusable Circle Button
@@ -67,7 +57,7 @@ private struct FloatingCircleButton: View {
                 .font(.body)
                 .foregroundStyle(tint)
                 .frame(width: 40, height: 40)
-                .background(Color(.systemGray5).opacity(0.8))
+                .background(Color.white.opacity(0.1))
                 .clipShape(Circle())
         }
     }

@@ -45,6 +45,7 @@ struct RecordingSaveService {
         }
 
         modelContext.insert(video)
+        try modelContext.save()
         try? FileManager.default.removeItem(at: sourceURL)
 
         return video

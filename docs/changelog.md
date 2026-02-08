@@ -9,6 +9,31 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Fixed
+- **Data loss on reinstall**: SwingVideo now stores relative paths instead of absolute paths; container UUID changes no longer break video references
+- **Race conditions in detectors**: Added NSLock synchronization to PersonCropper and MotionGateService; wrapped all mutable state mutations in SwingNetDetector and ActionClassifierDetector
+- **Save-before-delete**: RecordingSaveService and VideoImportService now call `modelContext.save()` before deleting source files
+- **Notification leak in SwingReplayView**: Loop observer stored as `@State`, removed in `onDisappear`
+- **savedVideo never cleared**: RecordingView fullScreenCover now clears `savedVideo` on dismiss
+- **seekToImpact ignoring contactTime2**: ComparisonViewModel now uses both contact times to set sync offset
+- **ComparisonViewModel resource leak**: Players paused and Combine subscriptions cancelled in `deinit`
+- **Export temp files accumulate**: Export temp files deleted after successful save to Photos; orphaned exports cleaned at launch
+- **Force unwraps in CrossCorrelationRefiner**: Replaced `window1.last!`/`window1.first!` with guard
+- **Duration timer on wrong thread**: RecordingCoordinator timer now scheduled on main run loop
+- **FeatureAccess always false in Release**: All features now unlocked until paywall is implemented
+
+### Added
+- **AppLogger**: Unified logging via `os.Logger` with 6 subsystem categories (detection, storage, camera, sync, general, ui)
+- **VideoPathMigrationService**: One-time migration converting absolute paths to relative paths at app launch
+- **@MainActor on ViewModels**: VideoPlayerViewModel and ComparisonViewModel formalize main thread isolation
+
+### Changed
+- Replaced all 39 `print()` calls across 15 files with `AppLogger` (debug/info stripped in Release builds)
+
+### Removed
+- **SwingPlaybackManager.swift**: Unused dead code
+- **CountdownManager.swift**: Unused dead code
+
+### Fixed (previous)
 - **Favorites lost on save**: RecordingSaveService now copies `isFavorite` from SwingClip to SwingMarker
 - **Re-analysis wipes live-detected swings**: Videos saved with swings now marked `hasBeenAnalyzed = true` to skip redundant auto-detection
 - **No navigation after save**: Recording save now opens SingleVideoPlayerView via `fullScreenCover(item:)` instead of showing a confirmation dialog

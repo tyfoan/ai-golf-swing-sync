@@ -34,7 +34,7 @@ struct SyncOffsetStrip: View {
                 .font(.caption).fontWeight(.semibold)
                 .foregroundStyle(.white.opacity(0.6))
                 .frame(width: 32, height: 28)
-                .background(Color(.systemGray5))
+                .background(Color.white.opacity(0.1))
                 .clipShape(RoundedRectangle(cornerRadius: 6))
         }
     }

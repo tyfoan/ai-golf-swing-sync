@@ -93,10 +93,12 @@ final class RecordingCoordinator: RecordingCoordinating {
     }
 
     private func startDurationTimer() {
-        durationTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
+        let timer = Timer(timeInterval: 0.1, repeats: true) { [weak self] _ in
             guard let self, let startTime = self.recordingStartTime else { return }
             self.recordedDuration = Date().timeIntervalSince(startTime)
         }
+        RunLoop.main.add(timer, forMode: .common)
+        durationTimer = timer
     }
 
     private func stopDurationTimer() {

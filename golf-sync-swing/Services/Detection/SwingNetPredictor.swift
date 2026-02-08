@@ -8,6 +8,7 @@
 
 import CoreML
 import Foundation
+import os
 
 /// Parsed SwingNet output
 struct SwingNetAnalysis {
@@ -69,10 +70,10 @@ final class SwingNetPredictor: SwingNetPredicting, @unchecked Sendable {
             config.computeUnits = .all
             swingNet = try SwingNet(configuration: config)
             isLoaded = true
-            print("SwingNetPredictor: loaded")
+            AppLogger.detection.debug("SwingNetPredictor: loaded")
         } catch {
             isLoaded = false
-            print("SwingNetPredictor: FAILED to load: \(error.localizedDescription)")
+            AppLogger.detection.error("SwingNetPredictor: FAILED to load: \(error.localizedDescription)")
         }
     }
 

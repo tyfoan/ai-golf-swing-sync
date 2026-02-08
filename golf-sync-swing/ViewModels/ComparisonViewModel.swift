@@ -11,6 +11,7 @@ import Foundation
 import AVFoundation
 import Combine
 
+@MainActor
 @Observable
 final class ComparisonViewModel {
     let player1: AVPlayer
@@ -70,8 +71,13 @@ final class ComparisonViewModel {
     }
 
     deinit {
-        if let observer = timeObserver {
-            player1.removeTimeObserver(observer)
+        player1.pause()
+        player2.pause()
+        MainActor.assumeIsolated {
+            if let observer = timeObserver {
+                player1.removeTimeObserver(observer)
+            }
+            cancellables.removeAll()
         }
     }
 
@@ -153,14 +159,6 @@ final class ComparisonViewModel {
         player2.rate = video2Rate
     }
 
-    /// Apply sync result from VideoSyncEngine
-    func applySyncResult(_ result: SyncResult) {
-        syncOffset = result.offset
-        video2TempoAdjustment = result.video2PlaybackSpeed
-        tempoSyncEnabled = false
-        seek(to: currentTime)
-    }
-
     /// Toggle tempo sync on/off
     func toggleTempoSync() {
         tempoSyncEnabled.toggle()
@@ -196,6 +194,11 @@ final class ComparisonViewModel {
     /// Contact times are absolute timestamps within each video.
     func seekToImpact(contactTime1: TimeInterval?, contactTime2: TimeInterval?) {
         guard let c1 = contactTime1 else { return }
+
+        if let c2 = contactTime2 {
+            syncOffset = c1 - c2
+        }
+
         seek(to: c1)
     }
 

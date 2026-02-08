@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftData
+import os
 
 enum DevVideoPreloader {
     private static let sourceDirectory = "/Users/aleksanderogurtsov/Desktop/test/video-comparer/ios/video-comparer/app/refs/golf"
@@ -24,7 +25,7 @@ enum DevVideoPreloader {
             let existing = try modelContext.fetch(descriptor)
             existingPaths = Set(existing.map(\.localURLString))
         } catch {
-            print("⚠️ DevVideoPreloader: failed to fetch existing videos: \(error)")
+            AppLogger.storage.warning("DevVideoPreloader: failed to fetch existing videos: \(error.localizedDescription)")
             return
         }
 
@@ -34,7 +35,7 @@ enum DevVideoPreloader {
             let url = URL(fileURLWithPath: sourceDirectory).appendingPathComponent(filename)
 
             guard FileManager.default.fileExists(atPath: url.path) else {
-                print("⚠️ DevVideoPreloader: missing \(filename)")
+                AppLogger.storage.warning("DevVideoPreloader: missing \(filename)")
                 continue
             }
 
@@ -50,9 +51,9 @@ enum DevVideoPreloader {
         if insertedCount > 0 {
             do {
                 try modelContext.save()
-                print("✅ DevVideoPreloader: inserted \(insertedCount) videos")
+                AppLogger.storage.info("DevVideoPreloader: inserted \(insertedCount) videos")
             } catch {
-                print("❌ DevVideoPreloader: save failed: \(error)")
+                AppLogger.storage.error("DevVideoPreloader: save failed: \(error.localizedDescription)")
             }
         }
     }

@@ -5,6 +5,7 @@
 
 import SwiftUI
 import AVKit
+import os
 
 struct SwingEditorSheet: View {
     let video: SwingVideo
@@ -214,7 +215,7 @@ struct SwingEditorSheet: View {
                     currentFrame = UIImage(cgImage: image)
                 }
             } catch {
-                print("Error generating frame: \(error)")
+                AppLogger.ui.error("Error generating frame: \(error.localizedDescription)")
             }
         }
     }

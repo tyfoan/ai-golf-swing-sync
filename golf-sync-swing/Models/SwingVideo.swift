@@ -21,16 +21,24 @@ final class SwingVideo {
 
     @Relationship(deleteRule: .cascade) var swings: [SwingMarker] = []
 
-    // MARK: - URL Access
+    // MARK: - Path Resolution
 
-    /// The URL for the video file
+    static var documentsDirectory: URL {
+        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+    }
+
+    /// The URL for the video file.
+    /// Handles both legacy absolute paths and new relative paths.
     var localURL: URL {
-        URL(fileURLWithPath: localURLString)
+        guard !localURLString.hasPrefix("/") else {
+            return URL(fileURLWithPath: localURLString)
+        }
+        return Self.documentsDirectory.appendingPathComponent(localURLString)
     }
 
     /// Whether the video file exists on disk
     var fileExists: Bool {
-        FileManager.default.fileExists(atPath: localURLString)
+        FileManager.default.fileExists(atPath: localURL.path)
     }
 
     /// Safe URL access - returns nil if file doesn't exist
@@ -41,7 +49,7 @@ final class SwingVideo {
 
     /// File size in bytes, or nil if file doesn't exist
     var fileSize: Int64? {
-        guard let attrs = try? FileManager.default.attributesOfItem(atPath: localURLString),
+        guard let attrs = try? FileManager.default.attributesOfItem(atPath: localURL.path),
               let size = attrs[.size] as? Int64 else {
             return nil
         }
@@ -59,7 +67,7 @@ final class SwingVideo {
     // MARK: - Init
 
     init(localURL: URL, duration: TimeInterval, fps: Double, thumbnailData: Data? = nil) {
-        self.localURLString = localURL.path
+        self.localURLString = Self.relativePath(for: localURL)
         self.duration = duration
         self.fps = fps
         self.thumbnailData = thumbnailData
@@ -75,5 +83,17 @@ final class SwingVideo {
     /// Check if video has a high-confidence auto-detected swing
     var hasHighConfidenceDetection: Bool {
         swings.contains { $0.isAutoDetected && $0.detectionConfidence >= 0.7 }
+    }
+
+    // MARK: - Private
+
+    /// Convert an absolute URL to a path relative to Documents directory.
+    /// Returns the path unchanged if it's outside the Documents directory.
+    private static func relativePath(for url: URL) -> String {
+        let documentsPath = documentsDirectory.path
+        let absolutePath = url.path
+        guard absolutePath.hasPrefix(documentsPath) else { return absolutePath }
+        let relative = String(absolutePath.dropFirst(documentsPath.count))
+        return relative.hasPrefix("/") ? String(relative.dropFirst()) : relative
     }
 }

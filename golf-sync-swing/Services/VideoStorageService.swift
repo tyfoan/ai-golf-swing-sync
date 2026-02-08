@@ -6,6 +6,7 @@
 import Foundation
 import AVFoundation
 import SwiftData
+import os
 
 final class VideoStorageService {
     static let shared = VideoStorageService()
@@ -32,14 +33,14 @@ final class VideoStorageService {
         // Get source file size for verification
         let sourceAttributes = try FileManager.default.attributesOfItem(atPath: sourceURL.path)
         let sourceSize = sourceAttributes[.size] as? Int64 ?? 0
-        print("📁 Source video size: \(sourceSize) bytes (\(Double(sourceSize) / 1_000_000) MB)")
+        AppLogger.storage.debug("Source video size: \(sourceSize) bytes (\(Double(sourceSize) / 1_000_000) MB)")
 
         try FileManager.default.copyItem(at: sourceURL, to: destinationURL)
 
         // Verify destination file size matches
         let destAttributes = try FileManager.default.attributesOfItem(atPath: destinationURL.path)
         let destSize = destAttributes[.size] as? Int64 ?? 0
-        print("📁 Copied video size: \(destSize) bytes")
+        AppLogger.storage.debug("Copied video size: \(destSize) bytes")
 
         guard sourceSize == destSize else {
             throw NSError(
@@ -63,7 +64,7 @@ final class VideoStorageService {
             // Load asset duration
             let durationValue = try await asset.load(.duration)
             let assetDuration = CMTimeGetSeconds(durationValue)
-            print("📊 Asset duration: \(assetDuration)s (flags: \(durationValue.flags))")
+            AppLogger.storage.debug("Asset duration: \(assetDuration)s (flags: \(durationValue.flags.rawValue))")
 
             // Also check video track duration as fallback
             if let videoTrack = try await asset.loadTracks(withMediaType: .video).first {
@@ -73,7 +74,7 @@ final class VideoStorageService {
                 // Get track duration as well
                 let trackTimeRange = try await videoTrack.load(.timeRange)
                 let trackDuration = CMTimeGetSeconds(trackTimeRange.duration)
-                print("📊 Video track duration: \(trackDuration)s, fps: \(fps)")
+                AppLogger.storage.debug("Video track duration: \(trackDuration)s, fps: \(fps)")
 
                 // Use the longer of asset or track duration (sometimes asset is wrong)
                 duration = max(assetDuration, trackDuration)
@@ -84,7 +85,7 @@ final class VideoStorageService {
                     // Average bitrate for 1080p30 is ~8Mbps = 1MB/s
                     if let fileSize = try? FileManager.default.attributesOfItem(atPath: url.path)[.size] as? Int64 {
                         let estimatedDuration = Double(fileSize) / 1_000_000 // ~1MB per second
-                        print("⚠️ Duration seems wrong, estimated from file size: \(estimatedDuration)s")
+                        AppLogger.storage.warning("Duration seems wrong, estimated from file size: \(estimatedDuration)s")
                         // Don't override, just log for debugging
                     }
                 }
@@ -94,14 +95,14 @@ final class VideoStorageService {
 
             // Ensure duration is valid
             if duration.isNaN || duration.isInfinite || duration <= 0 {
-                print("⚠️ Invalid duration detected: \(duration)")
+                AppLogger.storage.warning("Invalid duration detected: \(duration)")
                 duration = 0
             }
         } catch {
-            print("❌ Error loading video metadata: \(error)")
+            AppLogger.storage.error("Error loading video metadata: \(error.localizedDescription)")
         }
 
-        print("📊 Final metadata: duration=\(duration)s, fps=\(fps)")
+        AppLogger.storage.debug("Final metadata: duration=\(duration)s, fps=\(fps)")
         return (duration, fps)
     }
 

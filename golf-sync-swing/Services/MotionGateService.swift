@@ -31,6 +31,8 @@ final class MotionGateService: @unchecked Sendable {
 
     // MARK: - State
 
+    private let lock = NSLock()
+
     /// Reference frame R-channel values (subsampled)
     private var referencePixels: ContiguousArray<UInt8> = []
 
@@ -55,9 +57,11 @@ final class MotionGateService: @unchecked Sendable {
         }
 
         // First frame or after reset — store as reference
+        lock.lock()
         if referencePixels.isEmpty {
             referencePixels = currentSamples
             framesSinceReference = 0
+            lock.unlock()
             return .idle
         }
 
@@ -76,6 +80,7 @@ final class MotionGateService: @unchecked Sendable {
             referencePixels = currentSamples
             framesSinceReference = 0
         }
+        lock.unlock()
 
         // Classify motion
         if avgDiff >= peakThreshold {
@@ -89,7 +94,9 @@ final class MotionGateService: @unchecked Sendable {
 
     /// Reset state (e.g. when recording stops)
     func reset() {
+        lock.lock()
         referencePixels.removeAll()
         framesSinceReference = 0
+        lock.unlock()
     }
 }

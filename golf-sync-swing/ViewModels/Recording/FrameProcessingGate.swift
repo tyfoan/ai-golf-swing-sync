@@ -8,6 +8,7 @@
 
 import AVFoundation
 import Foundation
+import os
 
 final class FrameProcessingGate: @unchecked Sendable {
 
@@ -58,7 +59,7 @@ final class FrameProcessingGate: @unchecked Sendable {
         lock.lock()
         if _recordingStartTimestamp == nil {
             _recordingStartTimestamp = cameraTime
-            print("📹 RecordingVM: First frame at \(cameraTime)s")
+            AppLogger.camera.debug("RecordingVM: First frame at \(cameraTime)s")
         }
         _frameProcessedCount += 1
         let count = _frameProcessedCount
@@ -67,7 +68,7 @@ final class FrameProcessingGate: @unchecked Sendable {
 
         let relativeTime = cameraTime - startTime
         if count % 60 == 0 {
-            print("📹 RecordingVM: Processed \(count) frames, t=\(String(format: "%.2f", relativeTime))s")
+            AppLogger.camera.debug("RecordingVM: Processed \(count) frames, t=\(String(format: "%.2f", relativeTime))s")
         }
         return relativeTime
     }

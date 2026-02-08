@@ -8,6 +8,7 @@
 
 import CoreML
 import Foundation
+import os
 
 struct PredictionRecord {
     let timestamp: TimeInterval      // Timestamp of LAST frame in the window
@@ -39,15 +40,15 @@ final class PhaseClassifier: PhaseClassifying, @unchecked Sendable {
                 do {
                     model = try MLModel(contentsOf: url, configuration: config)
                     isLoaded = true
-                    print("PhaseClassifier: loaded \(name)")
+                    AppLogger.detection.info("PhaseClassifier: loaded \(name)")
                     return
                 } catch {
-                    print("PhaseClassifier: failed to load \(name): \(error.localizedDescription)")
+                    AppLogger.detection.error("PhaseClassifier: failed to load \(name): \(error.localizedDescription)")
                 }
             }
         }
 
-        print("PhaseClassifier: no Action Classifier model found in bundle")
+        AppLogger.detection.error("PhaseClassifier: no Action Classifier model found in bundle")
     }
 
     func classify(frames: [PoseFrame], predictionWindow: Int) -> PredictionRecord? {

@@ -16,6 +16,7 @@
 import AVFoundation
 import CoreML
 import Foundation
+import os
 
 /// SwingNet event indices
 enum SwingNetEvent: Int, CaseIterable {
@@ -126,13 +127,17 @@ final class SwingNetDetector: @unchecked Sendable {
     // MARK: - Public API
 
     func processFrame(_ pixelBuffer: CVPixelBuffer, at timestamp: TimeInterval) {
+        lock.lock()
         totalFramesProcessed += 1
+        lock.unlock()
 
         guard let rgbData = personCropper.extractRGBData(from: pixelBuffer, frameWidth: frameWidth, frameHeight: frameHeight) else {
             return
         }
 
         let motionState = motionGate.update(with: rgbData)
+
+        lock.lock()
         isMotionDetected = motionState != .idle
 
         switch motionState {
@@ -140,6 +145,7 @@ final class SwingNetDetector: @unchecked Sendable {
         case .active: adaptiveStride = 8
         case .peak:   adaptiveStride = 5
         }
+        lock.unlock()
 
         frameBuffer.append(RGBFrameData(timestamp: timestamp, rgbData: rgbData))
 
@@ -148,11 +154,16 @@ final class SwingNetDetector: @unchecked Sendable {
             lock.unlock()
             return
         }
-        lock.unlock()
 
         frameCounter += 1
-        if frameCounter >= adaptiveStride && frameBuffer.isFull {
+        let currentStride = adaptiveStride
+        let shouldClassify = frameCounter >= currentStride && frameBuffer.isFull
+        if shouldClassify {
             frameCounter = 0
+        }
+        lock.unlock()
+
+        if shouldClassify {
             runClassification()
         }
     }
@@ -173,7 +184,7 @@ final class SwingNetDetector: @unchecked Sendable {
         motionGate.reset()
         lastAnalysis = nil
         lastAnalysisFrames = nil
-        print("SwingNetDetector: Reset")
+        AppLogger.detection.debug("SwingNetDetector: Reset")
     }
 
     // MARK: - Classification
@@ -187,12 +198,12 @@ final class SwingNetDetector: @unchecked Sendable {
         }
 
         if let rejection = validationPipeline.validate(analysis) {
-            print("SwingNet: rejected: \(rejection)")
+            AppLogger.detection.debug("SwingNet: rejected: \(rejection)")
             return
         }
 
         let impactTimestamp = analysis.impactTimestamp(in: frames)
-        print("SwingNet: VALIDATED impact=\(String(format: "%.2f", impactTimestamp))s (\(Int(analysis.impactProb * 100))%)")
+        AppLogger.detection.info("SwingNet: VALIDATED impact=\(String(format: "%.2f", impactTimestamp))s (\(Int(analysis.impactProb * 100))%)")
 
         lock.lock()
         lastAnalysis = analysis
@@ -223,7 +234,7 @@ final class SwingNetDetector: @unchecked Sendable {
             lastDetectionTime = frames.last?.timestamp ?? impactTimestamp
             lock.unlock()
 
-            print("SWING: \(String(format: "%.2f", swing.startTime))s -> \(String(format: "%.2f", swing.impactTime))s -> \(String(format: "%.2f", swing.endTime))s")
+            AppLogger.detection.info("SWING: \(String(format: "%.2f", swing.startTime))s -> \(String(format: "%.2f", swing.impactTime))s -> \(String(format: "%.2f", swing.endTime))s")
             onSwingDetected?(swing)
             onPhaseChanged?("impact", Double(analysis.impactProb))
         } else {

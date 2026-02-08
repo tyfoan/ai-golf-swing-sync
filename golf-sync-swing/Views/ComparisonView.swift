@@ -19,13 +19,7 @@ struct ComparisonView: View {
     @State private var exportProgress: Float = 0
     @State private var isExporting = false
     @State private var showDoneSheet = false
-    @State private var isAutoSyncing = false
-    @State private var autoSyncProgress: Float = 0
-    @State private var autoSyncStatus: String = ""
-    @State private var syncResult: SyncResult?
-    @State private var syncError: String?
     @State private var showSyncConfirmation = false
-    private let syncEngine = VideoSyncEngine()
 
     var body: some View {
         ZStack {
@@ -47,13 +41,6 @@ struct ComparisonView: View {
             Button("Done") { dismiss() }
             Button("Cancel", role: .cancel) { }
         }
-        .alert("Sync Error", isPresented: .init(
-            get: { syncError != nil }, set: { if !$0 { syncError = nil } }
-        )) {
-            Button("OK") { syncError = nil }
-        } message: {
-            Text(syncError ?? "Unknown error")
-        }
     }
 }
 
@@ -64,8 +51,8 @@ private extension ComparisonView {
         VStack(spacing: 0) {
             topBar(viewModel: viewModel)
             ComparisonVideoAreaView(
-                viewModel: viewModel, isAutoSyncing: isAutoSyncing,
-                autoSyncStatus: autoSyncStatus, showSyncConfirmation: showSyncConfirmation
+                viewModel: viewModel, isAutoSyncing: false,
+                autoSyncStatus: "", showSyncConfirmation: showSyncConfirmation
             )
             controlsPanel(viewModel: viewModel)
         }
@@ -86,7 +73,7 @@ private extension ComparisonView {
                 .font(.body).fontWeight(.semibold)
                 .foregroundStyle(.white.opacity(0.7))
                 .frame(width: 36, height: 36)
-                .background(Color(.systemGray5))
+                .background(Color.white.opacity(0.1))
                 .clipShape(Circle())
         }
     }
@@ -184,7 +171,7 @@ private extension ComparisonView {
             }
             .foregroundStyle(viewModel.tempoSyncEnabled ? Color.appTeal : .white.opacity(0.5))
             .padding(.horizontal, 10).padding(.vertical, 6)
-            .background(Color(.systemGray5))
+            .background(Color.white.opacity(0.1))
             .clipShape(Capsule())
         }
     }
@@ -218,44 +205,10 @@ private extension ComparisonView {
         let vm = ComparisonViewModel(video1: video1, video2: video2)
         viewModel = vm
 
-        // Quick initial seek using ActionClassifier times (instant, ~250ms accuracy)
         if let c1 = contactTime1, let c2 = contactTime2 {
             vm.setSyncOffset(c1 - c2)
             vm.seekToImpact(contactTime1: c1, contactTime2: c2)
-        }
-
-        // Always refine with SwingNet for precise frame-level impact alignment
-        runSwingNetSync(viewModel: vm)
-    }
-
-    func runSwingNetSync(viewModel: ComparisonViewModel) {
-        isAutoSyncing = true
-        autoSyncProgress = 0
-        autoSyncStatus = "Refining sync..."
-        Task {
-            do {
-                let result = try await syncEngine.calculateSyncOffset(
-                    video1: video1, video2: video2,
-                    approximateContact1: contactTime1,
-                    approximateContact2: contactTime2
-                ) { progress, status in
-                    Task { @MainActor in
-                        autoSyncProgress = progress
-                        autoSyncStatus = status
-                    }
-                }
-                await MainActor.run {
-                    syncResult = result
-                    viewModel.applySyncResult(result)
-                    isAutoSyncing = false
-                    showSyncConfirmationBriefly()
-                }
-            } catch {
-                await MainActor.run {
-                    isAutoSyncing = false
-                    syncError = error.localizedDescription
-                }
-            }
+            showSyncConfirmationBriefly()
         }
     }
 

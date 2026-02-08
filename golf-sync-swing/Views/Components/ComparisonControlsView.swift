@@ -11,14 +11,42 @@ struct ComparisonControlsView: View {
     @Bindable var viewModel: ComparisonViewModel
 
     var body: some View {
-        HStack(spacing: 20) {
-            speedPill
+        HStack(spacing: 0) {
+            transportControls
             Spacer()
+            speedPill
+        }
+    }
+
+    // MARK: - Transport
+
+    private var transportControls: some View {
+        HStack(spacing: 16) {
             frameStepButton(forward: false)
             playPauseButton
             frameStepButton(forward: true)
-            Spacer()
-            poseToggle
+        }
+    }
+
+    private func frameStepButton(forward: Bool) -> some View {
+        Button { viewModel.stepFrame(forward: forward) } label: {
+            Image(systemName: forward ? "forward.frame.fill" : "backward.frame.fill")
+                .font(.body)
+                .foregroundStyle(.white.opacity(0.8))
+                .frame(width: 40, height: 40)
+                .background(Color.white.opacity(0.1))
+                .clipShape(Circle())
+        }
+    }
+
+    private var playPauseButton: some View {
+        Button { viewModel.togglePlayPause() } label: {
+            Image(systemName: viewModel.isPlaying ? "pause.fill" : "play.fill")
+                .font(.title3)
+                .foregroundStyle(.white)
+                .frame(width: 48, height: 48)
+                .background(Color.white.opacity(0.15))
+                .clipShape(Circle())
         }
     }
 
@@ -42,65 +70,9 @@ struct ComparisonControlsView: View {
             Text(formatRate(viewModel.playbackRate))
                 .font(.subheadline).fontWeight(.semibold)
                 .foregroundStyle(.white)
-                .padding(.horizontal, 14).padding(.vertical, 8)
-                .background(Color(.systemGray5))
-                .clipShape(RoundedRectangle(cornerRadius: 16))
-        }
-    }
-
-    // MARK: - Transport Buttons
-
-    private func frameStepButton(forward: Bool) -> some View {
-        Button { viewModel.stepFrame(forward: forward) } label: {
-            Image(systemName: forward ? "forward.frame.fill" : "backward.frame.fill")
-                .font(.title2)
-                .foregroundStyle(.white)
-                .frame(width: 48, height: 48)
-                .background(Color(.systemGray5))
-                .clipShape(Circle())
-        }
-    }
-
-    private var playPauseButton: some View {
-        Button { viewModel.togglePlayPause() } label: {
-            Image(systemName: viewModel.isPlaying ? "pause.fill" : "play.fill")
-                .font(.title)
-                .foregroundStyle(.white)
-                .frame(width: 56, height: 56)
-                .background(Color(.systemGray5))
-                .clipShape(Circle())
-        }
-    }
-
-    // MARK: - Pose Toggle
-
-    private var poseToggle: some View {
-        let available = FeatureAccess.isUnlocked(.poseEstimation)
-        return Button {
-            guard available else { return }
-            viewModel.showPoseOverlay.toggle()
-        } label: {
-            Image(systemName: "figure.stand")
-                .font(.title2)
-                .foregroundStyle(poseButtonTint(available: available))
-                .frame(width: 48, height: 48)
-                .background(Color(.systemGray5))
-                .clipShape(Circle())
-                .overlay(poseActiveBorder)
-        }
-        .disabled(!available)
-    }
-
-    private func poseButtonTint(available: Bool) -> Color {
-        guard available else { return .white.opacity(0.3) }
-        return viewModel.showPoseOverlay ? Color.appTeal : .white.opacity(0.6)
-    }
-
-    @ViewBuilder
-    private var poseActiveBorder: some View {
-        if viewModel.showPoseOverlay {
-            Circle()
-                .strokeBorder(Color.appTeal, lineWidth: 2)
+                .padding(.horizontal, 12).padding(.vertical, 6)
+                .background(Color.white.opacity(0.1))
+                .clipShape(RoundedRectangle(cornerRadius: 14))
         }
     }
 

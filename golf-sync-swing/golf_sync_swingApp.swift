@@ -5,6 +5,7 @@
 
 import SwiftUI
 import SwiftData
+import os
 
 @main
 struct golf_sync_swingApp: App {
@@ -24,18 +25,19 @@ struct golf_sync_swingApp: App {
             let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
             self.sharedModelContainer = try ModelContainer(for: schema, configurations: [modelConfiguration])
         } catch {
-            // Try in-memory fallback so app can still launch
-            print("⚠️ Failed to create persistent ModelContainer: \(error)")
-            print("⚠️ Falling back to in-memory storage")
+            AppLogger.general.error("Failed to create persistent ModelContainer: \(error.localizedDescription)")
+            AppLogger.general.warning("Falling back to in-memory storage")
 
             do {
                 let fallbackConfig = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
                 self.sharedModelContainer = try ModelContainer(for: schema, configurations: [fallbackConfig])
             } catch {
-                // Last resort: crash with clear message
                 fatalError("Cannot create ModelContainer even in-memory: \(error)")
             }
         }
+
+        VideoPathMigrationService.migrateIfNeeded(modelContainer: sharedModelContainer)
+        VideoExportService.cleanupOrphanedExports()
     }
 
     var body: some Scene {

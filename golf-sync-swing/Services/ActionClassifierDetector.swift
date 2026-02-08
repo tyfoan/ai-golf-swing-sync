@@ -14,6 +14,7 @@
 
 import AVFoundation
 import Foundation
+import os
 
 final class ActionClassifierDetector: @unchecked Sendable {
 
@@ -76,23 +77,31 @@ final class ActionClassifierDetector: @unchecked Sendable {
 
     func processFrame(_ pixelBuffer: CVPixelBuffer, at timestamp: TimeInterval) {
         guard (phaseClassifier as? PhaseClassifier)?.isLoaded ?? true else {
+            lock.lock()
             totalFramesProcessed += 1
+            lock.unlock()
             return
         }
 
+        lock.lock()
         totalFramesProcessed += 1
+        lock.unlock()
 
         guard let poseArray = poseExtractor.extractPose(from: pixelBuffer) else {
+            lock.lock()
             consecutiveNoPoseFrames += 1
             if consecutiveNoPoseFrames > noPoseIdleThreshold {
                 isMotionDetected = false
                 classificationStride = idleStride
             }
+            lock.unlock()
             return
         }
 
+        lock.lock()
         consecutiveNoPoseFrames = 0
         isMotionDetected = true
+        lock.unlock()
 
         poseBuffer.append(PoseFrame(timestamp: timestamp, keypointsArray: poseArray))
 
@@ -101,14 +110,16 @@ final class ActionClassifierDetector: @unchecked Sendable {
             lock.unlock()
             return
         }
-        lock.unlock()
 
         frameCounter += 1
-        if frameCounter >= classificationStride && poseBuffer.isFull {
-            frameCounter = 0
-            let frames = poseBuffer.snapshot(last: predictionWindow)
-            runClassification(frames: frames)
-        }
+        let currentStride = classificationStride
+        let shouldClassify = frameCounter >= currentStride && poseBuffer.isFull
+        if shouldClassify { frameCounter = 0 }
+        lock.unlock()
+
+        guard shouldClassify else { return }
+        let frames = poseBuffer.snapshot(last: predictionWindow)
+        runClassification(frames: frames)
     }
 
     func reset() {
@@ -125,7 +136,7 @@ final class ActionClassifierDetector: @unchecked Sendable {
         isMotionDetected = false
         consecutiveNoPoseFrames = 0
         classificationStride = idleStride
-        print("ActionClassifierDetector: Reset")
+        AppLogger.detection.debug("ActionClassifierDetector: Reset")
     }
 
     // MARK: - Classification
@@ -135,27 +146,27 @@ final class ActionClassifierDetector: @unchecked Sendable {
             return
         }
 
-        classificationCount += 1
         let confidence = record.probabilities[record.label] ?? 0
 
         lock.lock()
+        classificationCount += 1
+        let currentCount = classificationCount
         predictionHistory.append(record)
         if predictionHistory.count > maxHistorySize {
             predictionHistory.removeFirst()
         }
+
+        let isActiveSwing = (record.label == downswingLabel || record.label == followThroughLabel || record.label == backswingLabel)
+        isTrackingSwing = isActiveSwing
+        classificationStride = isActiveSwing ? activeStride : idleStride
         lock.unlock()
 
         onPhaseChanged?(record.label, confidence)
 
-        // Update tracking state + adaptive stride
-        let isActiveSwing = (record.label == downswingLabel || record.label == followThroughLabel || record.label == backswingLabel)
-        isTrackingSwing = isActiveSwing
-        classificationStride = isActiveSwing ? activeStride : idleStride
-
         let pDown = record.probabilities[downswingLabel] ?? 0
         let pFollow = record.probabilities[followThroughLabel] ?? 0
         let pBack = record.probabilities[backswingLabel] ?? 0
-        print("ActionClassifier[\(classificationCount)]: \(record.label) (\(Int(confidence * 100))%)  back=\(Int(pBack * 100)) down=\(Int(pDown * 100)) follow=\(Int(pFollow * 100))")
+        AppLogger.detection.debug("ActionClassifier[\(currentCount)]: \(record.label) (\(Int(confidence * 100))%)  back=\(Int(pBack * 100)) down=\(Int(pDown * 100)) follow=\(Int(pFollow * 100))")
 
         checkForImpact()
     }
@@ -180,7 +191,7 @@ final class ActionClassifierDetector: @unchecked Sendable {
             lock.unlock()
 
             let swing = candidate.swingBounds
-            print("ActionClassifier SWING [\(candidate.strategy)]: \(String(format: "%.2f", swing.startTime))s -> impact=\(String(format: "%.2f", swing.impactTime))s -> \(String(format: "%.2f", swing.endTime))s  conf=\(Int(swing.confidence * 100))%")
+            AppLogger.detection.info("ActionClassifier SWING [\(candidate.strategy)]: \(String(format: "%.2f", swing.startTime))s -> impact=\(String(format: "%.2f", swing.impactTime))s -> \(String(format: "%.2f", swing.endTime))s  conf=\(Int(swing.confidence * 100))%")
             onSwingDetected?(swing)
         }
     }
