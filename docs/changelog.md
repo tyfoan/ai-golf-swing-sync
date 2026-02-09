@@ -8,7 +8,30 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
-### Fixed
+### Added
+- **Synced comparison mode**: New `sideBySideSynced` comparison mode — both videos loop aligned at impact point
+- **`ComparisonMode.isSynchronized`**: Distinguishes free (independent loops) vs synced (drift-corrected) playback
+- **`PremiumFeature.synchronizedPlayback`**: Premium gate for synced comparison modes
+
+### Changed
+- **Comparison default = synced + auto-play**: ComparisonView opens with both videos playing in sync at impact, looping within swing bounds
+- **SwingTimeRange passed to comparison**: HomeView passes full `SwingTimeRange` (start, contact, end) instead of just contact times; sync offset calculated once from pre-detected swings — no re-analysis
+- **ComparisonViewModel rewrite**: Swing-bound playback with per-player time observers, dual looping modes, drift correction (40ms threshold), removed Combine dependency
+- **ComparisonVideoAreaView simplified**: Removed auto-sync overlay/confirmation banners; handles `sideBySideSynced` layout
+- **ComparisonTimelineSlider**: Shows `displayTime` (relative to swing start) instead of absolute video time
+- **VideoSyncEngine simplified**: Only uses `VideoFrameIterator` + `ActionClassifierDetector`; removed TempoAnalyzer, SyncStrategySelector, CrossCorrelationRefiner collaborators
+
+### Removed
+- **SwingNet pipeline (fully removed)**: SwingNetDetector, PersonCropper, RGBFrameBuffer, SwingNetPredictor, SwingValidationPipeline, 5 validation rules (ImpactConfidenceRule, EdgeArtifactRule, NoEventDominanceRule, TemporalOrderRule, MultiEventCorroborationRule)
+- **MotionGateService**: Was only used by SwingNet
+- **DetectorFactory**: No longer needed with single detector
+- **Sync collaborators**: TempoAnalyzer, SyncStrategySelector, CrossCorrelationRefiner (effectively dead code)
+- **Tempo sync UI**: Removed `tempoSyncEnabled`, `video2TempoAdjustment`, tempo toggle from ComparisonView
+- **`PremiumFeature.tempoSync`**: Replaced by `synchronizedPlayback`
+- **`seekToImpact` method**: Replaced by init-time sync offset calculation
+- **Auto-sync overlay**: Sync progress banner and confirmation banner removed from ComparisonVideoAreaView
+
+### Fixed (previous)
 - **Data loss on reinstall**: SwingVideo now stores relative paths instead of absolute paths; container UUID changes no longer break video references
 - **Race conditions in detectors**: Added NSLock synchronization to PersonCropper and MotionGateService; wrapped all mutable state mutations in SwingNetDetector and ActionClassifierDetector
 - **Save-before-delete**: RecordingSaveService and VideoImportService now call `modelContext.save()` before deleting source files

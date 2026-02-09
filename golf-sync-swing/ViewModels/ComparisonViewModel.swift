@@ -2,14 +2,16 @@
 //  ComparisonViewModel.swift
 //  golf-sync-swing
 //
-//  Orchestrates dual-player synchronized playback.
-//  Player1 is the time reference; player2 follows at (time - syncOffset).
-//  A periodic re-sync corrects drift during playback.
+//  Orchestrates dual-player playback within swing bounds.
+//
+//  Two modes:
+//  - Side-by-side (free): Both videos loop their own swing independently.
+//  - Synchronized (paid): Player1 is time reference; player2 follows
+//    at (time - syncOffset) with periodic drift correction.
 //
 
 import Foundation
 import AVFoundation
-import Combine
 
 @MainActor
 @Observable
@@ -18,100 +20,120 @@ final class ComparisonViewModel {
     let player2: AVPlayer
     let video1: SwingVideo
     let video2: SwingVideo
+    let swing1: SwingTimeRange
+    let swing2: SwingTimeRange
 
     private(set) var isPlaying = false
     private(set) var currentTime: TimeInterval = 0
     private(set) var playbackRate: Float = 1.0
     var syncOffset: TimeInterval = 0
-    var comparisonMode: ComparisonMode = .sideBySide
-    var onionSkinOpacity: Double = 0.5
-    var showPoseOverlay: Bool = false
-
-    /// Tempo adjustment for video2 (1.0 = same speed, >1.0 = faster, <1.0 = slower)
-    var video2TempoAdjustment: Float = 1.0
-
-    /// Whether tempo sync is enabled
-    var tempoSyncEnabled: Bool = false
-
-    /// Description of tempo adjustment for UI
-    var tempoDescription: String? {
-        guard abs(video2TempoAdjustment - 1.0) > 0.05 else { return nil }
-        let percent = Int(abs(video2TempoAdjustment - 1.0) * 100)
-        return video2TempoAdjustment > 1.0
-            ? "Video 2: +\(percent)% speed"
-            : "Video 2: -\(percent)% speed"
+    var comparisonMode: ComparisonMode = .sideBySideSynced {
+        didSet { onModeChanged() }
     }
+    var onionSkinOpacity: Double = 0.5
 
-    private var timeObserver: Any?
-    private var cancellables = Set<AnyCancellable>()
+    private var timeObserver1: Any?
+    private var timeObserver2: Any?
     private var isSwapped = false
 
-    /// Drift threshold (seconds) before forcing a re-sync of player2
     private let maxDrift: TimeInterval = 0.04
 
     static let playbackRates: [Float] = [0.125, 0.25, 0.5, 1.0]
 
-    var effectiveVideo1: SwingVideo { isSwapped ? video2 : video1 }
-    var effectiveVideo2: SwingVideo { isSwapped ? video1 : video2 }
+    // MARK: - Effective (swapped) accessors
+
     var effectivePlayer1: AVPlayer { isSwapped ? player2 : player1 }
     var effectivePlayer2: AVPlayer { isSwapped ? player1 : player2 }
+    var effectiveSwing1: SwingTimeRange { isSwapped ? swing2 : swing1 }
+    var effectiveSwing2: SwingTimeRange { isSwapped ? swing1 : swing2 }
 
-    var totalDuration: TimeInterval {
-        max(video1.duration, video2.duration + syncOffset)
-    }
+    /// Timeline duration = reference swing duration.
+    var totalDuration: TimeInterval { swing1.duration }
 
-    init(video1: SwingVideo, video2: SwingVideo) {
+    /// Time relative to swing start, for display.
+    var displayTime: TimeInterval { max(0, currentTime - swing1.startTime) }
+
+    // MARK: - Init
+
+    init(video1: SwingVideo, video2: SwingVideo, swing1: SwingTimeRange, swing2: SwingTimeRange) {
         self.video1 = video1
         self.video2 = video2
+        self.swing1 = swing1
+        self.swing2 = swing2
         self.player1 = AVPlayer(url: video1.localURL)
         self.player2 = AVPlayer(url: video2.localURL)
+        self.syncOffset = swing1.contactTime - swing2.contactTime
 
-        setupTimeObserver()
-        setupNotifications()
+        setupTimeObservers()
+        seekToSwingStarts()
+        play()
     }
 
     deinit {
         player1.pause()
         player2.pause()
         MainActor.assumeIsolated {
-            if let observer = timeObserver {
-                player1.removeTimeObserver(observer)
-            }
-            cancellables.removeAll()
+            if let obs = timeObserver1 { player1.removeTimeObserver(obs) }
+            if let obs = timeObserver2 { player2.removeTimeObserver(obs) }
         }
     }
 
-    // MARK: - Time Observer (with drift correction)
+    // MARK: - Time Observers
 
-    private func setupTimeObserver() {
+    private func setupTimeObservers() {
         let interval = CMTime(seconds: 0.01, preferredTimescale: 600)
-        timeObserver = player1.addPeriodicTimeObserver(forInterval: interval, queue: .main) { [weak self] time in
-            guard let self else { return }
-            let t1 = CMTimeGetSeconds(time)
-            self.currentTime = t1
-            self.correctDriftIfNeeded(player1Time: t1)
+
+        timeObserver1 = player1.addPeriodicTimeObserver(
+            forInterval: interval, queue: .main
+        ) { [weak self] time in
+            self?.onPlayer1Tick(CMTimeGetSeconds(time))
+        }
+
+        timeObserver2 = player2.addPeriodicTimeObserver(
+            forInterval: interval, queue: .main
+        ) { [weak self] time in
+            self?.onPlayer2Tick(CMTimeGetSeconds(time))
         }
     }
 
-    private func correctDriftIfNeeded(player1Time t1: TimeInterval) {
+    private func onPlayer1Tick(_ time: TimeInterval) {
+        currentTime = time
+        loopIfNeeded(player: player1, swing: swing1, isReference: true)
+
+        guard comparisonMode.isSynchronized, isPlaying else { return }
+        correctDriftIfNeeded()
+    }
+
+    private func onPlayer2Tick(_ time: TimeInterval) {
+        loopIfNeeded(player: player2, swing: swing2, isReference: false)
+    }
+
+    // MARK: - Looping
+
+    private func loopIfNeeded(player: AVPlayer, swing: SwingTimeRange, isReference: Bool) {
         guard isPlaying else { return }
-        let expectedTime2 = max(0, t1 - syncOffset)
-        let actualTime2 = CMTimeGetSeconds(player2.currentTime())
-        let drift = abs(actualTime2 - expectedTime2)
+        let time = CMTimeGetSeconds(player.currentTime())
+        guard time >= swing.endTime - 0.01 else { return }
+
+        guard comparisonMode.isSynchronized else {
+            seekPlayer(player, to: swing.startTime)
+            return
+        }
+        // In synced mode, only the reference player triggers a joint loop.
+        guard isReference else { return }
+        seekToSwingStarts()
+    }
+
+    // MARK: - Drift Correction (synced modes only)
+
+    private func correctDriftIfNeeded() {
+        let t1 = CMTimeGetSeconds(player1.currentTime())
+        let expected2 = max(swing2.startTime, t1 - syncOffset)
+        let actual2 = CMTimeGetSeconds(player2.currentTime())
+        let drift = abs(actual2 - expected2)
 
         guard drift > maxDrift else { return }
-        let cmTarget = CMTime(seconds: expectedTime2, preferredTimescale: 600)
-        player2.seek(to: cmTarget, toleranceBefore: .zero, toleranceAfter: .zero)
-    }
-
-    private func setupNotifications() {
-        NotificationCenter.default.publisher(for: .AVPlayerItemDidPlayToEndTime, object: player1.currentItem)
-            .merge(with: NotificationCenter.default.publisher(for: .AVPlayerItemDidPlayToEndTime, object: player2.currentItem))
-            .sink { [weak self] _ in
-                self?.pause()
-                self?.seek(to: 0)
-            }
-            .store(in: &cancellables)
+        seekPlayer(player2, to: expected2)
     }
 
     // MARK: - Playback Controls
@@ -121,16 +143,12 @@ final class ComparisonViewModel {
     }
 
     func play() {
-        // Sync player2 to correct position before starting playback
-        let expectedTime2 = max(0, currentTime - syncOffset)
-        let cmTarget = CMTime(seconds: expectedTime2, preferredTimescale: 600)
-        player2.seek(to: cmTarget, toleranceBefore: .zero, toleranceAfter: .zero)
-
+        if comparisonMode.isSynchronized {
+            let expected2 = max(swing2.startTime, currentTime - syncOffset)
+            seekPlayer(player2, to: expected2)
+        }
         player1.rate = playbackRate
-        let video2Rate = tempoSyncEnabled
-            ? playbackRate * video2TempoAdjustment
-            : playbackRate
-        player2.rate = video2Rate
+        player2.rate = playbackRate
         isPlaying = true
     }
 
@@ -141,36 +159,35 @@ final class ComparisonViewModel {
     }
 
     func seek(to time: TimeInterval) {
-        let cmTime1 = CMTime(seconds: time, preferredTimescale: 600)
-        player1.seek(to: cmTime1, toleranceBefore: .zero, toleranceAfter: .zero)
+        let clamped = clamp(time, within: swing1)
+        seekPlayer(player1, to: clamped)
 
-        let time2 = max(0, time - syncOffset)
-        let cmTime2 = CMTime(seconds: time2, preferredTimescale: 600)
-        player2.seek(to: cmTime2, toleranceBefore: .zero, toleranceAfter: .zero)
-
-        currentTime = time
+        if comparisonMode.isSynchronized {
+            let expected2 = max(swing2.startTime, clamped - syncOffset)
+            seekPlayer(player2, to: expected2)
+        } else {
+            // In one-by-one, also seek player2 proportionally within its swing
+            let fraction = swing1.duration > 0
+                ? (clamped - swing1.startTime) / swing1.duration
+                : 0
+            let time2 = swing2.startTime + fraction * swing2.duration
+            seekPlayer(player2, to: clamp(time2, within: swing2))
+        }
+        currentTime = clamped
     }
 
     func setPlaybackRate(_ rate: Float) {
         playbackRate = rate
         guard isPlaying else { return }
         player1.rate = rate
-        let video2Rate = tempoSyncEnabled ? rate * video2TempoAdjustment : rate
-        player2.rate = video2Rate
-    }
-
-    /// Toggle tempo sync on/off
-    func toggleTempoSync() {
-        tempoSyncEnabled.toggle()
-        guard isPlaying else { return }
-        setPlaybackRate(playbackRate)
+        player2.rate = rate
     }
 
     func stepFrame(forward: Bool) {
-        let frameDuration = 1.0 / min(video1.fps, video2.fps)
+        let step = 1.0 / 30.0
         let newTime = forward
-            ? min(currentTime + frameDuration, totalDuration)
-            : max(currentTime - frameDuration, 0)
+            ? min(currentTime + step, swing1.endTime)
+            : max(currentTime - step, swing1.startTime)
         seek(to: newTime)
     }
 
@@ -178,39 +195,54 @@ final class ComparisonViewModel {
         isSwapped.toggle()
     }
 
+    // MARK: - Sync Offset (synced modes)
+
     func adjustSyncOffset(by delta: TimeInterval) {
         syncOffset += delta
-        seek(to: currentTime)
+        resyncPlayer2()
     }
 
     func setSyncOffset(_ offset: TimeInterval) {
         syncOffset = offset
-        seek(to: currentTime)
-    }
-
-    // MARK: - Seek to Impact
-
-    /// Seek both players to the impact alignment point.
-    /// Contact times are absolute timestamps within each video.
-    func seekToImpact(contactTime1: TimeInterval?, contactTime2: TimeInterval?) {
-        guard let c1 = contactTime1 else { return }
-
-        if let c2 = contactTime2 {
-            syncOffset = c1 - c2
-        }
-
-        seek(to: c1)
+        resyncPlayer2()
     }
 
     // MARK: - Progress
 
     var progress: Double {
-        guard totalDuration > 0 else { return 0 }
-        return currentTime / totalDuration
+        guard swing1.duration > 0 else { return 0 }
+        return max(0, min(1, (currentTime - swing1.startTime) / swing1.duration))
     }
 
     func seekToProgress(_ progress: Double) {
-        let time = progress * totalDuration
+        let time = swing1.startTime + progress * swing1.duration
         seek(to: time)
+    }
+
+    // MARK: - Private Helpers
+
+    private func seekPlayer(_ player: AVPlayer, to time: TimeInterval) {
+        let cmTime = CMTime(seconds: time, preferredTimescale: 600)
+        player.seek(to: cmTime, toleranceBefore: .zero, toleranceAfter: .zero)
+    }
+
+    private func seekToSwingStarts() {
+        seekPlayer(player1, to: swing1.startTime)
+        seekPlayer(player2, to: swing2.startTime)
+        currentTime = swing1.startTime
+    }
+
+    private func resyncPlayer2() {
+        let expected2 = max(swing2.startTime, currentTime - syncOffset)
+        seekPlayer(player2, to: expected2)
+    }
+
+    private func onModeChanged() {
+        guard comparisonMode.isSynchronized else { return }
+        resyncPlayer2()
+    }
+
+    private func clamp(_ time: TimeInterval, within swing: SwingTimeRange) -> TimeInterval {
+        max(swing.startTime, min(swing.endTime, time))
     }
 }

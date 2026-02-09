@@ -9,10 +9,10 @@
 import Foundation
 
 enum PremiumFeature: String, CaseIterable {
+    case synchronizedPlayback
     case onionSkinMode
     case overlayMode
     case poseEstimation
-    case tempoSync
     case exportHD
     case exportNoWatermark
 }

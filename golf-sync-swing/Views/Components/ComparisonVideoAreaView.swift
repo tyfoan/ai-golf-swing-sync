@@ -3,7 +3,7 @@
 //  golf-sync-swing
 //
 //  Renders dual video players in the active ComparisonMode:
-//  side-by-side, onion skin (opacity blend), or full overlay.
+//  side-by-side, synced side-by-side, onion skin, or overlay.
 //
 
 import SwiftUI
@@ -11,16 +11,10 @@ import AVFoundation
 
 struct ComparisonVideoAreaView: View {
     let viewModel: ComparisonViewModel
-    let isAutoSyncing: Bool
-    let autoSyncStatus: String
-    let showSyncConfirmation: Bool
 
     var body: some View {
         GeometryReader { geometry in
-            ZStack {
-                modeLayout(geometry: geometry)
-                syncOverlay
-            }
+            modeLayout(geometry: geometry)
         }
     }
 }
@@ -31,7 +25,7 @@ private extension ComparisonVideoAreaView {
     @ViewBuilder
     func modeLayout(geometry: GeometryProxy) -> some View {
         switch viewModel.comparisonMode {
-        case .sideBySide:
+        case .sideBySide, .sideBySideSynced:
             sideBySideLayout(geometry: geometry)
         case .onionSkin:
             onionSkinLayout(geometry: geometry)
@@ -73,7 +67,7 @@ private extension ComparisonVideoAreaView {
     }
 }
 
-// MARK: - Video Panel (Side-By-Side)
+// MARK: - Video Panel
 
 private extension ComparisonVideoAreaView {
     func videoPanel(player: AVPlayer, width: CGFloat) -> some View {
@@ -81,49 +75,5 @@ private extension ComparisonVideoAreaView {
             .frame(width: width)
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .onTapGesture { viewModel.togglePlayPause() }
-    }
-}
-
-// MARK: - Sync Overlay
-
-private extension ComparisonVideoAreaView {
-    @ViewBuilder
-    var syncOverlay: some View {
-        if isAutoSyncing {
-            syncProgressBanner
-        } else if showSyncConfirmation {
-            syncConfirmationBanner
-        }
-    }
-
-    var syncProgressBanner: some View {
-        VStack {
-            Spacer()
-            HStack(spacing: 8) {
-                ProgressView().tint(.white)
-                Text(autoSyncStatus).font(.caption).foregroundStyle(.white)
-            }
-            .padding(.horizontal, 14).padding(.vertical, 8)
-            .background(.ultraThinMaterial)
-            .clipShape(Capsule())
-            .padding(.bottom, 8)
-        }
-    }
-
-    var syncConfirmationBanner: some View {
-        VStack {
-            Spacer()
-            HStack(spacing: 6) {
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundStyle(Color.appTeal)
-                Text("Synced at impact")
-                    .font(.caption).fontWeight(.medium).foregroundStyle(.white)
-            }
-            .padding(.horizontal, 14).padding(.vertical, 8)
-            .background(.ultraThinMaterial)
-            .clipShape(Capsule())
-            .padding(.bottom, 8)
-            .transition(.opacity)
-        }
     }
 }

@@ -49,7 +49,7 @@ struct HomeView: View {
             .navigationDestination(for: ComparisonDestination.self) { dest in
                 ComparisonView(
                     video1: dest.video1, video2: dest.video2,
-                    contactTime1: dest.contactTime1, contactTime2: dest.contactTime2
+                    swing1: dest.swing1, swing2: dest.swing2
                 )
             }
         }
@@ -118,9 +118,7 @@ private extension HomeView {
             if let idx = selectedSwings.firstIndex(where: { $0.swingId == swing.id }) {
                 selectedSwings.remove(at: idx)
             } else if selectedSwings.count < 2 {
-                selectedSwings.append(
-                    SwingSelection(videoId: video.id, swingId: swing.id, contactTime: swing.contactTime)
-                )
+                selectedSwings.append(SwingSelection(from: swing, videoId: video.id))
             }
         }
     }
@@ -136,7 +134,7 @@ private extension HomeView {
 
         navigationPath.append(ComparisonDestination(
             video1: v1, video2: v2,
-            contactTime1: sel1.contactTime, contactTime2: sel2.contactTime
+            swing1: sel1.swingTimeRange, swing2: sel2.swingTimeRange
         ))
         selectedSwings.removeAll()
     }
@@ -187,7 +185,17 @@ private extension HomeView {
 struct SwingSelection: Hashable {
     let videoId: UUID
     let swingId: UUID
-    let contactTime: TimeInterval
+    let swingTimeRange: SwingTimeRange
+
+    init(from swing: SwingMarker, videoId: UUID) {
+        self.videoId = videoId
+        self.swingId = swing.id
+        self.swingTimeRange = SwingTimeRange(
+            startTime: swing.startTime,
+            contactTime: swing.contactTime,
+            endTime: swing.endTime
+        )
+    }
 }
 
 struct VideoDateGroup: Identifiable {
@@ -201,8 +209,8 @@ struct VideoDateGroup: Identifiable {
 struct ComparisonDestination: Hashable {
     let video1: SwingVideo
     let video2: SwingVideo
-    let contactTime1: TimeInterval?
-    let contactTime2: TimeInterval?
+    let swing1: SwingTimeRange
+    let swing2: SwingTimeRange
 }
 
 #Preview {

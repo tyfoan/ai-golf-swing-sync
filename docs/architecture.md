@@ -39,19 +39,11 @@
 │    ├── PoseFrameBuffer (thread-safe ring buffer)            │
 │    └── ImpactDetectionChain (4 strategy objects)            │
 │                                                             │
-│  SwingNetDetector (orchestrator, deprecated)                │
-│    ├── PersonCropper → SwingNetPredictor                    │
-│    ├── RGBFrameBuffer (thread-safe ring buffer)             │
-│    └── SwingValidationPipeline (5 rule objects)             │
-│                                                             │
 │  VideoSyncEngine (orchestrator)                             │
-│    ├── VideoFrameIterator                                   │
-│    ├── TempoAnalyzer                                        │
-│    ├── SyncStrategySelector                                 │
-│    └── CrossCorrelationRefiner                              │
+│    └── VideoFrameIterator                                   │
 │                                                             │
 │  VideoImportService │ VideoStorageService │ VideoExport     │
-│  DetectorFactory │ ThumbnailService │ MotionGateService     │
+│  ThumbnailService                                           │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
@@ -66,14 +58,9 @@
 **Strategy Pattern** — Impact detection uses 4 interchangeable strategies in a chain of responsibility:
   `DownswingToFollowThroughStrategy`, `BackswingToFollowThroughStrategy`, `DownswingDecayStrategy`, `BackswingDecayStrategy`
 
-**Composite Pattern** — Swing validation uses 5 rules in a pipeline:
-  `ImpactConfidenceRule`, `EdgeArtifactRule`, `NoEventDominanceRule`, `TemporalOrderRule`, `MultiEventCorroborationRule`
-
 **Facade Pattern** — CameraService exposes a simple interface while delegating to 5 collaborators.
 
-**Orchestrator Pattern** — ActionClassifierDetector, SwingNetDetector, VideoSyncEngine, RecordingViewModel are slim orchestrators that wire collaborators together.
-
-**Factory Pattern** — DetectorFactory centralizes detector instantiation.
+**Orchestrator Pattern** — ActionClassifierDetector, VideoSyncEngine, RecordingViewModel are slim orchestrators that wire collaborators together.
 
 ## Components
 
@@ -128,9 +115,6 @@
 - One-time migration: converts absolute paths to relative paths in SwingVideo records
 - Guarded by UserDefaults flag, runs at app launch
 
-**DetectorFactory** (`Services/Detection/DetectorFactory.swift`)
-- Centralized detector instantiation for ActionClassifier and SwingNet
-
 #### Camera Service (Facade)
 
 **CameraService** (`Services/CameraService.swift`) — facade over:
@@ -152,25 +136,11 @@
   3. `DownswingDecayStrategy` — front camera (no follow_through)
   4. `BackswingDecayStrategy` — very fast swings
 
-#### SwingNetDetector (Orchestrator, Deprecated)
-
-**SwingNetDetector** (`Services/SwingNetDetector.swift`) — orchestrates:
-- `RGBFrameBuffer` — Thread-safe ring buffer for RGB frame data
-- `PersonCropper` — Pose-based person detection + bounding box crop
-- `SwingNetPredictor` — CoreML SwingNet model + ImageNet normalization
-- `SwingValidationPipeline` → 5 rules:
-  1. `ImpactConfidenceRule`, 2. `EdgeArtifactRule`, 3. `NoEventDominanceRule`, 4. `TemporalOrderRule`, 5. `MultiEventCorroborationRule`
-
-**MotionGateService** (`Services/MotionGateService.swift`)
-- Lightweight motion detection for adaptive processing stride
-
 #### VideoSyncEngine (Orchestrator)
 
 **VideoSyncEngine** (`Services/VideoSyncEngine.swift`) — orchestrates:
 - `VideoFrameIterator` — Async frame extraction from video files
-- `TempoAnalyzer` — Swing tempo comparison
-- `SyncStrategySelector` — Best sync point selection (4 cases)
-- `CrossCorrelationRefiner` — Sub-frame alignment via velocity cross-correlation
+- Uses `ActionClassifierDetector` for offline swing detection
 
 ### 3. ViewModels
 
@@ -187,7 +157,10 @@
 - Provides play/pause, seek, speed control
 
 **ComparisonViewModel** (`ViewModels/ComparisonViewModel.swift`)
-- @MainActor, manages dual-player synchronized playback with drift correction
+- @MainActor, dual-player swing-bound playback with 4 comparison modes
+- Sync offset from pre-detected contact times (no re-analysis)
+- Default: synced + auto-play, looping within swing bounds
+- Drift correction (40ms threshold) in synchronized modes
 
 ### 4. Views
 
@@ -224,40 +197,20 @@ PHPicker → VideoStorageService.copyVideoToStorage →
 ThumbnailService.generateThumbnail → SwingVideo model → SwiftData
 ```
 
-### Auto-Detection Flow (SwingNet)
+### Auto-Detection Flow
 ```
 SingleVideoPlayerView → "AUTO-DETECT" button
     ↓
 VideoSyncEngine.analyzeAllSwings()
     ↓
-SwingNetDetector.processFrame() × N frames (30fps sampling)
-    ├── extractRGBData()
-    │     ├── detectPersonPose() (every 60 frames) → cachedPersonBounds
-    │     ├── crop to person region (if pose detected)
-    │     └── scale to 160×160, extract UInt8 CHW data
-    ├── MotionGateService.update() → adaptive stride
-    └── runSwingNetClassification() (every stride frames)
-          ├── buildMLInput() → ImageNet-normalized Float32 tensor
-          ├── SwingNet.prediction() → 64×9 event probabilities
-          ├── analyzeFullOutput() → SwingNetAnalysis
-          └── validateSwingDetection() → 6-layer validation
+ActionClassifierDetector.processFrame() × N frames (30fps sampling)
+    ├── PoseExtractor → MLMultiArray keypoints
+    ├── PhaseClassifier → 4-class probabilities
+    └── ImpactDetectionChain → 4 strategies
     ↓
 detectedSwings: [SwingBounds] → [SwingDetectionResult]
     ↓
 SwingMarker(from: result) × N → SwiftData
-```
-
-### Auto-Sync Flow ⭐ NEW
-```
-ComparisonView → "Auto-Sync" button
-    ↓
-VideoSyncEngine.calculateSyncOffset(video1, video2)
-    ├── getImpactTime(video1) → detect or use cached
-    └── getImpactTime(video2) → detect or use cached
-    ↓
-offset = impact1 - impact2
-    ↓
-ComparisonViewModel.setSyncOffset(offset)
 ```
 
 ### Manual Swing Marking Flow
@@ -268,48 +221,19 @@ SwingMarker model → SwiftData
 
 ### Comparison Flow
 ```
-HomeView (select 2 videos) → ComparisonView →
-ComparisonViewModel (sync offset) → VideoPlayerViewModel × 2
+HomeView (select 2 swings) → SwingTimeRange × 2
+    ↓
+ComparisonView → ComparisonViewModel
+    ├── syncOffset = swing1.contactTime - swing2.contactTime
+    ├── player1 loops swing1 bounds (reference)
+    ├── player2 loops swing2 bounds (drift-corrected)
+    └── auto-play on entry, synced at impact
 ```
 
 ### Export Flow
 ```
 ComparisonView → VideoExportService.exportComparison →
 AVMutableComposition → AVAssetExportSession → Photos library
-```
-
-## SwingNet Detection Algorithm
-
-```
-Input: 64 consecutive frames (160×160 RGB, ImageNet normalized)
-
-SwingNet Model (GolfDB pretrained):
-  Output: 64 × 9 event probabilities
-  Events: address, toe_up, mid_backswing, top, mid_downswing,
-          impact, mid_follow_through, finish, no_event
-
-Single-Pass Analysis (O(64×9)):
-  - Track peak (frame, probability) for each event
-  - Count frames where noEvent is dominant class
-
-6-Layer Validation Pipeline:
-  1. Impact confidence ≥ 30%
-  2. Impact frame position: high conf → frames 4-60, low conf → 17-47
-  3. NoEvent dominance: ≥ 24/64 frames (real swings are mostly idle)
-  4. Temporal order: address < top < impact
-  5. Corroboration: address OR top confidence ≥ 15%
-
-Pose-Based Person Crop (every 60 frames):
-  - VNDetectHumanBodyPoseRequest → skeleton keypoints (conf > 0.1)
-  - Bounding box from min/max of keypoint positions
-  - Expand 30% for club arc, clamp to image bounds
-  - Fallback: full frame when no pose detected
-
-Performance Budget (~3.4ms/frame amortized):
-  - Pose detection: ~15ms × 1/60 frames = ~0.25ms
-  - Motion gate: ~0.1ms
-  - CIImage crop+scale: ~2ms
-  - UInt8 extraction: ~1ms
 ```
 
 ## Related Documents

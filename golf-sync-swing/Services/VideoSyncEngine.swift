@@ -59,8 +59,7 @@ final class VideoSyncEngine {
             SwingDetectionResult(
                 impactTime: swing.impactTime, impactConfidence: swing.confidence,
                 topOfBackswingTime: nil, topOfBackswingConfidence: 0,
-                startTime: max(0, swing.startTime), endTime: min(duration, swing.endTime),
-                phases: [], velocityProfile: []
+                startTime: max(0, swing.startTime), endTime: min(duration, swing.endTime)
             )
         }
     }

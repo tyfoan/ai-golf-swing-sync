@@ -10,7 +10,7 @@
 
 **Phase**: Deployment Preparation
 **Status**: On Track
-**Current Focus**: Bug fixes, thread safety, production hardening
+**Current Focus**: SwingNet cleanup, comparison view overhaul, synced playback
 
 ---
 
@@ -53,10 +53,7 @@
 | Recording UI | Done | RecordingView with countdown, pose overlay |
 | PiP during replay | Done | Shows live feed during swing replay |
 | **Production Camera Fixes** | Done | Lifecycle, interruptions, errors, memory |
-| **SwingNet ML Detection** | Done | GolfDB pretrained, 6-layer validation |
-| **Pose-Based Person Crop** | Done | VNDetectHumanBodyPoseRequest, 30% expansion |
 | **Multi-Swing Detection** | Done | Full-video scan, returns all swings |
-| **Motion Gate** | Done | Adaptive stride, frame processing gate |
 | **4-Strategy Detection** | Done | Phase transition, backswing fallback, downswing decay, backswing decay |
 | **Positioning Guide** | Done | Best practice rules overlay on camera |
 | **Replay Controls** | Done | Play/pause + mute on swing replay |
@@ -70,12 +67,12 @@
 | Deliverable | Status | Notes |
 |-------------|--------|-------|
 | ActionClassifierDetector decomposition | Done | 667→187 lines, 9 new files |
-| SwingNetDetector decomposition | Done | 693→233 lines, 9 new files (deprecated) |
+| SwingNetDetector removal | Done | Fully removed (deprecated) |
 | CameraService decomposition | Done | 824→313 lines, 5 new files |
-| VideoSyncEngine decomposition | Done | 796→248 lines, 4 new files |
+| VideoSyncEngine simplification | Done | Removed 3 dead collaborators, uses ActionClassifier only |
 | RecordingViewModel decomposition | Done | 579→263 lines, 2 new files |
 | View decomposition | Done | 6 views reduced, 7 new components |
-| Service extraction | Done | VideoImportService, RecordingSaveService, DetectorFactory |
+| Service extraction | Done | VideoImportService, RecordingSaveService |
 | Build verification | Done | All 41 new files compile clean |
 
 **Progress**: ██████████ 100%
@@ -110,6 +107,15 @@
 ---
 
 ## Recent Updates
+
+### 2026-02-09 (SwingNet Removal + Comparison Overhaul)
+- Fully removed SwingNet pipeline: SwingNetDetector, PersonCropper, RGBFrameBuffer, SwingNetPredictor, SwingValidationPipeline, 5 validation rules, MotionGateService, DetectorFactory
+- Removed dead sync collaborators: TempoAnalyzer, SyncStrategySelector, CrossCorrelationRefiner
+- Comparison view overhaul: 4 modes (sideBySide, sideBySideSynced, onionSkin, overlay)
+- Default = synced + auto-play: comparison opens playing both videos looped and synced at impact
+- SwingTimeRange (start, contact, end) passed from HomeView through ComparisonDestination
+- Sync offset = swing1.contactTime - swing2.contactTime (one-time, no re-analysis)
+- Removed tempo sync UI and auto-sync overlay/confirmation banners
 
 ### 2026-02-09 (Deployment Preparation — 20 Issues Fixed)
 - Fixed 5 critical issues: relative path storage (data loss on reinstall), race conditions in 4 detector/service classes
@@ -259,5 +265,4 @@
 - VideoExportService uses deprecated AVFoundation APIs (iOS 18/26 deprecations)
 - Export watermark disabled (was causing issues)
 - Auto-detection accuracy depends on camera angle and lighting
-- CrossCorrelation refinement is effectively dead code (velocity profiles always empty)
 - Accessibility labels missing on custom controls (timeline, playback, recording)

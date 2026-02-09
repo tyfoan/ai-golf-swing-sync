@@ -68,7 +68,7 @@ struct ComparisonTimelineSlider: View {
 
     private var timeLabels: some View {
         HStack {
-            Text(formatTime(viewModel.currentTime))
+            Text(formatTime(viewModel.displayTime))
             Spacer()
             Text(formatTime(viewModel.totalDuration))
         }

@@ -2,7 +2,9 @@
 //  ComparisonView.swift
 //  golf-sync-swing
 //
-//  Dark immersive side-by-side video comparison with auto-sync.
+//  Dark immersive side-by-side video comparison.
+//  Default mode: independent swing loops (free).
+//  Synced/Onion/Overlay modes require premium.
 //
 
 import SwiftUI
@@ -10,8 +12,8 @@ import SwiftUI
 struct ComparisonView: View {
     let video1: SwingVideo
     let video2: SwingVideo
-    var contactTime1: TimeInterval?
-    var contactTime2: TimeInterval?
+    let swing1: SwingTimeRange
+    let swing2: SwingTimeRange
 
     @Environment(\.dismiss) private var dismiss
     @State private var viewModel: ComparisonViewModel?
@@ -19,7 +21,6 @@ struct ComparisonView: View {
     @State private var exportProgress: Float = 0
     @State private var isExporting = false
     @State private var showDoneSheet = false
-    @State private var showSyncConfirmation = false
 
     var body: some View {
         ZStack {
@@ -50,10 +51,7 @@ private extension ComparisonView {
     func contentStack(viewModel: ComparisonViewModel) -> some View {
         VStack(spacing: 0) {
             topBar(viewModel: viewModel)
-            ComparisonVideoAreaView(
-                viewModel: viewModel, isAutoSyncing: false,
-                autoSyncStatus: "", showSyncConfirmation: showSyncConfirmation
-            )
+            ComparisonVideoAreaView(viewModel: viewModel)
             controlsPanel(viewModel: viewModel)
         }
     }
@@ -85,13 +83,20 @@ private extension ComparisonView {
     func controlsPanel(viewModel: ComparisonViewModel) -> some View {
         VStack(spacing: 12) {
             ComparisonTimelineSlider(viewModel: viewModel)
-            SyncOffsetStrip(viewModel: viewModel)
+            syncOffsetRow(viewModel: viewModel)
             modePicker(viewModel: viewModel)
             premiumControls(viewModel: viewModel)
             ComparisonControlsView(viewModel: viewModel)
             doneButton
         }
         .padding(.horizontal, 20).padding(.vertical, 12)
+    }
+
+    @ViewBuilder
+    func syncOffsetRow(viewModel: ComparisonViewModel) -> some View {
+        if viewModel.comparisonMode.isSynchronized {
+            SyncOffsetStrip(viewModel: viewModel)
+        }
     }
 
     func modePicker(viewModel: ComparisonViewModel) -> some View {
@@ -139,9 +144,6 @@ private extension ComparisonView {
         if viewModel.comparisonMode == .onionSkin {
             onionSkinSlider(viewModel: viewModel)
         }
-        if viewModel.tempoDescription != nil {
-            tempoSyncToggle(viewModel: viewModel)
-        }
     }
 
     func onionSkinSlider(viewModel: ComparisonViewModel) -> some View {
@@ -157,23 +159,6 @@ private extension ComparisonView {
                 .font(.caption).foregroundStyle(.white.opacity(0.5))
         }
         .transition(.opacity.combined(with: .move(edge: .top)))
-    }
-
-    func tempoSyncToggle(viewModel: ComparisonViewModel) -> some View {
-        Button {
-            viewModel.toggleTempoSync()
-        } label: {
-            HStack(spacing: 6) {
-                Image(systemName: viewModel.tempoSyncEnabled ? "metronome.fill" : "metronome")
-                    .font(.caption)
-                Text(viewModel.tempoDescription ?? "")
-                    .font(.caption2)
-            }
-            .foregroundStyle(viewModel.tempoSyncEnabled ? Color.appTeal : .white.opacity(0.5))
-            .padding(.horizontal, 10).padding(.vertical, 6)
-            .background(Color.white.opacity(0.1))
-            .clipShape(Capsule())
-        }
     }
 
     var doneButton: some View {
@@ -198,25 +183,13 @@ private extension ComparisonView {
     }
 }
 
-// MARK: - Auto Sync
+// MARK: - Setup
 
 private extension ComparisonView {
     func onViewAppear() {
-        let vm = ComparisonViewModel(video1: video1, video2: video2)
-        viewModel = vm
-
-        if let c1 = contactTime1, let c2 = contactTime2 {
-            vm.setSyncOffset(c1 - c2)
-            vm.seekToImpact(contactTime1: c1, contactTime2: c2)
-            showSyncConfirmationBriefly()
-        }
-    }
-
-    func showSyncConfirmationBriefly() {
-        withAnimation { showSyncConfirmation = true }
-        Task {
-            try? await Task.sleep(for: .seconds(2))
-            await MainActor.run { withAnimation { showSyncConfirmation = false } }
-        }
+        viewModel = ComparisonViewModel(
+            video1: video1, video2: video2,
+            swing1: swing1, swing2: swing2
+        )
     }
 }
