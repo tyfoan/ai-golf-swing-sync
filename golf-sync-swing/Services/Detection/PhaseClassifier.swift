@@ -86,6 +86,12 @@ final class PhaseClassifier: PhaseClassifying, @unchecked Sendable {
             return nil
         }
 
+        let allShapesMatch = frames.allSatisfy { $0.keypointsArray.shape == firstShape }
+        guard allShapesMatch else {
+            AppLogger.detection.warning("PhaseClassifier: frame shape mismatch — skipping prediction")
+            return nil
+        }
+
         do {
             let result = try MLMultiArray(
                 shape: [predictionWindow as NSNumber,

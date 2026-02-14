@@ -2,15 +2,15 @@
 
 > Current progress for Golf Sync Swing
 
-**Last Updated**: 2026-02-09
+**Last Updated**: 2026-02-13
 
 ---
 
 ## Current Phase
 
-**Phase**: Deployment Preparation
+**Phase**: Monetization & Launch Prep
 **Status**: On Track
-**Current Focus**: SwingNet cleanup, comparison view overhaul, synced playback
+**Current Focus**: RevenueCat integration, deployment blocker fixes, App Store readiness
 
 ---
 
@@ -94,19 +94,36 @@
 
 **Progress**: ██████████ 100%
 
-### Milestone 4: [Monetization] - Not Started
+### Milestone 4: [Monetization] - In Progress
 
 | Deliverable | Status | Notes |
 |-------------|--------|-------|
-| RevenueCat integration | Not Started | |
+| RevenueCat integration | Done | PurchaseService singleton, customerInfoStream, entitlement checking |
+| SettingsView | Done | Subscription management, restore purchases, customer center |
+| PaywallView | Done | RevenueCatUI native paywall with close button |
+| FeatureAccess wiring | Done | Delegates to PurchaseService.shared.isPremium |
+| Privacy manifest | Done | PrivacyInfo.xcprivacy for App Store compliance |
 | Onboarding flow | Not Started | |
-| Paywall | Not Started | |
 
-**Progress**: ░░░░░░░░░░ 0%
+**Progress**: █████████░ 85%
 
 ---
 
 ## Recent Updates
+
+### 2026-02-13 (Deployment Blockers + RevenueCat)
+- Fixed 6 deployment blockers identified by expert review panel
+- Added PrivacyInfo.xcprivacy (required for App Store submission since iOS 17)
+- Hardened PoseExtractor joint thresholds (confidence 0.1→0.35, count 5→8)
+- Added PhaseClassifier frame shape validation guard
+- Replaced fatalError in ModelContainer init with graceful in-memory fallback
+- Tracked GolfSwingClassifier_v3.mlmodel in git
+- Integrated RevenueCat SDK via SPM (purchases-ios-spm v5.59.0)
+- Created PurchaseService with customerInfoStream observation
+- Created SettingsView with PaywallView, CustomerCenterView, restore purchases
+- Wired FeatureAccess to delegate to PurchaseService.shared.isPremium
+- Added Settings tab to MainTabView
+- Added skeleton/pose visualization: BodyJointMap, PosePublisher, SkeletonOverlayView, DetectionBorderView
 
 ### 2026-02-09 (SwingNet Removal + Comparison Overhaul)
 - Fully removed SwingNet pipeline: SwingNetDetector, PersonCropper, RGBFrameBuffer, SwingNetPredictor, SwingValidationPipeline, 5 validation rules, MotionGateService, DetectorFactory

@@ -36,6 +36,7 @@ final class ActionClassifierDetector: @unchecked Sendable {
     private let phaseClassifier: PhaseClassifying
     private let poseBuffer: PoseFrameBuffer
     private let impactChain: ImpactDetectionChain
+    let posePublisher: PosePublisher
 
     // MARK: - State
 
@@ -65,12 +66,14 @@ final class ActionClassifierDetector: @unchecked Sendable {
         poseExtractor: PoseExtracting = PoseExtractor(),
         phaseClassifier: PhaseClassifying = PhaseClassifier(),
         poseBuffer: PoseFrameBuffer = PoseFrameBuffer(capacity: 60),
-        impactChain: ImpactDetectionChain = .default()
+        impactChain: ImpactDetectionChain = .default(),
+        posePublisher: PosePublisher = PosePublisher()
     ) {
         self.poseExtractor = poseExtractor
         self.phaseClassifier = phaseClassifier
         self.poseBuffer = poseBuffer
         self.impactChain = impactChain
+        self.posePublisher = posePublisher
     }
 
     // MARK: - Public API
@@ -87,7 +90,8 @@ final class ActionClassifierDetector: @unchecked Sendable {
         totalFramesProcessed += 1
         lock.unlock()
 
-        guard let poseArray = poseExtractor.extractPose(from: pixelBuffer) else {
+        guard let result = poseExtractor.extractPose(from: pixelBuffer, at: timestamp) else {
+            posePublisher.publish(nil)
             lock.lock()
             consecutiveNoPoseFrames += 1
             if consecutiveNoPoseFrames > noPoseIdleThreshold {
@@ -98,12 +102,14 @@ final class ActionClassifierDetector: @unchecked Sendable {
             return
         }
 
+        posePublisher.publish(result.jointMap)
+
         lock.lock()
         consecutiveNoPoseFrames = 0
         isMotionDetected = true
         lock.unlock()
 
-        poseBuffer.append(PoseFrame(timestamp: timestamp, keypointsArray: poseArray))
+        poseBuffer.append(PoseFrame(timestamp: timestamp, keypointsArray: result.multiArray))
 
         lock.lock()
         guard timestamp - lastDetectionTime > minDetectionInterval else {

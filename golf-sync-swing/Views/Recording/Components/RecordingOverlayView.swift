@@ -65,6 +65,27 @@ struct ReplayIndicatorOverlay: View {
     }
 }
 
+// MARK: - Replay Loading Overlay
+
+struct ReplayLoadingOverlay: View {
+    var body: some View {
+        ZStack {
+            Color.black.opacity(0.7).ignoresSafeArea()
+
+            VStack(spacing: 16) {
+                ProgressView()
+                    .scaleEffect(1.5)
+                    .tint(.white)
+                Text("Loading replay...")
+                    .font(.subheadline)
+                    .foregroundStyle(.white.opacity(0.7))
+            }
+        }
+        .allowsHitTesting(false)
+        .transition(.opacity)
+    }
+}
+
 // MARK: - Interruption Overlay
 
 struct InterruptionOverlay: View {

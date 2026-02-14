@@ -155,6 +155,8 @@
 			);
 			name = "golf-sync-swing";
 			packageProductDependencies = (
+				886500012F35A00100DB5D4D /* RevenueCat */,
+				886500022F35A00100DB5D4D /* RevenueCatUI */,
 			);
 			productName = "golf-sync-swing";
 			productReference = 88649A2E2F2C322400DB5D4D /* golf-sync-swing.app */;
@@ -238,6 +240,9 @@
 			);
 			mainGroup = 88649A252F2C322400DB5D4D;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				886500002F35A00100DB5D4D /* XCRemoteSwiftPackageReference "purchases-ios-spm" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 88649A2F2F2C322400DB5D4D /* Products */;
 			projectDirPath = "";
@@ -451,6 +456,8 @@
 				DEVELOPMENT_TEAM = J2R9272WYX;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "AI Golf Swing Sync";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Golf Sync Swing needs camera access to record your golf swings for analysis and comparison.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Golf Sync Swing needs microphone access to detect ball impact sounds for automatic swing detection.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Golf Sync Swing needs permission to save exported comparison videos to your photo library.";
@@ -487,6 +494,8 @@
 				DEVELOPMENT_TEAM = J2R9272WYX;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "AI Golf Swing Sync";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Golf Sync Swing needs camera access to record your golf swings for analysis and comparison.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Golf Sync Swing needs microphone access to detect ball impact sounds for automatic swing detection.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Golf Sync Swing needs permission to save exported comparison videos to your photo library.";
@@ -637,6 +646,31 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		886500002F35A00100DB5D4D /* XCRemoteSwiftPackageReference "purchases-ios-spm" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/RevenueCat/purchases-ios-spm.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		886500012F35A00100DB5D4D /* RevenueCat */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 886500002F35A00100DB5D4D /* XCRemoteSwiftPackageReference "purchases-ios-spm" */;
+			productName = RevenueCat;
+		};
+		886500022F35A00100DB5D4D /* RevenueCatUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 886500002F35A00100DB5D4D /* XCRemoteSwiftPackageReference "purchases-ios-spm" */;
+			productName = RevenueCatUI;
+		};
+/* End XCSwiftPackageProductDependency section */
+
 	};
 	rootObject = 88649A262F2C322400DB5D4D /* Project object */;
 }

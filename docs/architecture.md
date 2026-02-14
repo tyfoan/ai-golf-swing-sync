@@ -10,6 +10,8 @@
 │   MainTabView → HomeView / HistoryView → SingleVideoPlayer  │
 │   ComparisonView ← ComparisonTimelineSlider                 │
 │                    ← ComparisonControlsView                  │
+│   SettingsView ← PaywallView (RevenueCatUI)                 │
+│                ← CustomerCenterView (RevenueCatUI)           │
 │   RecordingView  ← RecordingTopBar, RecordingControlsView   │
 │                  ← RecordingPiPView, RecordingOverlayView   │
 │   SingleVideoPlayerView ← SwingDetectionPanel               │
@@ -48,8 +50,16 @@
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
+│                   MONETIZATION                               │
+│  PurchaseService (RevenueCat singleton)                      │
+│    ├── customerInfoStream → isPremium                        │
+│    └── FeatureAccess (delegates to PurchaseService)          │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
 │                      DATA LAYER                             │
-│       SwiftData │ AVFoundation │ Vision │ CoreML │ Photos  │
+│  SwiftData │ AVFoundation │ Vision │ CoreML │ Photos │ RC  │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -115,6 +125,16 @@
 - One-time migration: converts absolute paths to relative paths in SwingVideo records
 - Guarded by UserDefaults flag, runs at app launch
 
+**PurchaseService** (`Services/PurchaseService.swift`)
+- RevenueCat singleton — single source of truth for premium access
+- Configures `Purchases` with API key at app launch
+- Observes `customerInfoStream` (AsyncStream) for real-time entitlement updates
+- Exposes `isPremium`, `customerInfo`, restore/refresh methods
+
+**FeatureAccess** (`Services/FeatureAccess.swift`)
+- Delegates `isUnlocked()` and `isPremiumUser` to `PurchaseService.shared.isPremium`
+- Gates premium features: synced playback, onion skin, overlay comparison modes
+
 #### Camera Service (Facade)
 
 **CameraService** (`Services/CameraService.swift`) — facade over:
@@ -164,8 +184,9 @@
 
 ### 4. Views
 
-**MainTabView** - Tab container (Camera, Compare, Recordings)
+**MainTabView** - Tab container (Camera, History, Compare, Settings)
 **HomeView** - Video library with selection for comparison
+**SettingsView** - Subscription management, restore purchases, customer center
 **HistoryView** - All videos with swing counts
 **ComparisonView** → ComparisonTimelineSlider + ComparisonControlsView
 **SingleVideoPlayerView** → SwingDetectionPanel (auto-detect + swing list)

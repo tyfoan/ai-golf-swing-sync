@@ -15,7 +15,10 @@ struct RecordingPiPView: View {
     let lastSwing: SwingClip?
     let recordingURL: URL?
     let playbackSpeed: Float
+    let detectionAnimationActive: Bool
     let onTap: () -> Void
+
+    private let cornerRadius: CGFloat = 12
 
     var body: some View {
         VStack {
@@ -29,11 +32,12 @@ struct RecordingPiPView: View {
                     badge
                         .padding(8)
                 }
-                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 12)
+                    RoundedRectangle(cornerRadius: cornerRadius)
                         .stroke(pipDisplayMode == .lastSwingReplay ? Color.sand : Color.fairwayGreen, lineWidth: 2)
                 )
+                .overlay(DetectionBorderView(isActive: detectionAnimationActive, cornerRadius: cornerRadius))
                 .shadow(color: .black.opacity(0.5), radius: 8, x: 0, y: 4)
                 .onTapGesture(perform: onTap)
             }

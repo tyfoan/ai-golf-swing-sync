@@ -13,6 +13,7 @@ struct SwingReplayView: View {
     let startTime: TimeInterval
     let endTime: TimeInterval
     var playbackSpeed: Float = 1.0
+    var onLoaded: (() -> Void)?
 
     @State private var player: AVPlayer?
     @State private var isLoading = true
@@ -131,6 +132,7 @@ struct SwingReplayView: View {
         guard FileManager.default.fileExists(atPath: videoURL.path) else {
             loadError = "Video file not found"
             isLoading = false
+            onLoaded?()
             return
         }
 
@@ -150,6 +152,7 @@ struct SwingReplayView: View {
                 }
                 loadError = "Video not ready yet"
                 isLoading = false
+                onLoaded?()
                 return
             }
 
@@ -180,6 +183,7 @@ struct SwingReplayView: View {
                 avPlayer.seek(to: CMTime(seconds: safeStartTime, preferredTimescale: 600))
                 self.player = avPlayer
                 self.isLoading = false
+                self.onLoaded?()
             }
         } catch {
             // Retry on error
@@ -192,6 +196,7 @@ struct SwingReplayView: View {
             await MainActor.run {
                 loadError = "Loading: \(error.localizedDescription)"
                 isLoading = false
+                onLoaded?()
             }
         }
     }

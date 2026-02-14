@@ -28,7 +28,17 @@ struct RecordingView: View {
             ZStack {
                 Color.black.ignoresSafeArea()
 
-                mainContentView.ignoresSafeArea()
+                mainContentView
+                    .overlay {
+                        if viewModel.skeletonEnabled && !viewModel.mainViewShowsReplay {
+                            SkeletonOverlayView(
+                                jointMap: viewModel.currentJointMap,
+                                isMirrored: viewModel.isFrontCamera
+                            )
+                        }
+                    }
+                    .ignoresSafeArea()
+                    .animation(.easeInOut(duration: 0.3), value: viewModel.mainViewShowsReplay)
 
                 if viewModel.state == .idle {
                     PositioningGuideOverlay()
@@ -46,6 +56,14 @@ struct RecordingView: View {
                         onCancel: viewModel.cancel
                     )
 
+                    if viewModel.isRecording && !viewModel.mainViewShowsReplay {
+                        HStack {
+                            SkeletonToggleButton(isActive: $viewModel.skeletonEnabled)
+                            Spacer()
+                        }
+                        .padding(.horizontal)
+                    }
+
                     Spacer()
 
                     if viewModel.swingCount > 0 && viewModel.isRecording {
@@ -53,6 +71,11 @@ struct RecordingView: View {
                     }
 
                     RecordingControlsView(viewModel: viewModel)
+                }
+
+                if viewModel.isLoadingReplay {
+                    ReplayLoadingOverlay()
+                        .animation(.easeInOut(duration: 0.3), value: viewModel.isLoadingReplay)
                 }
 
                 if viewModel.isRecording && viewModel.swingCount > 0 {
@@ -63,6 +86,7 @@ struct RecordingView: View {
                         lastSwing: viewModel.pipSwing,
                         recordingURL: viewModel.recordingURL,
                         playbackSpeed: viewModel.playbackSpeed,
+                        detectionAnimationActive: viewModel.detectionAnimationActive,
                         onTap: viewModel.swapMainAndPip
                     )
                     .id(viewModel.pipSwing?.id)
@@ -117,9 +141,23 @@ struct RecordingView: View {
 
     // MARK: - Main Content
 
+    @ViewBuilder
     private var mainContentView: some View {
-        CameraPreviewView(session: viewModel.cameraService.captureSession)
-            .id("main-camera-\(viewModel.cameraService.sessionConfigurationId)")
+        if viewModel.mainViewShowsReplay, let swing = viewModel.pipSwing, let url = viewModel.recordingURL {
+            SwingReplayView(
+                videoURL: url,
+                startTime: swing.startTime,
+                endTime: swing.endTime,
+                playbackSpeed: viewModel.playbackSpeed,
+                onLoaded: viewModel.replayDidLoad
+            )
+            .id("main-replay-\(swing.id)")
+            .transition(.opacity)
+        } else {
+            CameraPreviewView(session: viewModel.cameraService.captureSession)
+                .id("main-camera-\(viewModel.cameraService.sessionConfigurationId)")
+                .transition(.opacity)
+        }
     }
 
     // MARK: - Swing Attempts

@@ -21,21 +21,26 @@ struct golf_sync_swingApp: App {
             ComparisonSession.self,
         ])
 
-        do {
-            let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-            self.sharedModelContainer = try ModelContainer(for: schema, configurations: [modelConfiguration])
-        } catch {
-            AppLogger.general.error("Failed to create persistent ModelContainer: \(error.localizedDescription)")
-            AppLogger.general.warning("Falling back to in-memory storage")
-
-            do {
-                let fallbackConfig = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
-                self.sharedModelContainer = try ModelContainer(for: schema, configurations: [fallbackConfig])
-            } catch {
-                fatalError("Cannot create ModelContainer even in-memory: \(error)")
-            }
+        if let container = try? ModelContainer(
+            for: schema,
+            configurations: [ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)]
+        ) {
+            self.sharedModelContainer = container
+        } else {
+            AppLogger.general.error("Persistent storage failed — falling back to in-memory")
+            let fallback = try? ModelContainer(
+                for: schema,
+                configurations: [ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)]
+            )
+            self.sharedModelContainer = fallback ?? (try! ModelContainer(
+                for: Schema([]),
+                configurations: [ModelConfiguration(isStoredInMemoryOnly: true)]
+            ))
+            self._showDataError = State(initialValue: true)
+            self._dataErrorMessage = State(initialValue: "Unable to save data permanently. Your recordings may not persist between sessions.")
         }
 
+        PurchaseService.shared.configure()
         VideoPathMigrationService.migrateIfNeeded(modelContainer: sharedModelContainer)
         VideoExportService.cleanupOrphanedExports()
     }

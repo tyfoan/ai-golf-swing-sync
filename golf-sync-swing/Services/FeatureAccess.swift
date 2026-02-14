@@ -3,7 +3,7 @@
 //  golf-sync-swing
 //
 //  Single source of truth for premium feature gating.
-//  All features unlocked until paywall is implemented.
+//  Delegates to PurchaseService for RevenueCat entitlement checks.
 //
 
 import Foundation
@@ -18,7 +18,11 @@ enum PremiumFeature: String, CaseIterable {
 }
 
 struct FeatureAccess {
-    static func isUnlocked(_ feature: PremiumFeature) -> Bool { true }
+    static func isUnlocked(_ feature: PremiumFeature) -> Bool {
+        PurchaseService.shared.isPremium
+    }
 
-    static var isPremiumUser: Bool { true }
+    static var isPremiumUser: Bool {
+        PurchaseService.shared.isPremium
+    }
 }

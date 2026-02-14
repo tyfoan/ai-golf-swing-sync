@@ -33,6 +33,10 @@ final class RecordingViewModel {
     var mainViewShowsReplay: Bool = false
     var replayingSwingIndex: Int? = nil
     var pipDisplayMode: PipDisplayMode = .liveCamera
+    var isLoadingReplay: Bool = false
+    var detectionAnimationActive: Bool = false
+    var skeletonEnabled: Bool = false
+    var currentJointMap: BodyJointMap?
 
     // MARK: - Collaborators
 
@@ -88,6 +92,7 @@ final class RecordingViewModel {
                 if let error {
                     self.errorMessage = error.localizedDescription
                     self.mainViewShowsReplay = false
+                    self.isLoadingReplay = false
                     self.replayingSwingIndex = nil
                     self.state = .idle
                 } else {
@@ -107,6 +112,15 @@ final class RecordingViewModel {
         guard frameGate.isCurrentlyRecording else { return }
         let relativeTime = frameGate.recordFrame(at: timestamp.seconds)
         detector.processFrame(pixelBuffer, at: relativeTime)
+
+        // Throttle skeleton updates to ~15fps (every other frame)
+        let shouldPublishSkeleton = frameGate.frameProcessedCount % 2 == 0
+        guard shouldPublishSkeleton else { return }
+
+        let jointMap = detector.posePublisher.latestJointMap
+        Task { @MainActor [weak self] in
+            self?.currentJointMap = jointMap
+        }
     }
 
     // MARK: - Swing Detection
@@ -116,8 +130,18 @@ final class RecordingViewModel {
         let clip = SwingClip(from: bounds)
         detectedSwings.append(clip)
         replayingSwingIndex = detectedSwings.count - 1
-        mainViewShowsReplay = false
-        pipDisplayMode = .lastSwingReplay
+        mainViewShowsReplay = true
+        isLoadingReplay = true
+        pipDisplayMode = .liveCamera
+        triggerDetectionAnimation()
+    }
+
+    private func triggerDetectionAnimation() {
+        detectionAnimationActive = true
+        Task {
+            try? await Task.sleep(for: .milliseconds(1500))
+            detectionAnimationActive = false
+        }
     }
 
     // MARK: - Actions
@@ -159,6 +183,7 @@ final class RecordingViewModel {
         recordingURL = url
         detectedSwings.removeAll()
         mainViewShowsReplay = false
+        isLoadingReplay = false
         replayingSwingIndex = nil
         pipDisplayMode = .liveCamera
         detector.reset()
@@ -169,6 +194,7 @@ final class RecordingViewModel {
         guard isRecording else { return }
         frameGate.isCurrentlyRecording = false
         mainViewShowsReplay = false
+        isLoadingReplay = false
         replayingSwingIndex = nil
         state = .finalizingVideo
         cameraService.stopRecording()
@@ -190,19 +216,28 @@ final class RecordingViewModel {
         if replayingSwingIndex == nil {
             replayingSwingIndex = detectedSwings.indices.last
         }
-        pipDisplayMode = .lastSwingReplay
+        mainViewShowsReplay.toggle()
+        isLoadingReplay = mainViewShowsReplay
+        pipDisplayMode = mainViewShowsReplay ? .liveCamera : .lastSwingReplay
     }
 
     func showSwing(at index: Int) {
         guard detectedSwings.indices.contains(index) else { return }
         replayingSwingIndex = index
-        pipDisplayMode = .lastSwingReplay
+        mainViewShowsReplay = true
+        isLoadingReplay = true
+        pipDisplayMode = .liveCamera
     }
 
     func showLiveCamera() {
         mainViewShowsReplay = false
+        isLoadingReplay = false
         replayingSwingIndex = nil
         if lastDetectedSwing != nil { pipDisplayMode = .lastSwingReplay }
+    }
+
+    func replayDidLoad() {
+        isLoadingReplay = false
     }
 
     func toggleFavorite(at index: Int) {
@@ -236,6 +271,7 @@ final class RecordingViewModel {
             recordingURL = nil
             detectedSwings.removeAll()
             mainViewShowsReplay = false
+            isLoadingReplay = false
             replayingSwingIndex = nil
             savedVideo = video
             state = .idle
@@ -252,6 +288,7 @@ final class RecordingViewModel {
         recordingURL = nil
         detectedSwings.removeAll()
         mainViewShowsReplay = false
+        isLoadingReplay = false
         replayingSwingIndex = nil
         state = .idle
     }
@@ -265,6 +302,7 @@ final class RecordingViewModel {
         recordingURL = nil
         detectedSwings.removeAll()
         mainViewShowsReplay = false
+        isLoadingReplay = false
         replayingSwingIndex = nil
         detector.reset()
         state = .idle

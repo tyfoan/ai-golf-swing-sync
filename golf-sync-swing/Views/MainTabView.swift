@@ -29,6 +29,12 @@ struct MainTabView: View {
                     Label("Compare", systemImage: "square.split.2x1.fill")
                 }
                 .tag(2)
+
+            SettingsView()
+                .tabItem {
+                    Label("Settings", systemImage: "gearshape.fill")
+                }
+                .tag(3)
         }
         .tint(.appTeal)
         #if DEBUG

@@ -9,6 +9,24 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- **RevenueCat integration**: PurchaseService singleton with `customerInfoStream` observation, PaywallView, CustomerCenterView
+- **SettingsView**: New Settings tab with subscription management, restore purchases, app version display
+- **PrivacyInfo.xcprivacy**: Privacy manifest declaring UserDefaults API usage (required for App Store submission)
+- **Skeleton overlay**: BodyJointMap, PosePublisher, SkeletonOverlayView, SkeletonToggleButton for real-time pose visualization
+- **Detection border**: DetectionBorderView visual feedback during swing detection
+- **GolfSwingClassifier v3 model tracked in git**: Previously untracked `.mlmodel` now version-controlled
+
+### Changed
+- **FeatureAccess delegates to RevenueCat**: `isUnlocked()` and `isPremiumUser` now check `PurchaseService.shared.isPremium` instead of returning hardcoded `true`
+- **MainTabView**: Added 4th tab (Settings) with `gearshape.fill` icon
+- **PoseExtractor thresholds hardened**: `minimumJointConfidence` 0.1→0.35, `minimumJointCount` 5→8 (prevents garbage data reaching classifier)
+- **App startup resilience**: Replaced `fatalError` in ModelContainer init with graceful in-memory fallback + user-facing error alert
+
+### Fixed
+- **PhaseClassifier crash on shape mismatch**: Added guard validating all frame shapes match before CoreML prediction
+- **fatalError on corrupted persistent store**: App no longer crashes — falls back to in-memory storage with user notification
+
+### Added (previous)
 - **Synced comparison mode**: New `sideBySideSynced` comparison mode — both videos loop aligned at impact point
 - **`ComparisonMode.isSynchronized`**: Distinguishes free (independent loops) vs synced (drift-corrected) playback
 - **`PremiumFeature.synchronizedPlayback`**: Premium gate for synced comparison modes
