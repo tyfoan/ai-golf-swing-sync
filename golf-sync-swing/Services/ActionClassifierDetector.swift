@@ -2,13 +2,13 @@
 //  ActionClassifierDetector.swift
 //  golf-sync-swing
 //
-//  Pose-based swing detector using 4-class Create ML Action Classifier.
+//  Pose-based swing detector using 6-class Create ML Action Classifier.
 //  Angle-independent: works from any camera position (front, side, behind).
 //
 //  Delegates to collaborators:
 //    PoseExtractor      - Vision framework body pose detection
 //    PoseFrameBuffer    - Thread-safe sliding window of pose keypoints
-//    PhaseClassifier    - CoreML 4-class swing phase prediction
+//    PhaseClassifier    - CoreML 6-class swing phase prediction
 //    ImpactDetectionChain - Polymorphic impact detection strategies
 //
 
@@ -20,14 +20,16 @@ final class ActionClassifierDetector: @unchecked Sendable {
 
     // MARK: - Configuration
 
-    private let predictionWindow: Int = 60
-    private let idleStride: Int = 15
-    private let activeStride: Int = 8
+    private let predictionWindow: Int = 15
+    private let idleStride: Int = 8
+    private let activeStride: Int = 2
     private let minDetectionInterval: TimeInterval = 3.0
     private let maxHistorySize: Int = 30
 
     private let backswingLabel = "backswing"
-    private let downswingLabel = "downswing"
+    private let earlyDownswingLabel = "early_downswing"
+    private let lateDownswingLabel = "late_downswing"
+    private let earlyFollowLabel = "early_follow"
     private let followThroughLabel = "follow_through"
 
     // MARK: - Collaborators
@@ -65,7 +67,7 @@ final class ActionClassifierDetector: @unchecked Sendable {
     init(
         poseExtractor: PoseExtracting = PoseExtractor(),
         phaseClassifier: PhaseClassifying = PhaseClassifier(),
-        poseBuffer: PoseFrameBuffer = PoseFrameBuffer(capacity: 60),
+        poseBuffer: PoseFrameBuffer = PoseFrameBuffer(capacity: 15),
         impactChain: ImpactDetectionChain = .default(),
         posePublisher: PosePublisher = PosePublisher()
     ) {
@@ -162,17 +164,20 @@ final class ActionClassifierDetector: @unchecked Sendable {
             predictionHistory.removeFirst()
         }
 
-        let isActiveSwing = (record.label == downswingLabel || record.label == followThroughLabel || record.label == backswingLabel)
+        let swingLabels = [backswingLabel, earlyDownswingLabel, lateDownswingLabel, earlyFollowLabel, followThroughLabel]
+        let isActiveSwing = swingLabels.contains(record.label)
         isTrackingSwing = isActiveSwing
         classificationStride = isActiveSwing ? activeStride : idleStride
         lock.unlock()
 
         onPhaseChanged?(record.label, confidence)
 
-        let pDown = record.probabilities[downswingLabel] ?? 0
-        let pFollow = record.probabilities[followThroughLabel] ?? 0
         let pBack = record.probabilities[backswingLabel] ?? 0
-        AppLogger.detection.debug("ActionClassifier[\(currentCount)]: \(record.label) (\(Int(confidence * 100))%)  back=\(Int(pBack * 100)) down=\(Int(pDown * 100)) follow=\(Int(pFollow * 100))")
+        let pEDown = record.probabilities[earlyDownswingLabel] ?? 0
+        let pLDown = record.probabilities[lateDownswingLabel] ?? 0
+        let pEFol = record.probabilities[earlyFollowLabel] ?? 0
+        let pFol = record.probabilities[followThroughLabel] ?? 0
+        AppLogger.detection.debug("ActionClassifier[\(currentCount)]: \(record.label) (\(Int(confidence * 100))%)  back=\(Int(pBack * 100)) eDown=\(Int(pEDown * 100)) lDown=\(Int(pLDown * 100)) eFol=\(Int(pEFol * 100)) fol=\(Int(pFol * 100))")
 
         checkForImpact()
     }

@@ -11,6 +11,7 @@ import os
 struct golf_sync_swingApp: App {
     @State private var showDataError = false
     @State private var dataErrorMessage = ""
+    @State private var showOnboarding: Bool
 
     private let sharedModelContainer: ModelContainer
 
@@ -40,6 +41,8 @@ struct golf_sync_swingApp: App {
             self._dataErrorMessage = State(initialValue: "Unable to save data permanently. Your recordings may not persist between sessions.")
         }
 
+        self._showOnboarding = State(initialValue: !OnboardingService.shared.hasCompletedOnboarding)
+
         PurchaseService.shared.configure()
         VideoPathMigrationService.migrateIfNeeded(modelContainer: sharedModelContainer)
         VideoExportService.cleanupOrphanedExports()
@@ -47,7 +50,7 @@ struct golf_sync_swingApp: App {
 
     var body: some Scene {
         WindowGroup {
-            MainTabView()
+            rootView
                 .alert("Data Error", isPresented: $showDataError) {
                     Button("OK") { }
                 } message: {
@@ -55,5 +58,18 @@ struct golf_sync_swingApp: App {
                 }
         }
         .modelContainer(sharedModelContainer)
+    }
+
+    @ViewBuilder
+    private var rootView: some View {
+        if showOnboarding {
+            OnboardingView {
+                withAnimation {
+                    showOnboarding = false
+                }
+            }
+        } else {
+            MainTabView()
+        }
     }
 }

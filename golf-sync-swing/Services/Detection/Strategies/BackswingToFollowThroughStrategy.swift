@@ -2,8 +2,8 @@
 //  BackswingToFollowThroughStrategy.swift
 //  golf-sync-swing
 //
-//  Fallback impact detection for fast swings where the downswing phase
-//  is too brief (~150ms) to register: backswing->follow_through transition.
+//  Fallback impact detection for fast swings where the downswing phases
+//  are too brief to register: backswing->follow_through transition.
 //
 
 import Foundation
@@ -24,7 +24,7 @@ struct BackswingToFollowThroughStrategy: ImpactDetectionStrategy {
 
         for record in history {
             let pBack = record.probabilities["backswing"] ?? 0
-            let pFollow = record.probabilities["follow_through"] ?? 0
+            let pFollow = followProbability(record)
 
             if pBack >= backswingThreshold {
                 lastBackswingRecord = record
@@ -39,7 +39,7 @@ struct BackswingToFollowThroughStrategy: ImpactDetectionStrategy {
         guard let backPred = lastBackswingRecord,
               let followPred = firstFollowRecord else { return nil }
 
-        let peakFollow = followPred.probabilities["follow_through"] ?? 0
+        let peakFollow = followProbability(followPred)
         guard peakFollow >= followThroughThreshold else { return nil }
 
         let impactTime = (backPred.timestamp + followPred.windowStart) / 2.0
@@ -57,5 +57,11 @@ struct BackswingToFollowThroughStrategy: ImpactDetectionStrategy {
         )
 
         return ImpactCandidate(swingBounds: bounds, strategy: name)
+    }
+
+    private func followProbability(_ record: PredictionRecord) -> Double {
+        let pFollow = record.probabilities["follow_through"] ?? 0
+        let pEarlyFollow = record.probabilities["early_follow"] ?? 0
+        return pFollow + pEarlyFollow
     }
 }

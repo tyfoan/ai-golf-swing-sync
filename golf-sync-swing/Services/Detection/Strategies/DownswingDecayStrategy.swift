@@ -2,7 +2,7 @@
 //  DownswingDecayStrategy.swift
 //  golf-sync-swing
 //
-//  Detects backswing->downswing->no_swing pattern.
+//  Detects downswing->noswing pattern.
 //  Common from front-facing cameras where the follow_through pose isn't recognized.
 //
 
@@ -12,8 +12,8 @@ struct DownswingDecayStrategy: ImpactDetectionStrategy {
 
     var name: String { "downswing-decay" }
 
-    private let downswingThreshold: Double = 0.30
-    private let minPeakDownswing: Double = 0.40
+    private let downswingThreshold: Double = 0.25
+    private let minPeakDownswing: Double = 0.35
     private let preSwingBuffer: TimeInterval = 0.8
     private let postSwingBuffer: TimeInterval = 0.8
     private let maxHalfDuration: TimeInterval = 2.0
@@ -23,23 +23,23 @@ struct DownswingDecayStrategy: ImpactDetectionStrategy {
         var confirmedByNoSwing = false
 
         for record in history {
-            let pDown = record.probabilities["downswing"] ?? 0
+            let pDown = downswingProbability(record)
             let pBack = record.probabilities["backswing"] ?? 0
 
             if pDown >= downswingThreshold {
                 lastDownswingRecord = record
                 confirmedByNoSwing = false
-            } else if lastDownswingRecord != nil && record.label == "no_swing" && pBack < 0.3 {
+            } else if lastDownswingRecord != nil && record.label == "noswing" && pBack < 0.3 {
                 confirmedByNoSwing = true
             }
         }
 
         guard let downPred = lastDownswingRecord, confirmedByNoSwing else { return nil }
 
-        let peakDown = downPred.probabilities["downswing"] ?? 0
+        let peakDown = downswingProbability(downPred)
         guard peakDown >= minPeakDownswing else { return nil }
 
-        let impactTime = downPred.timestamp - 0.2
+        let impactTime = downPred.timestamp - 0.1
         let swingStart = findSwingStart(in: history, before: downPred.timestamp)
 
         let clampedStart = max(impactTime - maxHalfDuration, swingStart - preSwingBuffer)
@@ -50,11 +50,17 @@ struct DownswingDecayStrategy: ImpactDetectionStrategy {
             impactTime: impactTime,
             endTime: clampedEnd,
             confidence: peakDown * 0.6,
-            detectionTime: downPred.timestamp + 1.0,
+            detectionTime: downPred.timestamp + 0.5,
             audioConfirmed: false
         )
 
         return ImpactCandidate(swingBounds: bounds, strategy: name)
+    }
+
+    private func downswingProbability(_ record: PredictionRecord) -> Double {
+        let pEarly = record.probabilities["early_downswing"] ?? 0
+        let pLate = record.probabilities["late_downswing"] ?? 0
+        return pEarly + pLate
     }
 
     private func findSwingStart(in history: [PredictionRecord], before cutoff: TimeInterval) -> TimeInterval {

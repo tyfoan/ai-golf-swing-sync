@@ -21,7 +21,14 @@ final class PurchaseService {
     private(set) var isConfigured = false
 
     static let entitlementID = "Golf Swing Sync Premium"
+
+    // TODO: Replace with production API key before App Store submission
+    // Production keys start with "appl_" — test keys start with "test_"
+    #if DEBUG
     static let apiKey = "test_MXPuGlggjlfQHxlnRQsOUthWyYo"
+    #else
+    static let apiKey = "test_MXPuGlggjlfQHxlnRQsOUthWyYo" // REPLACE with production key
+    #endif
 
     private init() {}
 

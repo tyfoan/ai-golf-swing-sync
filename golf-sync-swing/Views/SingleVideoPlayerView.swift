@@ -98,22 +98,19 @@ private extension SingleVideoPlayerView {
         .padding(.top, 8)
     }
 
-    @ViewBuilder
     func swingsSection(vm: VideoPlayerViewModel) -> some View {
-        if playbackMode == .swingsOnly {
-            SwingDetectionPanel(
-                video: video,
-                selectedSwingId: selectedSwingId,
-                isAnalyzing: detector.isAnalyzing,
-                analysisProgress: detector.progress,
-                analysisStatus: detector.status,
-                onAddNew: { editingSwing = nil; showSwingEditor = true },
-                onEditSelected: { editSelectedSwing() },
-                onSwingTap: { swing in selectSwing(swing, vm: vm) }
-            )
-            .padding(.top, 6)
-            .padding(.bottom, 16)
-        }
+        SwingDetectionPanel(
+            video: video,
+            selectedSwingId: selectedSwingId,
+            isAnalyzing: detector.isAnalyzing,
+            analysisProgress: detector.progress,
+            analysisStatus: detector.status,
+            onAddNew: { editingSwing = nil; showSwingEditor = true },
+            onEditSelected: { editSelectedSwing() },
+            onSwingTap: { swing in selectSwing(swing, vm: vm) }
+        )
+        .padding(.top, 6)
+        .padding(.bottom, 16)
     }
 
     @ViewBuilder
@@ -185,14 +182,18 @@ private extension SingleVideoPlayerView {
         if let existing = editingSwing {
             existing.updateTimes(start: start, contact: contact, end: end)
             existing.isAutoDetected = false
+            showSwingEditor = false
+            editingSwing = nil
         } else {
             let swing = SwingMarker(startTime: start, contactTime: contact, endTime: end)
             swing.video = video
             video.swings.append(swing)
             modelContext.insert(swing)
+            showSwingEditor = false
+            editingSwing = nil
+            playbackMode = .swingsOnly
+            if let vm = viewModel { selectSwing(swing, vm: vm) }
         }
-        showSwingEditor = false
-        editingSwing = nil
     }
 
     func deleteCurrentSwing() {

@@ -9,6 +9,24 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- **Onboarding flow**: 3-page onboarding (Welcome, Auto-Sync, Pro Benefits) with animated icons, highlight lists, page indicators, skip button
+- **Custom paywall**: Full-screen paywall with animated hero, feature list, weekly/annual subscription options, savings badge, free trial detection
+- **OnboardingService**: First-launch detection and onboarding completion state via UserDefaults
+- **ReviewPromptService**: StoreKit review prompt after 3rd swing detection, once per app version
+- **Feature gate paywall triggers**: Tapping locked comparison modes or HD export now presents paywall instead of being disabled
+- **PremiumBadge component**: Reusable "PRO" badge for locked features
+- **FeatureGateModifier**: Reusable view modifier for presenting paywall on premium feature access
+- **Legal links in Settings**: Terms of Use (Apple EULA) and Privacy Policy links
+- **Debug: Reset Onboarding**: Debug-only button in Settings to re-show onboarding
+
+### Changed
+- **App entry point**: Shows OnboardingView on first launch, MainTabView on subsequent launches
+- **SettingsView paywall**: Now uses custom AppPaywallView instead of RevenueCatUI default PaywallView
+- **ComparisonView mode picker**: Locked modes now open paywall instead of being disabled
+- **ExportProgressView**: Locked quality options now open paywall on tap
+- **PurchaseService API key**: Conditional compilation for DEBUG vs RELEASE keys
+- **PrivacyInfo.xcprivacy**: Added file timestamp API declaration (C617.1)
+
 - **RevenueCat integration**: PurchaseService singleton with `customerInfoStream` observation, PaywallView, CustomerCenterView
 - **SettingsView**: New Settings tab with subscription management, restore purchases, app version display
 - **PrivacyInfo.xcprivacy**: Privacy manifest declaring UserDefaults API usage (required for App Store submission)

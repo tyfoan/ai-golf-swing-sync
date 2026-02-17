@@ -26,8 +26,8 @@ struct SettingsView: View {
                 aboutSection
             }
             .navigationTitle("Settings")
-            .sheet(isPresented: $showPaywall) {
-                PaywallView(displayCloseButton: true)
+            .fullScreenCover(isPresented: $showPaywall) {
+                AppPaywallView(source: .settings, onDismiss: { showPaywall = false })
             }
             .sheet(isPresented: $showCustomerCenter) {
                 CustomerCenterView()
@@ -68,6 +68,37 @@ struct SettingsView: View {
             }
         } header: {
             Text("About")
+        }
+
+        legalSection
+
+        #if DEBUG
+        DebugSettingsSection()
+        #endif
+    }
+
+    private var legalSection: some View {
+        Section {
+            Link(destination: URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!) {
+                HStack {
+                    Text("Terms of Use")
+                    Spacer()
+                    Image(systemName: "arrow.up.forward")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            Link(destination: URL(string: "https://golfswingsync.app/privacy")!) {
+                HStack {
+                    Text("Privacy Policy")
+                    Spacer()
+                    Image(systemName: "arrow.up.forward")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        } header: {
+            Text("Legal")
         }
     }
 

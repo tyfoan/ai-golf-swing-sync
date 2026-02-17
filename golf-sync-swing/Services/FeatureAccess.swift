@@ -19,10 +19,16 @@ enum PremiumFeature: String, CaseIterable {
 
 struct FeatureAccess {
     static func isUnlocked(_ feature: PremiumFeature) -> Bool {
-        PurchaseService.shared.isPremium
+        #if DEBUG
+        if ScreenshotModeService.shared.isEnabled { return true }
+        #endif
+        return PurchaseService.shared.isPremium
     }
 
     static var isPremiumUser: Bool {
-        PurchaseService.shared.isPremium
+        #if DEBUG
+        if ScreenshotModeService.shared.isEnabled { return true }
+        #endif
+        return PurchaseService.shared.isPremium
     }
 }

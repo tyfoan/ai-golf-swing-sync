@@ -21,6 +21,7 @@ struct ComparisonView: View {
     @State private var exportProgress: Float = 0
     @State private var isExporting = false
     @State private var showDoneSheet = false
+    @State private var showPaywall = false
 
     var body: some View {
         ZStack {
@@ -41,6 +42,9 @@ struct ComparisonView: View {
             Button("Export Video") { showExportSheet = true }
             Button("Done") { dismiss() }
             Button("Cancel", role: .cancel) { }
+        }
+        .fullScreenCover(isPresented: $showPaywall) {
+            AppPaywallView(source: .featureGate, onDismiss: { showPaywall = false })
         }
     }
 }
@@ -132,10 +136,11 @@ private extension ComparisonView {
                 }
             }
         } else {
-            Button { } label: {
+            Button {
+                showPaywall = true
+            } label: {
                 Label("\(mode.rawValue) (Pro)", systemImage: "lock.fill")
             }
-            .disabled(true)
         }
     }
 

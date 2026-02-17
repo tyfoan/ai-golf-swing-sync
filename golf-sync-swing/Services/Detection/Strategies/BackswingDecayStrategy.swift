@@ -2,9 +2,9 @@
 //  BackswingDecayStrategy.swift
 //  golf-sync-swing
 //
-//  Detects backswing->no_swing when the swing is too fast for the model
+//  Detects backswing->noswing when the swing is too fast for the model
 //  to register downswing or follow_through. Requires residual swing signal
-//  in the confirming no_swing prediction to reduce false positives.
+//  in the confirming noswing prediction to reduce false positives.
 //
 
 import Foundation
@@ -25,14 +25,12 @@ struct BackswingDecayStrategy: ImpactDetectionStrategy {
 
         for record in history {
             let pBack = record.probabilities["backswing"] ?? 0
-            let pDown = record.probabilities["downswing"] ?? 0
-            let pFollow = record.probabilities["follow_through"] ?? 0
 
             if pBack >= minBackswingProb {
                 lastBackswingRecord = record
                 confirmingRecord = nil
-            } else if lastBackswingRecord != nil && record.label == "no_swing" {
-                let swingResidual = pDown + pFollow
+            } else if lastBackswingRecord != nil && record.label == "noswing" {
+                let swingResidual = swingProbability(record)
                 if swingResidual >= minSwingResidual && confirmingRecord == nil {
                     confirmingRecord = record
                 }
@@ -58,5 +56,13 @@ struct BackswingDecayStrategy: ImpactDetectionStrategy {
         )
 
         return ImpactCandidate(swingBounds: bounds, strategy: name)
+    }
+
+    private func swingProbability(_ record: PredictionRecord) -> Double {
+        let pEDown = record.probabilities["early_downswing"] ?? 0
+        let pLDown = record.probabilities["late_downswing"] ?? 0
+        let pEFol = record.probabilities["early_follow"] ?? 0
+        let pFol = record.probabilities["follow_through"] ?? 0
+        return pEDown + pLDown + pEFol + pFol
     }
 }

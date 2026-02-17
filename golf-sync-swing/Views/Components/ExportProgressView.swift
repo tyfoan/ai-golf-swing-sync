@@ -16,6 +16,7 @@ struct ExportProgressView: View {
     @State private var showShareSheet = false
     @State private var savedToPhotos = false
     @State private var selectedQuality: ExportQuality = .standard
+    @State private var showPaywall = false
 
     var body: some View {
         NavigationStack {
@@ -33,6 +34,9 @@ struct ExportProgressView: View {
             }
         }
         .presentationDetents([.medium])
+        .fullScreenCover(isPresented: $showPaywall) {
+            AppPaywallView(source: .featureGate, onDismiss: { showPaywall = false })
+        }
     }
 }
 
@@ -84,7 +88,10 @@ private extension ExportProgressView {
     func qualityRow(_ quality: ExportQuality) -> some View {
         let locked = quality.requiresPremium && !FeatureAccess.isUnlocked(.exportHD)
         return Button {
-            guard !locked else { return }
+            guard !locked else {
+                showPaywall = true
+                return
+            }
             selectedQuality = quality
         } label: {
             HStack {

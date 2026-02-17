@@ -58,7 +58,6 @@ final class VideoSyncEngine {
         return detectedSwings.map { swing in
             SwingDetectionResult(
                 impactTime: swing.impactTime, impactConfidence: swing.confidence,
-                topOfBackswingTime: nil, topOfBackswingConfidence: 0,
                 startTime: max(0, swing.startTime), endTime: min(duration, swing.endTime)
             )
         }

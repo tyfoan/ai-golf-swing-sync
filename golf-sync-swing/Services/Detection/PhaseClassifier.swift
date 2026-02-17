@@ -2,7 +2,7 @@
 //  PhaseClassifier.swift
 //  golf-sync-swing
 //
-//  Wraps the CoreML GolfSwingClassifier model for 4-class swing phase prediction.
+//  Wraps the CoreML Action Classifier model for 6-class swing phase prediction.
 //  Input: sliding window of pose keypoints -> Output: phase label + probabilities.
 //
 
@@ -34,7 +34,7 @@ final class PhaseClassifier: PhaseClassifying, @unchecked Sendable {
         let config = MLModelConfiguration()
         config.computeUnits = .all
 
-        let modelNames = ["GolfSwingClassifier_v3", "GolfSwingClassifier_v2", "GolfSwingClassifier"]
+        let modelNames = ["GolfSwingClassifier_6class", "GolfSwingClassifier_v3", "GolfSwingClassifier_v2", "GolfSwingClassifier"]
         for name in modelNames {
             if let url = Bundle.main.url(forResource: name, withExtension: "mlmodelc") {
                 do {

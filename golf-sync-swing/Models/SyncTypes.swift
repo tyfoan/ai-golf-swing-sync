@@ -23,8 +23,6 @@ struct SwingTimeRange: Hashable {
 struct SwingDetectionResult {
     let impactTime: TimeInterval?
     let impactConfidence: Double
-    let topOfBackswingTime: TimeInterval?
-    let topOfBackswingConfidence: Double
     let startTime: TimeInterval?
     let endTime: TimeInterval?
 

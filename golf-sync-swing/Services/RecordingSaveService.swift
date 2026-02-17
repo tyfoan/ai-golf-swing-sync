@@ -48,6 +48,8 @@ struct RecordingSaveService {
         try modelContext.save()
         try? FileManager.default.removeItem(at: sourceURL)
 
+        ReviewPromptService.shared.recordSwingDetected()
+
         return video
     }
 }

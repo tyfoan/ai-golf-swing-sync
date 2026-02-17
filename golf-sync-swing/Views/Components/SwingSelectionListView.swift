@@ -43,13 +43,31 @@ struct SwingSelectionListView: View {
                 .font(.caption).foregroundStyle(.secondary)
                 .padding(.leading, 4)
         } else {
-            swingThumbnailStrip(for: video)
+            VStack(alignment: .leading, spacing: 6) {
+                videoTimeLabel(for: video)
+                swingThumbnailStrip(for: video)
+            }
         }
+    }
+
+    private func videoTimeLabel(for video: SwingVideo) -> some View {
+        HStack(spacing: 4) {
+            Image(systemName: "clock")
+                .font(.system(size: 10))
+                .foregroundStyle(Color.charcoal.opacity(0.35))
+            Text(Self.timeFormatter.string(from: video.createdAt))
+                .font(.caption).foregroundStyle(Color.charcoal.opacity(0.5))
+            Text("\u{2022}")
+                .font(.caption2).foregroundStyle(Color.charcoal.opacity(0.25))
+            Text("\(video.swings.count) swing\(video.swings.count == 1 ? "" : "s")")
+                .font(.caption).foregroundStyle(Color.charcoal.opacity(0.5))
+        }
+        .padding(.leading, 2)
     }
 
     private func swingThumbnailStrip(for video: SwingVideo) -> some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
+            HStack(spacing: 12) {
                 ForEach(Array(video.swings.enumerated()), id: \.element.id) { idx, swing in
                     SwingThumbnailView(
                         video: video, swing: swing, index: idx + 1,
@@ -59,8 +77,18 @@ struct SwingSelectionListView: View {
                     .onTapGesture { onSwingTap(swing, video) }
                 }
             }
+            .padding(.vertical, 4)
         }
     }
+
+    // MARK: - Formatters
+
+    private static let timeFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.timeStyle = .short
+        f.dateStyle = .none
+        return f
+    }()
 
     // MARK: - Selection Queries
 

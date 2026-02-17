@@ -15,6 +15,8 @@
 		88649EF22F32386700DB5D4D /* milestone-4-monetization.md in Resources */ = {isa = PBXBuildFile; fileRef = 88649EEA2F32386700DB5D4D /* milestone-4-monetization.md */; };
 		88649EF32F32386700DB5D4D /* project_status.md in Resources */ = {isa = PBXBuildFile; fileRef = 88649EE62F32386700DB5D4D /* project_status.md */; };
 		88649EF42F32386700DB5D4D /* project_spec.md in Resources */ = {isa = PBXBuildFile; fileRef = 88649EEC2F32386700DB5D4D /* project_spec.md */; };
+		88B37B602F3FDF6700DDB85A /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 886500012F35A00100DB5D4D /* RevenueCat */; };
+		88B37B612F3FDF6700DDB85A /* RevenueCatUI in Frameworks */ = {isa = PBXBuildFile; productRef = 886500022F35A00100DB5D4D /* RevenueCatUI */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -71,6 +73,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				88B37B612F3FDF6700DDB85A /* RevenueCatUI in Frameworks */,
+				88B37B602F3FDF6700DDB85A /* RevenueCat in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -670,7 +674,6 @@
 			productName = RevenueCatUI;
 		};
 /* End XCSwiftPackageProductDependency section */
-
 	};
 	rootObject = 88649A262F2C322400DB5D4D /* Project object */;
 }
