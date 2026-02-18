@@ -1,0 +1,44 @@
+# Xcode build artifacts
+.derivedData/
+DerivedData/
+build/
+*.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+*.xcuserstate
+
+# macOS metadata
+.DS_Store
+**/.DS_Store
+
+# ML training pipeline (70 GB of videos, datasets, venvs)
+ml-training/youtube_videos/
+ml-training/training_data*/
+ml-training/venv/
+ml-training/__pycache__/
+ml-training/golfdb_repo/
+ml-training/golfdb/
+ml-training/MyActionClassifier.mlproj/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.venv/
+
+# Playwright MCP debug logs
+.playwright-mcp/
+
+# Claude Code local config
+.claude/settings.local.json
+
+# SPM
+.build/
+
+# Misc
+*.swp
+*.swo
+*~
+*.bak
+*.orig
+*.tmp

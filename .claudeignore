@@ -1,0 +1,51 @@
+# Build artifacts & caches
+.derivedData/
+DerivedData/
+build/
+*.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+
+# Xcode project binary (pbxproj is useful but xcuserstate is not)
+*.xcuserstate
+
+# ML training pipeline (70 GB — not app code)
+ml-training/
+
+# ML model binaries (Claude can't read these)
+*.mlmodel
+*.mlmodelc
+*.mlpackage/
+
+# Demo videos (binary, not useful for code context)
+golf-sync-swing/DemoVideos/
+
+# Asset catalog images (binary)
+*.imageset/*.png
+*.imageset/*.jpg
+*.appiconset/*.png
+
+# Obsolete scripts (superseded by ml-training/extract_5class_dataset.py)
+scripts/
+
+# Completed plans (historical, not active)
+plans/
+
+# macOS metadata
+.DS_Store
+
+# Playwright MCP logs
+.playwright-mcp/
+
+# Python artifacts
+__pycache__/
+*.pyc
+venv/
+
+# Git internals
+.git/
+
+# SPM build
+.build/
+
+# Package resolution (lock file, not code)
+Package.resolved
