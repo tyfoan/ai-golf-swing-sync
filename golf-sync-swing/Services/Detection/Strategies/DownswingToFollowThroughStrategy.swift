@@ -12,21 +12,27 @@ struct DownswingToFollowThroughStrategy: ImpactDetectionStrategy {
 
     var name: String { "phase-transition" }
 
-    private let lateDownswingThreshold: Double = 0.25
-    private let earlyFollowThreshold: Double = 0.25
-    private let minSwingConfidence: Double = 0.35
+    private let config: DetectorConfiguration
     private let crossoverMinProb: Double = 0.05
     private let preSwingBuffer: TimeInterval = 0.8
     private let postSwingBuffer: TimeInterval = 0.8
     private let maxHalfDuration: TimeInterval = 2.0
-    private let predictionWindow: Int = 15
+
+    private var primaryDownswingThreshold: Double { config.thresholds.primaryDownswing }
+    private var primaryFollowThreshold: Double { config.thresholds.primaryFollow }
+    private var aggregateDownswingThreshold: Double { config.thresholds.aggregateDownswing }
+    private var minSwingConfidence: Double { config.thresholds.minSwingConfidence }
+
+    init(configuration: DetectorConfiguration) {
+        self.config = configuration
+    }
 
     func detectImpact(in history: [PredictionRecord]) -> ImpactCandidate? {
         let transition = findTransition(in: history)
         guard let transition else { return nil }
 
-        let peakDown = transition.downswingRecord.probabilities["late_downswing"] ?? 0
-        let peakFollow = transition.followThroughRecord.probabilities["early_follow"] ?? 0
+        let peakDown = transition.downswingRecord.probabilities[config.primaryDownswingLabel] ?? 0
+        let peakFollow = transition.followThroughRecord.probabilities[config.primaryFollowLabel] ?? 0
         guard (peakDown + peakFollow) >= minSwingConfidence else { return nil }
 
         let impactTime = estimateImpactTime(from: history, fallbackDown: transition.downswingRecord)
@@ -59,16 +65,14 @@ struct DownswingToFollowThroughStrategy: ImpactDetectionStrategy {
         var firstFollow: PredictionRecord?
 
         for record in history {
-            let pLateDown = record.probabilities["late_downswing"] ?? 0
-            let pEarlyDown = record.probabilities["early_downswing"] ?? 0
-            let pEarlyFollow = record.probabilities["early_follow"] ?? 0
+            let pPrimaryDown = record.probabilities[config.primaryDownswingLabel] ?? 0
+            let pDownswingAggregate = aggregateDownswing(record)
+            let pPrimaryFollow = record.probabilities[config.primaryFollowLabel] ?? 0
 
-            let pDownswing = pLateDown + pEarlyDown
-
-            if pLateDown >= lateDownswingThreshold || pDownswing >= 0.40 {
+            if pPrimaryDown >= primaryDownswingThreshold || pDownswingAggregate >= aggregateDownswingThreshold {
                 lastDownswing = record
                 firstFollow = nil
-            } else if pEarlyFollow >= earlyFollowThreshold && lastDownswing != nil {
+            } else if pPrimaryFollow >= primaryFollowThreshold && lastDownswing != nil {
                 if firstFollow == nil {
                     firstFollow = record
                 }
@@ -82,7 +86,7 @@ struct DownswingToFollowThroughStrategy: ImpactDetectionStrategy {
     // MARK: - Impact Time Estimation (crossover interpolation)
 
     private func estimateImpactTime(from history: [PredictionRecord], fallbackDown: PredictionRecord) -> TimeInterval {
-        let windowDuration = Double(predictionWindow) / 30.0
+        let windowDuration = Double(config.predictionWindow) / 30.0
         let estimates = collectCrossoverEstimates(from: history, windowDuration: windowDuration)
 
         guard !estimates.isEmpty else {
@@ -92,7 +96,7 @@ struct DownswingToFollowThroughStrategy: ImpactDetectionStrategy {
         return weightedAverage(estimates)
     }
 
-    /// Each record where both P(late_downswing) and P(early_follow) are non-zero
+    /// Each record where both P(primaryDownswing) and P(primaryFollow) are non-zero
     /// gives an independent impact estimate. Records closer to the 50/50
     /// crossover are weighted higher — they straddle the impact frame most evenly.
     private func collectCrossoverEstimates(
@@ -102,8 +106,8 @@ struct DownswingToFollowThroughStrategy: ImpactDetectionStrategy {
         var estimates: [(time: TimeInterval, weight: Double)] = []
 
         for record in history {
-            let pDown = record.probabilities["late_downswing"] ?? 0
-            let pFollow = record.probabilities["early_follow"] ?? 0
+            let pDown = record.probabilities[config.primaryDownswingLabel] ?? 0
+            let pFollow = record.probabilities[config.primaryFollowLabel] ?? 0
             let total = pDown + pFollow
 
             guard total > minSwingConfidence else { continue }
@@ -129,11 +133,15 @@ struct DownswingToFollowThroughStrategy: ImpactDetectionStrategy {
     private func findSwingStart(in history: [PredictionRecord], before cutoff: TimeInterval) -> TimeInterval {
         var earliest = cutoff
         for record in history where record.timestamp <= cutoff {
-            let pBack = record.probabilities["backswing"] ?? 0
-            if pBack >= 0.3 && record.windowStart < earliest {
+            let pBack = record.probabilities[config.backswingLabel] ?? 0
+            if pBack >= 0.10 && record.windowStart < earliest {
                 earliest = record.windowStart
             }
         }
         return earliest
+    }
+
+    private func aggregateDownswing(_ record: PredictionRecord) -> Double {
+        config.downswingLabels.reduce(0.0) { $0 + (record.probabilities[$1] ?? 0) }
     }
 }

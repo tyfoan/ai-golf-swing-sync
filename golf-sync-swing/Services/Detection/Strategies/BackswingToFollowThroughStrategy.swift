@@ -12,19 +12,25 @@ struct BackswingToFollowThroughStrategy: ImpactDetectionStrategy {
 
     var name: String { "backswing-fallback" }
 
-    private let backswingThreshold: Double = 0.40
-    private let followThroughThreshold: Double = 0.30
+    private let config: DetectorConfiguration
     private let preSwingBuffer: TimeInterval = 0.8
     private let postSwingBuffer: TimeInterval = 0.8
     private let maxHalfDuration: TimeInterval = 2.0
+
+    private var backswingThreshold: Double { config.thresholds.backswing }
+    private var followThroughThreshold: Double { config.thresholds.followThrough }
+
+    init(configuration: DetectorConfiguration) {
+        self.config = configuration
+    }
 
     func detectImpact(in history: [PredictionRecord]) -> ImpactCandidate? {
         var lastBackswingRecord: PredictionRecord?
         var firstFollowRecord: PredictionRecord?
 
         for record in history {
-            let pBack = record.probabilities["backswing"] ?? 0
-            let pFollow = followProbability(record)
+            let pBack = record.probabilities[config.backswingLabel] ?? 0
+            let pFollow = aggregateFollow(record)
 
             if pBack >= backswingThreshold {
                 lastBackswingRecord = record
@@ -39,7 +45,7 @@ struct BackswingToFollowThroughStrategy: ImpactDetectionStrategy {
         guard let backPred = lastBackswingRecord,
               let followPred = firstFollowRecord else { return nil }
 
-        let peakFollow = followProbability(followPred)
+        let peakFollow = aggregateFollow(followPred)
         guard peakFollow >= followThroughThreshold else { return nil }
 
         let impactTime = (backPred.timestamp + followPred.windowStart) / 2.0
@@ -59,9 +65,7 @@ struct BackswingToFollowThroughStrategy: ImpactDetectionStrategy {
         return ImpactCandidate(swingBounds: bounds, strategy: name)
     }
 
-    private func followProbability(_ record: PredictionRecord) -> Double {
-        let pFollow = record.probabilities["follow_through"] ?? 0
-        let pEarlyFollow = record.probabilities["early_follow"] ?? 0
-        return pFollow + pEarlyFollow
+    private func aggregateFollow(_ record: PredictionRecord) -> Double {
+        config.followThroughLabels.reduce(0.0) { $0 + (record.probabilities[$1] ?? 0) }
     }
 }

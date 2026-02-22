@@ -12,31 +12,37 @@ struct DownswingDecayStrategy: ImpactDetectionStrategy {
 
     var name: String { "downswing-decay" }
 
-    private let downswingThreshold: Double = 0.25
-    private let minPeakDownswing: Double = 0.35
+    private let config: DetectorConfiguration
     private let preSwingBuffer: TimeInterval = 0.8
     private let postSwingBuffer: TimeInterval = 0.8
     private let maxHalfDuration: TimeInterval = 2.0
+
+    private var downswingThreshold: Double { config.thresholds.downswingDecay }
+    private var minPeakDownswing: Double { config.thresholds.minPeakDownswing }
+
+    init(configuration: DetectorConfiguration) {
+        self.config = configuration
+    }
 
     func detectImpact(in history: [PredictionRecord]) -> ImpactCandidate? {
         var lastDownswingRecord: PredictionRecord?
         var confirmedByNoSwing = false
 
         for record in history {
-            let pDown = downswingProbability(record)
-            let pBack = record.probabilities["backswing"] ?? 0
+            let pDown = aggregateDownswing(record)
+            let pBack = record.probabilities[config.backswingLabel] ?? 0
 
             if pDown >= downswingThreshold {
                 lastDownswingRecord = record
                 confirmedByNoSwing = false
-            } else if lastDownswingRecord != nil && record.label == "noswing" && pBack < 0.3 {
+            } else if lastDownswingRecord != nil && record.label == config.noSwingLabel && pBack < 0.15 {
                 confirmedByNoSwing = true
             }
         }
 
         guard let downPred = lastDownswingRecord, confirmedByNoSwing else { return nil }
 
-        let peakDown = downswingProbability(downPred)
+        let peakDown = aggregateDownswing(downPred)
         guard peakDown >= minPeakDownswing else { return nil }
 
         let impactTime = downPred.timestamp - 0.1
@@ -57,17 +63,15 @@ struct DownswingDecayStrategy: ImpactDetectionStrategy {
         return ImpactCandidate(swingBounds: bounds, strategy: name)
     }
 
-    private func downswingProbability(_ record: PredictionRecord) -> Double {
-        let pEarly = record.probabilities["early_downswing"] ?? 0
-        let pLate = record.probabilities["late_downswing"] ?? 0
-        return pEarly + pLate
+    private func aggregateDownswing(_ record: PredictionRecord) -> Double {
+        config.downswingLabels.reduce(0.0) { $0 + (record.probabilities[$1] ?? 0) }
     }
 
     private func findSwingStart(in history: [PredictionRecord], before cutoff: TimeInterval) -> TimeInterval {
         var earliest = cutoff
         for record in history where record.timestamp <= cutoff {
-            let pBack = record.probabilities["backswing"] ?? 0
-            if pBack >= 0.3 && record.windowStart < earliest {
+            let pBack = record.probabilities[config.backswingLabel] ?? 0
+            if pBack >= 0.10 && record.windowStart < earliest {
                 earliest = record.windowStart
             }
         }

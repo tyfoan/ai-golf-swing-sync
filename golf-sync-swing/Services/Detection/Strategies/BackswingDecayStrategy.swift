@@ -13,25 +13,31 @@ struct BackswingDecayStrategy: ImpactDetectionStrategy {
 
     var name: String { "backswing-decay" }
 
-    private let minBackswingProb: Double = 0.50
+    private let config: DetectorConfiguration
     private let minSwingResidual: Double = 0.05
     private let preSwingBuffer: TimeInterval = 0.8
     private let postSwingBuffer: TimeInterval = 0.8
     private let maxHalfDuration: TimeInterval = 2.0
+
+    private var minBackswingProb: Double { config.thresholds.minBackswingProb }
+
+    init(configuration: DetectorConfiguration) {
+        self.config = configuration
+    }
 
     func detectImpact(in history: [PredictionRecord]) -> ImpactCandidate? {
         var lastBackswingRecord: PredictionRecord?
         var confirmingRecord: PredictionRecord?
 
         for record in history {
-            let pBack = record.probabilities["backswing"] ?? 0
+            let pBack = record.probabilities[config.backswingLabel] ?? 0
 
             if pBack >= minBackswingProb {
                 lastBackswingRecord = record
                 confirmingRecord = nil
-            } else if lastBackswingRecord != nil && record.label == "noswing" {
-                let swingResidual = swingProbability(record)
-                if swingResidual >= minSwingResidual && confirmingRecord == nil {
+            } else if lastBackswingRecord != nil && record.label == config.noSwingLabel {
+                let residual = swingResidual(record)
+                if residual >= minSwingResidual && confirmingRecord == nil {
                     confirmingRecord = record
                 }
             }
@@ -40,7 +46,7 @@ struct BackswingDecayStrategy: ImpactDetectionStrategy {
         guard let backPred = lastBackswingRecord,
               let confirmPred = confirmingRecord else { return nil }
 
-        let peakBack = backPred.probabilities["backswing"] ?? 0
+        let peakBack = backPred.probabilities[config.backswingLabel] ?? 0
         let impactTime = (backPred.timestamp + confirmPred.windowStart) / 2.0
 
         let clampedStart = max(impactTime - maxHalfDuration, backPred.windowStart - preSwingBuffer)
@@ -58,11 +64,8 @@ struct BackswingDecayStrategy: ImpactDetectionStrategy {
         return ImpactCandidate(swingBounds: bounds, strategy: name)
     }
 
-    private func swingProbability(_ record: PredictionRecord) -> Double {
-        let pEDown = record.probabilities["early_downswing"] ?? 0
-        let pLDown = record.probabilities["late_downswing"] ?? 0
-        let pEFol = record.probabilities["early_follow"] ?? 0
-        let pFol = record.probabilities["follow_through"] ?? 0
-        return pEDown + pLDown + pEFol + pFol
+    private func swingResidual(_ record: PredictionRecord) -> Double {
+        let labels = config.downswingLabels + config.followThroughLabels
+        return labels.reduce(0.0) { $0 + (record.probabilities[$1] ?? 0) }
     }
 }
