@@ -16,6 +16,7 @@ struct HomeView: View {
     @State private var showVideoPicker = false
     @State private var selectedSwings: [SwingSelection] = []
     @State private var navigationPath = NavigationPath()
+    @State private var importError: String?
 
     var body: some View {
         NavigationStack(path: $navigationPath) {
@@ -51,6 +52,14 @@ struct HomeView: View {
                     video1: dest.video1, video2: dest.video2,
                     swing1: dest.swing1, swing2: dest.swing2
                 )
+            }
+            .alert("Import Error", isPresented: Binding(
+                get: { importError != nil },
+                set: { if !$0 { importError = nil } }
+            )) {
+                Button("OK") { importError = nil }
+            } message: {
+                Text(importError ?? "")
             }
         }
     }
@@ -174,6 +183,7 @@ private extension HomeView {
             do {
                 try await VideoImportService().importVideo(from: url, into: modelContext)
             } catch {
+                importError = "Could not import video: \(error.localizedDescription)"
                 AppLogger.storage.error("Error importing video: \(error.localizedDescription)")
             }
         }

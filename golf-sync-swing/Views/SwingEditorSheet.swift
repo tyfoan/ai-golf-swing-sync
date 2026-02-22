@@ -154,10 +154,11 @@ struct SwingEditorSheet: View {
                             .font(.headline)
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(Color.fairwayGreen)
+                            .background(isValidTimeOrder ? Color.fairwayGreen : Color.gray)
                             .foregroundStyle(.white)
                             .cornerRadius(12)
                     }
+                    .disabled(!isValidTimeOrder)
 
                     Button {
                         onCancel()
@@ -218,6 +219,10 @@ struct SwingEditorSheet: View {
                 AppLogger.ui.error("Error generating frame: \(error.localizedDescription)")
             }
         }
+    }
+
+    private var isValidTimeOrder: Bool {
+        startTime < contactTime && contactTime < endTime
     }
 
     private func formatTime(_ time: TimeInterval) -> String {

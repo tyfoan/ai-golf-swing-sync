@@ -22,6 +22,7 @@ struct ComparisonView: View {
     @State private var isExporting = false
     @State private var showDoneSheet = false
     @State private var showPaywall = false
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         ZStack {
@@ -37,6 +38,9 @@ struct ComparisonView: View {
         .toolbar(.hidden, for: .tabBar)
         .onAppear { onViewAppear() }
         .onDisappear { viewModel?.pause() }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .background { viewModel?.pause() }
+        }
         .sheet(isPresented: $showExportSheet) { exportSheet }
         .confirmationDialog("Done", isPresented: $showDoneSheet, titleVisibility: .hidden) {
             Button("Export Video") { showExportSheet = true }
@@ -192,6 +196,7 @@ private extension ComparisonView {
 
 private extension ComparisonView {
     func onViewAppear() {
+        guard viewModel == nil else { return }
         viewModel = ComparisonViewModel(
             video1: video1, video2: video2,
             swing1: swing1, swing2: swing2

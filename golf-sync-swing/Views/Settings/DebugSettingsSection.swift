@@ -236,7 +236,7 @@ struct DebugSettingsSection: View {
                 detail: demoLoadState.label
             )
 
-            debugDetail("In bundle", value: "\(DemoVideoPaths.all.count)/\(DemoVideoPaths.entries.count)")
+            debugDetail("Available", value: "\(DemoVideoPaths.all.count)/\(DemoVideoPaths.entries.count)")
 
             HStack(spacing: 12) {
                 debugActionButton("Load Demo Videos", systemImage: "arrow.down.doc") {
@@ -283,7 +283,7 @@ struct DebugSettingsSection: View {
     private func loadDemoVideos() async {
         let sources = DemoVideoPaths.all
         guard !sources.isEmpty else {
-            demoLoadState = .error("No demo videos in bundle")
+            demoLoadState = .error("No demo videos found")
             return
         }
 
@@ -291,7 +291,6 @@ struct DebugSettingsSection: View {
         demoLoadState = .loading(0, schedule.count)
 
         let storage = VideoStorageService.shared
-        let runner = SwingAutoDetectionRunner()
         var loaded = 0
 
         for entry in schedule {
@@ -300,9 +299,6 @@ struct DebugSettingsSection: View {
                 let video = await storage.createSwingVideo(from: destURL)
                 video.createdAt = entry.date
                 modelContext.insert(video)
-                try modelContext.save()
-
-                _ = await runner.analyze(video: video, context: modelContext)
                 try modelContext.save()
 
                 loaded += 1
@@ -381,16 +377,38 @@ struct DebugSettingsSection: View {
 // MARK: - Demo Video Paths
 
 private enum DemoVideoPaths {
-    static let entries: [(name: String, ext: String)] = [
-        ("demo1", "mov"), ("demo2", "mov"),
-        ("demo3", "mp4"), ("demo4", "mp4"),
-        ("swing1", "mp4"), ("swing2", "mov"),
-        ("swing3", "mp4"), ("swing4", "mp4"),
-        ("swing5", "mov"), ("swing6", "mov")
+
+    static let entries: [String] = [
+        "31p1YZI_mrc.mp4",
+        "7DR3pFxkPVg.mp4",
+        "CAlO52kAYHE.mp4",
+        "UoshlPscc2U.mp4",
+        "pxO_eGmiDFk.mp4",
+        "PlSBuqG15oA.mp4",
+        "Ya_DsarE9KU.mp4",
+        "eykMCjLK6GQ.mp4",
+        "hpZC-9PvQyQ.mp4",
+        "B1uIW4LN16Q.mp4",
     ]
 
     static var all: [URL] {
-        entries.compactMap { Bundle.main.url(forResource: $0.name, withExtension: $0.ext) }
+        let dir = videosDirectory
+        return entries.compactMap { filename in
+            let url = dir.appendingPathComponent(filename)
+            return FileManager.default.fileExists(atPath: url.path) ? url : nil
+        }
+    }
+
+    private static var videosDirectory: URL {
+        let thisFile = URL(fileURLWithPath: #filePath)
+        let projectRoot = thisFile
+            .deletingLastPathComponent()  // Settings/
+            .deletingLastPathComponent()  // Views/
+            .deletingLastPathComponent()  // golf-sync-swing/
+            .deletingLastPathComponent()  // project root
+        return projectRoot
+            .appendingPathComponent("ml-training")
+            .appendingPathComponent("youtube_videos")
     }
 }
 
@@ -404,18 +422,25 @@ private enum DemoSchedule {
 
     static func entries(from sources: [URL]) -> [Entry] {
         let calendar = Calendar.current
-        // Feb 12, 2026 — morning and afternoon sessions
-        let feb12AM = calendar.date(from: DateComponents(year: 2026, month: 2, day: 12, hour: 9, minute: 15))!
-        let feb12PM = calendar.date(from: DateComponents(year: 2026, month: 2, day: 12, hour: 14, minute: 40))!
-        // Feb 13, 2026 — morning and afternoon sessions
-        let feb13AM = calendar.date(from: DateComponents(year: 2026, month: 2, day: 13, hour: 10, minute: 5))!
-        let feb13PM = calendar.date(from: DateComponents(year: 2026, month: 2, day: 13, hour: 16, minute: 20))!
-
-        let dates = [feb12AM, feb12PM, feb13AM, feb13PM]
-
-        return dates.enumerated().map { index, date in
-            Entry(url: sources[index % sources.count], date: date)
+        let dates = sessionDates(calendar: calendar)
+        return sources.enumerated().map { index, url in
+            Entry(url: url, date: dates[index % dates.count])
         }
+    }
+
+    private static func sessionDates(calendar: Calendar) -> [Date] {
+        [
+            calendar.date(from: DateComponents(year: 2026, month: 2, day: 10, hour: 8,  minute: 30))!,
+            calendar.date(from: DateComponents(year: 2026, month: 2, day: 10, hour: 14, minute: 15))!,
+            calendar.date(from: DateComponents(year: 2026, month: 2, day: 11, hour: 9,  minute: 45))!,
+            calendar.date(from: DateComponents(year: 2026, month: 2, day: 12, hour: 7,  minute: 20))!,
+            calendar.date(from: DateComponents(year: 2026, month: 2, day: 12, hour: 16, minute: 10))!,
+            calendar.date(from: DateComponents(year: 2026, month: 2, day: 13, hour: 10, minute: 0))!,
+            calendar.date(from: DateComponents(year: 2026, month: 2, day: 13, hour: 15, minute: 30))!,
+            calendar.date(from: DateComponents(year: 2026, month: 2, day: 14, hour: 8,  minute: 45))!,
+            calendar.date(from: DateComponents(year: 2026, month: 2, day: 14, hour: 13, minute: 20))!,
+            calendar.date(from: DateComponents(year: 2026, month: 2, day: 15, hour: 9,  minute: 0))!,
+        ]
     }
 }
 

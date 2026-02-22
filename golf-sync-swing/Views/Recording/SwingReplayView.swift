@@ -204,15 +204,17 @@ struct SwingReplayView: View {
     private func setupLooping() {
         guard let player else { return }
 
+        let loopStart = startTime
+        let speed = playbackSpeed
+
         loopObserver = NotificationCenter.default.addObserver(
             forName: .AVPlayerItemDidPlayToEndTime,
             object: player.currentItem,
             queue: .main
         ) { [weak player] _ in
-            guard self.isPlaying else { return }
-            let seekTime = CMTime(seconds: startTime, preferredTimescale: 600)
+            let seekTime = CMTime(seconds: loopStart, preferredTimescale: 600)
             player?.seek(to: seekTime) { _ in
-                player?.rate = self.playbackSpeed
+                player?.rate = speed
             }
         }
     }

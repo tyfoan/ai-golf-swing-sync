@@ -21,6 +21,7 @@ struct AppPaywallView: View {
     @State private var selectedPackage: Package?
     @State private var isPurchasing = false
     @State private var errorMessage: String?
+    @State private var offeringsError: String?
     @State private var heroScale: CGFloat = 0.8
     @State private var heroOpacity: Double = 0
 
@@ -46,7 +47,10 @@ struct AppPaywallView: View {
             }
         }
         .task { await loadOfferings() }
-        .alert("Error", isPresented: .constant(errorMessage != nil)) {
+        .alert("Error", isPresented: Binding(
+            get: { errorMessage != nil },
+            set: { if !$0 { errorMessage = nil } }
+        )) {
             Button("OK") { errorMessage = nil }
         } message: {
             Text(errorMessage ?? "")
@@ -191,8 +195,20 @@ struct AppPaywallView: View {
 
     @ViewBuilder
     private var subscriptionOptions: some View {
-        if packages.isEmpty {
+        if let offeringsError {
+            VStack(spacing: 12) {
+                Text(offeringsError)
+                    .font(.caption)
+                    .foregroundStyle(Color.white.opacity(0.6))
+                    .multilineTextAlignment(.center)
+                Button("Tap to Retry") { Task { await loadOfferings() } }
+                    .font(.footnote).fontWeight(.medium)
+                    .foregroundStyle(Color.onboardingGold)
+            }
+            .padding()
+        } else if packages.isEmpty {
             ProgressView("Loading plans...")
+                .tint(.white)
                 .padding()
         } else {
             VStack(spacing: 10) {
@@ -311,12 +327,17 @@ struct AppPaywallView: View {
     // MARK: - Data Loading
 
     private func loadOfferings() async {
+        offeringsError = nil
         do {
             let offerings = try await Purchases.shared.offerings()
-            guard let current = offerings.current else { return }
+            guard let current = offerings.current else {
+                offeringsError = "No subscription plans available. Please try again later."
+                return
+            }
             packages = current.availablePackages
             selectedPackage = preferredDefault(from: packages)
         } catch {
+            offeringsError = "Could not load subscription plans. Check your connection and try again."
             AppLogger.general.error("Paywall: failed to load offerings — \(error)")
         }
     }

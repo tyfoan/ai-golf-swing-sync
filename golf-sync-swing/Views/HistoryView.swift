@@ -12,6 +12,7 @@ struct HistoryView: View {
     @Query(sort: \SwingVideo.createdAt, order: .reverse) private var videos: [SwingVideo]
 
     @State private var showVideoPicker = false
+    @State private var importError: String?
 
     var body: some View {
         NavigationStack {
@@ -59,6 +60,14 @@ struct HistoryView: View {
                     importVideo(from: url)
                 }
             }
+            .alert("Import Error", isPresented: Binding(
+                get: { importError != nil },
+                set: { if !$0 { importError = nil } }
+            )) {
+                Button("OK") { importError = nil }
+            } message: {
+                Text(importError ?? "")
+            }
         }
     }
 
@@ -67,6 +76,7 @@ struct HistoryView: View {
             do {
                 try await VideoImportService().importVideo(from: url, into: modelContext)
             } catch {
+                importError = "Could not import video: \(error.localizedDescription)"
                 AppLogger.storage.error("Error importing video: \(error.localizedDescription)")
             }
         }

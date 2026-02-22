@@ -4,9 +4,7 @@
 //
 //  Orchestrator for recording workflow.
 //  Delegates to collaborators:
-//    FrameProcessingGate  - Thread-safe frame gating and timing
-//    CameraService        - Camera session management
-//    ActionClassifierDetector - Live swing detection
+//    CameraService - Camera session management
 //
 //  Types: RecordingTypes.swift (RecordingState, PipDisplayMode, SwingClip)
 //
@@ -34,21 +32,13 @@ final class RecordingViewModel {
     var replayingSwingIndex: Int? = nil
     var pipDisplayMode: PipDisplayMode = .liveCamera
     var isLoadingReplay: Bool = false
-    var detectionAnimationActive: Bool = false
-    var skeletonEnabled: Bool = false
-    var currentJointMap: BodyJointMap?
 
     // MARK: - Collaborators
 
     let cameraService = CameraService()
-    nonisolated(unsafe) private let detector = ActionClassifierDetector()
-    nonisolated(unsafe) private let frameGate = FrameProcessingGate()
 
     private var countdownTask: Task<Void, Never>?
     private let saveService = RecordingSaveService()
-    nonisolated(unsafe) private let poseProcessingQueue = DispatchQueue(
-        label: "com.golfsync.pose.processing", qos: .userInteractive
-    )
 
     // MARK: - Computed Properties
 
@@ -77,15 +67,6 @@ final class RecordingViewModel {
     }
 
     private func setupCallbacks() {
-        cameraService.onFrameCaptured = { [weak self] pixelBuffer, timestamp in
-            guard let self else { return }
-            guard self.frameGate.tryAcquire() else { return }
-            self.poseProcessingQueue.async {
-                defer { self.frameGate.release() }
-                self.processFrameOnBackground(pixelBuffer, timestamp: timestamp)
-            }
-        }
-
         cameraService.onRecordingFinished = { [weak self] _, error in
             Task { @MainActor [weak self] in
                 guard let self else { return }
@@ -99,48 +80,6 @@ final class RecordingViewModel {
                     self.state = .reviewing
                 }
             }
-        }
-
-        detector.onSwingDetected = { [weak self] bounds in
-            Task { @MainActor [weak self] in self?.handleSwingDetected(bounds) }
-        }
-    }
-
-    // MARK: - Frame Processing (Background Thread)
-
-    nonisolated private func processFrameOnBackground(_ pixelBuffer: CVPixelBuffer, timestamp: CMTime) {
-        guard frameGate.isCurrentlyRecording else { return }
-        let relativeTime = frameGate.recordFrame(at: timestamp.seconds)
-        detector.processFrame(pixelBuffer, at: relativeTime)
-
-        // Throttle skeleton updates to ~15fps (every other frame)
-        let shouldPublishSkeleton = frameGate.frameProcessedCount % 2 == 0
-        guard shouldPublishSkeleton else { return }
-
-        let jointMap = detector.posePublisher.latestJointMap
-        Task { @MainActor [weak self] in
-            self?.currentJointMap = jointMap
-        }
-    }
-
-    // MARK: - Swing Detection
-
-    private func handleSwingDetected(_ bounds: SwingBounds) {
-        guard isRecording else { return }
-        let clip = SwingClip(from: bounds)
-        detectedSwings.append(clip)
-        replayingSwingIndex = detectedSwings.count - 1
-        mainViewShowsReplay = true
-        isLoadingReplay = true
-        pipDisplayMode = .liveCamera
-        triggerDetectionAnimation()
-    }
-
-    private func triggerDetectionAnimation() {
-        detectionAnimationActive = true
-        Task {
-            try? await Task.sleep(for: .milliseconds(1500))
-            detectionAnimationActive = false
         }
     }
 
@@ -170,11 +109,7 @@ final class RecordingViewModel {
     }
 
     private func beginRecording() {
-        frameGate.reset()
-        frameGate.isCurrentlyRecording = true
-
         guard let url = cameraService.startRecording() else {
-            frameGate.isCurrentlyRecording = false
             state = .idle
             errorMessage = cameraService.currentError?.errorDescription
             return
@@ -186,13 +121,11 @@ final class RecordingViewModel {
         isLoadingReplay = false
         replayingSwingIndex = nil
         pipDisplayMode = .liveCamera
-        detector.reset()
         state = .recording
     }
 
     func stopRecording() {
         guard isRecording else { return }
-        frameGate.isCurrentlyRecording = false
         mainViewShowsReplay = false
         isLoadingReplay = false
         replayingSwingIndex = nil
@@ -296,7 +229,6 @@ final class RecordingViewModel {
     func cancel() {
         countdownTask?.cancel()
         countdownTask = nil
-        frameGate.isCurrentlyRecording = false
         cameraService.stopRecording()
         cameraService.stopSession()
         recordingURL = nil
@@ -304,13 +236,10 @@ final class RecordingViewModel {
         mainViewShowsReplay = false
         isLoadingReplay = false
         replayingSwingIndex = nil
-        detector.reset()
         state = .idle
     }
 
     func cleanup() {
-        frameGate.isCurrentlyRecording = false
         cameraService.stopSession()
-        detector.reset()
     }
 }

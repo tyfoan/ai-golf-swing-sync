@@ -32,7 +32,10 @@ struct SettingsView: View {
             .sheet(isPresented: $showCustomerCenter) {
                 CustomerCenterView()
             }
-            .alert("Restore Purchases", isPresented: .constant(restoreMessage != nil)) {
+            .alert("Restore Purchases", isPresented: Binding(
+                get: { restoreMessage != nil },
+                set: { if !$0 { restoreMessage = nil } }
+            )) {
                 Button("OK") { restoreMessage = nil }
             } message: {
                 Text(restoreMessage ?? "")

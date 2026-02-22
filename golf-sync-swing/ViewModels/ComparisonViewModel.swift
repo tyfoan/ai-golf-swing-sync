@@ -32,8 +32,8 @@ final class ComparisonViewModel {
     }
     var onionSkinOpacity: Double = 0.5
 
-    private var timeObserver1: Any?
-    private var timeObserver2: Any?
+    nonisolated(unsafe) private var timeObserver1: Any?
+    nonisolated(unsafe) private var timeObserver2: Any?
     private var isSwapped = false
     private let synchronizer: PlaybackSynchronizing
 
@@ -65,8 +65,8 @@ final class ComparisonViewModel {
         self.video2 = video2
         self.swing1 = swing1
         self.swing2 = swing2
-        self.player1 = AVPlayer(url: video1.localURL)
-        self.player2 = AVPlayer(url: video2.localURL)
+        self.player1 = AVPlayer(url: video1.validLocalURL ?? video1.localURL)
+        self.player2 = AVPlayer(url: video2.validLocalURL ?? video2.localURL)
         self.synchronizer = synchronizer
         self.syncOffset = swing1.contactTime - swing2.contactTime
 
@@ -82,17 +82,15 @@ final class ComparisonViewModel {
     deinit {
         player1.pause()
         player2.pause()
-        MainActor.assumeIsolated {
-            synchronizer.stop()
-            if let obs = timeObserver1 { player1.removeTimeObserver(obs) }
-            if let obs = timeObserver2 { player2.removeTimeObserver(obs) }
-        }
+        synchronizer.stop()
+        if let obs = timeObserver1 { player1.removeTimeObserver(obs) }
+        if let obs = timeObserver2 { player2.removeTimeObserver(obs) }
     }
 
     // MARK: - Time Observers
 
     private func setupTimeObservers() {
-        let interval = CMTime(seconds: 0.01, preferredTimescale: 600)
+        let interval = CMTime(seconds: 1.0 / 30.0, preferredTimescale: 600)
 
         timeObserver1 = player1.addPeriodicTimeObserver(
             forInterval: interval, queue: .main

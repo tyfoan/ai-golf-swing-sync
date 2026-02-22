@@ -29,14 +29,6 @@ struct RecordingView: View {
                 Color.black.ignoresSafeArea()
 
                 mainContentView
-                    .overlay {
-                        if viewModel.skeletonEnabled && !viewModel.mainViewShowsReplay {
-                            SkeletonOverlayView(
-                                jointMap: viewModel.currentJointMap,
-                                isMirrored: viewModel.isFrontCamera
-                            )
-                        }
-                    }
                     .ignoresSafeArea()
                     .animation(.easeInOut(duration: 0.3), value: viewModel.mainViewShowsReplay)
 
@@ -55,14 +47,6 @@ struct RecordingView: View {
                         recordedDuration: viewModel.cameraService.recordedDuration,
                         onCancel: viewModel.cancel
                     )
-
-                    if viewModel.isRecording && !viewModel.mainViewShowsReplay {
-                        HStack {
-                            SkeletonToggleButton(isActive: $viewModel.skeletonEnabled)
-                            Spacer()
-                        }
-                        .padding(.horizontal)
-                    }
 
                     Spacer()
 
@@ -86,7 +70,6 @@ struct RecordingView: View {
                         lastSwing: viewModel.pipSwing,
                         recordingURL: viewModel.recordingURL,
                         playbackSpeed: viewModel.playbackSpeed,
-                        detectionAnimationActive: viewModel.detectionAnimationActive,
                         onTap: viewModel.swapMainAndPip
                     )
                     .id(viewModel.pipSwing?.id)
@@ -119,8 +102,11 @@ struct RecordingView: View {
             SingleVideoPlayerView(video: video)
         }
         .sheet(isPresented: $showingTips) { RecordingTipsSheet() }
-        .alert("Camera Error", isPresented: $showingError) {
-            Button("OK") { showingError = false }
+        .alert("Error", isPresented: $showingError) {
+            Button("OK") {
+                showingError = false
+                viewModel.errorMessage = nil
+            }
             if viewModel.cameraService.currentError?.errorDescription?.contains("Settings") == true {
                 Button("Open Settings") {
                     if let url = URL(string: UIApplication.openSettingsURLString) {
@@ -129,12 +115,15 @@ struct RecordingView: View {
                 }
             }
         } message: {
-            Text(viewModel.cameraService.currentError?.errorDescription ?? "An unknown error occurred")
+            Text(viewModel.errorMessage ?? viewModel.cameraService.currentError?.errorDescription ?? "An unknown error occurred")
         }
         .onChange(of: scenePhase) { oldPhase, newPhase in
             handleScenePhaseChange(from: oldPhase, to: newPhase)
         }
         .onChange(of: viewModel.cameraService.currentError) { _, newError in
+            if newError != nil { showingError = true }
+        }
+        .onChange(of: viewModel.errorMessage) { _, newError in
             if newError != nil { showingError = true }
         }
     }

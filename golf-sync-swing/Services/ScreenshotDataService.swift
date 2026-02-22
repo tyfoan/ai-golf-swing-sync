@@ -113,16 +113,38 @@ final class ScreenshotDataService {
 // MARK: - Video Catalog
 
 private enum ScreenshotVideoCatalog {
-    static let entries: [(name: String, ext: String)] = [
-        ("demo1", "mov"),  ("demo2", "mov"),
-        ("demo3", "mp4"),  ("demo4", "mp4"),
-        ("swing1", "mp4"), ("swing2", "mov"),
-        ("swing3", "mp4"), ("swing4", "mp4"),
-        ("swing5", "mov"), ("swing6", "mov")
+
+    static let entries: [String] = [
+        "31p1YZI_mrc.mp4",
+        "7DR3pFxkPVg.mp4",
+        "CAlO52kAYHE.mp4",
+        "UoshlPscc2U.mp4",
+        "pxO_eGmiDFk.mp4",
+        "PlSBuqG15oA.mp4",
+        "Ya_DsarE9KU.mp4",
+        "eykMCjLK6GQ.mp4",
+        "hpZC-9PvQyQ.mp4",
+        "B1uIW4LN16Q.mp4",
     ]
 
     static var all: [URL] {
-        entries.compactMap { Bundle.main.url(forResource: $0.name, withExtension: $0.ext) }
+        entries.compactMap { filename in
+            let url = videosDirectory.appendingPathComponent(filename)
+            guard FileManager.default.fileExists(atPath: url.path) else { return nil }
+            return url
+        }
+    }
+
+    private static var videosDirectory: URL {
+        let thisFile = URL(fileURLWithPath: #filePath)
+        // #filePath → .../golf-sync-swing/Services/ScreenshotDataService.swift
+        let projectRoot = thisFile
+            .deletingLastPathComponent()  // Services/
+            .deletingLastPathComponent()  // golf-sync-swing/
+            .deletingLastPathComponent()  // project root
+        return projectRoot
+            .appendingPathComponent("ml-training")
+            .appendingPathComponent("youtube_videos")
     }
 }
 

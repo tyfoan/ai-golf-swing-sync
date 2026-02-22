@@ -3,9 +3,9 @@
 //  golf-sync-swing
 //
 
-import SwiftUI
-import SwiftData
 import os
+import SwiftData
+import SwiftUI
 
 @main
 struct golf_sync_swingApp: App {
@@ -16,27 +16,27 @@ struct golf_sync_swingApp: App {
     private let sharedModelContainer: ModelContainer
 
     init() {
-        let schema = Schema([
-            SwingVideo.self,
-            SwingMarker.self,
-            ComparisonSession.self,
-        ])
+        let schema = Schema(versionedSchema: SchemaV1.self)
 
         if let container = try? ModelContainer(
             for: schema,
+            migrationPlan: SwingDataMigrationPlan.self,
             configurations: [ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)]
         ) {
             self.sharedModelContainer = container
         } else {
             AppLogger.general.error("Persistent storage failed — falling back to in-memory")
-            let fallback = try? ModelContainer(
-                for: schema,
-                configurations: [ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)]
-            )
-            self.sharedModelContainer = fallback ?? (try! ModelContainer(
-                for: Schema([]),
-                configurations: [ModelConfiguration(isStoredInMemoryOnly: true)]
-            ))
+            let fallbackContainer: ModelContainer
+            do {
+                fallbackContainer = try ModelContainer(
+                    for: schema,
+                    configurations: [ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)]
+                )
+            } catch {
+                AppLogger.general.error("In-memory fallback also failed: \(error)")
+                fatalError("Cannot create any ModelContainer: \(error)")
+            }
+            self.sharedModelContainer = fallbackContainer
             self._showDataError = State(initialValue: true)
             self._dataErrorMessage = State(initialValue: "Unable to save data permanently. Your recordings may not persist between sessions.")
         }

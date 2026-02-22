@@ -13,7 +13,6 @@ enum AppLogger {
 
     private static let subsystem = Bundle.main.bundleIdentifier ?? "com.golfsyncswing"
 
-    static let detection = Logger(subsystem: subsystem, category: "detection")
     static let storage = Logger(subsystem: subsystem, category: "storage")
     static let camera = Logger(subsystem: subsystem, category: "camera")
     static let sync = Logger(subsystem: subsystem, category: "sync")

@@ -19,7 +19,6 @@ struct SingleVideoPlayerView: View {
     @State private var selectedSwingId: UUID?
     @State private var showSwingEditor = false
     @State private var editingSwing: SwingMarker?
-    @State private var detector = SwingAutoDetectionRunner()
 
     var body: some View {
         ZStack {
@@ -75,11 +74,6 @@ private extension SingleVideoPlayerView {
                 }
                 .padding(.trailing, 4)
             }
-            AnalysisOverlayView(
-                isAnalyzing: detector.isAnalyzing,
-                progress: detector.progress,
-                status: detector.status
-            )
         }
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .padding(.horizontal, 12)
@@ -102,9 +96,9 @@ private extension SingleVideoPlayerView {
         SwingDetectionPanel(
             video: video,
             selectedSwingId: selectedSwingId,
-            isAnalyzing: detector.isAnalyzing,
-            analysisProgress: detector.progress,
-            analysisStatus: detector.status,
+            isAnalyzing: false,
+            analysisProgress: 0,
+            analysisStatus: "",
             onAddNew: { editingSwing = nil; showSwingEditor = true },
             onEditSelected: { editSelectedSwing() },
             onSwingTap: { swing in selectSwing(swing, vm: vm) }
@@ -134,19 +128,10 @@ private extension SingleVideoPlayerView {
         viewModel = vm
         playbackMode = video.swings.isEmpty ? .fullVideo : .swingsOnly
 
-        // Always start playing so the user sees the video immediately
         vm.play()
 
-        guard !video.hasBeenAnalyzed else { return }
-        Task {
-            let swings = await detector.analyze(video: video, context: modelContext)
-            guard let first = swings.first else {
-                playbackMode = .fullVideo
-                return
-            }
-            playbackMode = .swingsOnly
-            selectSwing(first, vm: vm)
-        }
+        guard let first = video.swings.first else { return }
+        selectSwing(first, vm: vm)
     }
 
     func switchMode(to mode: VideoPlaybackMode) {
