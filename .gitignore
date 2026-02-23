@@ -18,6 +18,8 @@ ml-training/__pycache__/
 ml-training/golfdb_repo/
 ml-training/golfdb/
 ml-training/MyActionClassifier.mlproj/
+ml-training/swingnet/venv*/
+ml-training/swingnet/models/
 
 # Python
 __pycache__/
