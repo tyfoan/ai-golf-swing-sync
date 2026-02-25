@@ -1,0 +1,25 @@
+{
+  "pytorch_events": {
+    "Address": 74,
+    "Toe-up": 86,
+    "Mid-backswing": 98,
+    "Top": 114,
+    "Mid-downswing": 132,
+    "Impact": 143,
+    "Mid-follow-through": 151,
+    "Finish": 236
+  },
+  "coreml_events": {
+    "Address": 74,
+    "Toe-up": 86,
+    "Mid-backswing": 98,
+    "Top": 114,
+    "Mid-downswing": 132,
+    "Impact": 143,
+    "Mid-follow-through": 151,
+    "Finish": 236
+  },
+  "impact_diff_frames": 0,
+  "max_diff_frames": 0,
+  "verdict": "GO"
+}

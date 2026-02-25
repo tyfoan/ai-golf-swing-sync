@@ -20,6 +20,11 @@ struct SingleVideoPlayerView: View {
     @State private var showSwingEditor = false
     @State private var editingSwing: SwingMarker?
 
+    // SwingNet analysis state
+    @State private var isAnalyzing = false
+    @State private var analysisProgress: Float = 0
+    @State private var analysisStatus: String = ""
+
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
@@ -96,9 +101,9 @@ private extension SingleVideoPlayerView {
         SwingDetectionPanel(
             video: video,
             selectedSwingId: selectedSwingId,
-            isAnalyzing: false,
-            analysisProgress: 0,
-            analysisStatus: "",
+            isAnalyzing: isAnalyzing,
+            analysisProgress: analysisProgress,
+            analysisStatus: analysisStatus,
             onAddNew: { editingSwing = nil; showSwingEditor = true },
             onEditSelected: { editSelectedSwing() },
             onSwingTap: { swing in selectSwing(swing, vm: vm) }
@@ -130,8 +135,37 @@ private extension SingleVideoPlayerView {
 
         vm.play()
 
-        guard let first = video.swings.first else { return }
-        selectSwing(first, vm: vm)
+        if let first = video.swings.first {
+            selectSwing(first, vm: vm)
+        } else if !video.hasBeenAnalyzed {
+            runSwingNetAnalysis(vm: vm)
+        }
+    }
+
+    func runSwingNetAnalysis(vm: VideoPlayerViewModel) {
+        guard !isAnalyzing else { return }
+        isAnalyzing = true
+
+        Task {
+            do {
+                let runner = SwingNetAnalysisRunner()
+                try await runner.analyze(video: video, context: modelContext) { progress, status in
+                    Task { @MainActor in
+                        analysisProgress = progress
+                        analysisStatus = status
+                    }
+                }
+
+                isAnalyzing = false
+                if let first = video.swings.first {
+                    playbackMode = .swingsOnly
+                    selectSwing(first, vm: vm)
+                }
+            } catch {
+                isAnalyzing = false
+                analysisStatus = "Analysis failed"
+            }
+        }
     }
 
     func switchMode(to mode: VideoPlaybackMode) {
