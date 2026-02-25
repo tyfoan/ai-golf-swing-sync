@@ -69,13 +69,14 @@ final class SwingNetAnalysisRunner: SwingAnalysisRunning {
         AppLogger.detection.info("Extracted \(frames.count) frames, running detection...")
         progress(0.7, "Detecting swing events...")
 
-        let result = try detector.detect(frames: frames)
+        let results = try detector.detectMultiple(frames: frames)
         progress(0.9, "Saving results...")
 
-        await saveResult(result, video: video, context: context)
+        await saveResults(results, video: video, context: context)
 
-        AppLogger.detection.info("Analysis complete: impact=\(result.impactTime.map { String(format: "%.2f", $0) } ?? "none")")
-        progress(1.0, result.hasValidDetection ? "Swing detected!" : "No swing detected")
+        let count = results.count
+        AppLogger.detection.info("Analysis complete: \(count) swing(s) detected")
+        progress(1.0, swingCountMessage(count))
     }
 
     // MARK: - Frame Extraction
@@ -106,19 +107,23 @@ final class SwingNetAnalysisRunner: SwingAnalysisRunning {
 
     // MARK: - Persistence
 
-    private func saveResult(_ result: SwingDetectionResult, video: SwingVideo, context: ModelContext) {
-        guard result.hasValidDetection else {
-            video.hasBeenAnalyzed = true
-            video.analysisDate = Date()
-            return
+    private func saveResults(_ results: [SwingDetectionResult], video: SwingVideo, context: ModelContext) {
+        for result in results {
+            let marker = SwingMarker(from: result)
+            marker.video = video
+            video.swings.append(marker)
+            context.insert(marker)
         }
-
-        let marker = SwingMarker(from: result)
-        marker.video = video
-        video.swings.append(marker)
-        context.insert(marker)
 
         video.hasBeenAnalyzed = true
         video.analysisDate = Date()
+    }
+
+    private nonisolated func swingCountMessage(_ count: Int) -> String {
+        switch count {
+        case 0: return "No swing detected"
+        case 1: return "Swing detected!"
+        default: return "\(count) swings detected!"
+        }
     }
 }

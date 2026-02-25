@@ -1,7 +1,7 @@
 # SwingNet Impact Detection — Implementation Plan
 
 **Created:** 2026-02-25
-**Status:** Phase 3 — Testing Complete, Ready for Phase 4 Refinements
+**Status:** Phase 4 — Refinements Complete
 **Verified by:** 9 expert agents across 3 research teams
 
 ---
@@ -136,15 +136,16 @@ SingleVideoPlayerView
 
 ---
 
-## Phase 4: Refinements
+## Phase 4: Refinements ✅ COMPLETE
 
-| Enhancement | Effort | Impact |
+| Enhancement | Status | Result |
 |-------------|:------:|--------|
-| FP16 quantization (20MB → ~10MB) | 1 hour | Halves model size |
-| Wrist y-minimum refinement | 2 hours | ±100ms → ±33ms accuracy |
-| Audio 2-4kHz spike confirmation | 3 hours | Sub-frame precision |
-| Multi-swing detection in one video | 2 hours | Handles compilation videos |
-| Real-time recording hint (simplified) | 4 hours | Show "swing detected" during recording |
+| FP16 quantization (20MB → ~10MB) | ✅ | 20.5MB → 10.2MB (50% reduction), 0-frame drift |
+| Multi-swing detection | ✅ | Dual strategy: P(no-event) valleys + impact peak detection; creates SwingMarker per swing |
+| Wrist y-minimum refinement | ✅ | VNDetectHumanBodyPoseRequest, ±10 frame search window |
+| SwingNetDetector refactoring | ✅ | Split 345-line class into SwingNetInference (135) + SwingSegmenter (191) + SwingNetDetector (106) |
+| Audio 2-4kHz spike confirmation | Deferred | High effort, unreliable outdoors |
+| Real-time recording hint | Deferred | Different pipeline needed |
 
 ---
 
