@@ -11,7 +11,6 @@
 
 import SwiftUI
 import AVFoundation
-import SwiftData
 
 @MainActor
 @Observable
@@ -26,7 +25,6 @@ final class RecordingViewModel {
     // MARK: - UI State
 
     var playbackSpeed: Float = 1.0
-    var savedVideo: SwingVideo?
     var errorMessage: String?
     var mainViewShowsReplay: Bool = false
     var replayingSwingIndex: Int? = nil
@@ -38,7 +36,6 @@ final class RecordingViewModel {
     let cameraService = CameraService()
 
     private var countdownTask: Task<Void, Never>?
-    private let saveService = RecordingSaveService()
 
     // MARK: - Computed Properties
 
@@ -48,7 +45,6 @@ final class RecordingViewModel {
     var isProcessingSwing: Bool { state == .processingSwing }
     var isFinalizingVideo: Bool { state == .finalizingVideo }
     var isReviewing: Bool { state == .reviewing }
-    var isSaving: Bool { state == .saving }
     var swingCount: Int { detectedSwings.count }
     var isFrontCamera: Bool { cameraService.currentCameraPosition == .front }
     var lastDetectedSwing: SwingClip? { detectedSwings.last }
@@ -189,32 +185,6 @@ final class RecordingViewModel {
     }
 
     // MARK: - Save & Delete
-
-    func saveRecording(to modelContext: ModelContext) async -> SwingVideo? {
-        guard let sourceURL = recordingURL else { return nil }
-        state = .saving
-
-        do {
-            let video = try await saveService.save(
-                sourceURL: sourceURL,
-                swings: detectedSwings,
-                expectedDuration: cameraService.recordedDuration,
-                modelContext: modelContext
-            )
-            recordingURL = nil
-            detectedSwings.removeAll()
-            mainViewShowsReplay = false
-            isLoadingReplay = false
-            replayingSwingIndex = nil
-            savedVideo = video
-            state = .idle
-            return video
-        } catch {
-            errorMessage = error.localizedDescription
-            state = .reviewing
-            return nil
-        }
-    }
 
     func deleteRecording() {
         if let url = recordingURL { try? FileManager.default.removeItem(at: url) }

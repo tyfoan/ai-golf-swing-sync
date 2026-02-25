@@ -6,10 +6,8 @@
 //
 
 import SwiftUI
-import SwiftData
 
 struct RecordingControlsView: View {
-    @Environment(\.modelContext) private var modelContext
     @Bindable var viewModel: RecordingViewModel
 
     var body: some View {
@@ -33,7 +31,14 @@ struct RecordingControlsView: View {
 
     private var actionButtons: some View {
         HStack(spacing: 24) {
-            SpeedButton(speed: viewModel.playbackSpeed, onTap: viewModel.cyclePlaybackSpeed)
+            Button(action: viewModel.cyclePlaybackSpeed) {
+                Text(String(format: "%.2gx", viewModel.playbackSpeed))
+                    .font(.subheadline.bold())
+                    .foregroundStyle(.white)
+                    .frame(width: 50, height: 50)
+                    .background(Color.gray.opacity(0.5))
+                    .clipShape(Circle())
+            }
 
             Button {
                 if let index = viewModel.replayingSwingIndex ?? viewModel.detectedSwings.indices.last {
@@ -94,9 +99,7 @@ struct RecordingControlsView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 16))
             }
 
-            Button {
-                Task { _ = await viewModel.saveRecording(to: modelContext) }
-            } label: {
+            Button(action: viewModel.deleteRecording) {
                 Text(viewModel.swingCount > 0 ? "Save (\(viewModel.swingCount))" : "Save")
                     .font(.headline)
                     .fontWeight(.semibold)

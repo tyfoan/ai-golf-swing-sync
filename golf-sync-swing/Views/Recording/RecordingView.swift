@@ -6,18 +6,14 @@
 //    RecordingTopBar        - Cancel, timer, swing count
 //    RecordingControlsView  - Start/stop/save buttons
 //    RecordingPiPView       - Picture-in-picture overlay
-//    RecordingOverlayView   - Finalizing, replay indicator, interruption
 //
 
 import SwiftUI
-import SwiftData
 import AVFoundation
 
 struct RecordingView: View {
-    @Environment(\.modelContext) private var modelContext
     @Environment(\.scenePhase) private var scenePhase
     @State private var viewModel = RecordingViewModel()
-    @State private var showingTips = false
     @State private var showingError = false
     @State private var hasSetupCamera = false
     @State private var isTabVisible = false
@@ -49,10 +45,6 @@ struct RecordingView: View {
                     )
 
                     Spacer()
-
-                    if viewModel.swingCount > 0 && viewModel.isRecording {
-                        swingAttemptsList
-                    }
 
                     RecordingControlsView(viewModel: viewModel)
                 }
@@ -98,10 +90,6 @@ struct RecordingView: View {
         }
         .onAppear { handleAppear() }
         .onDisappear { handleDisappear() }
-        .fullScreenCover(item: $viewModel.savedVideo, onDismiss: { viewModel.savedVideo = nil }) { video in
-            SingleVideoPlayerView(video: video)
-        }
-        .sheet(isPresented: $showingTips) { RecordingTipsSheet() }
         .alert("Error", isPresented: $showingError) {
             Button("OK") {
                 showingError = false
@@ -149,26 +137,6 @@ struct RecordingView: View {
         }
     }
 
-    // MARK: - Swing Attempts
-
-    private var swingAttemptsList: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 12) {
-                ForEach(Array(viewModel.detectedSwings.enumerated()), id: \.element.id) { index, swing in
-                    SwingAttemptCard(
-                        swingNumber: index + 1,
-                        confidence: swing.confidence,
-                        isFavorite: swing.isFavorite,
-                        isSelected: viewModel.replayingSwingIndex == index
-                    )
-                    .onTapGesture { viewModel.showSwing(at: index) }
-                }
-            }
-            .padding(.horizontal)
-        }
-        .padding(.bottom, 12)
-    }
-
     // MARK: - Lifecycle
 
     private func handleAppear() {
@@ -207,7 +175,92 @@ struct RecordingView: View {
     }
 }
 
+// MARK: - Finalizing Video Overlay
+
+private struct FinalizingVideoOverlay: View {
+    let swingCount: Int
+
+    var body: some View {
+        ZStack {
+            Color.black.opacity(0.7).ignoresSafeArea()
+
+            VStack(spacing: 16) {
+                ProgressView()
+                    .scaleEffect(1.5)
+                    .tint(.white)
+                Text("Saving Video...")
+                    .font(.headline)
+                    .foregroundStyle(.white)
+                Text("\(swingCount) swing\(swingCount == 1 ? "" : "s") detected")
+                    .font(.subheadline)
+                    .foregroundStyle(.white.opacity(0.7))
+            }
+            .padding(32)
+            .background(.ultraThinMaterial)
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+        }
+    }
+}
+
+// MARK: - Replay Loading Overlay
+
+private struct ReplayLoadingOverlay: View {
+    var body: some View {
+        ZStack {
+            Color.black.opacity(0.7).ignoresSafeArea()
+
+            VStack(spacing: 16) {
+                ProgressView()
+                    .scaleEffect(1.5)
+                    .tint(.white)
+                Text("Loading replay...")
+                    .font(.subheadline)
+                    .foregroundStyle(.white.opacity(0.7))
+            }
+        }
+        .allowsHitTesting(false)
+        .transition(.opacity)
+    }
+}
+
+// MARK: - Interruption Overlay
+
+private struct InterruptionOverlay: View {
+    let errorDescription: String?
+    let onResume: () -> Void
+
+    var body: some View {
+        ZStack {
+            Color.black.opacity(0.8).ignoresSafeArea()
+
+            VStack(spacing: 20) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .font(.system(size: 50))
+                    .foregroundStyle(.yellow)
+
+                Text("Recording Interrupted")
+                    .font(.title2.bold())
+                    .foregroundStyle(.white)
+
+                Text(errorDescription ?? "Camera session was interrupted")
+                    .font(.body)
+                    .foregroundStyle(.white.opacity(0.8))
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+
+                Button("Resume", action: onResume)
+                    .font(.headline)
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 32)
+                    .padding(.vertical, 12)
+                    .background(Color.fairwayGreen)
+                    .clipShape(Capsule())
+            }
+            .padding(32)
+        }
+    }
+}
+
 #Preview {
     RecordingView()
-        .modelContainer(for: [SwingVideo.self, SwingMarker.self], inMemory: true)
 }

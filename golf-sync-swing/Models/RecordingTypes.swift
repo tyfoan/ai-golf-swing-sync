@@ -70,7 +70,7 @@ enum PipDisplayMode: Equatable {
 
 // MARK: - Swing Clip
 
-/// Detected swing clip during recording (before saving to SwiftData)
+/// Detected swing clip during recording
 struct SwingClip: Identifiable, Equatable {
     let id: UUID
     let startTime: TimeInterval
