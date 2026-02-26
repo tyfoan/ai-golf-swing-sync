@@ -46,7 +46,7 @@ final class PoseDetector: @unchecked Sendable {
         }
 
         let joints = extractJoints(from: observation)
-        return PoseFrame(timestamp: timestamp, joints: joints)
+        return PoseFrame(timestamp: timestamp, joints: joints, observation: observation)
     }
 
     func processFrame(pixelBuffer: CVPixelBuffer, timestamp: TimeInterval) -> PoseFrame {

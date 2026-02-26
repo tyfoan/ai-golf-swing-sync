@@ -12,11 +12,22 @@ import Vision
 struct PoseFrame: Sendable {
     let timestamp: TimeInterval
     let joints: [VNHumanBodyPoseObservation.JointName: JointPosition]
+    let observation: VNHumanBodyPoseObservation?
 
     struct JointPosition: Sendable {
         let x: CGFloat
         let y: CGFloat
         let confidence: Float
+    }
+
+    init(
+        timestamp: TimeInterval,
+        joints: [VNHumanBodyPoseObservation.JointName: JointPosition],
+        observation: VNHumanBodyPoseObservation? = nil
+    ) {
+        self.timestamp = timestamp
+        self.joints = joints
+        self.observation = observation
     }
 }
 
