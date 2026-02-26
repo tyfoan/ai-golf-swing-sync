@@ -65,7 +65,10 @@ final class RecordingViewModel {
         setupCallbacks()
         detectionOrchestrator.onSwingDetected = { [weak self] clip in
             Task { @MainActor [weak self] in
-                self?.detectedSwings.append(clip)
+                guard let self else { return }
+                self.detectedSwings.append(clip)
+                self.pipDisplayMode = .lastSwingReplay
+                self.playbackSpeed = 0.5
             }
         }
     }
