@@ -99,7 +99,9 @@ struct RecordingControlsView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 16))
             }
 
-            Button(action: viewModel.deleteRecording) {
+            Button {
+                Task { await viewModel.saveToPhotos() }
+            } label: {
                 Text(viewModel.swingCount > 0 ? "Save (\(viewModel.swingCount))" : "Save")
                     .font(.headline)
                     .fontWeight(.semibold)

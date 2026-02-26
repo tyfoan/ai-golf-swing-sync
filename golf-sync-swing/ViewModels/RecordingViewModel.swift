@@ -11,6 +11,7 @@
 
 import SwiftUI
 import AVFoundation
+import CoreMedia
 
 @MainActor
 @Observable
@@ -34,6 +35,8 @@ final class RecordingViewModel {
     // MARK: - Collaborators
 
     let cameraService = CameraService()
+    private let detectionOrchestrator = DetectionOrchestrator()
+    private let photosSaveService = PhotosSaveService()
 
     private var countdownTask: Task<Void, Never>?
 
@@ -60,6 +63,11 @@ final class RecordingViewModel {
 
     init() {
         setupCallbacks()
+        detectionOrchestrator.onSwingDetected = { [weak self] clip in
+            Task { @MainActor [weak self] in
+                self?.detectedSwings.append(clip)
+            }
+        }
     }
 
     private func setupCallbacks() {
@@ -118,6 +126,13 @@ final class RecordingViewModel {
         replayingSwingIndex = nil
         pipDisplayMode = .liveCamera
         state = .recording
+        detectionOrchestrator.start()
+        cameraService.onFrameCaptured = { [weak self] pixelBuffer, timestamp in
+            self?.detectionOrchestrator.processFrame(
+                pixelBuffer: pixelBuffer,
+                timestamp: CMTimeGetSeconds(timestamp)
+            )
+        }
     }
 
     func stopRecording() {
@@ -125,6 +140,8 @@ final class RecordingViewModel {
         mainViewShowsReplay = false
         isLoadingReplay = false
         replayingSwingIndex = nil
+        detectionOrchestrator.stop()
+        cameraService.onFrameCaptured = nil
         state = .finalizingVideo
         cameraService.stopRecording()
     }
@@ -186,6 +203,42 @@ final class RecordingViewModel {
 
     // MARK: - Save & Delete
 
+    func saveToPhotos() async {
+        guard let url = recordingURL else { return }
+        state = .saving
+
+        let authorized = await PhotosSaveService.requestAuthorization()
+        guard authorized else {
+            errorMessage = "Photos access denied. Please enable in Settings."
+            state = .reviewing
+            return
+        }
+
+        do {
+            if detectedSwings.isEmpty {
+                try await photosSaveService.saveFullRecording(from: url)
+            } else {
+                for swing in detectedSwings {
+                    try await photosSaveService.saveClip(
+                        from: url,
+                        startTime: swing.startTime,
+                        endTime: swing.endTime
+                    )
+                }
+            }
+            try? FileManager.default.removeItem(at: url)
+            recordingURL = nil
+            detectedSwings.removeAll()
+            mainViewShowsReplay = false
+            isLoadingReplay = false
+            replayingSwingIndex = nil
+            state = .idle
+        } catch {
+            errorMessage = error.localizedDescription
+            state = .reviewing
+        }
+    }
+
     func deleteRecording() {
         if let url = recordingURL { try? FileManager.default.removeItem(at: url) }
         recordingURL = nil
@@ -199,6 +252,8 @@ final class RecordingViewModel {
     func cancel() {
         countdownTask?.cancel()
         countdownTask = nil
+        detectionOrchestrator.stop()
+        cameraService.onFrameCaptured = nil
         cameraService.stopRecording()
         cameraService.stopSession()
         recordingURL = nil
