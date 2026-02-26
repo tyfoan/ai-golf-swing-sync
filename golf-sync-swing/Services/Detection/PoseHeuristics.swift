@@ -16,11 +16,14 @@ protocol SwingDetecting: Sendable {
 
 struct PoseHeuristics: SwingDetecting {
 
-    private let velocityThreshold: CGFloat = 0.8
-    private let minimumDescentFrames: Int = 3
+    private let velocityThreshold: CGFloat = 2.0
+    private let minimumDescentFrames: Int = 5
+    private let minimumDisplacement: CGFloat = 0.15
 
     func analyze(frames: [PoseFrame]) -> SwingEvent {
-        guard frames.count >= 6 else { return .noSwing }
+        guard frames.count >= 10 else { return .noSwing }
+
+        guard meetsDisplacementThreshold(frames: frames) else { return .noSwing }
 
         let velocities = computeWristVelocities(frames: frames)
         let descentCount = velocities.filter { $0 < -velocityThreshold }.count
@@ -30,10 +33,16 @@ struct PoseHeuristics: SwingDetecting {
         let peakVelocityIndex = velocities.enumerated()
             .min(by: { $0.element < $1.element })?.offset ?? 0
         let timestamp = frames[min(peakVelocityIndex + 1, frames.count - 1)].timestamp
-        let confidence = min(1.0, Double(descentCount) / 6.0)
+        let confidence = min(1.0, Double(descentCount) / 8.0)
 
         AppLogger.detection.info("PoseHeuristics: swing detected (descent=\(descentCount) frames, conf=\(String(format: "%.2f", confidence)))")
         return .swingDetected(confidence: confidence, timestamp: timestamp)
+    }
+
+    private func meetsDisplacementThreshold(frames: [PoseFrame]) -> Bool {
+        let yValues = frames.compactMap { leadWristY(in: $0) }
+        guard let maxY = yValues.max(), let minY = yValues.min() else { return false }
+        return (maxY - minY) >= minimumDisplacement
     }
 
     private func computeWristVelocities(frames: [PoseFrame]) -> [CGFloat] {

@@ -46,7 +46,7 @@ final class DetectionOrchestrator: @unchecked Sendable {
         poseDetector: PoseDetector = PoseDetector(),
         classifier: SwingClassifier = SwingClassifier(),
         heuristics: PoseHeuristics = PoseHeuristics(),
-        stateMachine: SwingStateMachine = SwingStateMachine(),
+        stateMachine: SwingStateMachine = SwingStateMachine(cooldownDuration: 4.0),
         impactDetector: ImpactDetecting = ImpactDetector()
     ) {
         self.poseDetector = poseDetector
@@ -120,13 +120,19 @@ final class DetectionOrchestrator: @unchecked Sendable {
     // MARK: - Strategy Selection
 
     private func detectSwing(in frames: [PoseFrame]) -> SwingEvent {
-        // Primary: Create ML classifier
+        let heuristicsResult = heuristics.analyze(frames: frames)
         let classifierResult = classifier.analyze(frames: frames)
-        if case .swingDetected = classifierResult {
-            return classifierResult
+
+        // Consensus: both must detect a swing to reduce false positives.
+        // If classifier is unavailable, heuristics alone suffices.
+        if classifier.isAvailable {
+            guard case .swingDetected(let cc, let ct) = classifierResult,
+                  case .swingDetected = heuristicsResult else {
+                return .noSwing
+            }
+            return .swingDetected(confidence: cc, timestamp: ct)
         }
 
-        // Fallback: Pose heuristics
-        return heuristics.analyze(frames: frames)
+        return heuristicsResult
     }
 }

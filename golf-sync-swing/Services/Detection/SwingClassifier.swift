@@ -21,7 +21,7 @@ final class SwingClassifier: SwingDetecting, @unchecked Sendable {
     private let windowSize: Int
     private let swingConfidenceThreshold: Double
 
-    init(windowSize: Int = 15, swingConfidenceThreshold: Double = 0.6) {
+    init(windowSize: Int = 15, swingConfidenceThreshold: Double = 0.85) {
         self.windowSize = windowSize
         self.swingConfidenceThreshold = swingConfidenceThreshold
         self.model = Self.loadModel()
