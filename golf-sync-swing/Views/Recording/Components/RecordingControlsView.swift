@@ -111,6 +111,7 @@ struct RecordingControlsView: View {
                     .background(Color.fairwayGreen)
                     .clipShape(RoundedRectangle(cornerRadius: 16))
             }
+            .disabled(viewModel.state == .saving)
         }
         .padding(.horizontal, 40)
     }

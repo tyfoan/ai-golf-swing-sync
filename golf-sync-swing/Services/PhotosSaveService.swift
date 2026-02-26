@@ -64,8 +64,9 @@ struct PhotosSaveService: PhotosSaving {
             throw PhotosSaveError.exportFailed(exporter.error?.localizedDescription ?? "Unknown error")
         }
 
+        defer { try? FileManager.default.removeItem(at: outputURL) }
+
         try await saveToPhotos(url: outputURL)
-        try? FileManager.default.removeItem(at: outputURL)
 
         AppLogger.detection.info("Saved trimmed clip to Photos (\(String(format: "%.1f", startTime))-\(String(format: "%.1f", endTime))s)")
     }
