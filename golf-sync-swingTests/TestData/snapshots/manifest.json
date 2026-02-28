@@ -38,5 +38,20 @@
     "player": "Paula Creamer",
     "club": "driver",
     "angle": "other"
+  },
+  {
+    "file": "synthetic_standing.json",
+    "type": "no_swing",
+    "label": "Standing still"
+  },
+  {
+    "file": "synthetic_slow_raise.json",
+    "type": "no_swing",
+    "label": "Slow arm raise"
+  },
+  {
+    "file": "synthetic_fidget.json",
+    "type": "no_swing",
+    "label": "Small fidgeting"
   }
 ]

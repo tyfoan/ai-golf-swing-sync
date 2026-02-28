@@ -65,6 +65,19 @@ private struct Scorecard: Codable {
     }
 }
 
+// MARK: - Errors
+
+private enum SyntheticLoadError: Error, CustomStringConvertible {
+    case fileNotFound(String)
+
+    var description: String {
+        switch self {
+        case .fileNotFound(let name):
+            return "Synthetic snapshot not found: \(name).json"
+        }
+    }
+}
+
 // MARK: - Loaded Snapshot
 
 private struct LoadedSnapshot {
@@ -159,6 +172,41 @@ struct ValidationScorecardTests {
         try emitScorecard(scorecard)
         assertSuccessCriteria(scorecard)
         assertAllVideosPass(videoResults)
+    }
+
+    // MARK: - Synthetic Non-Swing Tests
+
+    @Test("Synthetic non-swing scenarios are not detected as swings", .tags(.validation))
+    func syntheticNonSwingSnapshots() throws {
+        let syntheticFiles = [
+            "synthetic_standing",
+            "synthetic_slow_raise",
+            "synthetic_fidget"
+        ]
+
+        let bundle = Bundle(for: ScorecardBundleToken.self)
+        let decoder = JSONDecoder()
+        let heuristics = PoseHeuristics()
+        let analysisWindowSize = 15
+
+        for filename in syntheticFiles {
+            let frames = try loadSyntheticFrames(
+                named: filename, bundle: bundle, decoder: decoder
+            )
+
+            #expect(
+                frames.count >= analysisWindowSize,
+                "\(filename) has \(frames.count) frames, need at least \(analysisWindowSize)"
+            )
+
+            let window = Array(frames.suffix(analysisWindowSize))
+            let event = heuristics.analyze(frames: window)
+
+            #expect(
+                !isSwingDetected(event),
+                "False positive: \(filename) was detected as a swing"
+            )
+        }
     }
 
     // MARK: - Snapshot Evaluation
@@ -358,6 +406,22 @@ struct ValidationScorecardTests {
 
         let frames = serializedFrames.map { $0.toPoseFrame() }
         return LoadedSnapshot(entry: entry, frames: frames)
+    }
+
+    private func loadSyntheticFrames(
+        named filename: String,
+        bundle: Bundle,
+        decoder: JSONDecoder
+    ) throws -> [PoseFrame] {
+        guard let url = bundle.url(
+            forResource: filename, withExtension: "json", subdirectory: "snapshots"
+        ) ?? bundle.url(forResource: filename, withExtension: "json") else {
+            throw SyntheticLoadError.fileNotFound(filename)
+        }
+
+        let data = try Data(contentsOf: url)
+        let serialized = try decoder.decode([SerializablePoseFrame].self, from: data)
+        return serialized.map { $0.toPoseFrame() }
     }
 
     // MARK: - Helpers
