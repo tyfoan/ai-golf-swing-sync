@@ -14,7 +14,7 @@ struct PoseFrame: Sendable {
     let joints: [VNHumanBodyPoseObservation.JointName: JointPosition]
     let observation: VNHumanBodyPoseObservation?
 
-    struct JointPosition: Sendable {
+    struct JointPosition: Sendable, Codable {
         let x: CGFloat
         let y: CGFloat
         let confidence: Float
