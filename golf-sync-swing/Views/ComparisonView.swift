@@ -66,14 +66,14 @@ private extension ComparisonView {
 
     func topBar(viewModel: ComparisonViewModel) -> some View {
         HStack {
-            circleButton(icon: "xmark") { showDoneSheet = true }
+            circleButton(icon: "xmark", accessibilityLabel: "Close comparison") { showDoneSheet = true }
             Spacer()
-            circleButton(icon: "arrow.left.arrow.right") { viewModel.swapVideos() }
+            circleButton(icon: "arrow.left.arrow.right", accessibilityLabel: "Swap videos") { viewModel.swapVideos() }
         }
         .padding(.horizontal, 16).padding(.top, 8)
     }
 
-    func circleButton(icon: String, action: @escaping () -> Void) -> some View {
+    func circleButton(icon: String, accessibilityLabel: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Image(systemName: icon)
                 .font(.body).fontWeight(.semibold)
@@ -82,6 +82,7 @@ private extension ComparisonView {
                 .background(Color.white.opacity(0.1))
                 .clipShape(Circle())
         }
+        .accessibilityLabel(accessibilityLabel)
     }
 }
 
