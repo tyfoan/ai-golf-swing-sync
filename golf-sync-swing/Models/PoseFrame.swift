@@ -9,7 +9,9 @@
 import Foundation
 import Vision
 
-struct PoseFrame: Sendable {
+/// @unchecked because VNHumanBodyPoseObservation is effectively immutable once created
+/// by Vision framework. All properties are read-only after initialization.
+struct PoseFrame: @unchecked Sendable {
     let timestamp: TimeInterval
     let joints: [VNHumanBodyPoseObservation.JointName: JointPosition]
     let observation: VNHumanBodyPoseObservation?
