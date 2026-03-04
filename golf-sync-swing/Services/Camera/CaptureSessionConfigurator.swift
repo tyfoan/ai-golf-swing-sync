@@ -151,7 +151,7 @@ final class CaptureSessionConfigurator {
                 guard dimensions.width == 1920 && dimensions.height == 1080 else { continue }
                 for range in format.videoSupportedFrameRateRanges {
                     if range.maxFrameRate >= targetFPS {
-                        if bestFrameRateRange == nil || range.maxFrameRate > bestFrameRateRange!.maxFrameRate {
+                        if bestFrameRateRange.map({ range.maxFrameRate > $0.maxFrameRate }) ?? true {
                             bestFormat = format
                             bestFrameRateRange = range
                         }

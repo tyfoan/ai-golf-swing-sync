@@ -96,7 +96,7 @@ struct WristRefinementService: WristRefining {
             }
 
             let y = point.location.y
-            if lowestY == nil || y < lowestY! {
+            if lowestY.map({ y < $0 }) ?? true {
                 lowestY = y
             }
         }
