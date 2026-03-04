@@ -38,7 +38,7 @@ final class PersonCropper: PersonCropping {
         let boundingBox = detectPerson(in: pixelBuffer) ?? cachedBoundingBox
         let sourceImage = CIImage(cvPixelBuffer: pixelBuffer)
         let cropRect = buildCropRect(boundingBox: boundingBox, imageExtent: sourceImage.extent)
-        return renderCroppedBuffer(from: sourceImage, cropRect: cropRect)
+        return renderCroppedBuffer(from: sourceImage, cropRect: cropRect) ?? pixelBuffer
     }
 
     // MARK: - Person Detection
@@ -89,7 +89,7 @@ final class PersonCropper: PersonCropping {
 
     // MARK: - Rendering
 
-    private func renderCroppedBuffer(from source: CIImage, cropRect: CGRect) -> CVPixelBuffer {
+    private func renderCroppedBuffer(from source: CIImage, cropRect: CGRect) -> CVPixelBuffer? {
         let cropped = source
             .cropped(to: cropRect)
             .transformed(by: CGAffineTransform(translationX: -cropRect.origin.x, y: -cropRect.origin.y))
@@ -112,9 +112,9 @@ final class PersonCropper: PersonCropping {
         return buffer
     }
 
-    private func createBlankBuffer() -> CVPixelBuffer {
+    private func createBlankBuffer() -> CVPixelBuffer? {
         var buffer: CVPixelBuffer?
         CVPixelBufferCreate(kCFAllocatorDefault, targetSize, targetSize, kCVPixelFormatType_32BGRA, nil, &buffer)
-        return buffer!
+        return buffer
     }
 }
