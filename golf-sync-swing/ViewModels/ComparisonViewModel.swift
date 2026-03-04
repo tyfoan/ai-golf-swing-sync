@@ -72,7 +72,6 @@ final class ComparisonViewModel {
 
         setupTimeObservers()
         seekToSwingStarts()
-        play()
     }
 
     deinit {
@@ -187,11 +186,17 @@ final class ComparisonViewModel {
     }
 
     func swapVideos() {
+        let wasPlaying = isPlaying
+        if comparisonMode.isSynchronized { synchronizer.stop() }
         isSwapped.toggle()
         syncOffset = -syncOffset
-        synchronizer.updateOffset(syncOffset)
         guard comparisonMode.isSynchronized else { return }
+        startSynchronizer()
         synchronizer.resync(referenceTime: currentTime)
+        if wasPlaying {
+            effectivePlayer1.rate = playbackRate
+            effectivePlayer2.rate = playbackRate
+        }
     }
 
     // MARK: - Sync Offset (synced modes)
