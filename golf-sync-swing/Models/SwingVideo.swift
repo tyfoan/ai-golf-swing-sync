@@ -74,18 +74,6 @@ final class SwingVideo {
         self.thumbnailData = thumbnailData
     }
 
-    // MARK: - Swing Detection
-
-    /// Get the primary detected impact time (first auto-detected swing)
-    var detectedImpactTime: TimeInterval? {
-        swings.first { $0.isAutoDetected }?.contactTime
-    }
-
-    /// Check if video has a high-confidence auto-detected swing
-    var hasHighConfidenceDetection: Bool {
-        swings.contains { $0.isAutoDetected && $0.detectionConfidence >= 0.7 }
-    }
-
     // MARK: - Private
 
     /// Convert an absolute URL to a path relative to Documents directory.
