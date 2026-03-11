@@ -77,7 +77,7 @@ final class RecordingViewModel {
             Task { @MainActor [weak self] in
                 guard let self else { return }
                 self.detectedSwings.append(clip)
-                self.playbackSpeed = 0.5
+                self.playbackSpeed = 1.0
             }
         }
     }

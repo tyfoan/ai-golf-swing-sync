@@ -13,6 +13,7 @@ struct SwingReplayView: View {
     let startTime: TimeInterval
     let endTime: TimeInterval
     var playbackSpeed: Float = 1.0
+    var showControls: Bool = true
     var onLoaded: (() -> Void)?
 
     @State private var player: AVPlayer?
@@ -21,12 +22,14 @@ struct SwingReplayView: View {
     @State private var retryCount = 0
     @State private var isPlaying = true
     @State private var isMuted = true
-    @State private var loopObserver: NSObjectProtocol?
+    @State private var loopObserver: Any?
+    @State private var safeStartTime: TimeInterval = 0
+    @State private var safeEndTime: TimeInterval = 0
 
     /// Maximum retries if video isn't ready
     private let maxRetries = 5
     /// Delay between retries
-    private let retryDelay: UInt64 = 300_000_000 // 300ms in nanoseconds
+    private let retryDelay: UInt64 = 150_000_000 // 150ms in nanoseconds
 
     private var clipDuration: TimeInterval {
         endTime - startTime
@@ -39,11 +42,6 @@ struct SwingReplayView: View {
             if let player {
                 VideoPlayer(player: player)
                     .disabled(true) // No native controls
-                    .onAppear {
-                        player.isMuted = isMuted
-                        player.rate = playbackSpeed
-                        setupLooping()
-                    }
             } else if isLoading {
                 ProgressView()
                     .progressViewStyle(CircularProgressViewStyle(tint: .white))
@@ -61,26 +59,24 @@ struct SwingReplayView: View {
                 .padding()
             }
 
-            // Floating replay controls
-            if player != nil {
+            // Floating replay controls (hidden in PiP mode)
+            if player != nil && showControls {
                 VStack {
                     Spacer()
                     replayControls
                         .padding(.bottom, 12)
                 }
             }
-            // Note: Replay badge is shown by parent RecordingView
         }
         .task {
             await loadVideo()
         }
         .onDisappear {
-            if let observer = loopObserver {
-                NotificationCenter.default.removeObserver(observer)
-                loopObserver = nil
-            }
-            player?.pause()
-            player = nil
+            cleanupPlayer()
+        }
+        .onChange(of: playbackSpeed) { _, newSpeed in
+            player?.rate = newSpeed
+            setupLooping()
         }
     }
 
@@ -126,9 +122,6 @@ struct SwingReplayView: View {
     // MARK: - Video Loading
 
     private func loadVideo() async {
-        // Small initial delay
-        try? await Task.sleep(for: .milliseconds(100))
-
         guard FileManager.default.fileExists(atPath: videoURL.path) else {
             loadError = "Video file not found"
             isLoading = false
@@ -145,6 +138,7 @@ struct SwingReplayView: View {
             guard isPlayable else {
                 // Retry if not playable yet
                 if retryCount < maxRetries {
+                    guard !Task.isCancelled else { return }
                     retryCount += 1
                     try? await Task.sleep(nanoseconds: retryDelay)
                     await loadVideo()
@@ -162,32 +156,42 @@ struct SwingReplayView: View {
             // Check if video has enough content for the full swing
             // If not, retry to let more frames be written
             if videoDuration < endTime && retryCount < maxRetries {
+                guard !Task.isCancelled else { return }
                 retryCount += 1
                 try? await Task.sleep(nanoseconds: retryDelay)
                 await loadVideo()
                 return
             }
 
-            // Validate times - use actual video duration
-            let safeStartTime = max(0, min(startTime, videoDuration - 0.1))
-            let safeEndTime = max(safeStartTime + 0.5, min(endTime, videoDuration))
+            // Validate times - clamp to actual video duration
+            let clampedStart = max(0, min(startTime, videoDuration - 0.1))
+            let clampedEnd = max(clampedStart + 0.5, min(endTime, videoDuration))
 
             // Create player item
             let playerItem = AVPlayerItem(asset: asset)
 
-            // Set up time range
-            playerItem.forwardPlaybackEndTime = CMTime(seconds: safeEndTime, preferredTimescale: 600)
+            // Note: Do NOT use forwardPlaybackEndTime — it silently pauses
+            // without firing AVPlayerItemDidPlayToEndTime. Looping is handled
+            // by a boundary time observer in setupLooping().
 
             await MainActor.run {
+                cleanupPlayer()
+                self.safeStartTime = clampedStart
+                self.safeEndTime = clampedEnd
                 let avPlayer = AVPlayer(playerItem: playerItem)
-                avPlayer.seek(to: CMTime(seconds: safeStartTime, preferredTimescale: 600))
+                avPlayer.isMuted = isMuted
+                avPlayer.seek(to: CMTime(seconds: clampedStart, preferredTimescale: 600)) { _ in
+                    avPlayer.rate = self.playbackSpeed
+                }
                 self.player = avPlayer
                 self.isLoading = false
+                setupLooping()
                 self.onLoaded?()
             }
         } catch {
             // Retry on error
             if retryCount < maxRetries {
+                guard !Task.isCancelled else { return }
                 retryCount += 1
                 try? await Task.sleep(nanoseconds: retryDelay)
                 await loadVideo()
@@ -201,22 +205,36 @@ struct SwingReplayView: View {
         }
     }
 
+    private func cleanupPlayer() {
+        removeLoopObserver()
+        player?.pause()
+        player?.replaceCurrentItem(with: nil)
+        player = nil
+    }
+
     private func setupLooping() {
         guard let player else { return }
 
-        let loopStart = startTime
+        removeLoopObserver()
+
+        let loopStart = CMTime(seconds: safeStartTime, preferredTimescale: 600)
+        let loopEnd = CMTime(seconds: safeEndTime, preferredTimescale: 600)
         let speed = playbackSpeed
 
-        loopObserver = NotificationCenter.default.addObserver(
-            forName: .AVPlayerItemDidPlayToEndTime,
-            object: player.currentItem,
+        loopObserver = player.addBoundaryTimeObserver(
+            forTimes: [NSValue(time: loopEnd)],
             queue: .main
-        ) { [weak player] _ in
-            let seekTime = CMTime(seconds: loopStart, preferredTimescale: 600)
-            player?.seek(to: seekTime) { _ in
+        ) { [weak player] in
+            player?.seek(to: loopStart) { _ in
                 player?.rate = speed
             }
         }
+    }
+
+    private func removeLoopObserver() {
+        guard let observer = loopObserver else { return }
+        player?.removeTimeObserver(observer)
+        loopObserver = nil
     }
 }
 

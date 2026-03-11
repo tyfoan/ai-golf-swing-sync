@@ -6,6 +6,7 @@
 //  (live camera or last swing replay).
 //
 
+import AVFoundation
 import SwiftUI
 
 struct RecordingPiPView: View {
@@ -30,6 +31,10 @@ struct RecordingPiPView: View {
 
                     badge
                         .padding(8)
+
+                    Color.clear
+                        .contentShape(Rectangle())
+                        .onTapGesture(perform: onTap)
                 }
                 .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
                 .overlay(
@@ -37,7 +42,6 @@ struct RecordingPiPView: View {
                         .stroke(pipDisplayMode == .lastSwingReplay ? Color.sand : Color.fairwayGreen, lineWidth: 2)
                 )
                 .shadow(color: .black.opacity(0.5), radius: 8, x: 0, y: 4)
-                .onTapGesture(perform: onTap)
             }
             .padding()
 
@@ -51,7 +55,8 @@ struct RecordingPiPView: View {
             CameraPreviewView(session: captureSession)
                 .id("pip-camera-\(sessionConfigurationId)")
         } else if let swing = lastSwing, let url = recordingURL {
-            SwingReplayView(videoURL: url, startTime: swing.startTime, endTime: swing.endTime, playbackSpeed: playbackSpeed)
+            SwingReplayView(videoURL: url, startTime: swing.startTime, endTime: swing.endTime, playbackSpeed: playbackSpeed, showControls: false)
+                .id(swing.id)
         }
     }
 
@@ -71,5 +76,3 @@ struct RecordingPiPView: View {
         .clipShape(Capsule())
     }
 }
-
-import AVFoundation
