@@ -32,6 +32,20 @@ final class SwingStateMachine: @unchecked Sendable {
         self.cooldownDuration = cooldownDuration
     }
 
+    /// Auto-expires cooldown if elapsed >= cooldownDuration. Pass the current
+    /// frame timestamp; without auto-expiry cooldown is permanent until reset().
+    func isInCooldown(at timestamp: TimeInterval) -> Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        guard currentState == .cooldown else { return false }
+        if timestamp - cooldownStartTime >= cooldownDuration {
+            currentState = .idle
+            AppLogger.detection.info("SwingStateMachine: cooldown expired -> idle")
+            return false
+        }
+        return true
+    }
+
     func handle(event: SwingEvent) -> SwingDetection? {
         lock.lock()
         defer { lock.unlock() }

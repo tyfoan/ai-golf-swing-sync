@@ -16,9 +16,20 @@ protocol SwingDetecting: Sendable {
 
 struct PoseHeuristics: SwingDetecting {
 
-    private let velocityThreshold: CGFloat = 2.0
-    private let minimumDescentFrames: Int = 5
-    private let minimumDisplacement: CGFloat = 0.15
+    private let velocityThreshold: CGFloat
+    private let minimumDescentFrames: Int
+    private let minimumDisplacement: CGFloat
+    private let minimumConfidenceThreshold: Double = 0.25
+
+    init(
+        velocityThreshold: CGFloat = 0.5,
+        minimumDescentFrames: Int = 3,
+        minimumDisplacement: CGFloat = 0.08
+    ) {
+        self.velocityThreshold = velocityThreshold
+        self.minimumDescentFrames = minimumDescentFrames
+        self.minimumDisplacement = minimumDisplacement
+    }
 
     func analyze(frames: [PoseFrame]) -> SwingEvent {
         guard frames.count >= 10 else { return .noSwing }
@@ -34,6 +45,8 @@ struct PoseHeuristics: SwingDetecting {
             .min(by: { $0.element < $1.element })?.offset ?? 0
         let timestamp = frames[min(peakVelocityIndex + 1, frames.count - 1)].timestamp
         let confidence = min(1.0, Double(descentCount) / 8.0)
+
+        guard confidence >= minimumConfidenceThreshold else { return .noSwing }
 
         AppLogger.detection.info("PoseHeuristics: swing detected (descent=\(descentCount) frames, conf=\(String(format: "%.2f", confidence)))")
         return .swingDetected(confidence: confidence, timestamp: timestamp)

@@ -40,6 +40,7 @@ struct PhotosSaveService: PhotosSaving {
         )
 
         try compositionTrack.insertTimeRange(timeRange, of: videoTrack, at: .zero)
+        compositionTrack.preferredTransform = try await videoTrack.load(.preferredTransform)
 
         // Add audio if available
         if let audioTrack = try? await asset.loadTracks(withMediaType: .audio).first,
@@ -50,6 +51,7 @@ struct PhotosSaveService: PhotosSaving {
         let outputURL = FileManager.default.temporaryDirectory
             .appendingPathComponent(UUID().uuidString)
             .appendingPathExtension("mov")
+        defer { try? FileManager.default.removeItem(at: outputURL) }
 
         guard let exporter = AVAssetExportSession(asset: composition, presetName: AVAssetExportPresetHighestQuality) else {
             throw PhotosSaveError.exportFailed("Cannot create export session")
@@ -63,8 +65,6 @@ struct PhotosSaveService: PhotosSaving {
         guard exporter.status == .completed else {
             throw PhotosSaveError.exportFailed(exporter.error?.localizedDescription ?? "Unknown error")
         }
-
-        defer { try? FileManager.default.removeItem(at: outputURL) }
 
         try await saveToPhotos(url: outputURL)
 

@@ -1,0 +1,402 @@
+[
+  {
+    "angle": "face-on",
+    "club": "driver",
+    "file": "GXn3A0IuWsE.json",
+    "impactTime": 1.9333,
+    "player": "ROGER CLEMENS",
+    "type": "swing"
+  },
+  {
+    "angle": "face-on",
+    "club": "driver",
+    "file": "-x6fBaulaWU.json",
+    "impactTime": 2.5333,
+    "player": "MINJEE LEE",
+    "type": "swing"
+  },
+  {
+    "angle": "down-the-line",
+    "club": "driver",
+    "file": "bOcZP5_fPxo.json",
+    "impactTime": 2.0667,
+    "player": "CHARLIE WI",
+    "type": "swing"
+  },
+  {
+    "angle": "down-the-line",
+    "club": "driver",
+    "file": "7DR3pFxkPVg.json",
+    "impactTime": 2.1333,
+    "player": "BRYSON DECHAMBEAU",
+    "type": "swing"
+  },
+  {
+    "angle": "other",
+    "club": "wedge",
+    "file": "qqF9qeNzqTA.json",
+    "impactTime": 2.4,
+    "player": "LYDIA KO",
+    "type": "swing"
+  },
+  {
+    "angle": "other",
+    "club": "iron",
+    "file": "7dI2HeBChks.json",
+    "impactTime": 2.3667,
+    "player": "SO YEON RYU",
+    "type": "swing"
+  },
+  {
+    "angle": "other",
+    "club": "driver",
+    "file": "U2iNjzyTIJE.json",
+    "impactTime": 1.9333,
+    "player": "IAN POULTER",
+    "type": "swing"
+  },
+  {
+    "angle": "down-the-line",
+    "club": "fairway",
+    "file": "9pp7eRBOCso.json",
+    "impactTime": 2.4667,
+    "player": "LYDIA KO",
+    "type": "swing"
+  },
+  {
+    "angle": "down-the-line",
+    "club": "driver",
+    "file": "RibG0A13urY.json",
+    "impactTime": 2.3667,
+    "player": "CRISTIE KERR",
+    "type": "swing"
+  },
+  {
+    "angle": "other",
+    "club": "hybrid",
+    "file": "C4Vt3X8P6xs.json",
+    "impactTime": 2.0667,
+    "player": "RICKY BARNES",
+    "type": "swing"
+  },
+  {
+    "angle": "face-on",
+    "club": "driver",
+    "file": "gdoWMR-tauc.json",
+    "impactTime": 2.1667,
+    "player": "AZAHARA MUNOZ",
+    "type": "swing"
+  },
+  {
+    "angle": "down-the-line",
+    "club": "iron",
+    "file": "ZivMJ6nSS-E.json",
+    "impactTime": 2.0333,
+    "player": "TONY FINAU",
+    "type": "swing"
+  },
+  {
+    "angle": "down-the-line",
+    "club": "driver",
+    "file": "07lqNiTJVqc.json",
+    "impactTime": 2.1333,
+    "player": "HALE IRWIN",
+    "type": "swing"
+  },
+  {
+    "angle": "other",
+    "club": "iron",
+    "file": "H9MWcs3YS-I.json",
+    "impactTime": 2.0333,
+    "player": "TIGER WOODS",
+    "type": "swing"
+  },
+  {
+    "angle": "down-the-line",
+    "club": "fairway",
+    "file": "8HJXWpyYWVE.json",
+    "impactTime": 2,
+    "player": "GRAEME MCDOWELL",
+    "type": "swing"
+  },
+  {
+    "angle": "down-the-line",
+    "club": "iron",
+    "file": "1dSKw-krBIU.json",
+    "impactTime": 2.0333,
+    "player": "BUBBA WATSON",
+    "type": "swing"
+  },
+  {
+    "angle": "face-on",
+    "club": "iron",
+    "file": "SVM8DLYNeK0.json",
+    "impactTime": 2,
+    "player": "JEFF MAGGERT",
+    "type": "swing"
+  },
+  {
+    "angle": "down-the-line",
+    "club": "iron",
+    "file": "eQEdf5KMyzM.json",
+    "impactTime": 2.1333,
+    "player": "MORGAN PRESSEL",
+    "type": "swing"
+  },
+  {
+    "angle": "face-on",
+    "club": "driver",
+    "file": "hoq35-zbmVk.json",
+    "impactTime": 2.4,
+    "player": "TIM TEBOW",
+    "type": "swing"
+  },
+  {
+    "angle": "face-on",
+    "club": "driver",
+    "file": "dodETKV2Xpg.json",
+    "impactTime": 2.2333,
+    "player": "ANNA NORDQVIST",
+    "type": "swing"
+  },
+  {
+    "angle": "face-on",
+    "club": "driver",
+    "file": "lJTm53jHTiY.json",
+    "impactTime": 2.2,
+    "player": "KARINE ICHER",
+    "type": "swing"
+  },
+  {
+    "angle": "face-on",
+    "club": "wedge",
+    "file": "blonNcv1yas.json",
+    "impactTime": 2.1333,
+    "player": "TIGER WOODS",
+    "type": "swing"
+  },
+  {
+    "angle": "other",
+    "club": "fairway",
+    "file": "iMmoQ6xPY_U.json",
+    "impactTime": 2.1,
+    "player": "ERNIE ELS",
+    "type": "swing"
+  },
+  {
+    "angle": "face-on",
+    "club": "iron",
+    "file": "04d08bM6-6U.json",
+    "impactTime": 5.6,
+    "player": "EUN-HEE JI",
+    "type": "swing"
+  },
+  {
+    "angle": "other",
+    "club": "driver",
+    "file": "4H2k5sHRqUU.json",
+    "impactTime": 2.4333,
+    "player": "JUSTIN ROSE",
+    "type": "swing"
+  },
+  {
+    "angle": "face-on",
+    "club": "driver",
+    "file": "2Tj5jJ1Kh_Q.json",
+    "impactTime": 2.7,
+    "player": "SANDRA GAL",
+    "type": "swing"
+  },
+  {
+    "angle": "down-the-line",
+    "club": "hybrid",
+    "file": "HHPJ-KlWmWg.json",
+    "impactTime": 1.8667,
+    "player": "ROSS FISHER",
+    "type": "swing"
+  },
+  {
+    "angle": "face-on",
+    "club": "iron",
+    "file": "bwAvpekt8xY.json",
+    "impactTime": 1.8667,
+    "player": "BRANDT SNEDEKER",
+    "type": "swing"
+  },
+  {
+    "angle": "other",
+    "club": "iron",
+    "file": "IVRbQrq2JHo.json",
+    "impactTime": 2,
+    "player": "MICHELLE WIE",
+    "type": "swing"
+  },
+  {
+    "angle": "down-the-line",
+    "club": "driver",
+    "file": "WPap6OmEyuE.json",
+    "impactTime": 2.3333,
+    "player": "AYAKO UEHARA",
+    "type": "swing"
+  },
+  {
+    "angle": "down-the-line",
+    "club": "driver",
+    "file": "D4uV1bZxaek.json",
+    "impactTime": 2.1667,
+    "player": "CATRIONA MATTHEW",
+    "type": "swing"
+  },
+  {
+    "angle": "face-on",
+    "club": "driver",
+    "file": "KkB9KbBTb4c.json",
+    "impactTime": 2.5,
+    "player": "ALISON LEE",
+    "type": "swing"
+  },
+  {
+    "angle": "down-the-line",
+    "club": "driver",
+    "file": "wIiLM8ufWVI.json",
+    "impactTime": 1.8667,
+    "player": "RORY MCILROY",
+    "type": "swing"
+  },
+  {
+    "angle": "down-the-line",
+    "club": "driver",
+    "file": "vaoD7yodCF4.json",
+    "impactTime": 2.2333,
+    "player": "STACY LEWIS",
+    "type": "swing"
+  },
+  {
+    "angle": "down-the-line",
+    "club": "driver",
+    "file": "n1r99BGuW8k.json",
+    "impactTime": 2.0333,
+    "player": "CHARLES HOWELL",
+    "type": "swing"
+  },
+  {
+    "angle": "face-on",
+    "club": "driver",
+    "file": "xS9NnBGgtjg.json",
+    "impactTime": 1.7333,
+    "player": "JASON DUFNER",
+    "type": "swing"
+  },
+  {
+    "angle": "face-on",
+    "club": "fairway",
+    "file": "3wru0WH0buk.json",
+    "impactTime": 2.2667,
+    "player": "ARIYA JUTANUGARN",
+    "type": "swing"
+  },
+  {
+    "angle": "down-the-line",
+    "club": "driver",
+    "file": "3YZJYaJIJR4.json",
+    "impactTime": 2.1667,
+    "player": "IK KIM",
+    "type": "swing"
+  },
+  {
+    "angle": "face-on",
+    "club": "driver",
+    "file": "CuAL_6U7_aQ.json",
+    "impactTime": 1.9667,
+    "player": "TIGER WOODS",
+    "type": "swing"
+  },
+  {
+    "angle": "face-on",
+    "club": "driver",
+    "file": "bj4Gc7jm5hY.json",
+    "impactTime": 2.0333,
+    "player": "RETIEF GOOSEN",
+    "type": "swing"
+  },
+  {
+    "angle": "face-on",
+    "club": "hybrid",
+    "file": "D12euvW55Ns.json",
+    "impactTime": 2.1333,
+    "player": "CATRIONA MATTHEW",
+    "type": "swing"
+  },
+  {
+    "angle": "other",
+    "club": "driver",
+    "file": "ra887418NaA.json",
+    "impactTime": 2.1333,
+    "player": "JUSTIN LEONARD",
+    "type": "swing"
+  },
+  {
+    "angle": "down-the-line",
+    "club": "driver",
+    "file": "yfCt0Hkwues.json",
+    "impactTime": 2.2333,
+    "player": "LEXI THOMPSON",
+    "type": "swing"
+  },
+  {
+    "angle": "down-the-line",
+    "club": "driver",
+    "file": "YqsCyYTKpZg.json",
+    "impactTime": 2.6333,
+    "player": "JENNY SHIN",
+    "type": "swing"
+  },
+  {
+    "angle": "down-the-line",
+    "club": "driver",
+    "file": "ZQjY2Ie4V50.json",
+    "impactTime": 2.2667,
+    "player": "CINDY LACROSSE",
+    "type": "swing"
+  },
+  {
+    "angle": "down-the-line",
+    "club": "driver",
+    "file": "RiEUPJNPY_Y.json",
+    "impactTime": 1.9667,
+    "player": "MIKE WEIR",
+    "type": "swing"
+  },
+  {
+    "angle": "down-the-line",
+    "club": "wedge",
+    "file": "wrvEURqD-GI.json",
+    "impactTime": 2.0667,
+    "player": "PHIL MICKELSON",
+    "type": "swing"
+  },
+  {
+    "angle": "face-on",
+    "club": "driver",
+    "file": "_rFatlaZhEQ.json",
+    "impactTime": 3.6,
+    "player": "MATT KUCHAR",
+    "type": "swing"
+  },
+  {
+    "angle": "other",
+    "club": "fairway",
+    "file": "shmXjle1rR0.json",
+    "impactTime": 1.9333,
+    "player": "BUD CAULEY",
+    "type": "swing"
+  },
+  {
+    "angle": "down-the-line",
+    "club": "driver",
+    "file": "_MnmzCJCZRo.json",
+    "impactTime": 2.0333,
+    "player": "MO MARTIN",
+    "type": "swing"
+  }
+]

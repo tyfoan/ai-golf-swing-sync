@@ -1,0 +1,128 @@
+{
+  "activityEntities" : [
+    "experimentCreated",
+    [
+      {
+        "createdDate" : "2026-02-26T00:33:02Z",
+        "event" : "experimentCreated",
+        "id" : "A9510ACD-3463-44C5-A4C6-22EF20B956E4",
+        "subtitle" : "SwingClassifier 1",
+        "title" : "Model Source Created"
+      }
+    ]
+  ],
+  "contentDataResult" : {
+
+  },
+  "createdDate" : "2026-02-26T00:33:02Z",
+  "evaluationContainerEntity" : {
+    "createdDate" : "2026-02-26T00:33:02Z",
+    "evaluationEntities" : [
+
+    ],
+    "id" : "cda35238-3e83-4aeb-86f7-a8d029d8b23f",
+    "modifiedDate" : "2026-02-26T00:33:02Z",
+    "previewType" : "actionClassifier",
+    "testingEvaluationEntity" : {
+      "analysedDataType" : "none",
+      "createdDate" : "2026-02-26T00:33:02Z",
+      "dataResult" : {
+
+      },
+      "id" : "b51f5173-c857-4b92-948a-a9a9419223f5"
+    },
+    "trainingEvaluationEntity" : {
+      "analysedDataType" : "none",
+      "createdDate" : "2026-02-26T00:33:02Z",
+      "dataResult" : {
+
+      },
+      "id" : "2edb3817-81bf-4105-8911-408e055a3c8b"
+    },
+    "validationEvaluationEntity" : {
+      "analysedDataType" : "none",
+      "createdDate" : "2026-02-26T00:33:02Z",
+      "dataResult" : {
+
+      },
+      "id" : "6898f9e8-18e8-43f6-bc30-46225c35230d"
+    }
+  },
+  "evaluationEntity" : {
+    "analysedDataType" : "none",
+    "dataResult" : {
+
+    },
+    "id" : "2c52f72b-d6dd-4e50-a359-7e16dccd761f"
+  },
+  "evaluationState" : "uninitialized",
+  "id" : "77996E2C-BCE6-4DCB-A64C-93CB06FE97E9",
+  "modelEntity" : {
+    "createdDate" : "2026-02-26T00:33:02Z",
+    "experimentID" : "77996E2C-BCE6-4DCB-A64C-93CB06FE97E9",
+    "id" : "59DA47AC-C9CC-46A9-BB09-3D3FC7FE29BA",
+    "modifiedDate" : "2026-02-26T00:33:02Z",
+    "title" : "",
+    "version" : "1.0"
+  },
+  "modifiedDate" : "2026-02-26T00:33:02Z",
+  "preferredFilename" : "SwingClassifier 1",
+  "settingEntity" : {
+    "algorithmType" : "maxEnt",
+    "augmentations" : [
+
+    ],
+    "featureNames" : [
+
+    ],
+    "handActionClassifierAugmentations" : [
+
+    ],
+    "handPoseClassifierAugmentations" : [
+
+    ],
+    "harActionDuration" : 2,
+    "harIsCustomActionDuration" : false,
+    "harTargetFrameRate" : 30,
+    "harVideoAugmentations" : 0,
+    "seedType" : "default",
+    "styleTransferAlgorithmType" : "image",
+    "taskType" : "actionClassifier",
+    "transferLearningEmbeddingType" : "dynamic"
+  },
+  "snapshotRole" : {
+    "withoutSnapshots" : 0
+  },
+  "state" : "uninitialized",
+  "title" : "SwingClassifier 1",
+  "trainingEntity" : {
+    "analysedDataType" : "choose",
+    "checkpointMetrics" : {
+
+    },
+    "dataResult" : {
+
+    },
+    "featureExtractionCheckpointMayBeAvailable" : false,
+    "progress" : [
+
+    ],
+    "snapshottableCheckpoints" : {
+
+    }
+  },
+  "validationEntity" : {
+    "analysedDataType" : "auto",
+    "dataResult" : {
+
+    },
+    "splitOptions" : {
+      "strategy" : {
+        "automatic" : {
+
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

@@ -184,6 +184,12 @@ final class VideoExportService {
         // Export
         let outputURL = FileManager.default.temporaryDirectory
             .appendingPathComponent("export_\(UUID().uuidString).mp4")
+        var exportSucceeded = false
+        defer {
+            if !exportSucceeded {
+                try? FileManager.default.removeItem(at: outputURL)
+            }
+        }
 
         // Try different presets if highest quality fails
         var exportSession: AVAssetExportSession?
@@ -218,6 +224,7 @@ final class VideoExportService {
         progressTask.cancel()
 
         if session.status == .completed {
+            exportSucceeded = true
             return outputURL
         } else {
             let errorMessage = session.error?.localizedDescription ?? "Unknown error (status: \(session.status.rawValue))"

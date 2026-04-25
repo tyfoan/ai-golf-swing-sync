@@ -31,7 +31,7 @@ final class PoseDetector: @unchecked Sendable {
 
     // MARK: - Pose Extraction
 
-    func extractPose(from pixelBuffer: CVPixelBuffer, at timestamp: TimeInterval) -> PoseFrame {
+    internal func extractPose(from pixelBuffer: CVPixelBuffer, at timestamp: TimeInterval) -> PoseFrame {
         let request = VNDetectHumanBodyPoseRequest()
 
         do {

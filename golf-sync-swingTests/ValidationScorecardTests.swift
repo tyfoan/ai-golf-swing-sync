@@ -162,7 +162,7 @@ struct ValidationScorecardTests {
         }
 
         let impactDetector = ImpactDetector()
-        let heuristics = PoseHeuristics()
+        let heuristics = PoseHeuristics(minimumDescentFrames: 2)
 
         let videoResults = snapshots.map { snapshot in
             evaluateSnapshot(snapshot, impactDetector: impactDetector, heuristics: heuristics)
@@ -305,7 +305,7 @@ struct ValidationScorecardTests {
         )
 
         let thresholds = Scorecard.ThresholdSnapshot(
-            velocityThreshold: 0.8,
+            velocityThreshold: 0.5,
             minimumDescentFrames: 2,
             minimumDisplacement: 0.08
         )

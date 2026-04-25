@@ -72,6 +72,9 @@ final class SwingClassifier: SwingDetecting, @unchecked Sendable {
         return zeroPaddedArray()
     }
 
+    /// Returns a zero-filled [1, 3, 18] array as a fallback when no VNHumanBodyPoseObservation
+    /// is available (e.g. no person detected in frame). The model treats zero-padded frames
+    /// as "no pose data", which helps avoid false positives from missing detections.
     private func zeroPaddedArray() -> MLMultiArray {
         let array = try? MLMultiArray(shape: [1, 3, 18], dataType: .float32)
         return array ?? MLMultiArray()

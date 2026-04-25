@@ -9,10 +9,12 @@
 //
 
 import SwiftUI
+import SwiftData
 import AVFoundation
 
 struct RecordingView: View {
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.modelContext) private var modelContext
     @State private var viewModel = RecordingViewModel()
     @State private var showingError = false
     @State private var hasSetupCamera = false
@@ -64,7 +66,6 @@ struct RecordingView: View {
                         playbackSpeed: viewModel.playbackSpeed,
                         onTap: viewModel.swapMainAndPip
                     )
-                    .id(viewModel.pipSwing?.id)
                     .scaleEffect(pipVisible ? 1.0 : 0.5)
                     .opacity(pipVisible ? 1.0 : 0)
                     .animation(.spring(response: 0.4, dampingFraction: 0.7), value: pipVisible)
@@ -80,6 +81,12 @@ struct RecordingView: View {
                     FinalizingVideoOverlay(swingCount: viewModel.swingCount)
                 }
 
+                if viewModel.state == .saved {
+                    SavedSuccessOverlay()
+                        .transition(.opacity.combined(with: .scale))
+                        .animation(.spring(response: 0.4, dampingFraction: 0.7), value: viewModel.state)
+                }
+
                 if viewModel.cameraService.isInterrupted {
                     InterruptionOverlay(
                         errorDescription: viewModel.cameraService.currentError?.errorDescription,
@@ -88,7 +95,10 @@ struct RecordingView: View {
                 }
             }
         }
-        .onAppear { handleAppear() }
+        .onAppear {
+            viewModel.modelContext = modelContext
+            handleAppear()
+        }
         .onDisappear { handleDisappear() }
         .alert("Error", isPresented: $showingError) {
             Button("OK") {
@@ -175,88 +185,24 @@ struct RecordingView: View {
     }
 }
 
-// MARK: - Finalizing Video Overlay
+// MARK: - Saved Success Overlay
 
-private struct FinalizingVideoOverlay: View {
-    let swingCount: Int
-
+private struct SavedSuccessOverlay: View {
     var body: some View {
         ZStack {
-            Color.black.opacity(0.7).ignoresSafeArea()
+            Color.black.opacity(0.6).ignoresSafeArea()
 
             VStack(spacing: 16) {
-                ProgressView()
-                    .scaleEffect(1.5)
-                    .tint(.white)
-                Text("Saving Video...")
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.system(size: 56))
+                    .foregroundStyle(.green)
+                Text("Saved to Photos")
                     .font(.headline)
                     .foregroundStyle(.white)
-                Text("\(swingCount) swing\(swingCount == 1 ? "" : "s") detected")
-                    .font(.subheadline)
-                    .foregroundStyle(.white.opacity(0.7))
             }
             .padding(32)
             .background(.ultraThinMaterial)
             .clipShape(RoundedRectangle(cornerRadius: 16))
-        }
-    }
-}
-
-// MARK: - Replay Loading Overlay
-
-private struct ReplayLoadingOverlay: View {
-    var body: some View {
-        ZStack {
-            Color.black.opacity(0.7).ignoresSafeArea()
-
-            VStack(spacing: 16) {
-                ProgressView()
-                    .scaleEffect(1.5)
-                    .tint(.white)
-                Text("Loading replay...")
-                    .font(.subheadline)
-                    .foregroundStyle(.white.opacity(0.7))
-            }
-        }
-        .allowsHitTesting(false)
-        .transition(.opacity)
-    }
-}
-
-// MARK: - Interruption Overlay
-
-private struct InterruptionOverlay: View {
-    let errorDescription: String?
-    let onResume: () -> Void
-
-    var body: some View {
-        ZStack {
-            Color.black.opacity(0.8).ignoresSafeArea()
-
-            VStack(spacing: 20) {
-                Image(systemName: "exclamationmark.triangle.fill")
-                    .font(.system(size: 50))
-                    .foregroundStyle(.yellow)
-
-                Text("Recording Interrupted")
-                    .font(.title2.bold())
-                    .foregroundStyle(.white)
-
-                Text(errorDescription ?? "Camera session was interrupted")
-                    .font(.body)
-                    .foregroundStyle(.white.opacity(0.8))
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal)
-
-                Button("Resume", action: onResume)
-                    .font(.headline)
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 32)
-                    .padding(.vertical, 12)
-                    .background(Color.fairwayGreen)
-                    .clipShape(Capsule())
-            }
-            .padding(32)
         }
     }
 }

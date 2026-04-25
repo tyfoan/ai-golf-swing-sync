@@ -23,7 +23,7 @@ final class CameraService: NSObject {
 
     var isSessionRunning = false
     var isRecording = false
-    var recordedDuration: TimeInterval = 0
+    var recordedDuration: TimeInterval { recordingCoordinator.recordedDuration }
     var sessionConfigurationId: Int = 0
     var droppedFrameCount: Int = 0
     var currentError: CameraError?
@@ -46,7 +46,10 @@ final class CameraService: NSObject {
     private var movieFileOutput: AVCaptureMovieFileOutput?
     private var isAudioSessionConfigured = false
     private var isSessionConfigured = false
+    /// sessionQueue-only — not @Published, no main-thread requirement
+    private var isConfiguring = false
     private var targetFrameRate: Double = 60
+    // Duration is read directly from recordingCoordinator — no duplicate polling timer
 
     // MARK: - Queues
 
@@ -89,6 +92,10 @@ final class CameraService: NSObject {
 
     // MARK: - Session Setup
 
+    var isSessionConfiguredForCurrentParams: Bool {
+        isSessionConfigured
+    }
+
     func setupSession(position: AVCaptureDevice.Position = .back, frameRate: Double = 60) {
         sessionQueue.async { [weak self] in
             self?.configureSession(position: position, frameRate: frameRate)
@@ -96,6 +103,14 @@ final class CameraService: NSObject {
     }
 
     private func configureSession(position: AVCaptureDevice.Position, frameRate: Double) {
+        guard !isConfiguring else { return }
+        isConfiguring = true
+        defer { isConfiguring = false }
+
+        if captureSession.isRunning {
+            captureSession.stopRunning()
+        }
+
         configureAudioSession()
 
         let (outputs, error) = configurator.configure(
@@ -137,12 +152,14 @@ final class CameraService: NSObject {
     }
 
     func stopSession() {
+        onFrameCaptured = nil
+        onAudioCaptured = nil
         sessionQueue.async { [weak self] in
             guard let self else { return }
             if self.captureSession.isRunning { self.captureSession.stopRunning() }
+            self.deactivateAudioSession()
             DispatchQueue.main.async { self.isSessionRunning = false }
         }
-        deactivateAudioSession()
     }
 
     func pauseSession() {
@@ -204,7 +221,6 @@ final class CameraService: NSObject {
         } else {
             DispatchQueue.main.async {
                 self.isRecording = true
-                self.recordedDuration = 0
                 self.droppedFrameCount = 0
             }
         }
@@ -216,7 +232,9 @@ final class CameraService: NSObject {
         sessionQueue.async { [weak self] in
             guard let self else { return }
             self.recordingCoordinator.stopRecording(movieOutput: self.movieFileOutput)
-            DispatchQueue.main.async { self.isRecording = false }
+            DispatchQueue.main.async {
+                self.isRecording = false
+            }
         }
     }
 
@@ -307,7 +325,6 @@ extension CameraService: AVCaptureFileOutputRecordingDelegate {
         recordingCoordinator.markRecordingFinished()
         DispatchQueue.main.async { [weak self] in
             self?.isRecording = false
-            self?.recordedDuration = self?.recordingCoordinator.recordedDuration ?? 0
             self?.onRecordingFinished?(outputFileURL, error)
         }
     }

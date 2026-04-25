@@ -37,10 +37,15 @@ final class DetectionOrchestrator: @unchecked Sendable {
     // MARK: - State
 
     private var isActive = false
+    private let isActiveLock = NSLock()
     private let processingQueue = DispatchQueue(
         label: "com.golfsync.detection",
         qos: .userInitiated
     )
+
+    /// First frame's host-clock timestamp, used to normalize all detection
+    /// timestamps to recording-relative values (file timeline starts at 0).
+    private var baseTimestamp: TimeInterval?
 
     init(
         poseDetector: PoseDetector = PoseDetector(),
@@ -59,29 +64,52 @@ final class DetectionOrchestrator: @unchecked Sendable {
     // MARK: - Lifecycle
 
     func start() {
+        isActiveLock.lock()
         isActive = true
+        baseTimestamp = nil
+        isActiveLock.unlock()
         poseDetector.clearBuffer()
         stateMachine.reset()
         AppLogger.detection.info("DetectionOrchestrator: started")
     }
 
     func stop() {
-        isActive = false
+        processingQueue.sync {
+            self.isActiveLock.lock()
+            self.isActive = false
+            self.isActiveLock.unlock()
+        }
+        poseDetector.clearBuffer()
         AppLogger.detection.info("DetectionOrchestrator: stopped")
     }
 
     // MARK: - Frame Processing
 
     func processFrame(pixelBuffer: CVPixelBuffer, timestamp: TimeInterval) {
-        guard isActive else { return }
+        // Normalize host-clock timestamps to recording-relative (0-based).
+        // AVCaptureMovieFileOutput writes a zero-based timeline, so detection
+        // timestamps must match the file's timeline for seek/playback.
+        isActiveLock.lock()
+        let active = isActive
+        if active && baseTimestamp == nil { baseTimestamp = timestamp }
+        let base = baseTimestamp ?? 0
+        isActiveLock.unlock()
+        guard active else { return }
+
+        let relativeTimestamp = timestamp - base
 
         processingQueue.async { [weak self] in
-            self?.handleFrame(pixelBuffer: pixelBuffer, timestamp: timestamp)
+            self?.handleFrame(pixelBuffer: pixelBuffer, timestamp: relativeTimestamp)
         }
     }
 
     private func handleFrame(pixelBuffer: CVPixelBuffer, timestamp: TimeInterval) {
         let _ = poseDetector.processFrame(pixelBuffer: pixelBuffer, timestamp: timestamp)
+
+        // Skip detection during cooldown — just buffer frames for impact analysis.
+        // isInCooldown(at:) auto-transitions to .idle once cooldownDuration elapses.
+        guard !stateMachine.isInCooldown(at: timestamp) else { return }
+
         let recentFrames = poseDetector.recentFrames(count: analysisWindowSize)
 
         guard recentFrames.count >= analysisWindowSize else { return }
@@ -121,18 +149,20 @@ final class DetectionOrchestrator: @unchecked Sendable {
 
     private func detectSwing(in frames: [PoseFrame]) -> SwingEvent {
         let heuristicsResult = heuristics.analyze(frames: frames)
-        let classifierResult = classifier.analyze(frames: frames)
 
-        // Consensus: both must detect a swing to reduce false positives.
-        // If classifier is unavailable, heuristics alone suffices.
-        if classifier.isAvailable {
-            guard case .swingDetected(let cc, let ct) = classifierResult,
-                  case .swingDetected = heuristicsResult else {
-                return .noSwing
-            }
-            return .swingDetected(confidence: cc, timestamp: ct)
+        // Heuristics-primary: classifier is broken (always outputs "swing"),
+        // so heuristics drives detection. Classifier acts as optional confidence boost.
+        guard case .swingDetected(let hc, let ht) = heuristicsResult else {
+            return .noSwing
         }
 
-        return heuristicsResult
+        let classifierResult = classifier.analyze(frames: frames)
+        let boostedConfidence: Double = {
+            guard classifier.isAvailable,
+                  case .swingDetected = classifierResult else { return hc }
+            return min(1.0, hc + 0.15)
+        }()
+
+        return .swingDetected(confidence: boostedConfidence, timestamp: ht)
     }
 }

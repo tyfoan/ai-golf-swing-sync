@@ -55,4 +55,16 @@ struct SwingStateMachineTests {
         #expect(result == nil)
         #expect(machine.currentState == .idle)
     }
+
+    @Test("isInCooldown(at:) auto-expires once cooldownDuration elapses")
+    func isInCooldownAutoExpires() {
+        let machine = SwingStateMachine(cooldownDuration: 2.0)
+        machine.transitionToReplay(impactTime: 1.0, startTime: 0.5, endTime: 2.0)
+
+        #expect(machine.isInCooldown(at: 3.0) == true)
+        #expect(machine.currentState == .cooldown)
+
+        #expect(machine.isInCooldown(at: 4.5) == false)
+        #expect(machine.currentState == .idle)
+    }
 }

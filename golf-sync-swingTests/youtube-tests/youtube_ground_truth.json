@@ -1,0 +1,7346 @@
+[
+  {
+    "filename": "golfdb_GXn3A0IuWsE.mp4",
+    "youtube_id": "GXn3A0IuWsE",
+    "golfdb_index": 1388,
+    "player": "ROGER CLEMENS",
+    "club": "driver",
+    "view": "face-on",
+    "fps": 30,
+    "trim_start_sec": 7.5,
+    "trim_end_sec": 10.9,
+    "impact_time_sec": 1.967,
+    "events": {
+      "pre": {
+        "original_frame": 211,
+        "time_in_clip_sec": -0.467
+      },
+      "address": {
+        "original_frame": 255,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 265,
+        "time_in_clip_sec": 1.333
+      },
+      "mid_backswing": {
+        "original_frame": 270,
+        "time_in_clip_sec": 1.5
+      },
+      "top": {
+        "original_frame": 276,
+        "time_in_clip_sec": 1.7
+      },
+      "mid_downswing": {
+        "original_frame": 280,
+        "time_in_clip_sec": 1.833
+      },
+      "impact": {
+        "original_frame": 284,
+        "time_in_clip_sec": 1.967
+      },
+      "mid_follow_through": {
+        "original_frame": 286,
+        "time_in_clip_sec": 2.033
+      },
+      "finish": {
+        "original_frame": 297,
+        "time_in_clip_sec": 2.4
+      },
+      "post": {
+        "original_frame": 331,
+        "time_in_clip_sec": 3.533
+      }
+    }
+  },
+  {
+    "filename": "golfdb_-x6fBaulaWU.mp4",
+    "youtube_id": "-x6fBaulaWU",
+    "golfdb_index": 656,
+    "player": "MINJEE LEE",
+    "club": "driver",
+    "view": "face-on",
+    "fps": 30,
+    "trim_start_sec": 17.4,
+    "trim_end_sec": 21.6,
+    "impact_time_sec": 2.533,
+    "events": {
+      "pre": {
+        "original_frame": 391,
+        "time_in_clip_sec": -4.367
+      },
+      "address": {
+        "original_frame": 552,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 571,
+        "time_in_clip_sec": 1.633
+      },
+      "mid_backswing": {
+        "original_frame": 580,
+        "time_in_clip_sec": 1.933
+      },
+      "top": {
+        "original_frame": 590,
+        "time_in_clip_sec": 2.267
+      },
+      "mid_downswing": {
+        "original_frame": 594,
+        "time_in_clip_sec": 2.4
+      },
+      "impact": {
+        "original_frame": 598,
+        "time_in_clip_sec": 2.533
+      },
+      "mid_follow_through": {
+        "original_frame": 600,
+        "time_in_clip_sec": 2.6
+      },
+      "finish": {
+        "original_frame": 618,
+        "time_in_clip_sec": 3.2
+      },
+      "post": {
+        "original_frame": 661,
+        "time_in_clip_sec": 4.633
+      }
+    }
+  },
+  {
+    "filename": "golfdb_bOcZP5_fPxo.mp4",
+    "youtube_id": "bOcZP5_fPxo",
+    "golfdb_index": 1272,
+    "player": "CHARLIE WI",
+    "club": "driver",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 21.267,
+    "trim_end_sec": 24.8,
+    "impact_time_sec": 2.067,
+    "events": {
+      "pre": {
+        "original_frame": 391,
+        "time_in_clip_sec": -8.233
+      },
+      "address": {
+        "original_frame": 668,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 682,
+        "time_in_clip_sec": 1.467
+      },
+      "mid_backswing": {
+        "original_frame": 686,
+        "time_in_clip_sec": 1.6
+      },
+      "top": {
+        "original_frame": 693,
+        "time_in_clip_sec": 1.833
+      },
+      "mid_downswing": {
+        "original_frame": 697,
+        "time_in_clip_sec": 1.967
+      },
+      "impact": {
+        "original_frame": 700,
+        "time_in_clip_sec": 2.067
+      },
+      "mid_follow_through": {
+        "original_frame": 703,
+        "time_in_clip_sec": 2.167
+      },
+      "finish": {
+        "original_frame": 714,
+        "time_in_clip_sec": 2.533
+      },
+      "post": {
+        "original_frame": 750,
+        "time_in_clip_sec": 3.733
+      }
+    }
+  },
+  {
+    "filename": "golfdb_7DR3pFxkPVg.mp4",
+    "youtube_id": "7DR3pFxkPVg",
+    "golfdb_index": 1117,
+    "player": "BRYSON DECHAMBEAU",
+    "club": "driver",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 6.3,
+    "trim_end_sec": 9.967,
+    "impact_time_sec": 2.133,
+    "events": {
+      "pre": {
+        "original_frame": 62,
+        "time_in_clip_sec": -4.233
+      },
+      "address": {
+        "original_frame": 219,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 234,
+        "time_in_clip_sec": 1.5
+      },
+      "mid_backswing": {
+        "original_frame": 237,
+        "time_in_clip_sec": 1.6
+      },
+      "top": {
+        "original_frame": 245,
+        "time_in_clip_sec": 1.867
+      },
+      "mid_downswing": {
+        "original_frame": 250,
+        "time_in_clip_sec": 2.033
+      },
+      "impact": {
+        "original_frame": 253,
+        "time_in_clip_sec": 2.133
+      },
+      "mid_follow_through": {
+        "original_frame": 255,
+        "time_in_clip_sec": 2.2
+      },
+      "finish": {
+        "original_frame": 269,
+        "time_in_clip_sec": 2.667
+      },
+      "post": {
+        "original_frame": 307,
+        "time_in_clip_sec": 3.933
+      }
+    }
+  },
+  {
+    "filename": "golfdb_qqF9qeNzqTA.mp4",
+    "youtube_id": "qqF9qeNzqTA",
+    "golfdb_index": 1309,
+    "player": "LYDIA KO",
+    "club": "wedge",
+    "view": "other",
+    "fps": 30,
+    "trim_start_sec": 12.767,
+    "trim_end_sec": 16.933,
+    "impact_time_sec": 2.433,
+    "events": {
+      "pre": {
+        "original_frame": 301,
+        "time_in_clip_sec": -2.733
+      },
+      "address": {
+        "original_frame": 413,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 429,
+        "time_in_clip_sec": 1.533
+      },
+      "mid_backswing": {
+        "original_frame": 437,
+        "time_in_clip_sec": 1.8
+      },
+      "top": {
+        "original_frame": 447,
+        "time_in_clip_sec": 2.133
+      },
+      "mid_downswing": {
+        "original_frame": 452,
+        "time_in_clip_sec": 2.3
+      },
+      "impact": {
+        "original_frame": 456,
+        "time_in_clip_sec": 2.433
+      },
+      "mid_follow_through": {
+        "original_frame": 459,
+        "time_in_clip_sec": 2.533
+      },
+      "finish": {
+        "original_frame": 478,
+        "time_in_clip_sec": 3.167
+      },
+      "post": {
+        "original_frame": 575,
+        "time_in_clip_sec": 6.4
+      }
+    }
+  },
+  {
+    "filename": "golfdb_7dI2HeBChks.mp4",
+    "youtube_id": "7dI2HeBChks",
+    "golfdb_index": 138,
+    "player": "SO YEON RYU",
+    "club": "iron",
+    "view": "other",
+    "fps": 30,
+    "trim_start_sec": 73.8,
+    "trim_end_sec": 78.133,
+    "impact_time_sec": 2.267,
+    "events": {
+      "pre": {
+        "original_frame": 2029,
+        "time_in_clip_sec": -6.167
+      },
+      "address": {
+        "original_frame": 2244,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 2255,
+        "time_in_clip_sec": 1.367
+      },
+      "mid_backswing": {
+        "original_frame": 2266,
+        "time_in_clip_sec": 1.733
+      },
+      "top": {
+        "original_frame": 2275,
+        "time_in_clip_sec": 2.033
+      },
+      "mid_downswing": {
+        "original_frame": 2278,
+        "time_in_clip_sec": 2.133
+      },
+      "impact": {
+        "original_frame": 2282,
+        "time_in_clip_sec": 2.267
+      },
+      "mid_follow_through": {
+        "original_frame": 2285,
+        "time_in_clip_sec": 2.367
+      },
+      "finish": {
+        "original_frame": 2314,
+        "time_in_clip_sec": 3.333
+      },
+      "post": {
+        "original_frame": 2377,
+        "time_in_clip_sec": 5.433
+      }
+    }
+  },
+  {
+    "filename": "golfdb_U2iNjzyTIJE.mp4",
+    "youtube_id": "U2iNjzyTIJE",
+    "golfdb_index": 572,
+    "player": "IAN POULTER",
+    "club": "driver",
+    "view": "other",
+    "fps": 30,
+    "trim_start_sec": 16.833,
+    "trim_end_sec": 20.233,
+    "impact_time_sec": 1.9,
+    "events": {
+      "pre": {
+        "original_frame": 323,
+        "time_in_clip_sec": -6.067
+      },
+      "address": {
+        "original_frame": 535,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 544,
+        "time_in_clip_sec": 1.3
+      },
+      "mid_backswing": {
+        "original_frame": 547,
+        "time_in_clip_sec": 1.4
+      },
+      "top": {
+        "original_frame": 555,
+        "time_in_clip_sec": 1.667
+      },
+      "mid_downswing": {
+        "original_frame": 559,
+        "time_in_clip_sec": 1.8
+      },
+      "impact": {
+        "original_frame": 562,
+        "time_in_clip_sec": 1.9
+      },
+      "mid_follow_through": {
+        "original_frame": 564,
+        "time_in_clip_sec": 1.967
+      },
+      "finish": {
+        "original_frame": 577,
+        "time_in_clip_sec": 2.4
+      },
+      "post": {
+        "original_frame": 610,
+        "time_in_clip_sec": 3.5
+      }
+    }
+  },
+  {
+    "filename": "golfdb_9pp7eRBOCso.mp4",
+    "youtube_id": "9pp7eRBOCso",
+    "golfdb_index": 805,
+    "player": "LYDIA KO",
+    "club": "fairway",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 17.733,
+    "trim_end_sec": 21.933,
+    "impact_time_sec": 2.467,
+    "events": {
+      "pre": {
+        "original_frame": 151,
+        "time_in_clip_sec": -12.7
+      },
+      "address": {
+        "original_frame": 562,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 583,
+        "time_in_clip_sec": 1.7
+      },
+      "mid_backswing": {
+        "original_frame": 589,
+        "time_in_clip_sec": 1.9
+      },
+      "top": {
+        "original_frame": 597,
+        "time_in_clip_sec": 2.167
+      },
+      "mid_downswing": {
+        "original_frame": 602,
+        "time_in_clip_sec": 2.333
+      },
+      "impact": {
+        "original_frame": 606,
+        "time_in_clip_sec": 2.467
+      },
+      "mid_follow_through": {
+        "original_frame": 608,
+        "time_in_clip_sec": 2.533
+      },
+      "finish": {
+        "original_frame": 628,
+        "time_in_clip_sec": 3.2
+      },
+      "post": {
+        "original_frame": 662,
+        "time_in_clip_sec": 4.333
+      }
+    }
+  },
+  {
+    "filename": "golfdb_RibG0A13urY.mp4",
+    "youtube_id": "RibG0A13urY",
+    "golfdb_index": 824,
+    "player": "CRISTIE KERR",
+    "club": "driver",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 3.633,
+    "trim_end_sec": 7.7,
+    "impact_time_sec": 2.367,
+    "events": {
+      "pre": {
+        "original_frame": 63,
+        "time_in_clip_sec": -1.533
+      },
+      "address": {
+        "original_frame": 139,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 157,
+        "time_in_clip_sec": 1.6
+      },
+      "mid_backswing": {
+        "original_frame": 159,
+        "time_in_clip_sec": 1.667
+      },
+      "top": {
+        "original_frame": 170,
+        "time_in_clip_sec": 2.033
+      },
+      "mid_downswing": {
+        "original_frame": 176,
+        "time_in_clip_sec": 2.233
+      },
+      "impact": {
+        "original_frame": 180,
+        "time_in_clip_sec": 2.367
+      },
+      "mid_follow_through": {
+        "original_frame": 182,
+        "time_in_clip_sec": 2.433
+      },
+      "finish": {
+        "original_frame": 201,
+        "time_in_clip_sec": 3.067
+      },
+      "post": {
+        "original_frame": 237,
+        "time_in_clip_sec": 4.267
+      }
+    }
+  },
+  {
+    "filename": "golfdb_C4Vt3X8P6xs.mp4",
+    "youtube_id": "C4Vt3X8P6xs",
+    "golfdb_index": 1168,
+    "player": "RICKY BARNES",
+    "club": "hybrid",
+    "view": "other",
+    "fps": 30,
+    "trim_start_sec": 12.133,
+    "trim_end_sec": 15.833,
+    "impact_time_sec": 2.067,
+    "events": {
+      "pre": {
+        "original_frame": 211,
+        "time_in_clip_sec": -5.1
+      },
+      "address": {
+        "original_frame": 394,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 406,
+        "time_in_clip_sec": 1.4
+      },
+      "mid_backswing": {
+        "original_frame": 410,
+        "time_in_clip_sec": 1.533
+      },
+      "top": {
+        "original_frame": 418,
+        "time_in_clip_sec": 1.8
+      },
+      "mid_downswing": {
+        "original_frame": 423,
+        "time_in_clip_sec": 1.967
+      },
+      "impact": {
+        "original_frame": 426,
+        "time_in_clip_sec": 2.067
+      },
+      "mid_follow_through": {
+        "original_frame": 428,
+        "time_in_clip_sec": 2.133
+      },
+      "finish": {
+        "original_frame": 445,
+        "time_in_clip_sec": 2.7
+      },
+      "post": {
+        "original_frame": 480,
+        "time_in_clip_sec": 3.867
+      }
+    }
+  },
+  {
+    "filename": "golfdb_gdoWMR-tauc.mp4",
+    "youtube_id": "gdoWMR-tauc",
+    "golfdb_index": 1044,
+    "player": "AZAHARA MUNOZ",
+    "club": "driver",
+    "view": "face-on",
+    "fps": 30,
+    "trim_start_sec": 10.9,
+    "trim_end_sec": 14.867,
+    "impact_time_sec": 2.133,
+    "events": {
+      "pre": {
+        "original_frame": 241,
+        "time_in_clip_sec": -2.867
+      },
+      "address": {
+        "original_frame": 357,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 370,
+        "time_in_clip_sec": 1.433
+      },
+      "mid_backswing": {
+        "original_frame": 375,
+        "time_in_clip_sec": 1.6
+      },
+      "top": {
+        "original_frame": 382,
+        "time_in_clip_sec": 1.833
+      },
+      "mid_downswing": {
+        "original_frame": 387,
+        "time_in_clip_sec": 2.0
+      },
+      "impact": {
+        "original_frame": 391,
+        "time_in_clip_sec": 2.133
+      },
+      "mid_follow_through": {
+        "original_frame": 394,
+        "time_in_clip_sec": 2.233
+      },
+      "finish": {
+        "original_frame": 416,
+        "time_in_clip_sec": 2.967
+      },
+      "post": {
+        "original_frame": 450,
+        "time_in_clip_sec": 4.1
+      }
+    }
+  },
+  {
+    "filename": "golfdb_ZivMJ6nSS-E.mp4",
+    "youtube_id": "ZivMJ6nSS-E",
+    "golfdb_index": 472,
+    "player": "TONY FINAU",
+    "club": "iron",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 24.367,
+    "trim_end_sec": 27.967,
+    "impact_time_sec": 2.0,
+    "events": {
+      "pre": {
+        "original_frame": 361,
+        "time_in_clip_sec": -12.333
+      },
+      "address": {
+        "original_frame": 761,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 775,
+        "time_in_clip_sec": 1.467
+      },
+      "mid_backswing": {
+        "original_frame": 780,
+        "time_in_clip_sec": 1.633
+      },
+      "top": {
+        "original_frame": 785,
+        "time_in_clip_sec": 1.8
+      },
+      "mid_downswing": {
+        "original_frame": 788,
+        "time_in_clip_sec": 1.9
+      },
+      "impact": {
+        "original_frame": 791,
+        "time_in_clip_sec": 2.0
+      },
+      "mid_follow_through": {
+        "original_frame": 793,
+        "time_in_clip_sec": 2.067
+      },
+      "finish": {
+        "original_frame": 809,
+        "time_in_clip_sec": 2.6
+      },
+      "post": {
+        "original_frame": 844,
+        "time_in_clip_sec": 3.767
+      }
+    }
+  },
+  {
+    "filename": "golfdb_07lqNiTJVqc.mp4",
+    "youtube_id": "07lqNiTJVqc",
+    "golfdb_index": 1170,
+    "player": "HALE IRWIN",
+    "club": "driver",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 13.533,
+    "trim_end_sec": 17.267,
+    "impact_time_sec": 2.1,
+    "events": {
+      "pre": {
+        "original_frame": 91,
+        "time_in_clip_sec": -10.5
+      },
+      "address": {
+        "original_frame": 436,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 451,
+        "time_in_clip_sec": 1.5
+      },
+      "mid_backswing": {
+        "original_frame": 456,
+        "time_in_clip_sec": 1.667
+      },
+      "top": {
+        "original_frame": 462,
+        "time_in_clip_sec": 1.867
+      },
+      "mid_downswing": {
+        "original_frame": 466,
+        "time_in_clip_sec": 2.0
+      },
+      "impact": {
+        "original_frame": 469,
+        "time_in_clip_sec": 2.1
+      },
+      "mid_follow_through": {
+        "original_frame": 472,
+        "time_in_clip_sec": 2.2
+      },
+      "finish": {
+        "original_frame": 488,
+        "time_in_clip_sec": 2.733
+      },
+      "post": {
+        "original_frame": 524,
+        "time_in_clip_sec": 3.933
+      }
+    }
+  },
+  {
+    "filename": "golfdb_H9MWcs3YS-I.mp4",
+    "youtube_id": "H9MWcs3YS-I",
+    "golfdb_index": 1102,
+    "player": "TIGER WOODS",
+    "club": "iron",
+    "view": "other",
+    "fps": 30,
+    "trim_start_sec": 57.2,
+    "trim_end_sec": 60.767,
+    "impact_time_sec": 1.967,
+    "events": {
+      "pre": {
+        "original_frame": 1523,
+        "time_in_clip_sec": -6.433
+      },
+      "address": {
+        "original_frame": 1746,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 1758,
+        "time_in_clip_sec": 1.4
+      },
+      "mid_backswing": {
+        "original_frame": 1761,
+        "time_in_clip_sec": 1.5
+      },
+      "top": {
+        "original_frame": 1767,
+        "time_in_clip_sec": 1.7
+      },
+      "mid_downswing": {
+        "original_frame": 1772,
+        "time_in_clip_sec": 1.867
+      },
+      "impact": {
+        "original_frame": 1775,
+        "time_in_clip_sec": 1.967
+      },
+      "mid_follow_through": {
+        "original_frame": 1777,
+        "time_in_clip_sec": 2.033
+      },
+      "finish": {
+        "original_frame": 1793,
+        "time_in_clip_sec": 2.567
+      },
+      "post": {
+        "original_frame": 1823,
+        "time_in_clip_sec": 3.567
+      }
+    }
+  },
+  {
+    "filename": "golfdb_8HJXWpyYWVE.mp4",
+    "youtube_id": "8HJXWpyYWVE",
+    "golfdb_index": 759,
+    "player": "GRAEME MCDOWELL",
+    "club": "fairway",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 86.467,
+    "trim_end_sec": 89.867,
+    "impact_time_sec": 1.933,
+    "events": {
+      "pre": {
+        "original_frame": 2519,
+        "time_in_clip_sec": -2.5
+      },
+      "address": {
+        "original_frame": 2624,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 2635,
+        "time_in_clip_sec": 1.367
+      },
+      "mid_backswing": {
+        "original_frame": 2641,
+        "time_in_clip_sec": 1.567
+      },
+      "top": {
+        "original_frame": 2645,
+        "time_in_clip_sec": 1.7
+      },
+      "mid_downswing": {
+        "original_frame": 2649,
+        "time_in_clip_sec": 1.833
+      },
+      "impact": {
+        "original_frame": 2652,
+        "time_in_clip_sec": 1.933
+      },
+      "mid_follow_through": {
+        "original_frame": 2654,
+        "time_in_clip_sec": 2.0
+      },
+      "finish": {
+        "original_frame": 2666,
+        "time_in_clip_sec": 2.4
+      },
+      "post": {
+        "original_frame": 2700,
+        "time_in_clip_sec": 3.533
+      }
+    }
+  },
+  {
+    "filename": "golfdb_1dSKw-krBIU.mp4",
+    "youtube_id": "1dSKw-krBIU",
+    "golfdb_index": 92,
+    "player": "BUBBA WATSON",
+    "club": "iron",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 10.5,
+    "trim_end_sec": 13.867,
+    "impact_time_sec": 2.0,
+    "events": {
+      "pre": {
+        "original_frame": 301,
+        "time_in_clip_sec": -0.467
+      },
+      "address": {
+        "original_frame": 345,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 354,
+        "time_in_clip_sec": 1.3
+      },
+      "mid_backswing": {
+        "original_frame": 357,
+        "time_in_clip_sec": 1.4
+      },
+      "top": {
+        "original_frame": 366,
+        "time_in_clip_sec": 1.7
+      },
+      "mid_downswing": {
+        "original_frame": 372,
+        "time_in_clip_sec": 1.9
+      },
+      "impact": {
+        "original_frame": 375,
+        "time_in_clip_sec": 2.0
+      },
+      "mid_follow_through": {
+        "original_frame": 378,
+        "time_in_clip_sec": 2.1
+      },
+      "finish": {
+        "original_frame": 386,
+        "time_in_clip_sec": 2.367
+      },
+      "post": {
+        "original_frame": 421,
+        "time_in_clip_sec": 3.533
+      }
+    }
+  },
+  {
+    "filename": "golfdb_SVM8DLYNeK0.mp4",
+    "youtube_id": "SVM8DLYNeK0",
+    "golfdb_index": 1245,
+    "player": "JEFF MAGGERT",
+    "club": "iron",
+    "view": "face-on",
+    "fps": 30,
+    "trim_start_sec": 4.467,
+    "trim_end_sec": 8.267,
+    "impact_time_sec": 1.967,
+    "events": {
+      "pre": {
+        "original_frame": 91,
+        "time_in_clip_sec": -1.433
+      },
+      "address": {
+        "original_frame": 164,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 176,
+        "time_in_clip_sec": 1.4
+      },
+      "mid_backswing": {
+        "original_frame": 182,
+        "time_in_clip_sec": 1.6
+      },
+      "top": {
+        "original_frame": 187,
+        "time_in_clip_sec": 1.767
+      },
+      "mid_downswing": {
+        "original_frame": 189,
+        "time_in_clip_sec": 1.833
+      },
+      "impact": {
+        "original_frame": 193,
+        "time_in_clip_sec": 1.967
+      },
+      "mid_follow_through": {
+        "original_frame": 195,
+        "time_in_clip_sec": 2.033
+      },
+      "finish": {
+        "original_frame": 218,
+        "time_in_clip_sec": 2.8
+      },
+      "post": {
+        "original_frame": 255,
+        "time_in_clip_sec": 4.033
+      }
+    }
+  },
+  {
+    "filename": "golfdb_eQEdf5KMyzM.mp4",
+    "youtube_id": "eQEdf5KMyzM",
+    "golfdb_index": 648,
+    "player": "MORGAN PRESSEL",
+    "club": "iron",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 13.5,
+    "trim_end_sec": 17.5,
+    "impact_time_sec": 2.2,
+    "events": {
+      "pre": {
+        "original_frame": 391,
+        "time_in_clip_sec": -0.467
+      },
+      "address": {
+        "original_frame": 435,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 449,
+        "time_in_clip_sec": 1.467
+      },
+      "mid_backswing": {
+        "original_frame": 454,
+        "time_in_clip_sec": 1.633
+      },
+      "top": {
+        "original_frame": 464,
+        "time_in_clip_sec": 1.967
+      },
+      "mid_downswing": {
+        "original_frame": 467,
+        "time_in_clip_sec": 2.067
+      },
+      "impact": {
+        "original_frame": 471,
+        "time_in_clip_sec": 2.2
+      },
+      "mid_follow_through": {
+        "original_frame": 474,
+        "time_in_clip_sec": 2.3
+      },
+      "finish": {
+        "original_frame": 495,
+        "time_in_clip_sec": 3.0
+      },
+      "post": {
+        "original_frame": 557,
+        "time_in_clip_sec": 5.067
+      }
+    }
+  },
+  {
+    "filename": "golfdb_hoq35-zbmVk.mp4",
+    "youtube_id": "hoq35-zbmVk",
+    "golfdb_index": 561,
+    "player": "TIM TEBOW",
+    "club": "driver",
+    "view": "face-on",
+    "fps": 30,
+    "trim_start_sec": 10.733,
+    "trim_end_sec": 14.633,
+    "impact_time_sec": 2.433,
+    "events": {
+      "pre": {
+        "original_frame": 151,
+        "time_in_clip_sec": -5.7
+      },
+      "address": {
+        "original_frame": 352,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 370,
+        "time_in_clip_sec": 1.6
+      },
+      "mid_backswing": {
+        "original_frame": 376,
+        "time_in_clip_sec": 1.8
+      },
+      "top": {
+        "original_frame": 385,
+        "time_in_clip_sec": 2.1
+      },
+      "mid_downswing": {
+        "original_frame": 392,
+        "time_in_clip_sec": 2.333
+      },
+      "impact": {
+        "original_frame": 395,
+        "time_in_clip_sec": 2.433
+      },
+      "mid_follow_through": {
+        "original_frame": 396,
+        "time_in_clip_sec": 2.467
+      },
+      "finish": {
+        "original_frame": 409,
+        "time_in_clip_sec": 2.9
+      },
+      "post": {
+        "original_frame": 451,
+        "time_in_clip_sec": 4.3
+      }
+    }
+  },
+  {
+    "filename": "golfdb_dodETKV2Xpg.mp4",
+    "youtube_id": "dodETKV2Xpg",
+    "golfdb_index": 781,
+    "player": "ANNA NORDQVIST",
+    "club": "driver",
+    "view": "face-on",
+    "fps": 30,
+    "trim_start_sec": 15.533,
+    "trim_end_sec": 19.3,
+    "impact_time_sec": 2.2,
+    "events": {
+      "pre": {
+        "original_frame": 361,
+        "time_in_clip_sec": -3.5
+      },
+      "address": {
+        "original_frame": 496,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 511,
+        "time_in_clip_sec": 1.5
+      },
+      "mid_backswing": {
+        "original_frame": 518,
+        "time_in_clip_sec": 1.733
+      },
+      "top": {
+        "original_frame": 524,
+        "time_in_clip_sec": 1.933
+      },
+      "mid_downswing": {
+        "original_frame": 528,
+        "time_in_clip_sec": 2.067
+      },
+      "impact": {
+        "original_frame": 532,
+        "time_in_clip_sec": 2.2
+      },
+      "mid_follow_through": {
+        "original_frame": 535,
+        "time_in_clip_sec": 2.3
+      },
+      "finish": {
+        "original_frame": 549,
+        "time_in_clip_sec": 2.767
+      },
+      "post": {
+        "original_frame": 595,
+        "time_in_clip_sec": 4.3
+      }
+    }
+  },
+  {
+    "filename": "golfdb_lJTm53jHTiY.mp4",
+    "youtube_id": "lJTm53jHTiY",
+    "golfdb_index": 909,
+    "player": "KARINE ICHER",
+    "club": "driver",
+    "view": "face-on",
+    "fps": 30,
+    "trim_start_sec": 0.633,
+    "trim_end_sec": 4.467,
+    "impact_time_sec": 2.267,
+    "events": {
+      "pre": {
+        "original_frame": 31,
+        "time_in_clip_sec": 0.4
+      },
+      "address": {
+        "original_frame": 49,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 62,
+        "time_in_clip_sec": 1.433
+      },
+      "mid_backswing": {
+        "original_frame": 66,
+        "time_in_clip_sec": 1.567
+      },
+      "top": {
+        "original_frame": 77,
+        "time_in_clip_sec": 1.933
+      },
+      "mid_downswing": {
+        "original_frame": 83,
+        "time_in_clip_sec": 2.133
+      },
+      "impact": {
+        "original_frame": 87,
+        "time_in_clip_sec": 2.267
+      },
+      "mid_follow_through": {
+        "original_frame": 89,
+        "time_in_clip_sec": 2.333
+      },
+      "finish": {
+        "original_frame": 104,
+        "time_in_clip_sec": 2.833
+      },
+      "post": {
+        "original_frame": 144,
+        "time_in_clip_sec": 4.167
+      }
+    }
+  },
+  {
+    "filename": "golfdb_blonNcv1yas.mp4",
+    "youtube_id": "blonNcv1yas",
+    "golfdb_index": 521,
+    "player": "TIGER WOODS",
+    "club": "wedge",
+    "view": "face-on",
+    "fps": 30,
+    "trim_start_sec": 208.133,
+    "trim_end_sec": 211.7,
+    "impact_time_sec": 2.0,
+    "events": {
+      "pre": {
+        "original_frame": 6129,
+        "time_in_clip_sec": -3.833
+      },
+      "address": {
+        "original_frame": 6274,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 6286,
+        "time_in_clip_sec": 1.4
+      },
+      "mid_backswing": {
+        "original_frame": 6290,
+        "time_in_clip_sec": 1.533
+      },
+      "top": {
+        "original_frame": 6297,
+        "time_in_clip_sec": 1.767
+      },
+      "mid_downswing": {
+        "original_frame": 6301,
+        "time_in_clip_sec": 1.9
+      },
+      "impact": {
+        "original_frame": 6304,
+        "time_in_clip_sec": 2.0
+      },
+      "mid_follow_through": {
+        "original_frame": 6306,
+        "time_in_clip_sec": 2.067
+      },
+      "finish": {
+        "original_frame": 6321,
+        "time_in_clip_sec": 2.567
+      },
+      "post": {
+        "original_frame": 6360,
+        "time_in_clip_sec": 3.867
+      }
+    }
+  },
+  {
+    "filename": "golfdb_iMmoQ6xPY_U.mp4",
+    "youtube_id": "iMmoQ6xPY_U",
+    "golfdb_index": 895,
+    "player": "ERNIE ELS",
+    "club": "fairway",
+    "view": "other",
+    "fps": 30,
+    "trim_start_sec": 17.667,
+    "trim_end_sec": 21.633,
+    "impact_time_sec": 2.1,
+    "events": {
+      "pre": {
+        "original_frame": 271,
+        "time_in_clip_sec": -8.633
+      },
+      "address": {
+        "original_frame": 560,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 572,
+        "time_in_clip_sec": 1.4
+      },
+      "mid_backswing": {
+        "original_frame": 577,
+        "time_in_clip_sec": 1.567
+      },
+      "top": {
+        "original_frame": 584,
+        "time_in_clip_sec": 1.8
+      },
+      "mid_downswing": {
+        "original_frame": 590,
+        "time_in_clip_sec": 2.0
+      },
+      "impact": {
+        "original_frame": 593,
+        "time_in_clip_sec": 2.1
+      },
+      "mid_follow_through": {
+        "original_frame": 596,
+        "time_in_clip_sec": 2.2
+      },
+      "finish": {
+        "original_frame": 619,
+        "time_in_clip_sec": 2.967
+      },
+      "post": {
+        "original_frame": 653,
+        "time_in_clip_sec": 4.1
+      }
+    }
+  },
+  {
+    "filename": "golfdb_04d08bM6-6U.mp4",
+    "youtube_id": "04d08bM6-6U",
+    "golfdb_index": 114,
+    "player": "EUN-HEE JI",
+    "club": "iron",
+    "view": "face-on",
+    "fps": 30,
+    "trim_start_sec": 21.4,
+    "trim_end_sec": 30.967,
+    "impact_time_sec": 5.567,
+    "events": {
+      "pre": {
+        "original_frame": 651,
+        "time_in_clip_sec": 0.3
+      },
+      "address": {
+        "original_frame": 672,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 719,
+        "time_in_clip_sec": 2.567
+      },
+      "mid_backswing": {
+        "original_frame": 741,
+        "time_in_clip_sec": 3.3
+      },
+      "top": {
+        "original_frame": 779,
+        "time_in_clip_sec": 4.567
+      },
+      "mid_downswing": {
+        "original_frame": 795,
+        "time_in_clip_sec": 5.1
+      },
+      "impact": {
+        "original_frame": 809,
+        "time_in_clip_sec": 5.567
+      },
+      "mid_follow_through": {
+        "original_frame": 821,
+        "time_in_clip_sec": 5.967
+      },
+      "finish": {
+        "original_frame": 899,
+        "time_in_clip_sec": 8.567
+      },
+      "post": {
+        "original_frame": 972,
+        "time_in_clip_sec": 11.0
+      }
+    }
+  },
+  {
+    "filename": "golfdb_4H2k5sHRqUU.mp4",
+    "youtube_id": "4H2k5sHRqUU",
+    "golfdb_index": 879,
+    "player": "JUSTIN ROSE",
+    "club": "driver",
+    "view": "other",
+    "fps": 30,
+    "trim_start_sec": 28.067,
+    "trim_end_sec": 32.167,
+    "impact_time_sec": 2.433,
+    "events": {
+      "pre": {
+        "original_frame": 721,
+        "time_in_clip_sec": -4.033
+      },
+      "address": {
+        "original_frame": 872,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 895,
+        "time_in_clip_sec": 1.767
+      },
+      "mid_backswing": {
+        "original_frame": 900,
+        "time_in_clip_sec": 1.933
+      },
+      "top": {
+        "original_frame": 908,
+        "time_in_clip_sec": 2.2
+      },
+      "mid_downswing": {
+        "original_frame": 912,
+        "time_in_clip_sec": 2.333
+      },
+      "impact": {
+        "original_frame": 915,
+        "time_in_clip_sec": 2.433
+      },
+      "mid_follow_through": {
+        "original_frame": 917,
+        "time_in_clip_sec": 2.5
+      },
+      "finish": {
+        "original_frame": 935,
+        "time_in_clip_sec": 3.1
+      },
+      "post": {
+        "original_frame": 969,
+        "time_in_clip_sec": 4.233
+      }
+    }
+  },
+  {
+    "filename": "golfdb_2Tj5jJ1Kh_Q.mp4",
+    "youtube_id": "2Tj5jJ1Kh_Q",
+    "golfdb_index": 501,
+    "player": "SANDRA GAL",
+    "club": "driver",
+    "view": "face-on",
+    "fps": 30,
+    "trim_start_sec": 108.867,
+    "trim_end_sec": 114.0,
+    "impact_time_sec": 2.6,
+    "events": {
+      "pre": {
+        "original_frame": 3054,
+        "time_in_clip_sec": -7.067
+      },
+      "address": {
+        "original_frame": 3296,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 3320,
+        "time_in_clip_sec": 1.8
+      },
+      "mid_backswing": {
+        "original_frame": 3324,
+        "time_in_clip_sec": 1.933
+      },
+      "top": {
+        "original_frame": 3336,
+        "time_in_clip_sec": 2.333
+      },
+      "mid_downswing": {
+        "original_frame": 3340,
+        "time_in_clip_sec": 2.467
+      },
+      "impact": {
+        "original_frame": 3344,
+        "time_in_clip_sec": 2.6
+      },
+      "mid_follow_through": {
+        "original_frame": 3347,
+        "time_in_clip_sec": 2.7
+      },
+      "finish": {
+        "original_frame": 3390,
+        "time_in_clip_sec": 4.133
+      },
+      "post": {
+        "original_frame": 3450,
+        "time_in_clip_sec": 6.133
+      }
+    }
+  },
+  {
+    "filename": "golfdb_HHPJ-KlWmWg.mp4",
+    "youtube_id": "HHPJ-KlWmWg",
+    "golfdb_index": 832,
+    "player": "ROSS FISHER",
+    "club": "hybrid",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 4.033,
+    "trim_end_sec": 7.467,
+    "impact_time_sec": 1.867,
+    "events": {
+      "pre": {
+        "original_frame": 61,
+        "time_in_clip_sec": -2.0
+      },
+      "address": {
+        "original_frame": 151,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 161,
+        "time_in_clip_sec": 1.333
+      },
+      "mid_backswing": {
+        "original_frame": 164,
+        "time_in_clip_sec": 1.433
+      },
+      "top": {
+        "original_frame": 171,
+        "time_in_clip_sec": 1.667
+      },
+      "mid_downswing": {
+        "original_frame": 175,
+        "time_in_clip_sec": 1.8
+      },
+      "impact": {
+        "original_frame": 177,
+        "time_in_clip_sec": 1.867
+      },
+      "mid_follow_through": {
+        "original_frame": 179,
+        "time_in_clip_sec": 1.933
+      },
+      "finish": {
+        "original_frame": 194,
+        "time_in_clip_sec": 2.433
+      },
+      "post": {
+        "original_frame": 228,
+        "time_in_clip_sec": 3.567
+      }
+    }
+  },
+  {
+    "filename": "golfdb_bwAvpekt8xY.mp4",
+    "youtube_id": "bwAvpekt8xY",
+    "golfdb_index": 281,
+    "player": "BRANDT SNEDEKER",
+    "club": "iron",
+    "view": "face-on",
+    "fps": 30,
+    "trim_start_sec": 19.333,
+    "trim_end_sec": 23.133,
+    "impact_time_sec": 1.867,
+    "events": {
+      "pre": {
+        "original_frame": 571,
+        "time_in_clip_sec": -0.3
+      },
+      "address": {
+        "original_frame": 610,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 618,
+        "time_in_clip_sec": 1.267
+      },
+      "mid_backswing": {
+        "original_frame": 622,
+        "time_in_clip_sec": 1.4
+      },
+      "top": {
+        "original_frame": 628,
+        "time_in_clip_sec": 1.6
+      },
+      "mid_downswing": {
+        "original_frame": 632,
+        "time_in_clip_sec": 1.733
+      },
+      "impact": {
+        "original_frame": 636,
+        "time_in_clip_sec": 1.867
+      },
+      "mid_follow_through": {
+        "original_frame": 638,
+        "time_in_clip_sec": 1.933
+      },
+      "finish": {
+        "original_frame": 664,
+        "time_in_clip_sec": 2.8
+      },
+      "post": {
+        "original_frame": 817,
+        "time_in_clip_sec": 7.9
+      }
+    }
+  },
+  {
+    "filename": "golfdb_IVRbQrq2JHo.mp4",
+    "youtube_id": "IVRbQrq2JHo",
+    "golfdb_index": 1137,
+    "player": "MICHELLE WIE",
+    "club": "iron",
+    "view": "other",
+    "fps": 30,
+    "trim_start_sec": 100.233,
+    "trim_end_sec": 103.933,
+    "impact_time_sec": 1.967,
+    "events": {
+      "pre": {
+        "original_frame": 3021,
+        "time_in_clip_sec": 0.467
+      },
+      "address": {
+        "original_frame": 3037,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 3048,
+        "time_in_clip_sec": 1.367
+      },
+      "mid_backswing": {
+        "original_frame": 3054,
+        "time_in_clip_sec": 1.567
+      },
+      "top": {
+        "original_frame": 3059,
+        "time_in_clip_sec": 1.733
+      },
+      "mid_downswing": {
+        "original_frame": 3062,
+        "time_in_clip_sec": 1.833
+      },
+      "impact": {
+        "original_frame": 3066,
+        "time_in_clip_sec": 1.967
+      },
+      "mid_follow_through": {
+        "original_frame": 3068,
+        "time_in_clip_sec": 2.033
+      },
+      "finish": {
+        "original_frame": 3088,
+        "time_in_clip_sec": 2.7
+      },
+      "post": {
+        "original_frame": 3132,
+        "time_in_clip_sec": 4.167
+      }
+    }
+  },
+  {
+    "filename": "golfdb_WPap6OmEyuE.mp4",
+    "youtube_id": "WPap6OmEyuE",
+    "golfdb_index": 644,
+    "player": "AYAKO UEHARA",
+    "club": "driver",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 109.833,
+    "trim_end_sec": 114.0,
+    "impact_time_sec": 2.267,
+    "events": {
+      "pre": {
+        "original_frame": 3124,
+        "time_in_clip_sec": -5.7
+      },
+      "address": {
+        "original_frame": 3325,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 3340,
+        "time_in_clip_sec": 1.5
+      },
+      "mid_backswing": {
+        "original_frame": 3345,
+        "time_in_clip_sec": 1.667
+      },
+      "top": {
+        "original_frame": 3354,
+        "time_in_clip_sec": 1.967
+      },
+      "mid_downswing": {
+        "original_frame": 3360,
+        "time_in_clip_sec": 2.167
+      },
+      "impact": {
+        "original_frame": 3363,
+        "time_in_clip_sec": 2.267
+      },
+      "mid_follow_through": {
+        "original_frame": 3366,
+        "time_in_clip_sec": 2.367
+      },
+      "finish": {
+        "original_frame": 3390,
+        "time_in_clip_sec": 3.167
+      },
+      "post": {
+        "original_frame": 3425,
+        "time_in_clip_sec": 4.333
+      }
+    }
+  },
+  {
+    "filename": "golfdb_D4uV1bZxaek.mp4",
+    "youtube_id": "D4uV1bZxaek",
+    "golfdb_index": 355,
+    "player": "CATRIONA MATTHEW",
+    "club": "driver",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 11.3,
+    "trim_end_sec": 15.167,
+    "impact_time_sec": 2.167,
+    "events": {
+      "pre": {
+        "original_frame": 181,
+        "time_in_clip_sec": -5.267
+      },
+      "address": {
+        "original_frame": 369,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 385,
+        "time_in_clip_sec": 1.533
+      },
+      "mid_backswing": {
+        "original_frame": 390,
+        "time_in_clip_sec": 1.7
+      },
+      "top": {
+        "original_frame": 397,
+        "time_in_clip_sec": 1.933
+      },
+      "mid_downswing": {
+        "original_frame": 400,
+        "time_in_clip_sec": 2.033
+      },
+      "impact": {
+        "original_frame": 404,
+        "time_in_clip_sec": 2.167
+      },
+      "mid_follow_through": {
+        "original_frame": 407,
+        "time_in_clip_sec": 2.267
+      },
+      "finish": {
+        "original_frame": 425,
+        "time_in_clip_sec": 2.867
+      },
+      "post": {
+        "original_frame": 510,
+        "time_in_clip_sec": 5.7
+      }
+    }
+  },
+  {
+    "filename": "golfdb_KkB9KbBTb4c.mp4",
+    "youtube_id": "KkB9KbBTb4c",
+    "golfdb_index": 1323,
+    "player": "ALISON LEE",
+    "club": "driver",
+    "view": "face-on",
+    "fps": 30,
+    "trim_start_sec": 16.4,
+    "trim_end_sec": 20.6,
+    "impact_time_sec": 2.467,
+    "events": {
+      "pre": {
+        "original_frame": 391,
+        "time_in_clip_sec": -3.367
+      },
+      "address": {
+        "original_frame": 522,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 542,
+        "time_in_clip_sec": 1.667
+      },
+      "mid_backswing": {
+        "original_frame": 549,
+        "time_in_clip_sec": 1.9
+      },
+      "top": {
+        "original_frame": 557,
+        "time_in_clip_sec": 2.167
+      },
+      "mid_downswing": {
+        "original_frame": 562,
+        "time_in_clip_sec": 2.333
+      },
+      "impact": {
+        "original_frame": 566,
+        "time_in_clip_sec": 2.467
+      },
+      "mid_follow_through": {
+        "original_frame": 569,
+        "time_in_clip_sec": 2.567
+      },
+      "finish": {
+        "original_frame": 588,
+        "time_in_clip_sec": 3.2
+      },
+      "post": {
+        "original_frame": 648,
+        "time_in_clip_sec": 5.2
+      }
+    }
+  },
+  {
+    "filename": "golfdb_wIiLM8ufWVI.mp4",
+    "youtube_id": "wIiLM8ufWVI",
+    "golfdb_index": 304,
+    "player": "RORY MCILROY",
+    "club": "driver",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 12.7,
+    "trim_end_sec": 16.067,
+    "impact_time_sec": 1.833,
+    "events": {
+      "pre": {
+        "original_frame": 361,
+        "time_in_clip_sec": -0.667
+      },
+      "address": {
+        "original_frame": 411,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 418,
+        "time_in_clip_sec": 1.233
+      },
+      "mid_backswing": {
+        "original_frame": 421,
+        "time_in_clip_sec": 1.333
+      },
+      "top": {
+        "original_frame": 429,
+        "time_in_clip_sec": 1.6
+      },
+      "mid_downswing": {
+        "original_frame": 433,
+        "time_in_clip_sec": 1.733
+      },
+      "impact": {
+        "original_frame": 436,
+        "time_in_clip_sec": 1.833
+      },
+      "mid_follow_through": {
+        "original_frame": 438,
+        "time_in_clip_sec": 1.9
+      },
+      "finish": {
+        "original_frame": 452,
+        "time_in_clip_sec": 2.367
+      },
+      "post": {
+        "original_frame": 548,
+        "time_in_clip_sec": 5.567
+      }
+    }
+  },
+  {
+    "filename": "golfdb_vaoD7yodCF4.mp4",
+    "youtube_id": "vaoD7yodCF4",
+    "golfdb_index": 474,
+    "player": "STACY LEWIS",
+    "club": "driver",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 14.733,
+    "trim_end_sec": 18.7,
+    "impact_time_sec": 2.233,
+    "events": {
+      "pre": {
+        "original_frame": 331,
+        "time_in_clip_sec": -3.7
+      },
+      "address": {
+        "original_frame": 472,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 488,
+        "time_in_clip_sec": 1.533
+      },
+      "mid_backswing": {
+        "original_frame": 492,
+        "time_in_clip_sec": 1.667
+      },
+      "top": {
+        "original_frame": 501,
+        "time_in_clip_sec": 1.967
+      },
+      "mid_downswing": {
+        "original_frame": 506,
+        "time_in_clip_sec": 2.133
+      },
+      "impact": {
+        "original_frame": 509,
+        "time_in_clip_sec": 2.233
+      },
+      "mid_follow_through": {
+        "original_frame": 511,
+        "time_in_clip_sec": 2.3
+      },
+      "finish": {
+        "original_frame": 531,
+        "time_in_clip_sec": 2.967
+      },
+      "post": {
+        "original_frame": 594,
+        "time_in_clip_sec": 5.067
+      }
+    }
+  },
+  {
+    "filename": "golfdb_n1r99BGuW8k.mp4",
+    "youtube_id": "n1r99BGuW8k",
+    "golfdb_index": 178,
+    "player": "CHARLES HOWELL",
+    "club": "driver",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 101.5,
+    "trim_end_sec": 105.533,
+    "impact_time_sec": 1.967,
+    "events": {
+      "pre": {
+        "original_frame": 2678,
+        "time_in_clip_sec": -12.233
+      },
+      "address": {
+        "original_frame": 3075,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 3087,
+        "time_in_clip_sec": 1.4
+      },
+      "mid_backswing": {
+        "original_frame": 3091,
+        "time_in_clip_sec": 1.533
+      },
+      "top": {
+        "original_frame": 3097,
+        "time_in_clip_sec": 1.733
+      },
+      "mid_downswing": {
+        "original_frame": 3101,
+        "time_in_clip_sec": 1.867
+      },
+      "impact": {
+        "original_frame": 3104,
+        "time_in_clip_sec": 1.967
+      },
+      "mid_follow_through": {
+        "original_frame": 3107,
+        "time_in_clip_sec": 2.067
+      },
+      "finish": {
+        "original_frame": 3136,
+        "time_in_clip_sec": 3.033
+      },
+      "post": {
+        "original_frame": 3289,
+        "time_in_clip_sec": 8.133
+      }
+    }
+  },
+  {
+    "filename": "golfdb_xS9NnBGgtjg.mp4",
+    "youtube_id": "xS9NnBGgtjg",
+    "golfdb_index": 584,
+    "player": "JASON DUFNER",
+    "club": "driver",
+    "view": "face-on",
+    "fps": 30,
+    "trim_start_sec": 9.433,
+    "trim_end_sec": 12.9,
+    "impact_time_sec": 1.8,
+    "events": {
+      "pre": {
+        "original_frame": 301,
+        "time_in_clip_sec": 0.6
+      },
+      "address": {
+        "original_frame": 313,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 322,
+        "time_in_clip_sec": 1.3
+      },
+      "mid_backswing": {
+        "original_frame": 326,
+        "time_in_clip_sec": 1.433
+      },
+      "top": {
+        "original_frame": 330,
+        "time_in_clip_sec": 1.567
+      },
+      "mid_downswing": {
+        "original_frame": 333,
+        "time_in_clip_sec": 1.667
+      },
+      "impact": {
+        "original_frame": 337,
+        "time_in_clip_sec": 1.8
+      },
+      "mid_follow_through": {
+        "original_frame": 339,
+        "time_in_clip_sec": 1.867
+      },
+      "finish": {
+        "original_frame": 357,
+        "time_in_clip_sec": 2.467
+      },
+      "post": {
+        "original_frame": 387,
+        "time_in_clip_sec": 3.467
+      }
+    }
+  },
+  {
+    "filename": "golfdb_3wru0WH0buk.mp4",
+    "youtube_id": "3wru0WH0buk",
+    "golfdb_index": 188,
+    "player": "ARIYA JUTANUGARN",
+    "club": "fairway",
+    "view": "face-on",
+    "fps": 30,
+    "trim_start_sec": 10.7,
+    "trim_end_sec": 14.5,
+    "impact_time_sec": 2.267,
+    "events": {
+      "pre": {
+        "original_frame": 151,
+        "time_in_clip_sec": -5.667
+      },
+      "address": {
+        "original_frame": 351,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 370,
+        "time_in_clip_sec": 1.633
+      },
+      "mid_backswing": {
+        "original_frame": 374,
+        "time_in_clip_sec": 1.767
+      },
+      "top": {
+        "original_frame": 382,
+        "time_in_clip_sec": 2.033
+      },
+      "mid_downswing": {
+        "original_frame": 386,
+        "time_in_clip_sec": 2.167
+      },
+      "impact": {
+        "original_frame": 389,
+        "time_in_clip_sec": 2.267
+      },
+      "mid_follow_through": {
+        "original_frame": 391,
+        "time_in_clip_sec": 2.333
+      },
+      "finish": {
+        "original_frame": 405,
+        "time_in_clip_sec": 2.8
+      },
+      "post": {
+        "original_frame": 496,
+        "time_in_clip_sec": 5.833
+      }
+    }
+  },
+  {
+    "filename": "golfdb_3YZJYaJIJR4.mp4",
+    "youtube_id": "3YZJYaJIJR4",
+    "golfdb_index": 192,
+    "player": "IK KIM",
+    "club": "driver",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 10.9,
+    "trim_end_sec": 14.667,
+    "impact_time_sec": 2.167,
+    "events": {
+      "pre": {
+        "original_frame": 242,
+        "time_in_clip_sec": -2.833
+      },
+      "address": {
+        "original_frame": 357,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 369,
+        "time_in_clip_sec": 1.4
+      },
+      "mid_backswing": {
+        "original_frame": 373,
+        "time_in_clip_sec": 1.533
+      },
+      "top": {
+        "original_frame": 383,
+        "time_in_clip_sec": 1.867
+      },
+      "mid_downswing": {
+        "original_frame": 388,
+        "time_in_clip_sec": 2.033
+      },
+      "impact": {
+        "original_frame": 392,
+        "time_in_clip_sec": 2.167
+      },
+      "mid_follow_through": {
+        "original_frame": 395,
+        "time_in_clip_sec": 2.267
+      },
+      "finish": {
+        "original_frame": 410,
+        "time_in_clip_sec": 2.767
+      },
+      "post": {
+        "original_frame": 472,
+        "time_in_clip_sec": 4.833
+      }
+    }
+  },
+  {
+    "filename": "golfdb_CuAL_6U7_aQ.mp4",
+    "youtube_id": "CuAL_6U7_aQ",
+    "golfdb_index": 830,
+    "player": "TIGER WOODS",
+    "club": "driver",
+    "view": "face-on",
+    "fps": 30,
+    "trim_start_sec": 27.167,
+    "trim_end_sec": 30.767,
+    "impact_time_sec": 1.967,
+    "events": {
+      "pre": {
+        "original_frame": 661,
+        "time_in_clip_sec": -5.133
+      },
+      "address": {
+        "original_frame": 845,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 857,
+        "time_in_clip_sec": 1.4
+      },
+      "mid_backswing": {
+        "original_frame": 860,
+        "time_in_clip_sec": 1.5
+      },
+      "top": {
+        "original_frame": 867,
+        "time_in_clip_sec": 1.733
+      },
+      "mid_downswing": {
+        "original_frame": 871,
+        "time_in_clip_sec": 1.867
+      },
+      "impact": {
+        "original_frame": 874,
+        "time_in_clip_sec": 1.967
+      },
+      "mid_follow_through": {
+        "original_frame": 876,
+        "time_in_clip_sec": 2.033
+      },
+      "finish": {
+        "original_frame": 893,
+        "time_in_clip_sec": 2.6
+      },
+      "post": {
+        "original_frame": 927,
+        "time_in_clip_sec": 3.733
+      }
+    }
+  },
+  {
+    "filename": "golfdb_bj4Gc7jm5hY.mp4",
+    "youtube_id": "bj4Gc7jm5hY",
+    "golfdb_index": 273,
+    "player": "RETIEF GOOSEN",
+    "club": "driver",
+    "view": "face-on",
+    "fps": 30,
+    "trim_start_sec": 5.733,
+    "trim_end_sec": 9.433,
+    "impact_time_sec": 2.033,
+    "events": {
+      "pre": {
+        "original_frame": 181,
+        "time_in_clip_sec": 0.3
+      },
+      "address": {
+        "original_frame": 202,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 213,
+        "time_in_clip_sec": 1.367
+      },
+      "mid_backswing": {
+        "original_frame": 217,
+        "time_in_clip_sec": 1.5
+      },
+      "top": {
+        "original_frame": 226,
+        "time_in_clip_sec": 1.8
+      },
+      "mid_downswing": {
+        "original_frame": 229,
+        "time_in_clip_sec": 1.9
+      },
+      "impact": {
+        "original_frame": 233,
+        "time_in_clip_sec": 2.033
+      },
+      "mid_follow_through": {
+        "original_frame": 235,
+        "time_in_clip_sec": 2.1
+      },
+      "finish": {
+        "original_frame": 253,
+        "time_in_clip_sec": 2.7
+      },
+      "post": {
+        "original_frame": 383,
+        "time_in_clip_sec": 7.033
+      }
+    }
+  },
+  {
+    "filename": "golfdb_D12euvW55Ns.mp4",
+    "youtube_id": "D12euvW55Ns",
+    "golfdb_index": 933,
+    "player": "CATRIONA MATTHEW",
+    "club": "hybrid",
+    "view": "face-on",
+    "fps": 30,
+    "trim_start_sec": 10.133,
+    "trim_end_sec": 14.0,
+    "impact_time_sec": 2.167,
+    "events": {
+      "pre": {
+        "original_frame": 181,
+        "time_in_clip_sec": -4.1
+      },
+      "address": {
+        "original_frame": 334,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 351,
+        "time_in_clip_sec": 1.567
+      },
+      "mid_backswing": {
+        "original_frame": 355,
+        "time_in_clip_sec": 1.7
+      },
+      "top": {
+        "original_frame": 362,
+        "time_in_clip_sec": 1.933
+      },
+      "mid_downswing": {
+        "original_frame": 365,
+        "time_in_clip_sec": 2.033
+      },
+      "impact": {
+        "original_frame": 369,
+        "time_in_clip_sec": 2.167
+      },
+      "mid_follow_through": {
+        "original_frame": 371,
+        "time_in_clip_sec": 2.233
+      },
+      "finish": {
+        "original_frame": 390,
+        "time_in_clip_sec": 2.867
+      },
+      "post": {
+        "original_frame": 425,
+        "time_in_clip_sec": 4.033
+      }
+    }
+  },
+  {
+    "filename": "golfdb_ra887418NaA.mp4",
+    "youtube_id": "ra887418NaA",
+    "golfdb_index": 57,
+    "player": "JUSTIN LEONARD",
+    "club": "driver",
+    "view": "other",
+    "fps": 30,
+    "trim_start_sec": 17.9,
+    "trim_end_sec": 21.567,
+    "impact_time_sec": 2.133,
+    "events": {
+      "pre": {
+        "original_frame": 499,
+        "time_in_clip_sec": -1.267
+      },
+      "address": {
+        "original_frame": 567,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 582,
+        "time_in_clip_sec": 1.5
+      },
+      "mid_backswing": {
+        "original_frame": 588,
+        "time_in_clip_sec": 1.7
+      },
+      "top": {
+        "original_frame": 593,
+        "time_in_clip_sec": 1.867
+      },
+      "mid_downswing": {
+        "original_frame": 598,
+        "time_in_clip_sec": 2.033
+      },
+      "impact": {
+        "original_frame": 601,
+        "time_in_clip_sec": 2.133
+      },
+      "mid_follow_through": {
+        "original_frame": 604,
+        "time_in_clip_sec": 2.233
+      },
+      "finish": {
+        "original_frame": 617,
+        "time_in_clip_sec": 2.667
+      },
+      "post": {
+        "original_frame": 642,
+        "time_in_clip_sec": 3.5
+      }
+    }
+  },
+  {
+    "filename": "golfdb_yfCt0Hkwues.mp4",
+    "youtube_id": "yfCt0Hkwues",
+    "golfdb_index": 1382,
+    "player": "LEXI THOMPSON",
+    "club": "driver",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 11.433,
+    "trim_end_sec": 15.7,
+    "impact_time_sec": 2.267,
+    "events": {
+      "pre": {
+        "original_frame": 94,
+        "time_in_clip_sec": -8.3
+      },
+      "address": {
+        "original_frame": 373,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 390,
+        "time_in_clip_sec": 1.567
+      },
+      "mid_backswing": {
+        "original_frame": 394,
+        "time_in_clip_sec": 1.7
+      },
+      "top": {
+        "original_frame": 402,
+        "time_in_clip_sec": 1.967
+      },
+      "mid_downswing": {
+        "original_frame": 408,
+        "time_in_clip_sec": 2.167
+      },
+      "impact": {
+        "original_frame": 411,
+        "time_in_clip_sec": 2.267
+      },
+      "mid_follow_through": {
+        "original_frame": 414,
+        "time_in_clip_sec": 2.367
+      },
+      "finish": {
+        "original_frame": 441,
+        "time_in_clip_sec": 3.267
+      },
+      "post": {
+        "original_frame": 474,
+        "time_in_clip_sec": 4.367
+      }
+    }
+  },
+  {
+    "filename": "golfdb_YqsCyYTKpZg.mp4",
+    "youtube_id": "YqsCyYTKpZg",
+    "golfdb_index": 62,
+    "player": "JENNY SHIN",
+    "club": "driver",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 9.467,
+    "trim_end_sec": 13.733,
+    "impact_time_sec": 2.667,
+    "events": {
+      "pre": {
+        "original_frame": 301,
+        "time_in_clip_sec": 0.567
+      },
+      "address": {
+        "original_frame": 314,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 338,
+        "time_in_clip_sec": 1.8
+      },
+      "mid_backswing": {
+        "original_frame": 347,
+        "time_in_clip_sec": 2.1
+      },
+      "top": {
+        "original_frame": 355,
+        "time_in_clip_sec": 2.367
+      },
+      "mid_downswing": {
+        "original_frame": 360,
+        "time_in_clip_sec": 2.533
+      },
+      "impact": {
+        "original_frame": 364,
+        "time_in_clip_sec": 2.667
+      },
+      "mid_follow_through": {
+        "original_frame": 366,
+        "time_in_clip_sec": 2.733
+      },
+      "finish": {
+        "original_frame": 382,
+        "time_in_clip_sec": 3.267
+      },
+      "post": {
+        "original_frame": 415,
+        "time_in_clip_sec": 4.367
+      }
+    }
+  },
+  {
+    "filename": "golfdb_ZQjY2Ie4V50.mp4",
+    "youtube_id": "ZQjY2Ie4V50",
+    "golfdb_index": 106,
+    "player": "CINDY LACROSSE",
+    "club": "driver",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 17.733,
+    "trim_end_sec": 21.633,
+    "impact_time_sec": 2.267,
+    "events": {
+      "pre": {
+        "original_frame": 511,
+        "time_in_clip_sec": -0.7
+      },
+      "address": {
+        "original_frame": 562,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 577,
+        "time_in_clip_sec": 1.5
+      },
+      "mid_backswing": {
+        "original_frame": 582,
+        "time_in_clip_sec": 1.667
+      },
+      "top": {
+        "original_frame": 591,
+        "time_in_clip_sec": 1.967
+      },
+      "mid_downswing": {
+        "original_frame": 598,
+        "time_in_clip_sec": 2.2
+      },
+      "impact": {
+        "original_frame": 600,
+        "time_in_clip_sec": 2.267
+      },
+      "mid_follow_through": {
+        "original_frame": 603,
+        "time_in_clip_sec": 2.367
+      },
+      "finish": {
+        "original_frame": 619,
+        "time_in_clip_sec": 2.9
+      },
+      "post": {
+        "original_frame": 645,
+        "time_in_clip_sec": 3.767
+      }
+    }
+  },
+  {
+    "filename": "golfdb_RiEUPJNPY_Y.mp4",
+    "youtube_id": "RiEUPJNPY_Y",
+    "golfdb_index": 680,
+    "player": "MIKE WEIR",
+    "club": "driver",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 35.567,
+    "trim_end_sec": 39.2,
+    "impact_time_sec": 1.967,
+    "events": {
+      "pre": {
+        "original_frame": 961,
+        "time_in_clip_sec": -3.533
+      },
+      "address": {
+        "original_frame": 1097,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 1107,
+        "time_in_clip_sec": 1.333
+      },
+      "mid_backswing": {
+        "original_frame": 1113,
+        "time_in_clip_sec": 1.533
+      },
+      "top": {
+        "original_frame": 1120,
+        "time_in_clip_sec": 1.767
+      },
+      "mid_downswing": {
+        "original_frame": 1123,
+        "time_in_clip_sec": 1.867
+      },
+      "impact": {
+        "original_frame": 1126,
+        "time_in_clip_sec": 1.967
+      },
+      "mid_follow_through": {
+        "original_frame": 1128,
+        "time_in_clip_sec": 2.033
+      },
+      "finish": {
+        "original_frame": 1146,
+        "time_in_clip_sec": 2.633
+      },
+      "post": {
+        "original_frame": 1206,
+        "time_in_clip_sec": 4.633
+      }
+    }
+  },
+  {
+    "filename": "golfdb_wrvEURqD-GI.mp4",
+    "youtube_id": "wrvEURqD-GI",
+    "golfdb_index": 1052,
+    "player": "PHIL MICKELSON",
+    "club": "wedge",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 36.4,
+    "trim_end_sec": 39.967,
+    "impact_time_sec": 2.1,
+    "events": {
+      "pre": {
+        "original_frame": 982,
+        "time_in_clip_sec": -3.667
+      },
+      "address": {
+        "original_frame": 1122,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 1137,
+        "time_in_clip_sec": 1.5
+      },
+      "mid_backswing": {
+        "original_frame": 1140,
+        "time_in_clip_sec": 1.6
+      },
+      "top": {
+        "original_frame": 1146,
+        "time_in_clip_sec": 1.8
+      },
+      "mid_downswing": {
+        "original_frame": 1150,
+        "time_in_clip_sec": 1.933
+      },
+      "impact": {
+        "original_frame": 1155,
+        "time_in_clip_sec": 2.1
+      },
+      "mid_follow_through": {
+        "original_frame": 1158,
+        "time_in_clip_sec": 2.2
+      },
+      "finish": {
+        "original_frame": 1169,
+        "time_in_clip_sec": 2.567
+      },
+      "post": {
+        "original_frame": 1212,
+        "time_in_clip_sec": 4.0
+      }
+    }
+  },
+  {
+    "filename": "golfdb__rFatlaZhEQ.mp4",
+    "youtube_id": "_rFatlaZhEQ",
+    "golfdb_index": 618,
+    "player": "MATT KUCHAR",
+    "club": "driver",
+    "view": "face-on",
+    "fps": 30,
+    "trim_start_sec": 20.867,
+    "trim_end_sec": 26.167,
+    "impact_time_sec": 3.567,
+    "events": {
+      "pre": {
+        "original_frame": 402,
+        "time_in_clip_sec": -7.467
+      },
+      "address": {
+        "original_frame": 656,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 713,
+        "time_in_clip_sec": 2.9
+      },
+      "mid_backswing": {
+        "original_frame": 719,
+        "time_in_clip_sec": 3.1
+      },
+      "top": {
+        "original_frame": 726,
+        "time_in_clip_sec": 3.333
+      },
+      "mid_downswing": {
+        "original_frame": 729,
+        "time_in_clip_sec": 3.433
+      },
+      "impact": {
+        "original_frame": 733,
+        "time_in_clip_sec": 3.567
+      },
+      "mid_follow_through": {
+        "original_frame": 735,
+        "time_in_clip_sec": 3.633
+      },
+      "finish": {
+        "original_frame": 755,
+        "time_in_clip_sec": 4.3
+      },
+      "post": {
+        "original_frame": 785,
+        "time_in_clip_sec": 5.3
+      }
+    }
+  },
+  {
+    "filename": "golfdb_shmXjle1rR0.mp4",
+    "youtube_id": "shmXjle1rR0",
+    "golfdb_index": 1048,
+    "player": "BUD CAULEY",
+    "club": "fairway",
+    "view": "other",
+    "fps": 30,
+    "trim_start_sec": 11.1,
+    "trim_end_sec": 14.733,
+    "impact_time_sec": 1.9,
+    "events": {
+      "pre": {
+        "original_frame": 211,
+        "time_in_clip_sec": -4.067
+      },
+      "address": {
+        "original_frame": 363,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 373,
+        "time_in_clip_sec": 1.333
+      },
+      "mid_backswing": {
+        "original_frame": 377,
+        "time_in_clip_sec": 1.467
+      },
+      "top": {
+        "original_frame": 383,
+        "time_in_clip_sec": 1.667
+      },
+      "mid_downswing": {
+        "original_frame": 387,
+        "time_in_clip_sec": 1.8
+      },
+      "impact": {
+        "original_frame": 390,
+        "time_in_clip_sec": 1.9
+      },
+      "mid_follow_through": {
+        "original_frame": 392,
+        "time_in_clip_sec": 1.967
+      },
+      "finish": {
+        "original_frame": 412,
+        "time_in_clip_sec": 2.633
+      },
+      "post": {
+        "original_frame": 472,
+        "time_in_clip_sec": 4.633
+      }
+    }
+  },
+  {
+    "filename": "golfdb__MnmzCJCZRo.mp4",
+    "youtube_id": "_MnmzCJCZRo",
+    "golfdb_index": 594,
+    "player": "MO MARTIN",
+    "club": "driver",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 14.2,
+    "trim_end_sec": 18.033,
+    "impact_time_sec": 2.067,
+    "events": {
+      "pre": {
+        "original_frame": 271,
+        "time_in_clip_sec": -5.167
+      },
+      "address": {
+        "original_frame": 456,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 467,
+        "time_in_clip_sec": 1.367
+      },
+      "mid_backswing": {
+        "original_frame": 471,
+        "time_in_clip_sec": 1.5
+      },
+      "top": {
+        "original_frame": 480,
+        "time_in_clip_sec": 1.8
+      },
+      "mid_downswing": {
+        "original_frame": 484,
+        "time_in_clip_sec": 1.933
+      },
+      "impact": {
+        "original_frame": 488,
+        "time_in_clip_sec": 2.067
+      },
+      "mid_follow_through": {
+        "original_frame": 490,
+        "time_in_clip_sec": 2.133
+      },
+      "finish": {
+        "original_frame": 511,
+        "time_in_clip_sec": 2.833
+      },
+      "post": {
+        "original_frame": 571,
+        "time_in_clip_sec": 4.833
+      }
+    }
+  },
+  {
+    "filename": "golfdb_UVnNv2eW4gQ.mp4",
+    "youtube_id": "UVnNv2eW4gQ",
+    "golfdb_index": 256,
+    "player": "LYDIA KO",
+    "club": "driver",
+    "view": "face-on",
+    "fps": 30,
+    "trim_start_sec": 17.467,
+    "trim_end_sec": 21.933,
+    "impact_time_sec": 2.633,
+    "events": {
+      "pre": {
+        "original_frame": 312,
+        "time_in_clip_sec": -7.067
+      },
+      "address": {
+        "original_frame": 554,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 572,
+        "time_in_clip_sec": 1.6
+      },
+      "mid_backswing": {
+        "original_frame": 580,
+        "time_in_clip_sec": 1.867
+      },
+      "top": {
+        "original_frame": 594,
+        "time_in_clip_sec": 2.333
+      },
+      "mid_downswing": {
+        "original_frame": 599,
+        "time_in_clip_sec": 2.5
+      },
+      "impact": {
+        "original_frame": 603,
+        "time_in_clip_sec": 2.633
+      },
+      "mid_follow_through": {
+        "original_frame": 605,
+        "time_in_clip_sec": 2.7
+      },
+      "finish": {
+        "original_frame": 628,
+        "time_in_clip_sec": 3.467
+      },
+      "post": {
+        "original_frame": 688,
+        "time_in_clip_sec": 5.467
+      }
+    }
+  },
+  {
+    "filename": "golfdb_2GqeYdNBCWQ.mp4",
+    "youtube_id": "2GqeYdNBCWQ",
+    "golfdb_index": 1376,
+    "player": "BROOKE HENDERSON",
+    "club": "iron",
+    "view": "other",
+    "fps": 30,
+    "trim_start_sec": 16.933,
+    "trim_end_sec": 20.767,
+    "impact_time_sec": 2.167,
+    "events": {
+      "pre": {
+        "original_frame": 181,
+        "time_in_clip_sec": -10.9
+      },
+      "address": {
+        "original_frame": 538,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 556,
+        "time_in_clip_sec": 1.6
+      },
+      "mid_backswing": {
+        "original_frame": 560,
+        "time_in_clip_sec": 1.733
+      },
+      "top": {
+        "original_frame": 566,
+        "time_in_clip_sec": 1.933
+      },
+      "mid_downswing": {
+        "original_frame": 570,
+        "time_in_clip_sec": 2.067
+      },
+      "impact": {
+        "original_frame": 573,
+        "time_in_clip_sec": 2.167
+      },
+      "mid_follow_through": {
+        "original_frame": 576,
+        "time_in_clip_sec": 2.267
+      },
+      "finish": {
+        "original_frame": 593,
+        "time_in_clip_sec": 2.833
+      },
+      "post": {
+        "original_frame": 626,
+        "time_in_clip_sec": 3.933
+      }
+    }
+  },
+  {
+    "filename": "golfdb_sIQK-zKDe8E.mp4",
+    "youtube_id": "sIQK-zKDe8E",
+    "golfdb_index": 775,
+    "player": "STEVE LOWERY",
+    "club": "driver",
+    "view": "other",
+    "fps": 30,
+    "trim_start_sec": 13.967,
+    "trim_end_sec": 17.6,
+    "impact_time_sec": 1.933,
+    "events": {
+      "pre": {
+        "original_frame": 301,
+        "time_in_clip_sec": -3.933
+      },
+      "address": {
+        "original_frame": 449,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 458,
+        "time_in_clip_sec": 1.3
+      },
+      "mid_backswing": {
+        "original_frame": 462,
+        "time_in_clip_sec": 1.433
+      },
+      "top": {
+        "original_frame": 469,
+        "time_in_clip_sec": 1.667
+      },
+      "mid_downswing": {
+        "original_frame": 473,
+        "time_in_clip_sec": 1.8
+      },
+      "impact": {
+        "original_frame": 477,
+        "time_in_clip_sec": 1.933
+      },
+      "mid_follow_through": {
+        "original_frame": 479,
+        "time_in_clip_sec": 2.0
+      },
+      "finish": {
+        "original_frame": 498,
+        "time_in_clip_sec": 2.633
+      },
+      "post": {
+        "original_frame": 532,
+        "time_in_clip_sec": 3.767
+      }
+    }
+  },
+  {
+    "filename": "golfdb_EnqiIS99X_g.mp4",
+    "youtube_id": "EnqiIS99X_g",
+    "golfdb_index": 574,
+    "player": "TROY MERRITT",
+    "club": "driver",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 19.167,
+    "trim_end_sec": 23.1,
+    "impact_time_sec": 2.167,
+    "events": {
+      "pre": {
+        "original_frame": 421,
+        "time_in_clip_sec": -5.133
+      },
+      "address": {
+        "original_frame": 605,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 618,
+        "time_in_clip_sec": 1.433
+      },
+      "mid_backswing": {
+        "original_frame": 622,
+        "time_in_clip_sec": 1.567
+      },
+      "top": {
+        "original_frame": 632,
+        "time_in_clip_sec": 1.9
+      },
+      "mid_downswing": {
+        "original_frame": 636,
+        "time_in_clip_sec": 2.033
+      },
+      "impact": {
+        "original_frame": 640,
+        "time_in_clip_sec": 2.167
+      },
+      "mid_follow_through": {
+        "original_frame": 642,
+        "time_in_clip_sec": 2.233
+      },
+      "finish": {
+        "original_frame": 663,
+        "time_in_clip_sec": 2.933
+      },
+      "post": {
+        "original_frame": 693,
+        "time_in_clip_sec": 3.933
+      }
+    }
+  },
+  {
+    "filename": "golfdb_zqRpGtDP2Vc.mp4",
+    "youtube_id": "zqRpGtDP2Vc",
+    "golfdb_index": 709,
+    "player": "CATRIONA MATTHEW",
+    "club": "driver",
+    "view": "other",
+    "fps": 30,
+    "trim_start_sec": 14.767,
+    "trim_end_sec": 19.167,
+    "impact_time_sec": 2.633,
+    "events": {
+      "pre": {
+        "original_frame": 274,
+        "time_in_clip_sec": -5.633
+      },
+      "address": {
+        "original_frame": 473,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 500,
+        "time_in_clip_sec": 1.9
+      },
+      "mid_backswing": {
+        "original_frame": 505,
+        "time_in_clip_sec": 2.067
+      },
+      "top": {
+        "original_frame": 515,
+        "time_in_clip_sec": 2.4
+      },
+      "mid_downswing": {
+        "original_frame": 519,
+        "time_in_clip_sec": 2.533
+      },
+      "impact": {
+        "original_frame": 522,
+        "time_in_clip_sec": 2.633
+      },
+      "mid_follow_through": {
+        "original_frame": 525,
+        "time_in_clip_sec": 2.733
+      },
+      "finish": {
+        "original_frame": 545,
+        "time_in_clip_sec": 3.4
+      },
+      "post": {
+        "original_frame": 609,
+        "time_in_clip_sec": 5.533
+      }
+    }
+  },
+  {
+    "filename": "golfdb_TxtHgPKarMA.mp4",
+    "youtube_id": "TxtHgPKarMA",
+    "golfdb_index": 127,
+    "player": "STACY LEWIS",
+    "club": "driver",
+    "view": "face-on",
+    "fps": 30,
+    "trim_start_sec": 7.467,
+    "trim_end_sec": 11.433,
+    "impact_time_sec": 2.267,
+    "events": {
+      "pre": {
+        "original_frame": 221,
+        "time_in_clip_sec": -0.1
+      },
+      "address": {
+        "original_frame": 254,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 271,
+        "time_in_clip_sec": 1.567
+      },
+      "mid_backswing": {
+        "original_frame": 275,
+        "time_in_clip_sec": 1.7
+      },
+      "top": {
+        "original_frame": 285,
+        "time_in_clip_sec": 2.033
+      },
+      "mid_downswing": {
+        "original_frame": 289,
+        "time_in_clip_sec": 2.167
+      },
+      "impact": {
+        "original_frame": 292,
+        "time_in_clip_sec": 2.267
+      },
+      "mid_follow_through": {
+        "original_frame": 295,
+        "time_in_clip_sec": 2.367
+      },
+      "finish": {
+        "original_frame": 313,
+        "time_in_clip_sec": 2.967
+      },
+      "post": {
+        "original_frame": 375,
+        "time_in_clip_sec": 5.033
+      }
+    }
+  },
+  {
+    "filename": "golfdb_1OOqvNPDsDA.mp4",
+    "youtube_id": "1OOqvNPDsDA",
+    "golfdb_index": 985,
+    "player": "LYDIA KO",
+    "club": "fairway",
+    "view": "face-on",
+    "fps": 30,
+    "trim_start_sec": 22.033,
+    "trim_end_sec": 26.3,
+    "impact_time_sec": 2.567,
+    "events": {
+      "pre": {
+        "original_frame": 91,
+        "time_in_clip_sec": -19.0
+      },
+      "address": {
+        "original_frame": 691,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 714,
+        "time_in_clip_sec": 1.767
+      },
+      "mid_backswing": {
+        "original_frame": 720,
+        "time_in_clip_sec": 1.967
+      },
+      "top": {
+        "original_frame": 730,
+        "time_in_clip_sec": 2.3
+      },
+      "mid_downswing": {
+        "original_frame": 735,
+        "time_in_clip_sec": 2.467
+      },
+      "impact": {
+        "original_frame": 738,
+        "time_in_clip_sec": 2.567
+      },
+      "mid_follow_through": {
+        "original_frame": 740,
+        "time_in_clip_sec": 2.633
+      },
+      "finish": {
+        "original_frame": 759,
+        "time_in_clip_sec": 3.267
+      },
+      "post": {
+        "original_frame": 792,
+        "time_in_clip_sec": 4.367
+      }
+    }
+  },
+  {
+    "filename": "golfdb_tK7IAn-3X9Y.mp4",
+    "youtube_id": "tK7IAn-3X9Y",
+    "golfdb_index": 420,
+    "player": "SUN YOUNG YOO",
+    "club": "driver",
+    "view": "face-on",
+    "fps": 30,
+    "trim_start_sec": 11.367,
+    "trim_end_sec": 15.7,
+    "impact_time_sec": 2.5,
+    "events": {
+      "pre": {
+        "original_frame": 240,
+        "time_in_clip_sec": -3.367
+      },
+      "address": {
+        "original_frame": 371,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 393,
+        "time_in_clip_sec": 1.733
+      },
+      "mid_backswing": {
+        "original_frame": 398,
+        "time_in_clip_sec": 1.9
+      },
+      "top": {
+        "original_frame": 408,
+        "time_in_clip_sec": 2.233
+      },
+      "mid_downswing": {
+        "original_frame": 413,
+        "time_in_clip_sec": 2.4
+      },
+      "impact": {
+        "original_frame": 416,
+        "time_in_clip_sec": 2.5
+      },
+      "mid_follow_through": {
+        "original_frame": 419,
+        "time_in_clip_sec": 2.6
+      },
+      "finish": {
+        "original_frame": 441,
+        "time_in_clip_sec": 3.333
+      },
+      "post": {
+        "original_frame": 510,
+        "time_in_clip_sec": 5.633
+      }
+    }
+  },
+  {
+    "filename": "golfdb_Ux61clnnHrQ.mp4",
+    "youtube_id": "Ux61clnnHrQ",
+    "golfdb_index": 68,
+    "player": "DAVIS LOVE",
+    "club": "driver",
+    "view": "other",
+    "fps": 30,
+    "trim_start_sec": 12.167,
+    "trim_end_sec": 15.667,
+    "impact_time_sec": 1.967,
+    "events": {
+      "pre": {
+        "original_frame": 391,
+        "time_in_clip_sec": 0.867
+      },
+      "address": {
+        "original_frame": 395,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 405,
+        "time_in_clip_sec": 1.333
+      },
+      "mid_backswing": {
+        "original_frame": 409,
+        "time_in_clip_sec": 1.467
+      },
+      "top": {
+        "original_frame": 417,
+        "time_in_clip_sec": 1.733
+      },
+      "mid_downswing": {
+        "original_frame": 420,
+        "time_in_clip_sec": 1.833
+      },
+      "impact": {
+        "original_frame": 424,
+        "time_in_clip_sec": 1.967
+      },
+      "mid_follow_through": {
+        "original_frame": 426,
+        "time_in_clip_sec": 2.033
+      },
+      "finish": {
+        "original_frame": 440,
+        "time_in_clip_sec": 2.5
+      },
+      "post": {
+        "original_frame": 460,
+        "time_in_clip_sec": 3.167
+      }
+    }
+  },
+  {
+    "filename": "golfdb_c2zzaiV49fE.mp4",
+    "youtube_id": "c2zzaiV49fE",
+    "golfdb_index": 1293,
+    "player": "DANIEL BERGER",
+    "club": "driver",
+    "view": "face-on",
+    "fps": 30,
+    "trim_start_sec": 16.133,
+    "trim_end_sec": 19.733,
+    "impact_time_sec": 2.133,
+    "events": {
+      "pre": {
+        "original_frame": 451,
+        "time_in_clip_sec": -1.1
+      },
+      "address": {
+        "original_frame": 514,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 526,
+        "time_in_clip_sec": 1.4
+      },
+      "mid_backswing": {
+        "original_frame": 531,
+        "time_in_clip_sec": 1.567
+      },
+      "top": {
+        "original_frame": 539,
+        "time_in_clip_sec": 1.833
+      },
+      "mid_downswing": {
+        "original_frame": 545,
+        "time_in_clip_sec": 2.033
+      },
+      "impact": {
+        "original_frame": 548,
+        "time_in_clip_sec": 2.133
+      },
+      "mid_follow_through": {
+        "original_frame": 549,
+        "time_in_clip_sec": 2.167
+      },
+      "finish": {
+        "original_frame": 562,
+        "time_in_clip_sec": 2.6
+      },
+      "post": {
+        "original_frame": 622,
+        "time_in_clip_sec": 4.6
+      }
+    }
+  },
+  {
+    "filename": "golfdb_i69WoGq2-7o.mp4",
+    "youtube_id": "i69WoGq2-7o",
+    "golfdb_index": 941,
+    "player": "JOHN DALY",
+    "club": "driver",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 8.233,
+    "trim_end_sec": 11.833,
+    "impact_time_sec": 2.1,
+    "events": {
+      "pre": {
+        "original_frame": 151,
+        "time_in_clip_sec": -3.2
+      },
+      "address": {
+        "original_frame": 277,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 290,
+        "time_in_clip_sec": 1.433
+      },
+      "mid_backswing": {
+        "original_frame": 293,
+        "time_in_clip_sec": 1.533
+      },
+      "top": {
+        "original_frame": 302,
+        "time_in_clip_sec": 1.833
+      },
+      "mid_downswing": {
+        "original_frame": 307,
+        "time_in_clip_sec": 2.0
+      },
+      "impact": {
+        "original_frame": 310,
+        "time_in_clip_sec": 2.1
+      },
+      "mid_follow_through": {
+        "original_frame": 313,
+        "time_in_clip_sec": 2.2
+      },
+      "finish": {
+        "original_frame": 325,
+        "time_in_clip_sec": 2.6
+      },
+      "post": {
+        "original_frame": 360,
+        "time_in_clip_sec": 3.767
+      }
+    }
+  },
+  {
+    "filename": "golfdb_CB4m9LPVBbM.mp4",
+    "youtube_id": "CB4m9LPVBbM",
+    "golfdb_index": 1109,
+    "player": "MINJEE LEE",
+    "club": "iron",
+    "view": "face-on",
+    "fps": 30,
+    "trim_start_sec": 9.833,
+    "trim_end_sec": 13.8,
+    "impact_time_sec": 2.433,
+    "events": {
+      "pre": {
+        "original_frame": 181,
+        "time_in_clip_sec": -3.8
+      },
+      "address": {
+        "original_frame": 325,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 340,
+        "time_in_clip_sec": 1.5
+      },
+      "mid_backswing": {
+        "original_frame": 350,
+        "time_in_clip_sec": 1.833
+      },
+      "top": {
+        "original_frame": 360,
+        "time_in_clip_sec": 2.167
+      },
+      "mid_downswing": {
+        "original_frame": 364,
+        "time_in_clip_sec": 2.3
+      },
+      "impact": {
+        "original_frame": 368,
+        "time_in_clip_sec": 2.433
+      },
+      "mid_follow_through": {
+        "original_frame": 370,
+        "time_in_clip_sec": 2.5
+      },
+      "finish": {
+        "original_frame": 384,
+        "time_in_clip_sec": 2.967
+      },
+      "post": {
+        "original_frame": 420,
+        "time_in_clip_sec": 4.167
+      }
+    }
+  },
+  {
+    "filename": "golfdb_N2M9Lpzc1tA.mp4",
+    "youtube_id": "N2M9Lpzc1tA",
+    "golfdb_index": 108,
+    "player": "ANGELA STANFORD",
+    "club": "driver",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 8.667,
+    "trim_end_sec": 12.1,
+    "impact_time_sec": 1.933,
+    "events": {
+      "pre": {
+        "original_frame": 41,
+        "time_in_clip_sec": -7.3
+      },
+      "address": {
+        "original_frame": 290,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 299,
+        "time_in_clip_sec": 1.3
+      },
+      "mid_backswing": {
+        "original_frame": 303,
+        "time_in_clip_sec": 1.433
+      },
+      "top": {
+        "original_frame": 311,
+        "time_in_clip_sec": 1.7
+      },
+      "mid_downswing": {
+        "original_frame": 315,
+        "time_in_clip_sec": 1.833
+      },
+      "impact": {
+        "original_frame": 318,
+        "time_in_clip_sec": 1.933
+      },
+      "mid_follow_through": {
+        "original_frame": 321,
+        "time_in_clip_sec": 2.033
+      },
+      "finish": {
+        "original_frame": 333,
+        "time_in_clip_sec": 2.433
+      },
+      "post": {
+        "original_frame": 414,
+        "time_in_clip_sec": 5.133
+      }
+    }
+  },
+  {
+    "filename": "golfdb_EBw9BdZmKrs.mp4",
+    "youtube_id": "EBw9BdZmKrs",
+    "golfdb_index": 542,
+    "player": "JASON DAY",
+    "club": "fairway",
+    "view": "face-on",
+    "fps": 30,
+    "trim_start_sec": 6.233,
+    "trim_end_sec": 9.867,
+    "impact_time_sec": 2.1,
+    "events": {
+      "pre": {
+        "original_frame": 186,
+        "time_in_clip_sec": -0.033
+      },
+      "address": {
+        "original_frame": 217,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 231,
+        "time_in_clip_sec": 1.467
+      },
+      "mid_backswing": {
+        "original_frame": 236,
+        "time_in_clip_sec": 1.633
+      },
+      "top": {
+        "original_frame": 244,
+        "time_in_clip_sec": 1.9
+      },
+      "mid_downswing": {
+        "original_frame": 247,
+        "time_in_clip_sec": 2.0
+      },
+      "impact": {
+        "original_frame": 250,
+        "time_in_clip_sec": 2.1
+      },
+      "mid_follow_through": {
+        "original_frame": 252,
+        "time_in_clip_sec": 2.167
+      },
+      "finish": {
+        "original_frame": 266,
+        "time_in_clip_sec": 2.633
+      },
+      "post": {
+        "original_frame": 326,
+        "time_in_clip_sec": 4.633
+      }
+    }
+  },
+  {
+    "filename": "golfdb_OZN3Q6hvki4.mp4",
+    "youtube_id": "OZN3Q6hvki4",
+    "golfdb_index": 803,
+    "player": "CHARLEY HOFFMAN",
+    "club": "driver",
+    "view": "face-on",
+    "fps": 30,
+    "trim_start_sec": 7.9,
+    "trim_end_sec": 11.733,
+    "impact_time_sec": 2.033,
+    "events": {
+      "pre": {
+        "original_frame": 121,
+        "time_in_clip_sec": -3.867
+      },
+      "address": {
+        "original_frame": 267,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 280,
+        "time_in_clip_sec": 1.433
+      },
+      "mid_backswing": {
+        "original_frame": 286,
+        "time_in_clip_sec": 1.633
+      },
+      "top": {
+        "original_frame": 291,
+        "time_in_clip_sec": 1.8
+      },
+      "mid_downswing": {
+        "original_frame": 294,
+        "time_in_clip_sec": 1.9
+      },
+      "impact": {
+        "original_frame": 298,
+        "time_in_clip_sec": 2.033
+      },
+      "mid_follow_through": {
+        "original_frame": 300,
+        "time_in_clip_sec": 2.1
+      },
+      "finish": {
+        "original_frame": 322,
+        "time_in_clip_sec": 2.833
+      },
+      "post": {
+        "original_frame": 355,
+        "time_in_clip_sec": 3.933
+      }
+    }
+  },
+  {
+    "filename": "golfdb_Kbow-hEJoe0.mp4",
+    "youtube_id": "Kbow-hEJoe0",
+    "golfdb_index": 1290,
+    "player": "CHARLEY HULL",
+    "club": "driver",
+    "view": "face-on",
+    "fps": 30,
+    "trim_start_sec": 7.5,
+    "trim_end_sec": 10.967,
+    "impact_time_sec": 2.0,
+    "events": {
+      "pre": {
+        "original_frame": 121,
+        "time_in_clip_sec": -3.467
+      },
+      "address": {
+        "original_frame": 255,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 267,
+        "time_in_clip_sec": 1.4
+      },
+      "mid_backswing": {
+        "original_frame": 271,
+        "time_in_clip_sec": 1.533
+      },
+      "top": {
+        "original_frame": 277,
+        "time_in_clip_sec": 1.733
+      },
+      "mid_downswing": {
+        "original_frame": 282,
+        "time_in_clip_sec": 1.9
+      },
+      "impact": {
+        "original_frame": 285,
+        "time_in_clip_sec": 2.0
+      },
+      "mid_follow_through": {
+        "original_frame": 287,
+        "time_in_clip_sec": 2.067
+      },
+      "finish": {
+        "original_frame": 299,
+        "time_in_clip_sec": 2.467
+      },
+      "post": {
+        "original_frame": 336,
+        "time_in_clip_sec": 3.7
+      }
+    }
+  },
+  {
+    "filename": "golfdb_SNHlA5UMBs8.mp4",
+    "youtube_id": "SNHlA5UMBs8",
+    "golfdb_index": 699,
+    "player": "JIN PARK",
+    "club": "fairway",
+    "view": "other",
+    "fps": 30,
+    "trim_start_sec": 17.0,
+    "trim_end_sec": 21.267,
+    "impact_time_sec": 2.233,
+    "events": {
+      "pre": {
+        "original_frame": 271,
+        "time_in_clip_sec": -7.967
+      },
+      "address": {
+        "original_frame": 540,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 553,
+        "time_in_clip_sec": 1.433
+      },
+      "mid_backswing": {
+        "original_frame": 557,
+        "time_in_clip_sec": 1.567
+      },
+      "top": {
+        "original_frame": 569,
+        "time_in_clip_sec": 1.967
+      },
+      "mid_downswing": {
+        "original_frame": 574,
+        "time_in_clip_sec": 2.133
+      },
+      "impact": {
+        "original_frame": 577,
+        "time_in_clip_sec": 2.233
+      },
+      "mid_follow_through": {
+        "original_frame": 579,
+        "time_in_clip_sec": 2.3
+      },
+      "finish": {
+        "original_frame": 608,
+        "time_in_clip_sec": 3.267
+      },
+      "post": {
+        "original_frame": 668,
+        "time_in_clip_sec": 5.267
+      }
+    }
+  },
+  {
+    "filename": "golfdb_WoUmJvrnAnc.mp4",
+    "youtube_id": "WoUmJvrnAnc",
+    "golfdb_index": 468,
+    "player": "JOHN SENDEN",
+    "club": "driver",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 15.333,
+    "trim_end_sec": 19.267,
+    "impact_time_sec": 1.933,
+    "events": {
+      "pre": {
+        "original_frame": 301,
+        "time_in_clip_sec": -5.3
+      },
+      "address": {
+        "original_frame": 490,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 502,
+        "time_in_clip_sec": 1.4
+      },
+      "mid_backswing": {
+        "original_frame": 506,
+        "time_in_clip_sec": 1.533
+      },
+      "top": {
+        "original_frame": 513,
+        "time_in_clip_sec": 1.767
+      },
+      "mid_downswing": {
+        "original_frame": 515,
+        "time_in_clip_sec": 1.833
+      },
+      "impact": {
+        "original_frame": 518,
+        "time_in_clip_sec": 1.933
+      },
+      "mid_follow_through": {
+        "original_frame": 520,
+        "time_in_clip_sec": 2.0
+      },
+      "finish": {
+        "original_frame": 548,
+        "time_in_clip_sec": 2.933
+      },
+      "post": {
+        "original_frame": 608,
+        "time_in_clip_sec": 4.933
+      }
+    }
+  },
+  {
+    "filename": "golfdb__tkpPbeTYz4.mp4",
+    "youtube_id": "_tkpPbeTYz4",
+    "golfdb_index": 1333,
+    "player": "VIJAY SINGH",
+    "club": "driver",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 10.267,
+    "trim_end_sec": 14.567,
+    "impact_time_sec": 2.633,
+    "events": {
+      "pre": {
+        "original_frame": 94,
+        "time_in_clip_sec": -7.133
+      },
+      "address": {
+        "original_frame": 338,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 364,
+        "time_in_clip_sec": 1.867
+      },
+      "mid_backswing": {
+        "original_frame": 370,
+        "time_in_clip_sec": 2.067
+      },
+      "top": {
+        "original_frame": 377,
+        "time_in_clip_sec": 2.3
+      },
+      "mid_downswing": {
+        "original_frame": 384,
+        "time_in_clip_sec": 2.533
+      },
+      "impact": {
+        "original_frame": 387,
+        "time_in_clip_sec": 2.633
+      },
+      "mid_follow_through": {
+        "original_frame": 390,
+        "time_in_clip_sec": 2.733
+      },
+      "finish": {
+        "original_frame": 407,
+        "time_in_clip_sec": 3.3
+      },
+      "post": {
+        "original_frame": 444,
+        "time_in_clip_sec": 4.533
+      }
+    }
+  },
+  {
+    "filename": "golfdb_mWFBQ7J94k8.mp4",
+    "youtube_id": "mWFBQ7J94k8",
+    "golfdb_index": 789,
+    "player": "MINJEE LEE",
+    "club": "driver",
+    "view": "face-on",
+    "fps": 30,
+    "trim_start_sec": 4.9,
+    "trim_end_sec": 8.867,
+    "impact_time_sec": 2.333,
+    "events": {
+      "pre": {
+        "original_frame": 91,
+        "time_in_clip_sec": -1.867
+      },
+      "address": {
+        "original_frame": 177,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 191,
+        "time_in_clip_sec": 1.467
+      },
+      "mid_backswing": {
+        "original_frame": 200,
+        "time_in_clip_sec": 1.767
+      },
+      "top": {
+        "original_frame": 209,
+        "time_in_clip_sec": 2.067
+      },
+      "mid_downswing": {
+        "original_frame": 214,
+        "time_in_clip_sec": 2.233
+      },
+      "impact": {
+        "original_frame": 217,
+        "time_in_clip_sec": 2.333
+      },
+      "mid_follow_through": {
+        "original_frame": 219,
+        "time_in_clip_sec": 2.4
+      },
+      "finish": {
+        "original_frame": 236,
+        "time_in_clip_sec": 2.967
+      },
+      "post": {
+        "original_frame": 266,
+        "time_in_clip_sec": 3.967
+      }
+    }
+  },
+  {
+    "filename": "golfdb_bMVf3lKrUlo.mp4",
+    "youtube_id": "bMVf3lKrUlo",
+    "golfdb_index": 1182,
+    "player": "BERNHARD LANGER",
+    "club": "iron",
+    "view": "other",
+    "fps": 30,
+    "trim_start_sec": 47.867,
+    "trim_end_sec": 51.367,
+    "impact_time_sec": 2.0,
+    "events": {
+      "pre": {
+        "original_frame": 1233,
+        "time_in_clip_sec": -6.767
+      },
+      "address": {
+        "original_frame": 1466,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 1478,
+        "time_in_clip_sec": 1.4
+      },
+      "mid_backswing": {
+        "original_frame": 1484,
+        "time_in_clip_sec": 1.6
+      },
+      "top": {
+        "original_frame": 1488,
+        "time_in_clip_sec": 1.733
+      },
+      "mid_downswing": {
+        "original_frame": 1491,
+        "time_in_clip_sec": 1.833
+      },
+      "impact": {
+        "original_frame": 1496,
+        "time_in_clip_sec": 2.0
+      },
+      "mid_follow_through": {
+        "original_frame": 1500,
+        "time_in_clip_sec": 2.133
+      },
+      "finish": {
+        "original_frame": 1511,
+        "time_in_clip_sec": 2.5
+      },
+      "post": {
+        "original_frame": 1551,
+        "time_in_clip_sec": 3.833
+      }
+    }
+  },
+  {
+    "filename": "golfdb_obVruXSW5xw.mp4",
+    "youtube_id": "obVruXSW5xw",
+    "golfdb_index": 687,
+    "player": "HEE KYUNG SEO",
+    "club": "driver",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 32.333,
+    "trim_end_sec": 36.633,
+    "impact_time_sec": 2.433,
+    "events": {
+      "pre": {
+        "original_frame": 973,
+        "time_in_clip_sec": 0.1
+      },
+      "address": {
+        "original_frame": 1000,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 1015,
+        "time_in_clip_sec": 1.5
+      },
+      "mid_backswing": {
+        "original_frame": 1025,
+        "time_in_clip_sec": 1.833
+      },
+      "top": {
+        "original_frame": 1034,
+        "time_in_clip_sec": 2.133
+      },
+      "mid_downswing": {
+        "original_frame": 1040,
+        "time_in_clip_sec": 2.333
+      },
+      "impact": {
+        "original_frame": 1043,
+        "time_in_clip_sec": 2.433
+      },
+      "mid_follow_through": {
+        "original_frame": 1046,
+        "time_in_clip_sec": 2.533
+      },
+      "finish": {
+        "original_frame": 1069,
+        "time_in_clip_sec": 3.3
+      },
+      "post": {
+        "original_frame": 1116,
+        "time_in_clip_sec": 4.867
+      }
+    }
+  },
+  {
+    "filename": "golfdb_THqn7IjaiEY.mp4",
+    "youtube_id": "THqn7IjaiEY",
+    "golfdb_index": 1350,
+    "player": "TIGER WOODS",
+    "club": "iron",
+    "view": "other",
+    "fps": 30,
+    "trim_start_sec": 17.967,
+    "trim_end_sec": 21.467,
+    "impact_time_sec": 1.933,
+    "events": {
+      "pre": {
+        "original_frame": 421,
+        "time_in_clip_sec": -3.933
+      },
+      "address": {
+        "original_frame": 569,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 580,
+        "time_in_clip_sec": 1.367
+      },
+      "mid_backswing": {
+        "original_frame": 583,
+        "time_in_clip_sec": 1.467
+      },
+      "top": {
+        "original_frame": 589,
+        "time_in_clip_sec": 1.667
+      },
+      "mid_downswing": {
+        "original_frame": 594,
+        "time_in_clip_sec": 1.833
+      },
+      "impact": {
+        "original_frame": 597,
+        "time_in_clip_sec": 1.933
+      },
+      "mid_follow_through": {
+        "original_frame": 599,
+        "time_in_clip_sec": 2.0
+      },
+      "finish": {
+        "original_frame": 614,
+        "time_in_clip_sec": 2.5
+      },
+      "post": {
+        "original_frame": 650,
+        "time_in_clip_sec": 3.7
+      }
+    }
+  },
+  {
+    "filename": "golfdb_QNejdnePhZo.mp4",
+    "youtube_id": "QNejdnePhZo",
+    "golfdb_index": 783,
+    "player": "AZAHARA MUNOZ",
+    "club": "driver",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 16.6,
+    "trim_end_sec": 20.467,
+    "impact_time_sec": 2.2,
+    "events": {
+      "pre": {
+        "original_frame": 241,
+        "time_in_clip_sec": -8.567
+      },
+      "address": {
+        "original_frame": 528,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 542,
+        "time_in_clip_sec": 1.467
+      },
+      "mid_backswing": {
+        "original_frame": 547,
+        "time_in_clip_sec": 1.633
+      },
+      "top": {
+        "original_frame": 555,
+        "time_in_clip_sec": 1.9
+      },
+      "mid_downswing": {
+        "original_frame": 560,
+        "time_in_clip_sec": 2.067
+      },
+      "impact": {
+        "original_frame": 564,
+        "time_in_clip_sec": 2.2
+      },
+      "mid_follow_through": {
+        "original_frame": 567,
+        "time_in_clip_sec": 2.3
+      },
+      "finish": {
+        "original_frame": 584,
+        "time_in_clip_sec": 2.867
+      },
+      "post": {
+        "original_frame": 629,
+        "time_in_clip_sec": 4.367
+      }
+    }
+  },
+  {
+    "filename": "golfdb_0rliVha14ZQ.mp4",
+    "youtube_id": "0rliVha14ZQ",
+    "golfdb_index": 787,
+    "player": "BILLY HORSCHEL",
+    "club": "driver",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 87.7,
+    "trim_end_sec": 91.667,
+    "impact_time_sec": 2.3,
+    "events": {
+      "pre": {
+        "original_frame": 2421,
+        "time_in_clip_sec": -7.0
+      },
+      "address": {
+        "original_frame": 2661,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 2682,
+        "time_in_clip_sec": 1.7
+      },
+      "mid_backswing": {
+        "original_frame": 2687,
+        "time_in_clip_sec": 1.867
+      },
+      "top": {
+        "original_frame": 2694,
+        "time_in_clip_sec": 2.1
+      },
+      "mid_downswing": {
+        "original_frame": 2697,
+        "time_in_clip_sec": 2.2
+      },
+      "impact": {
+        "original_frame": 2700,
+        "time_in_clip_sec": 2.3
+      },
+      "mid_follow_through": {
+        "original_frame": 2703,
+        "time_in_clip_sec": 2.4
+      },
+      "finish": {
+        "original_frame": 2720,
+        "time_in_clip_sec": 2.967
+      },
+      "post": {
+        "original_frame": 2753,
+        "time_in_clip_sec": 4.067
+      }
+    }
+  },
+  {
+    "filename": "golfdb_3z21Egh2G1w.mp4",
+    "youtube_id": "3z21Egh2G1w",
+    "golfdb_index": 983,
+    "player": "DUSTIN JOHNSON",
+    "club": "fairway",
+    "view": "other",
+    "fps": 30,
+    "trim_start_sec": 2.733,
+    "trim_end_sec": 6.567,
+    "impact_time_sec": 2.167,
+    "events": {
+      "pre": {
+        "original_frame": 61,
+        "time_in_clip_sec": -0.7
+      },
+      "address": {
+        "original_frame": 112,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 125,
+        "time_in_clip_sec": 1.433
+      },
+      "mid_backswing": {
+        "original_frame": 129,
+        "time_in_clip_sec": 1.567
+      },
+      "top": {
+        "original_frame": 137,
+        "time_in_clip_sec": 1.833
+      },
+      "mid_downswing": {
+        "original_frame": 144,
+        "time_in_clip_sec": 2.067
+      },
+      "impact": {
+        "original_frame": 147,
+        "time_in_clip_sec": 2.167
+      },
+      "mid_follow_through": {
+        "original_frame": 148,
+        "time_in_clip_sec": 2.2
+      },
+      "finish": {
+        "original_frame": 167,
+        "time_in_clip_sec": 2.833
+      },
+      "post": {
+        "original_frame": 201,
+        "time_in_clip_sec": 3.967
+      }
+    }
+  },
+  {
+    "filename": "golfdb_Ne6ndS9DQsg.mp4",
+    "youtube_id": "Ne6ndS9DQsg",
+    "golfdb_index": 349,
+    "player": "HARRISON FRAZAR",
+    "club": "driver",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 2.4,
+    "trim_end_sec": 6.833,
+    "impact_time_sec": 2.2,
+    "events": {
+      "pre": {
+        "original_frame": 91,
+        "time_in_clip_sec": 0.633
+      },
+      "address": {
+        "original_frame": 102,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 113,
+        "time_in_clip_sec": 1.367
+      },
+      "mid_backswing": {
+        "original_frame": 120,
+        "time_in_clip_sec": 1.6
+      },
+      "top": {
+        "original_frame": 130,
+        "time_in_clip_sec": 1.933
+      },
+      "mid_downswing": {
+        "original_frame": 135,
+        "time_in_clip_sec": 2.1
+      },
+      "impact": {
+        "original_frame": 138,
+        "time_in_clip_sec": 2.2
+      },
+      "mid_follow_through": {
+        "original_frame": 140,
+        "time_in_clip_sec": 2.267
+      },
+      "finish": {
+        "original_frame": 175,
+        "time_in_clip_sec": 3.433
+      },
+      "post": {
+        "original_frame": 295,
+        "time_in_clip_sec": 7.433
+      }
+    }
+  },
+  {
+    "filename": "golfdb_UZ9f9sukG3A.mp4",
+    "youtube_id": "UZ9f9sukG3A",
+    "golfdb_index": 74,
+    "player": "INBEE PARK",
+    "club": "driver",
+    "view": "face-on",
+    "fps": 30,
+    "trim_start_sec": 18.533,
+    "trim_end_sec": 23.633,
+    "impact_time_sec": 2.967,
+    "events": {
+      "pre": {
+        "original_frame": 541,
+        "time_in_clip_sec": -0.5
+      },
+      "address": {
+        "original_frame": 586,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 612,
+        "time_in_clip_sec": 1.867
+      },
+      "mid_backswing": {
+        "original_frame": 622,
+        "time_in_clip_sec": 2.2
+      },
+      "top": {
+        "original_frame": 636,
+        "time_in_clip_sec": 2.667
+      },
+      "mid_downswing": {
+        "original_frame": 641,
+        "time_in_clip_sec": 2.833
+      },
+      "impact": {
+        "original_frame": 645,
+        "time_in_clip_sec": 2.967
+      },
+      "mid_follow_through": {
+        "original_frame": 647,
+        "time_in_clip_sec": 3.033
+      },
+      "finish": {
+        "original_frame": 679,
+        "time_in_clip_sec": 4.1
+      },
+      "post": {
+        "original_frame": 739,
+        "time_in_clip_sec": 6.1
+      }
+    }
+  },
+  {
+    "filename": "golfdb_WfvXp6uR_kI.mp4",
+    "youtube_id": "WfvXp6uR_kI",
+    "golfdb_index": 749,
+    "player": "CRISTIE KERR",
+    "club": "driver",
+    "view": "other",
+    "fps": 30,
+    "trim_start_sec": 34.833,
+    "trim_end_sec": 38.733,
+    "impact_time_sec": 2.267,
+    "events": {
+      "pre": {
+        "original_frame": 991,
+        "time_in_clip_sec": -1.8
+      },
+      "address": {
+        "original_frame": 1075,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 1089,
+        "time_in_clip_sec": 1.467
+      },
+      "mid_backswing": {
+        "original_frame": 1092,
+        "time_in_clip_sec": 1.567
+      },
+      "top": {
+        "original_frame": 1105,
+        "time_in_clip_sec": 2.0
+      },
+      "mid_downswing": {
+        "original_frame": 1109,
+        "time_in_clip_sec": 2.133
+      },
+      "impact": {
+        "original_frame": 1113,
+        "time_in_clip_sec": 2.267
+      },
+      "mid_follow_through": {
+        "original_frame": 1115,
+        "time_in_clip_sec": 2.333
+      },
+      "finish": {
+        "original_frame": 1132,
+        "time_in_clip_sec": 2.9
+      },
+      "post": {
+        "original_frame": 1167,
+        "time_in_clip_sec": 4.067
+      }
+    }
+  },
+  {
+    "filename": "golfdb_jJrnTKv37Eo.mp4",
+    "youtube_id": "jJrnTKv37Eo",
+    "golfdb_index": 917,
+    "player": "GREG CHALMERS",
+    "club": "driver",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 2.8,
+    "trim_end_sec": 6.567,
+    "impact_time_sec": 2.167,
+    "events": {
+      "pre": {
+        "original_frame": 61,
+        "time_in_clip_sec": -0.767
+      },
+      "address": {
+        "original_frame": 114,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 130,
+        "time_in_clip_sec": 1.533
+      },
+      "mid_backswing": {
+        "original_frame": 135,
+        "time_in_clip_sec": 1.7
+      },
+      "top": {
+        "original_frame": 142,
+        "time_in_clip_sec": 1.933
+      },
+      "mid_downswing": {
+        "original_frame": 146,
+        "time_in_clip_sec": 2.067
+      },
+      "impact": {
+        "original_frame": 149,
+        "time_in_clip_sec": 2.167
+      },
+      "mid_follow_through": {
+        "original_frame": 151,
+        "time_in_clip_sec": 2.233
+      },
+      "finish": {
+        "original_frame": 167,
+        "time_in_clip_sec": 2.767
+      },
+      "post": {
+        "original_frame": 208,
+        "time_in_clip_sec": 4.133
+      }
+    }
+  },
+  {
+    "filename": "golfdb_dYYi9v85nc8.mp4",
+    "youtube_id": "dYYi9v85nc8",
+    "golfdb_index": 1307,
+    "player": "KENNY PERRY",
+    "club": "driver",
+    "view": "other",
+    "fps": 30,
+    "trim_start_sec": 13.767,
+    "trim_end_sec": 17.867,
+    "impact_time_sec": 2.367,
+    "events": {
+      "pre": {
+        "original_frame": 361,
+        "time_in_clip_sec": -1.733
+      },
+      "address": {
+        "original_frame": 443,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 457,
+        "time_in_clip_sec": 1.467
+      },
+      "mid_backswing": {
+        "original_frame": 463,
+        "time_in_clip_sec": 1.667
+      },
+      "top": {
+        "original_frame": 477,
+        "time_in_clip_sec": 2.133
+      },
+      "mid_downswing": {
+        "original_frame": 480,
+        "time_in_clip_sec": 2.233
+      },
+      "impact": {
+        "original_frame": 484,
+        "time_in_clip_sec": 2.367
+      },
+      "mid_follow_through": {
+        "original_frame": 486,
+        "time_in_clip_sec": 2.433
+      },
+      "finish": {
+        "original_frame": 506,
+        "time_in_clip_sec": 3.1
+      },
+      "post": {
+        "original_frame": 603,
+        "time_in_clip_sec": 6.333
+      }
+    }
+  },
+  {
+    "filename": "golfdb_B1uIW4LN16Q.mp4",
+    "youtube_id": "B1uIW4LN16Q",
+    "golfdb_index": 29,
+    "player": "BRANFORD MARSALIS",
+    "club": "driver",
+    "view": "face-on",
+    "fps": 30,
+    "trim_start_sec": 8.5,
+    "trim_end_sec": 13.433,
+    "impact_time_sec": 2.333,
+    "events": {
+      "pre": {
+        "original_frame": 245,
+        "time_in_clip_sec": -0.333
+      },
+      "address": {
+        "original_frame": 285,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 303,
+        "time_in_clip_sec": 1.6
+      },
+      "mid_backswing": {
+        "original_frame": 305,
+        "time_in_clip_sec": 1.667
+      },
+      "top": {
+        "original_frame": 317,
+        "time_in_clip_sec": 2.067
+      },
+      "mid_downswing": {
+        "original_frame": 322,
+        "time_in_clip_sec": 2.233
+      },
+      "impact": {
+        "original_frame": 325,
+        "time_in_clip_sec": 2.333
+      },
+      "mid_follow_through": {
+        "original_frame": 327,
+        "time_in_clip_sec": 2.4
+      },
+      "finish": {
+        "original_frame": 373,
+        "time_in_clip_sec": 3.933
+      },
+      "post": {
+        "original_frame": 396,
+        "time_in_clip_sec": 4.7
+      }
+    }
+  },
+  {
+    "filename": "golfdb_ZaoNWC1YkEw.mp4",
+    "youtube_id": "ZaoNWC1YkEw",
+    "golfdb_index": 826,
+    "player": "HYO JOO KIM",
+    "club": "fairway",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 12.3,
+    "trim_end_sec": 16.3,
+    "impact_time_sec": 2.233,
+    "events": {
+      "pre": {
+        "original_frame": 151,
+        "time_in_clip_sec": -7.267
+      },
+      "address": {
+        "original_frame": 399,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 413,
+        "time_in_clip_sec": 1.467
+      },
+      "mid_backswing": {
+        "original_frame": 417,
+        "time_in_clip_sec": 1.6
+      },
+      "top": {
+        "original_frame": 427,
+        "time_in_clip_sec": 1.933
+      },
+      "mid_downswing": {
+        "original_frame": 433,
+        "time_in_clip_sec": 2.133
+      },
+      "impact": {
+        "original_frame": 436,
+        "time_in_clip_sec": 2.233
+      },
+      "mid_follow_through": {
+        "original_frame": 439,
+        "time_in_clip_sec": 2.333
+      },
+      "finish": {
+        "original_frame": 459,
+        "time_in_clip_sec": 3.0
+      },
+      "post": {
+        "original_frame": 493,
+        "time_in_clip_sec": 4.133
+      }
+    }
+  },
+  {
+    "filename": "golfdb_RfiyVH04V-c.mp4",
+    "youtube_id": "RfiyVH04V-c",
+    "golfdb_index": 1360,
+    "player": "GREG NORMAN",
+    "club": "driver",
+    "view": "other",
+    "fps": 30,
+    "trim_start_sec": 43.4,
+    "trim_end_sec": 47.0,
+    "impact_time_sec": 2.133,
+    "events": {
+      "pre": {
+        "original_frame": 751,
+        "time_in_clip_sec": -18.367
+      },
+      "address": {
+        "original_frame": 1332,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 1347,
+        "time_in_clip_sec": 1.5
+      },
+      "mid_backswing": {
+        "original_frame": 1349,
+        "time_in_clip_sec": 1.567
+      },
+      "top": {
+        "original_frame": 1358,
+        "time_in_clip_sec": 1.867
+      },
+      "mid_downswing": {
+        "original_frame": 1362,
+        "time_in_clip_sec": 2.0
+      },
+      "impact": {
+        "original_frame": 1366,
+        "time_in_clip_sec": 2.133
+      },
+      "mid_follow_through": {
+        "original_frame": 1368,
+        "time_in_clip_sec": 2.2
+      },
+      "finish": {
+        "original_frame": 1380,
+        "time_in_clip_sec": 2.6
+      },
+      "post": {
+        "original_frame": 1413,
+        "time_in_clip_sec": 3.7
+      }
+    }
+  },
+  {
+    "filename": "golfdb_nFTbqjkDm1k.mp4",
+    "youtube_id": "nFTbqjkDm1k",
+    "golfdb_index": 158,
+    "player": "MICHELLE WIE",
+    "club": "iron",
+    "view": "other",
+    "fps": 30,
+    "trim_start_sec": 49.867,
+    "trim_end_sec": 53.5,
+    "impact_time_sec": 1.967,
+    "events": {
+      "pre": {
+        "original_frame": 1489,
+        "time_in_clip_sec": -0.233
+      },
+      "address": {
+        "original_frame": 1526,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 1537,
+        "time_in_clip_sec": 1.367
+      },
+      "mid_backswing": {
+        "original_frame": 1542,
+        "time_in_clip_sec": 1.533
+      },
+      "top": {
+        "original_frame": 1548,
+        "time_in_clip_sec": 1.733
+      },
+      "mid_downswing": {
+        "original_frame": 1551,
+        "time_in_clip_sec": 1.833
+      },
+      "impact": {
+        "original_frame": 1555,
+        "time_in_clip_sec": 1.967
+      },
+      "mid_follow_through": {
+        "original_frame": 1558,
+        "time_in_clip_sec": 2.067
+      },
+      "finish": {
+        "original_frame": 1575,
+        "time_in_clip_sec": 2.633
+      },
+      "post": {
+        "original_frame": 1614,
+        "time_in_clip_sec": 3.933
+      }
+    }
+  },
+  {
+    "filename": "golfdb_CIp9Se3HFm0.mp4",
+    "youtube_id": "CIp9Se3HFm0",
+    "golfdb_index": 1354,
+    "player": "XI YU LIN",
+    "club": "iron",
+    "view": "face-on",
+    "fps": 30,
+    "trim_start_sec": 32.2,
+    "trim_end_sec": 36.733,
+    "impact_time_sec": 2.367,
+    "events": {
+      "pre": {
+        "original_frame": 631,
+        "time_in_clip_sec": -11.167
+      },
+      "address": {
+        "original_frame": 996,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 1012,
+        "time_in_clip_sec": 1.533
+      },
+      "mid_backswing": {
+        "original_frame": 1020,
+        "time_in_clip_sec": 1.8
+      },
+      "top": {
+        "original_frame": 1029,
+        "time_in_clip_sec": 2.1
+      },
+      "mid_downswing": {
+        "original_frame": 1034,
+        "time_in_clip_sec": 2.267
+      },
+      "impact": {
+        "original_frame": 1037,
+        "time_in_clip_sec": 2.367
+      },
+      "mid_follow_through": {
+        "original_frame": 1039,
+        "time_in_clip_sec": 2.433
+      },
+      "finish": {
+        "original_frame": 1072,
+        "time_in_clip_sec": 3.533
+      },
+      "post": {
+        "original_frame": 1111,
+        "time_in_clip_sec": 4.833
+      }
+    }
+  },
+  {
+    "filename": "golfdb_eNlBbMI-MhQ.mp4",
+    "youtube_id": "eNlBbMI-MhQ",
+    "golfdb_index": 1372,
+    "player": "MI HYANG LEE",
+    "club": "iron",
+    "view": "face-on",
+    "fps": 30,
+    "trim_start_sec": 21.133,
+    "trim_end_sec": 25.333,
+    "impact_time_sec": 2.467,
+    "events": {
+      "pre": {
+        "original_frame": 241,
+        "time_in_clip_sec": -13.1
+      },
+      "address": {
+        "original_frame": 664,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 683,
+        "time_in_clip_sec": 1.633
+      },
+      "mid_backswing": {
+        "original_frame": 688,
+        "time_in_clip_sec": 1.8
+      },
+      "top": {
+        "original_frame": 698,
+        "time_in_clip_sec": 2.133
+      },
+      "mid_downswing": {
+        "original_frame": 705,
+        "time_in_clip_sec": 2.367
+      },
+      "impact": {
+        "original_frame": 708,
+        "time_in_clip_sec": 2.467
+      },
+      "mid_follow_through": {
+        "original_frame": 710,
+        "time_in_clip_sec": 2.533
+      },
+      "finish": {
+        "original_frame": 730,
+        "time_in_clip_sec": 3.2
+      },
+      "post": {
+        "original_frame": 768,
+        "time_in_clip_sec": 4.467
+      }
+    }
+  },
+  {
+    "filename": "golfdb_Q_5DsrFRkUo.mp4",
+    "youtube_id": "Q_5DsrFRkUo",
+    "golfdb_index": 1125,
+    "player": "LEE WESTWOOD",
+    "club": "driver",
+    "view": "face-on",
+    "fps": 30,
+    "trim_start_sec": 22.2,
+    "trim_end_sec": 26.4,
+    "impact_time_sec": 2.333,
+    "events": {
+      "pre": {
+        "original_frame": 151,
+        "time_in_clip_sec": -17.167
+      },
+      "address": {
+        "original_frame": 696,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 714,
+        "time_in_clip_sec": 1.6
+      },
+      "mid_backswing": {
+        "original_frame": 722,
+        "time_in_clip_sec": 1.867
+      },
+      "top": {
+        "original_frame": 730,
+        "time_in_clip_sec": 2.133
+      },
+      "mid_downswing": {
+        "original_frame": 733,
+        "time_in_clip_sec": 2.233
+      },
+      "impact": {
+        "original_frame": 736,
+        "time_in_clip_sec": 2.333
+      },
+      "mid_follow_through": {
+        "original_frame": 738,
+        "time_in_clip_sec": 2.4
+      },
+      "finish": {
+        "original_frame": 762,
+        "time_in_clip_sec": 3.2
+      },
+      "post": {
+        "original_frame": 802,
+        "time_in_clip_sec": 4.533
+      }
+    }
+  },
+  {
+    "filename": "golfdb_U2PndBCHo0Y.mp4",
+    "youtube_id": "U2PndBCHo0Y",
+    "golfdb_index": 1020,
+    "player": "BEATRIZ RECARI",
+    "club": "driver",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 24.367,
+    "trim_end_sec": 28.267,
+    "impact_time_sec": 2.133,
+    "events": {
+      "pre": {
+        "original_frame": 451,
+        "time_in_clip_sec": -9.333
+      },
+      "address": {
+        "original_frame": 761,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 776,
+        "time_in_clip_sec": 1.5
+      },
+      "mid_backswing": {
+        "original_frame": 780,
+        "time_in_clip_sec": 1.633
+      },
+      "top": {
+        "original_frame": 788,
+        "time_in_clip_sec": 1.9
+      },
+      "mid_downswing": {
+        "original_frame": 791,
+        "time_in_clip_sec": 2.0
+      },
+      "impact": {
+        "original_frame": 795,
+        "time_in_clip_sec": 2.133
+      },
+      "mid_follow_through": {
+        "original_frame": 798,
+        "time_in_clip_sec": 2.233
+      },
+      "finish": {
+        "original_frame": 818,
+        "time_in_clip_sec": 2.9
+      },
+      "post": {
+        "original_frame": 851,
+        "time_in_clip_sec": 4.0
+      }
+    }
+  },
+  {
+    "filename": "golfdb_2zHVHTvK8Fc.mp4",
+    "youtube_id": "2zHVHTvK8Fc",
+    "golfdb_index": 820,
+    "player": "ALISON WALSHE",
+    "club": "driver",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 13.2,
+    "trim_end_sec": 18.033,
+    "impact_time_sec": 3.067,
+    "events": {
+      "pre": {
+        "original_frame": 151,
+        "time_in_clip_sec": -8.167
+      },
+      "address": {
+        "original_frame": 426,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 459,
+        "time_in_clip_sec": 2.1
+      },
+      "mid_backswing": {
+        "original_frame": 468,
+        "time_in_clip_sec": 2.4
+      },
+      "top": {
+        "original_frame": 481,
+        "time_in_clip_sec": 2.833
+      },
+      "mid_downswing": {
+        "original_frame": 484,
+        "time_in_clip_sec": 2.933
+      },
+      "impact": {
+        "original_frame": 488,
+        "time_in_clip_sec": 3.067
+      },
+      "mid_follow_through": {
+        "original_frame": 491,
+        "time_in_clip_sec": 3.167
+      },
+      "finish": {
+        "original_frame": 511,
+        "time_in_clip_sec": 3.833
+      },
+      "post": {
+        "original_frame": 548,
+        "time_in_clip_sec": 5.067
+      }
+    }
+  },
+  {
+    "filename": "golfdb_jLGdrOYwyZs.mp4",
+    "youtube_id": "jLGdrOYwyZs",
+    "golfdb_index": 678,
+    "player": "YANI TSENG",
+    "club": "driver",
+    "view": "face-on",
+    "fps": 30,
+    "trim_start_sec": 4.033,
+    "trim_end_sec": 8.133,
+    "impact_time_sec": 2.467,
+    "events": {
+      "pre": {
+        "original_frame": 91,
+        "time_in_clip_sec": -1.0
+      },
+      "address": {
+        "original_frame": 151,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 174,
+        "time_in_clip_sec": 1.767
+      },
+      "mid_backswing": {
+        "original_frame": 180,
+        "time_in_clip_sec": 1.967
+      },
+      "top": {
+        "original_frame": 188,
+        "time_in_clip_sec": 2.233
+      },
+      "mid_downswing": {
+        "original_frame": 192,
+        "time_in_clip_sec": 2.367
+      },
+      "impact": {
+        "original_frame": 195,
+        "time_in_clip_sec": 2.467
+      },
+      "mid_follow_through": {
+        "original_frame": 197,
+        "time_in_clip_sec": 2.533
+      },
+      "finish": {
+        "original_frame": 214,
+        "time_in_clip_sec": 3.1
+      },
+      "post": {
+        "original_frame": 248,
+        "time_in_clip_sec": 4.233
+      }
+    }
+  },
+  {
+    "filename": "golfdb_K_Z-c4_e98M.mp4",
+    "youtube_id": "K_Z-c4_e98M",
+    "golfdb_index": 1028,
+    "player": "PATRICK RODGERS",
+    "club": "driver",
+    "view": "face-on",
+    "fps": 30,
+    "trim_start_sec": 5.367,
+    "trim_end_sec": 8.833,
+    "impact_time_sec": 1.967,
+    "events": {
+      "pre": {
+        "original_frame": 151,
+        "time_in_clip_sec": -0.333
+      },
+      "address": {
+        "original_frame": 191,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 202,
+        "time_in_clip_sec": 1.367
+      },
+      "mid_backswing": {
+        "original_frame": 205,
+        "time_in_clip_sec": 1.467
+      },
+      "top": {
+        "original_frame": 212,
+        "time_in_clip_sec": 1.7
+      },
+      "mid_downswing": {
+        "original_frame": 217,
+        "time_in_clip_sec": 1.867
+      },
+      "impact": {
+        "original_frame": 220,
+        "time_in_clip_sec": 1.967
+      },
+      "mid_follow_through": {
+        "original_frame": 222,
+        "time_in_clip_sec": 2.033
+      },
+      "finish": {
+        "original_frame": 235,
+        "time_in_clip_sec": 2.467
+      },
+      "post": {
+        "original_frame": 268,
+        "time_in_clip_sec": 3.567
+      }
+    }
+  },
+  {
+    "filename": "golfdb_DZ9FpPXrD74.mp4",
+    "youtube_id": "DZ9FpPXrD74",
+    "golfdb_index": 119,
+    "player": "KEVIN CHAPPELL",
+    "club": "driver",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 13.467,
+    "trim_end_sec": 17.067,
+    "impact_time_sec": 2.033,
+    "events": {
+      "pre": {
+        "original_frame": 407,
+        "time_in_clip_sec": 0.1
+      },
+      "address": {
+        "original_frame": 434,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 447,
+        "time_in_clip_sec": 1.433
+      },
+      "mid_backswing": {
+        "original_frame": 451,
+        "time_in_clip_sec": 1.567
+      },
+      "top": {
+        "original_frame": 459,
+        "time_in_clip_sec": 1.833
+      },
+      "mid_downswing": {
+        "original_frame": 462,
+        "time_in_clip_sec": 1.933
+      },
+      "impact": {
+        "original_frame": 465,
+        "time_in_clip_sec": 2.033
+      },
+      "mid_follow_through": {
+        "original_frame": 467,
+        "time_in_clip_sec": 2.1
+      },
+      "finish": {
+        "original_frame": 482,
+        "time_in_clip_sec": 2.6
+      },
+      "post": {
+        "original_frame": 594,
+        "time_in_clip_sec": 6.333
+      }
+    }
+  },
+  {
+    "filename": "golfdb_tqhXL28u0VM.mp4",
+    "youtube_id": "tqhXL28u0VM",
+    "golfdb_index": 652,
+    "player": "DAVID DUVAL",
+    "club": "fairway",
+    "view": "other",
+    "fps": 30,
+    "trim_start_sec": 9.567,
+    "trim_end_sec": 13.367,
+    "impact_time_sec": 2.067,
+    "events": {
+      "pre": {
+        "original_frame": 241,
+        "time_in_clip_sec": -1.533
+      },
+      "address": {
+        "original_frame": 317,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 327,
+        "time_in_clip_sec": 1.333
+      },
+      "mid_backswing": {
+        "original_frame": 332,
+        "time_in_clip_sec": 1.5
+      },
+      "top": {
+        "original_frame": 340,
+        "time_in_clip_sec": 1.767
+      },
+      "mid_downswing": {
+        "original_frame": 345,
+        "time_in_clip_sec": 1.933
+      },
+      "impact": {
+        "original_frame": 349,
+        "time_in_clip_sec": 2.067
+      },
+      "mid_follow_through": {
+        "original_frame": 351,
+        "time_in_clip_sec": 2.133
+      },
+      "finish": {
+        "original_frame": 371,
+        "time_in_clip_sec": 2.8
+      },
+      "post": {
+        "original_frame": 406,
+        "time_in_clip_sec": 3.967
+      }
+    }
+  },
+  {
+    "filename": "golfdb_j_996vjUjEE.mp4",
+    "youtube_id": "j_996vjUjEE",
+    "golfdb_index": 1299,
+    "player": "BEN CRANE",
+    "club": "driver",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 16.2,
+    "trim_end_sec": 19.733,
+    "impact_time_sec": 2.033,
+    "events": {
+      "pre": {
+        "original_frame": 481,
+        "time_in_clip_sec": -0.167
+      },
+      "address": {
+        "original_frame": 516,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 527,
+        "time_in_clip_sec": 1.367
+      },
+      "mid_backswing": {
+        "original_frame": 532,
+        "time_in_clip_sec": 1.533
+      },
+      "top": {
+        "original_frame": 539,
+        "time_in_clip_sec": 1.767
+      },
+      "mid_downswing": {
+        "original_frame": 543,
+        "time_in_clip_sec": 1.9
+      },
+      "impact": {
+        "original_frame": 547,
+        "time_in_clip_sec": 2.033
+      },
+      "mid_follow_through": {
+        "original_frame": 549,
+        "time_in_clip_sec": 2.1
+      },
+      "finish": {
+        "original_frame": 562,
+        "time_in_clip_sec": 2.533
+      },
+      "post": {
+        "original_frame": 592,
+        "time_in_clip_sec": 3.533
+      }
+    }
+  },
+  {
+    "filename": "golfdb_a8sz0AGo3-k.mp4",
+    "youtube_id": "a8sz0AGo3-k",
+    "golfdb_index": 1015,
+    "player": "PETER JACOBSON",
+    "club": "iron",
+    "view": "face-on",
+    "fps": 30,
+    "trim_start_sec": 53.967,
+    "trim_end_sec": 57.833,
+    "impact_time_sec": 2.067,
+    "events": {
+      "pre": {
+        "original_frame": 1491,
+        "time_in_clip_sec": -4.267
+      },
+      "address": {
+        "original_frame": 1649,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 1660,
+        "time_in_clip_sec": 1.367
+      },
+      "mid_backswing": {
+        "original_frame": 1664,
+        "time_in_clip_sec": 1.5
+      },
+      "top": {
+        "original_frame": 1672,
+        "time_in_clip_sec": 1.767
+      },
+      "mid_downswing": {
+        "original_frame": 1678,
+        "time_in_clip_sec": 1.967
+      },
+      "impact": {
+        "original_frame": 1681,
+        "time_in_clip_sec": 2.067
+      },
+      "mid_follow_through": {
+        "original_frame": 1684,
+        "time_in_clip_sec": 2.167
+      },
+      "finish": {
+        "original_frame": 1705,
+        "time_in_clip_sec": 2.867
+      },
+      "post": {
+        "original_frame": 1738,
+        "time_in_clip_sec": 3.967
+      }
+    }
+  },
+  {
+    "filename": "golfdb_cshnEYiQggc.mp4",
+    "youtube_id": "cshnEYiQggc",
+    "golfdb_index": 536,
+    "player": "KYLE STANLEY",
+    "club": "driver",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 4.7,
+    "trim_end_sec": 8.533,
+    "impact_time_sec": 2.0,
+    "events": {
+      "pre": {
+        "original_frame": 121,
+        "time_in_clip_sec": -0.667
+      },
+      "address": {
+        "original_frame": 171,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 182,
+        "time_in_clip_sec": 1.367
+      },
+      "mid_backswing": {
+        "original_frame": 186,
+        "time_in_clip_sec": 1.5
+      },
+      "top": {
+        "original_frame": 194,
+        "time_in_clip_sec": 1.767
+      },
+      "mid_downswing": {
+        "original_frame": 198,
+        "time_in_clip_sec": 1.9
+      },
+      "impact": {
+        "original_frame": 201,
+        "time_in_clip_sec": 2.0
+      },
+      "mid_follow_through": {
+        "original_frame": 203,
+        "time_in_clip_sec": 2.067
+      },
+      "finish": {
+        "original_frame": 226,
+        "time_in_clip_sec": 2.833
+      },
+      "post": {
+        "original_frame": 286,
+        "time_in_clip_sec": 4.833
+      }
+    }
+  },
+  {
+    "filename": "golfdb_THJhOepkkqs.mp4",
+    "youtube_id": "THJhOepkkqs",
+    "golfdb_index": 1305,
+    "player": "REBECCA LEE BENTHAM",
+    "club": "driver",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 23.3,
+    "trim_end_sec": 27.133,
+    "impact_time_sec": 2.2,
+    "events": {
+      "pre": {
+        "original_frame": 661,
+        "time_in_clip_sec": -1.267
+      },
+      "address": {
+        "original_frame": 729,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 743,
+        "time_in_clip_sec": 1.467
+      },
+      "mid_backswing": {
+        "original_frame": 748,
+        "time_in_clip_sec": 1.633
+      },
+      "top": {
+        "original_frame": 756,
+        "time_in_clip_sec": 1.9
+      },
+      "mid_downswing": {
+        "original_frame": 761,
+        "time_in_clip_sec": 2.067
+      },
+      "impact": {
+        "original_frame": 765,
+        "time_in_clip_sec": 2.2
+      },
+      "mid_follow_through": {
+        "original_frame": 767,
+        "time_in_clip_sec": 2.267
+      },
+      "finish": {
+        "original_frame": 784,
+        "time_in_clip_sec": 2.833
+      },
+      "post": {
+        "original_frame": 844,
+        "time_in_clip_sec": 4.833
+      }
+    }
+  },
+  {
+    "filename": "golfdb_hpZC-9PvQyQ.mp4",
+    "youtube_id": "hpZC-9PvQyQ",
+    "golfdb_index": 1205,
+    "player": "DAVID HEARN",
+    "club": "fairway",
+    "view": "other",
+    "fps": 30,
+    "trim_start_sec": 15.367,
+    "trim_end_sec": 19.233,
+    "impact_time_sec": 2.067,
+    "events": {
+      "pre": {
+        "original_frame": 249,
+        "time_in_clip_sec": -7.067
+      },
+      "address": {
+        "original_frame": 491,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 501,
+        "time_in_clip_sec": 1.333
+      },
+      "mid_backswing": {
+        "original_frame": 507,
+        "time_in_clip_sec": 1.533
+      },
+      "top": {
+        "original_frame": 515,
+        "time_in_clip_sec": 1.8
+      },
+      "mid_downswing": {
+        "original_frame": 519,
+        "time_in_clip_sec": 1.933
+      },
+      "impact": {
+        "original_frame": 523,
+        "time_in_clip_sec": 2.067
+      },
+      "mid_follow_through": {
+        "original_frame": 525,
+        "time_in_clip_sec": 2.133
+      },
+      "finish": {
+        "original_frame": 547,
+        "time_in_clip_sec": 2.867
+      },
+      "post": {
+        "original_frame": 586,
+        "time_in_clip_sec": 4.167
+      }
+    }
+  },
+  {
+    "filename": "golfdb_6X6W_tdjkCU.mp4",
+    "youtube_id": "6X6W_tdjkCU",
+    "golfdb_index": 478,
+    "player": "IN-GEE CHUN",
+    "club": "iron",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 13.4,
+    "trim_end_sec": 17.767,
+    "impact_time_sec": 2.367,
+    "events": {
+      "pre": {
+        "original_frame": 301,
+        "time_in_clip_sec": -3.367
+      },
+      "address": {
+        "original_frame": 432,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 447,
+        "time_in_clip_sec": 1.5
+      },
+      "mid_backswing": {
+        "original_frame": 453,
+        "time_in_clip_sec": 1.7
+      },
+      "top": {
+        "original_frame": 465,
+        "time_in_clip_sec": 2.1
+      },
+      "mid_downswing": {
+        "original_frame": 470,
+        "time_in_clip_sec": 2.267
+      },
+      "impact": {
+        "original_frame": 473,
+        "time_in_clip_sec": 2.367
+      },
+      "mid_follow_through": {
+        "original_frame": 476,
+        "time_in_clip_sec": 2.467
+      },
+      "finish": {
+        "original_frame": 503,
+        "time_in_clip_sec": 3.367
+      },
+      "post": {
+        "original_frame": 533,
+        "time_in_clip_sec": 4.367
+      }
+    }
+  },
+  {
+    "filename": "golfdb_e8HtRKQiJSQ.mp4",
+    "youtube_id": "e8HtRKQiJSQ",
+    "golfdb_index": 1223,
+    "player": "BRITTANY LINCICOME",
+    "club": "driver",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 36.167,
+    "trim_end_sec": 40.433,
+    "impact_time_sec": 2.633,
+    "events": {
+      "pre": {
+        "original_frame": 991,
+        "time_in_clip_sec": -3.133
+      },
+      "address": {
+        "original_frame": 1115,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 1147,
+        "time_in_clip_sec": 2.067
+      },
+      "mid_backswing": {
+        "original_frame": 1152,
+        "time_in_clip_sec": 2.233
+      },
+      "top": {
+        "original_frame": 1157,
+        "time_in_clip_sec": 2.4
+      },
+      "mid_downswing": {
+        "original_frame": 1160,
+        "time_in_clip_sec": 2.5
+      },
+      "impact": {
+        "original_frame": 1164,
+        "time_in_clip_sec": 2.633
+      },
+      "mid_follow_through": {
+        "original_frame": 1166,
+        "time_in_clip_sec": 2.7
+      },
+      "finish": {
+        "original_frame": 1183,
+        "time_in_clip_sec": 3.267
+      },
+      "post": {
+        "original_frame": 1218,
+        "time_in_clip_sec": 4.433
+      }
+    }
+  },
+  {
+    "filename": "golfdb_kM6m0jQDAPY.mp4",
+    "youtube_id": "kM6m0jQDAPY",
+    "golfdb_index": 233,
+    "player": "BEN CURTIS",
+    "club": "fairway",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 11.433,
+    "trim_end_sec": 15.367,
+    "impact_time_sec": 2.133,
+    "events": {
+      "pre": {
+        "original_frame": 301,
+        "time_in_clip_sec": -1.4
+      },
+      "address": {
+        "original_frame": 373,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 388,
+        "time_in_clip_sec": 1.5
+      },
+      "mid_backswing": {
+        "original_frame": 392,
+        "time_in_clip_sec": 1.633
+      },
+      "top": {
+        "original_frame": 398,
+        "time_in_clip_sec": 1.833
+      },
+      "mid_downswing": {
+        "original_frame": 404,
+        "time_in_clip_sec": 2.033
+      },
+      "impact": {
+        "original_frame": 407,
+        "time_in_clip_sec": 2.133
+      },
+      "mid_follow_through": {
+        "original_frame": 409,
+        "time_in_clip_sec": 2.2
+      },
+      "finish": {
+        "original_frame": 431,
+        "time_in_clip_sec": 2.933
+      },
+      "post": {
+        "original_frame": 491,
+        "time_in_clip_sec": 4.933
+      }
+    }
+  },
+  {
+    "filename": "golfdb_igqba4C0O-4.mp4",
+    "youtube_id": "igqba4C0O-4",
+    "golfdb_index": 336,
+    "player": "GRAEME MCDOWELL",
+    "club": "driver",
+    "view": "face-on",
+    "fps": 30,
+    "trim_start_sec": 12.933,
+    "trim_end_sec": 16.3,
+    "impact_time_sec": 1.933,
+    "events": {
+      "pre": {
+        "original_frame": 403,
+        "time_in_clip_sec": 0.5
+      },
+      "address": {
+        "original_frame": 418,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 429,
+        "time_in_clip_sec": 1.367
+      },
+      "mid_backswing": {
+        "original_frame": 434,
+        "time_in_clip_sec": 1.533
+      },
+      "top": {
+        "original_frame": 440,
+        "time_in_clip_sec": 1.733
+      },
+      "mid_downswing": {
+        "original_frame": 442,
+        "time_in_clip_sec": 1.8
+      },
+      "impact": {
+        "original_frame": 446,
+        "time_in_clip_sec": 1.933
+      },
+      "mid_follow_through": {
+        "original_frame": 448,
+        "time_in_clip_sec": 2.0
+      },
+      "finish": {
+        "original_frame": 459,
+        "time_in_clip_sec": 2.367
+      },
+      "post": {
+        "original_frame": 525,
+        "time_in_clip_sec": 4.567
+      }
+    }
+  },
+  {
+    "filename": "golfdb_q38tguX7TsU.mp4",
+    "youtube_id": "q38tguX7TsU",
+    "golfdb_index": 851,
+    "player": "JERRY KELLY",
+    "club": "driver",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 78.0,
+    "trim_end_sec": 81.933,
+    "impact_time_sec": 2.267,
+    "events": {
+      "pre": {
+        "original_frame": 2169,
+        "time_in_clip_sec": -5.7
+      },
+      "address": {
+        "original_frame": 2370,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 2387,
+        "time_in_clip_sec": 1.567
+      },
+      "mid_backswing": {
+        "original_frame": 2391,
+        "time_in_clip_sec": 1.7
+      },
+      "top": {
+        "original_frame": 2401,
+        "time_in_clip_sec": 2.033
+      },
+      "mid_downswing": {
+        "original_frame": 2405,
+        "time_in_clip_sec": 2.167
+      },
+      "impact": {
+        "original_frame": 2408,
+        "time_in_clip_sec": 2.267
+      },
+      "mid_follow_through": {
+        "original_frame": 2410,
+        "time_in_clip_sec": 2.333
+      },
+      "finish": {
+        "original_frame": 2428,
+        "time_in_clip_sec": 2.933
+      },
+      "post": {
+        "original_frame": 2467,
+        "time_in_clip_sec": 4.233
+      }
+    }
+  },
+  {
+    "filename": "golfdb_oZcyBgK-mbM.mp4",
+    "youtube_id": "oZcyBgK-mbM",
+    "golfdb_index": 1007,
+    "player": "ARIYA JUTANUGARN",
+    "club": "fairway",
+    "view": "face-on",
+    "fps": 30,
+    "trim_start_sec": 4.6,
+    "trim_end_sec": 8.833,
+    "impact_time_sec": 2.4,
+    "events": {
+      "pre": {
+        "original_frame": 151,
+        "time_in_clip_sec": 0.433
+      },
+      "address": {
+        "original_frame": 168,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 189,
+        "time_in_clip_sec": 1.7
+      },
+      "mid_backswing": {
+        "original_frame": 195,
+        "time_in_clip_sec": 1.9
+      },
+      "top": {
+        "original_frame": 203,
+        "time_in_clip_sec": 2.167
+      },
+      "mid_downswing": {
+        "original_frame": 207,
+        "time_in_clip_sec": 2.3
+      },
+      "impact": {
+        "original_frame": 210,
+        "time_in_clip_sec": 2.4
+      },
+      "mid_follow_through": {
+        "original_frame": 213,
+        "time_in_clip_sec": 2.5
+      },
+      "finish": {
+        "original_frame": 235,
+        "time_in_clip_sec": 3.233
+      },
+      "post": {
+        "original_frame": 265,
+        "time_in_clip_sec": 4.233
+      }
+    }
+  },
+  {
+    "filename": "golfdb_DN8F1bG76Vk.mp4",
+    "youtube_id": "DN8F1bG76Vk",
+    "golfdb_index": 254,
+    "player": "CINDY LACROSSE",
+    "club": "driver",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 5.433,
+    "trim_end_sec": 9.167,
+    "impact_time_sec": 2.133,
+    "events": {
+      "pre": {
+        "original_frame": 151,
+        "time_in_clip_sec": -0.4
+      },
+      "address": {
+        "original_frame": 193,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 205,
+        "time_in_clip_sec": 1.4
+      },
+      "mid_backswing": {
+        "original_frame": 209,
+        "time_in_clip_sec": 1.533
+      },
+      "top": {
+        "original_frame": 218,
+        "time_in_clip_sec": 1.833
+      },
+      "mid_downswing": {
+        "original_frame": 224,
+        "time_in_clip_sec": 2.033
+      },
+      "impact": {
+        "original_frame": 227,
+        "time_in_clip_sec": 2.133
+      },
+      "mid_follow_through": {
+        "original_frame": 229,
+        "time_in_clip_sec": 2.2
+      },
+      "finish": {
+        "original_frame": 245,
+        "time_in_clip_sec": 2.733
+      },
+      "post": {
+        "original_frame": 314,
+        "time_in_clip_sec": 5.033
+      }
+    }
+  },
+  {
+    "filename": "golfdb_8cGaBRAZHO8.mp4",
+    "youtube_id": "8cGaBRAZHO8",
+    "golfdb_index": 745,
+    "player": "DAVID DUVAL",
+    "club": "iron",
+    "view": "other",
+    "fps": 30,
+    "trim_start_sec": 13.2,
+    "trim_end_sec": 17.0,
+    "impact_time_sec": 2.033,
+    "events": {
+      "pre": {
+        "original_frame": 301,
+        "time_in_clip_sec": -3.167
+      },
+      "address": {
+        "original_frame": 426,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 436,
+        "time_in_clip_sec": 1.333
+      },
+      "mid_backswing": {
+        "original_frame": 441,
+        "time_in_clip_sec": 1.5
+      },
+      "top": {
+        "original_frame": 449,
+        "time_in_clip_sec": 1.767
+      },
+      "mid_downswing": {
+        "original_frame": 454,
+        "time_in_clip_sec": 1.933
+      },
+      "impact": {
+        "original_frame": 457,
+        "time_in_clip_sec": 2.033
+      },
+      "mid_follow_through": {
+        "original_frame": 460,
+        "time_in_clip_sec": 2.133
+      },
+      "finish": {
+        "original_frame": 480,
+        "time_in_clip_sec": 2.8
+      },
+      "post": {
+        "original_frame": 540,
+        "time_in_clip_sec": 4.8
+      }
+    }
+  },
+  {
+    "filename": "golfdb_XIzyJGDBuqc.mp4",
+    "youtube_id": "XIzyJGDBuqc",
+    "golfdb_index": 437,
+    "player": "FRED COUPLES",
+    "club": "driver",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 76.567,
+    "trim_end_sec": 80.5,
+    "impact_time_sec": 2.067,
+    "events": {
+      "pre": {
+        "original_frame": 2121,
+        "time_in_clip_sec": -5.867
+      },
+      "address": {
+        "original_frame": 2327,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 2337,
+        "time_in_clip_sec": 1.333
+      },
+      "mid_backswing": {
+        "original_frame": 2341,
+        "time_in_clip_sec": 1.467
+      },
+      "top": {
+        "original_frame": 2352,
+        "time_in_clip_sec": 1.833
+      },
+      "mid_downswing": {
+        "original_frame": 2356,
+        "time_in_clip_sec": 1.967
+      },
+      "impact": {
+        "original_frame": 2359,
+        "time_in_clip_sec": 2.067
+      },
+      "mid_follow_through": {
+        "original_frame": 2361,
+        "time_in_clip_sec": 2.133
+      },
+      "finish": {
+        "original_frame": 2385,
+        "time_in_clip_sec": 2.933
+      },
+      "post": {
+        "original_frame": 2445,
+        "time_in_clip_sec": 4.933
+      }
+    }
+  },
+  {
+    "filename": "golfdb_Ux2iHMrS_PY.mp4",
+    "youtube_id": "Ux2iHMrS_PY",
+    "golfdb_index": 1147,
+    "player": "PETER HANSON",
+    "club": "driver",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 17.433,
+    "trim_end_sec": 20.9,
+    "impact_time_sec": 1.833,
+    "events": {
+      "pre": {
+        "original_frame": 211,
+        "time_in_clip_sec": -10.4
+      },
+      "address": {
+        "original_frame": 553,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 562,
+        "time_in_clip_sec": 1.3
+      },
+      "mid_backswing": {
+        "original_frame": 566,
+        "time_in_clip_sec": 1.433
+      },
+      "top": {
+        "original_frame": 572,
+        "time_in_clip_sec": 1.633
+      },
+      "mid_downswing": {
+        "original_frame": 575,
+        "time_in_clip_sec": 1.733
+      },
+      "impact": {
+        "original_frame": 578,
+        "time_in_clip_sec": 1.833
+      },
+      "mid_follow_through": {
+        "original_frame": 580,
+        "time_in_clip_sec": 1.9
+      },
+      "finish": {
+        "original_frame": 597,
+        "time_in_clip_sec": 2.467
+      },
+      "post": {
+        "original_frame": 633,
+        "time_in_clip_sec": 3.667
+      }
+    }
+  },
+  {
+    "filename": "golfdb_Jc0AMy9ismo.mp4",
+    "youtube_id": "Jc0AMy9ismo",
+    "golfdb_index": 672,
+    "player": "JULIETA GRANADA",
+    "club": "driver",
+    "view": "face-on",
+    "fps": 30,
+    "trim_start_sec": 5.033,
+    "trim_end_sec": 8.9,
+    "impact_time_sec": 2.233,
+    "events": {
+      "pre": {
+        "original_frame": 121,
+        "time_in_clip_sec": -1.0
+      },
+      "address": {
+        "original_frame": 181,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 196,
+        "time_in_clip_sec": 1.5
+      },
+      "mid_backswing": {
+        "original_frame": 202,
+        "time_in_clip_sec": 1.7
+      },
+      "top": {
+        "original_frame": 210,
+        "time_in_clip_sec": 1.967
+      },
+      "mid_downswing": {
+        "original_frame": 214,
+        "time_in_clip_sec": 2.1
+      },
+      "impact": {
+        "original_frame": 218,
+        "time_in_clip_sec": 2.233
+      },
+      "mid_follow_through": {
+        "original_frame": 220,
+        "time_in_clip_sec": 2.3
+      },
+      "finish": {
+        "original_frame": 237,
+        "time_in_clip_sec": 2.867
+      },
+      "post": {
+        "original_frame": 292,
+        "time_in_clip_sec": 4.7
+      }
+    }
+  },
+  {
+    "filename": "golfdb_9a4LQfePtI4.mp4",
+    "youtube_id": "9a4LQfePtI4",
+    "golfdb_index": 995,
+    "player": "TONY FINAU",
+    "club": "iron",
+    "view": "face-on",
+    "fps": 30,
+    "trim_start_sec": 33.367,
+    "trim_end_sec": 37.633,
+    "impact_time_sec": 2.7,
+    "events": {
+      "pre": {
+        "original_frame": 601,
+        "time_in_clip_sec": -13.333
+      },
+      "address": {
+        "original_frame": 1031,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 1065,
+        "time_in_clip_sec": 2.133
+      },
+      "mid_backswing": {
+        "original_frame": 1071,
+        "time_in_clip_sec": 2.333
+      },
+      "top": {
+        "original_frame": 1075,
+        "time_in_clip_sec": 2.467
+      },
+      "mid_downswing": {
+        "original_frame": 1078,
+        "time_in_clip_sec": 2.567
+      },
+      "impact": {
+        "original_frame": 1082,
+        "time_in_clip_sec": 2.7
+      },
+      "mid_follow_through": {
+        "original_frame": 1085,
+        "time_in_clip_sec": 2.8
+      },
+      "finish": {
+        "original_frame": 1099,
+        "time_in_clip_sec": 3.267
+      },
+      "post": {
+        "original_frame": 1134,
+        "time_in_clip_sec": 4.433
+      }
+    }
+  },
+  {
+    "filename": "golfdb_WvsL3qrvC9Q.mp4",
+    "youtube_id": "WvsL3qrvC9Q",
+    "golfdb_index": 522,
+    "player": "LYDIA KO",
+    "club": "driver",
+    "view": "face-on",
+    "fps": 30,
+    "trim_start_sec": 24.9,
+    "trim_end_sec": 29.067,
+    "impact_time_sec": 2.233,
+    "events": {
+      "pre": {
+        "original_frame": 331,
+        "time_in_clip_sec": -13.867
+      },
+      "address": {
+        "original_frame": 777,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 792,
+        "time_in_clip_sec": 1.5
+      },
+      "mid_backswing": {
+        "original_frame": 797,
+        "time_in_clip_sec": 1.667
+      },
+      "top": {
+        "original_frame": 807,
+        "time_in_clip_sec": 2.0
+      },
+      "mid_downswing": {
+        "original_frame": 811,
+        "time_in_clip_sec": 2.133
+      },
+      "impact": {
+        "original_frame": 814,
+        "time_in_clip_sec": 2.233
+      },
+      "mid_follow_through": {
+        "original_frame": 816,
+        "time_in_clip_sec": 2.3
+      },
+      "finish": {
+        "original_frame": 842,
+        "time_in_clip_sec": 3.167
+      },
+      "post": {
+        "original_frame": 872,
+        "time_in_clip_sec": 4.167
+      }
+    }
+  },
+  {
+    "filename": "golfdb_3WfIqboFIHM.mp4",
+    "youtube_id": "3WfIqboFIHM",
+    "golfdb_index": 1065,
+    "player": "RICKIE FOWLER",
+    "club": "driver",
+    "view": "other",
+    "fps": 30,
+    "trim_start_sec": 2.333,
+    "trim_end_sec": 5.733,
+    "impact_time_sec": 1.867,
+    "events": {
+      "pre": {
+        "original_frame": 32,
+        "time_in_clip_sec": -1.267
+      },
+      "address": {
+        "original_frame": 100,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 109,
+        "time_in_clip_sec": 1.3
+      },
+      "mid_backswing": {
+        "original_frame": 113,
+        "time_in_clip_sec": 1.433
+      },
+      "top": {
+        "original_frame": 119,
+        "time_in_clip_sec": 1.633
+      },
+      "mid_downswing": {
+        "original_frame": 123,
+        "time_in_clip_sec": 1.767
+      },
+      "impact": {
+        "original_frame": 126,
+        "time_in_clip_sec": 1.867
+      },
+      "mid_follow_through": {
+        "original_frame": 128,
+        "time_in_clip_sec": 1.933
+      },
+      "finish": {
+        "original_frame": 142,
+        "time_in_clip_sec": 2.4
+      },
+      "post": {
+        "original_frame": 179,
+        "time_in_clip_sec": 3.633
+      }
+    }
+  },
+  {
+    "filename": "golfdb_shPjhu1kxEE.mp4",
+    "youtube_id": "shPjhu1kxEE",
+    "golfdb_index": 464,
+    "player": "BRAD FAXON",
+    "club": "fairway",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 12.833,
+    "trim_end_sec": 16.7,
+    "impact_time_sec": 2.2,
+    "events": {
+      "pre": {
+        "original_frame": 185,
+        "time_in_clip_sec": -6.667
+      },
+      "address": {
+        "original_frame": 415,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 431,
+        "time_in_clip_sec": 1.533
+      },
+      "mid_backswing": {
+        "original_frame": 435,
+        "time_in_clip_sec": 1.667
+      },
+      "top": {
+        "original_frame": 443,
+        "time_in_clip_sec": 1.933
+      },
+      "mid_downswing": {
+        "original_frame": 448,
+        "time_in_clip_sec": 2.1
+      },
+      "impact": {
+        "original_frame": 451,
+        "time_in_clip_sec": 2.2
+      },
+      "mid_follow_through": {
+        "original_frame": 453,
+        "time_in_clip_sec": 2.267
+      },
+      "finish": {
+        "original_frame": 471,
+        "time_in_clip_sec": 2.867
+      },
+      "post": {
+        "original_frame": 507,
+        "time_in_clip_sec": 4.067
+      }
+    }
+  },
+  {
+    "filename": "golfdb_7pOD9yIfxCU.mp4",
+    "youtube_id": "7pOD9yIfxCU",
+    "golfdb_index": 731,
+    "player": "SUZANN PETTERSEN",
+    "club": "driver",
+    "view": "face-on",
+    "fps": 30,
+    "trim_start_sec": 18.033,
+    "trim_end_sec": 21.633,
+    "impact_time_sec": 2.067,
+    "events": {
+      "pre": {
+        "original_frame": 331,
+        "time_in_clip_sec": -7.0
+      },
+      "address": {
+        "original_frame": 571,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 583,
+        "time_in_clip_sec": 1.4
+      },
+      "mid_backswing": {
+        "original_frame": 588,
+        "time_in_clip_sec": 1.567
+      },
+      "top": {
+        "original_frame": 595,
+        "time_in_clip_sec": 1.8
+      },
+      "mid_downswing": {
+        "original_frame": 599,
+        "time_in_clip_sec": 1.933
+      },
+      "impact": {
+        "original_frame": 603,
+        "time_in_clip_sec": 2.067
+      },
+      "mid_follow_through": {
+        "original_frame": 605,
+        "time_in_clip_sec": 2.133
+      },
+      "finish": {
+        "original_frame": 619,
+        "time_in_clip_sec": 2.6
+      },
+      "post": {
+        "original_frame": 656,
+        "time_in_clip_sec": 3.833
+      }
+    }
+  },
+  {
+    "filename": "golfdb_NLprImdkR_k.mp4",
+    "youtube_id": "NLprImdkR_k",
+    "golfdb_index": 1082,
+    "player": "KEVIN KISNER",
+    "club": "driver",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 13.967,
+    "trim_end_sec": 17.567,
+    "impact_time_sec": 2.167,
+    "events": {
+      "pre": {
+        "original_frame": 241,
+        "time_in_clip_sec": -5.933
+      },
+      "address": {
+        "original_frame": 449,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 467,
+        "time_in_clip_sec": 1.6
+      },
+      "mid_backswing": {
+        "original_frame": 471,
+        "time_in_clip_sec": 1.733
+      },
+      "top": {
+        "original_frame": 477,
+        "time_in_clip_sec": 1.933
+      },
+      "mid_downswing": {
+        "original_frame": 480,
+        "time_in_clip_sec": 2.033
+      },
+      "impact": {
+        "original_frame": 484,
+        "time_in_clip_sec": 2.167
+      },
+      "mid_follow_through": {
+        "original_frame": 486,
+        "time_in_clip_sec": 2.233
+      },
+      "finish": {
+        "original_frame": 497,
+        "time_in_clip_sec": 2.6
+      },
+      "post": {
+        "original_frame": 533,
+        "time_in_clip_sec": 3.8
+      }
+    }
+  },
+  {
+    "filename": "golfdb_0yQOUWKJrf0.mp4",
+    "youtube_id": "0yQOUWKJrf0",
+    "golfdb_index": 317,
+    "player": "GERINA PILLER",
+    "club": "driver",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 7.467,
+    "trim_end_sec": 11.067,
+    "impact_time_sec": 2.1,
+    "events": {
+      "pre": {
+        "original_frame": 213,
+        "time_in_clip_sec": -0.367
+      },
+      "address": {
+        "original_frame": 254,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 266,
+        "time_in_clip_sec": 1.4
+      },
+      "mid_backswing": {
+        "original_frame": 270,
+        "time_in_clip_sec": 1.533
+      },
+      "top": {
+        "original_frame": 279,
+        "time_in_clip_sec": 1.833
+      },
+      "mid_downswing": {
+        "original_frame": 283,
+        "time_in_clip_sec": 1.967
+      },
+      "impact": {
+        "original_frame": 287,
+        "time_in_clip_sec": 2.1
+      },
+      "mid_follow_through": {
+        "original_frame": 289,
+        "time_in_clip_sec": 2.167
+      },
+      "finish": {
+        "original_frame": 302,
+        "time_in_clip_sec": 2.6
+      },
+      "post": {
+        "original_frame": 307,
+        "time_in_clip_sec": 2.767
+      }
+    }
+  },
+  {
+    "filename": "golfdb_3zZXUQywgSw.mp4",
+    "youtube_id": "3zZXUQywgSw",
+    "golfdb_index": 173,
+    "player": "BROOKE HENDERSON",
+    "club": "driver",
+    "view": "other",
+    "fps": 30,
+    "trim_start_sec": 69.233,
+    "trim_end_sec": 73.2,
+    "impact_time_sec": 2.333,
+    "events": {
+      "pre": {
+        "original_frame": 2104,
+        "time_in_clip_sec": 0.9
+      },
+      "address": {
+        "original_frame": 2107,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 2125,
+        "time_in_clip_sec": 1.6
+      },
+      "mid_backswing": {
+        "original_frame": 2130,
+        "time_in_clip_sec": 1.767
+      },
+      "top": {
+        "original_frame": 2138,
+        "time_in_clip_sec": 2.033
+      },
+      "mid_downswing": {
+        "original_frame": 2143,
+        "time_in_clip_sec": 2.2
+      },
+      "impact": {
+        "original_frame": 2147,
+        "time_in_clip_sec": 2.333
+      },
+      "mid_follow_through": {
+        "original_frame": 2149,
+        "time_in_clip_sec": 2.4
+      },
+      "finish": {
+        "original_frame": 2166,
+        "time_in_clip_sec": 2.967
+      },
+      "post": {
+        "original_frame": 2196,
+        "time_in_clip_sec": 3.967
+      }
+    }
+  },
+  {
+    "filename": "golfdb_iuWywRQ2HCs.mp4",
+    "youtube_id": "iuWywRQ2HCs",
+    "golfdb_index": 122,
+    "player": "JOHN DALY",
+    "club": "fairway",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 10.367,
+    "trim_end_sec": 13.933,
+    "impact_time_sec": 2.0,
+    "events": {
+      "pre": {
+        "original_frame": 310,
+        "time_in_clip_sec": -0.033
+      },
+      "address": {
+        "original_frame": 341,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 351,
+        "time_in_clip_sec": 1.333
+      },
+      "mid_backswing": {
+        "original_frame": 354,
+        "time_in_clip_sec": 1.433
+      },
+      "top": {
+        "original_frame": 365,
+        "time_in_clip_sec": 1.8
+      },
+      "mid_downswing": {
+        "original_frame": 368,
+        "time_in_clip_sec": 1.9
+      },
+      "impact": {
+        "original_frame": 371,
+        "time_in_clip_sec": 2.0
+      },
+      "mid_follow_through": {
+        "original_frame": 373,
+        "time_in_clip_sec": 2.067
+      },
+      "finish": {
+        "original_frame": 388,
+        "time_in_clip_sec": 2.567
+      },
+      "post": {
+        "original_frame": 432,
+        "time_in_clip_sec": 4.033
+      }
+    }
+  },
+  {
+    "filename": "golfdb_-w6CkCOV_no.mp4",
+    "youtube_id": "-w6CkCOV_no",
+    "golfdb_index": 1121,
+    "player": "TONY FINAU",
+    "club": "iron",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 20.267,
+    "trim_end_sec": 24.533,
+    "impact_time_sec": 2.633,
+    "events": {
+      "pre": {
+        "original_frame": 331,
+        "time_in_clip_sec": -9.233
+      },
+      "address": {
+        "original_frame": 638,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 671,
+        "time_in_clip_sec": 2.1
+      },
+      "mid_backswing": {
+        "original_frame": 677,
+        "time_in_clip_sec": 2.3
+      },
+      "top": {
+        "original_frame": 680,
+        "time_in_clip_sec": 2.4
+      },
+      "mid_downswing": {
+        "original_frame": 684,
+        "time_in_clip_sec": 2.533
+      },
+      "impact": {
+        "original_frame": 687,
+        "time_in_clip_sec": 2.633
+      },
+      "mid_follow_through": {
+        "original_frame": 689,
+        "time_in_clip_sec": 2.7
+      },
+      "finish": {
+        "original_frame": 706,
+        "time_in_clip_sec": 3.267
+      },
+      "post": {
+        "original_frame": 743,
+        "time_in_clip_sec": 4.5
+      }
+    }
+  },
+  {
+    "filename": "golfdb_AHtz9QPHMUU.mp4",
+    "youtube_id": "AHtz9QPHMUU",
+    "golfdb_index": 1321,
+    "player": "LEE JANZEN",
+    "club": "iron",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 22.733,
+    "trim_end_sec": 26.733,
+    "impact_time_sec": 1.933,
+    "events": {
+      "pre": {
+        "original_frame": 571,
+        "time_in_clip_sec": -3.7
+      },
+      "address": {
+        "original_frame": 712,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 720,
+        "time_in_clip_sec": 1.267
+      },
+      "mid_backswing": {
+        "original_frame": 725,
+        "time_in_clip_sec": 1.433
+      },
+      "top": {
+        "original_frame": 733,
+        "time_in_clip_sec": 1.7
+      },
+      "mid_downswing": {
+        "original_frame": 737,
+        "time_in_clip_sec": 1.833
+      },
+      "impact": {
+        "original_frame": 740,
+        "time_in_clip_sec": 1.933
+      },
+      "mid_follow_through": {
+        "original_frame": 743,
+        "time_in_clip_sec": 2.033
+      },
+      "finish": {
+        "original_frame": 772,
+        "time_in_clip_sec": 3.0
+      },
+      "post": {
+        "original_frame": 832,
+        "time_in_clip_sec": 5.0
+      }
+    }
+  },
+  {
+    "filename": "golfdb_ceXv_9tJUWE.mp4",
+    "youtube_id": "ceXv_9tJUWE",
+    "golfdb_index": 1211,
+    "player": "STEVE STRICKER",
+    "club": "driver",
+    "view": "other",
+    "fps": 30,
+    "trim_start_sec": 11.067,
+    "trim_end_sec": 14.867,
+    "impact_time_sec": 2.133,
+    "events": {
+      "pre": {
+        "original_frame": 121,
+        "time_in_clip_sec": -7.033
+      },
+      "address": {
+        "original_frame": 362,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 377,
+        "time_in_clip_sec": 1.5
+      },
+      "mid_backswing": {
+        "original_frame": 381,
+        "time_in_clip_sec": 1.633
+      },
+      "top": {
+        "original_frame": 388,
+        "time_in_clip_sec": 1.867
+      },
+      "mid_downswing": {
+        "original_frame": 393,
+        "time_in_clip_sec": 2.033
+      },
+      "impact": {
+        "original_frame": 396,
+        "time_in_clip_sec": 2.133
+      },
+      "mid_follow_through": {
+        "original_frame": 399,
+        "time_in_clip_sec": 2.233
+      },
+      "finish": {
+        "original_frame": 416,
+        "time_in_clip_sec": 2.8
+      },
+      "post": {
+        "original_frame": 450,
+        "time_in_clip_sec": 3.933
+      }
+    }
+  },
+  {
+    "filename": "golfdb_EK93TW3pEb0.mp4",
+    "youtube_id": "EK93TW3pEb0",
+    "golfdb_index": 1001,
+    "player": "MICHELLE WIE",
+    "club": "hybrid",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 3.3,
+    "trim_end_sec": 6.933,
+    "impact_time_sec": 2.067,
+    "events": {
+      "pre": {
+        "original_frame": 121,
+        "time_in_clip_sec": 0.733
+      },
+      "address": {
+        "original_frame": 129,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 141,
+        "time_in_clip_sec": 1.4
+      },
+      "mid_backswing": {
+        "original_frame": 147,
+        "time_in_clip_sec": 1.6
+      },
+      "top": {
+        "original_frame": 153,
+        "time_in_clip_sec": 1.8
+      },
+      "mid_downswing": {
+        "original_frame": 157,
+        "time_in_clip_sec": 1.933
+      },
+      "impact": {
+        "original_frame": 161,
+        "time_in_clip_sec": 2.067
+      },
+      "mid_follow_through": {
+        "original_frame": 163,
+        "time_in_clip_sec": 2.133
+      },
+      "finish": {
+        "original_frame": 178,
+        "time_in_clip_sec": 2.633
+      },
+      "post": {
+        "original_frame": 212,
+        "time_in_clip_sec": 3.767
+      }
+    }
+  },
+  {
+    "filename": "golfdb_v-vaBl6li0k.mp4",
+    "youtube_id": "v-vaBl6li0k",
+    "golfdb_index": 394,
+    "player": "SEAN OHAIR",
+    "club": "iron",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 12.867,
+    "trim_end_sec": 16.5,
+    "impact_time_sec": 2.067,
+    "events": {
+      "pre": {
+        "original_frame": 252,
+        "time_in_clip_sec": -4.467
+      },
+      "address": {
+        "original_frame": 416,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 428,
+        "time_in_clip_sec": 1.4
+      },
+      "mid_backswing": {
+        "original_frame": 432,
+        "time_in_clip_sec": 1.533
+      },
+      "top": {
+        "original_frame": 440,
+        "time_in_clip_sec": 1.8
+      },
+      "mid_downswing": {
+        "original_frame": 445,
+        "time_in_clip_sec": 1.967
+      },
+      "impact": {
+        "original_frame": 448,
+        "time_in_clip_sec": 2.067
+      },
+      "mid_follow_through": {
+        "original_frame": 450,
+        "time_in_clip_sec": 2.133
+      },
+      "finish": {
+        "original_frame": 465,
+        "time_in_clip_sec": 2.633
+      },
+      "post": {
+        "original_frame": 502,
+        "time_in_clip_sec": 3.867
+      }
+    }
+  },
+  {
+    "filename": "golfdb_b8KZ5HsS2TM.mp4",
+    "youtube_id": "b8KZ5HsS2TM",
+    "golfdb_index": 913,
+    "player": "BAEK KYU JUNG",
+    "club": "driver",
+    "view": "face-on",
+    "fps": 30,
+    "trim_start_sec": 20.567,
+    "trim_end_sec": 24.5,
+    "impact_time_sec": 2.167,
+    "events": {
+      "pre": {
+        "original_frame": 543,
+        "time_in_clip_sec": -2.467
+      },
+      "address": {
+        "original_frame": 647,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 660,
+        "time_in_clip_sec": 1.433
+      },
+      "mid_backswing": {
+        "original_frame": 669,
+        "time_in_clip_sec": 1.733
+      },
+      "top": {
+        "original_frame": 674,
+        "time_in_clip_sec": 1.9
+      },
+      "mid_downswing": {
+        "original_frame": 678,
+        "time_in_clip_sec": 2.033
+      },
+      "impact": {
+        "original_frame": 682,
+        "time_in_clip_sec": 2.167
+      },
+      "mid_follow_through": {
+        "original_frame": 684,
+        "time_in_clip_sec": 2.233
+      },
+      "finish": {
+        "original_frame": 705,
+        "time_in_clip_sec": 2.933
+      },
+      "post": {
+        "original_frame": 739,
+        "time_in_clip_sec": 4.067
+      }
+    }
+  },
+  {
+    "filename": "golfdb_8zLqwUYB38Q.mp4",
+    "youtube_id": "8zLqwUYB38Q",
+    "golfdb_index": 901,
+    "player": "CHARLES HOWELL",
+    "club": "driver",
+    "view": "other",
+    "fps": 30,
+    "trim_start_sec": 14.4,
+    "trim_end_sec": 18.033,
+    "impact_time_sec": 2.067,
+    "events": {
+      "pre": {
+        "original_frame": 121,
+        "time_in_clip_sec": -10.367
+      },
+      "address": {
+        "original_frame": 462,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 476,
+        "time_in_clip_sec": 1.467
+      },
+      "mid_backswing": {
+        "original_frame": 480,
+        "time_in_clip_sec": 1.6
+      },
+      "top": {
+        "original_frame": 487,
+        "time_in_clip_sec": 1.833
+      },
+      "mid_downswing": {
+        "original_frame": 491,
+        "time_in_clip_sec": 1.967
+      },
+      "impact": {
+        "original_frame": 494,
+        "time_in_clip_sec": 2.067
+      },
+      "mid_follow_through": {
+        "original_frame": 496,
+        "time_in_clip_sec": 2.133
+      },
+      "finish": {
+        "original_frame": 511,
+        "time_in_clip_sec": 2.633
+      },
+      "post": {
+        "original_frame": 553,
+        "time_in_clip_sec": 4.033
+      }
+    }
+  },
+  {
+    "filename": "golfdb_htF1nwyL3Dc.mp4",
+    "youtube_id": "htF1nwyL3Dc",
+    "golfdb_index": 877,
+    "player": "MICHELLE WIE",
+    "club": "driver",
+    "view": "face-on",
+    "fps": 30,
+    "trim_start_sec": 16.933,
+    "trim_end_sec": 20.6,
+    "impact_time_sec": 2.0,
+    "events": {
+      "pre": {
+        "original_frame": 211,
+        "time_in_clip_sec": -9.9
+      },
+      "address": {
+        "original_frame": 538,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 550,
+        "time_in_clip_sec": 1.4
+      },
+      "mid_backswing": {
+        "original_frame": 556,
+        "time_in_clip_sec": 1.6
+      },
+      "top": {
+        "original_frame": 561,
+        "time_in_clip_sec": 1.767
+      },
+      "mid_downswing": {
+        "original_frame": 565,
+        "time_in_clip_sec": 1.9
+      },
+      "impact": {
+        "original_frame": 568,
+        "time_in_clip_sec": 2.0
+      },
+      "mid_follow_through": {
+        "original_frame": 570,
+        "time_in_clip_sec": 2.067
+      },
+      "finish": {
+        "original_frame": 588,
+        "time_in_clip_sec": 2.667
+      },
+      "post": {
+        "original_frame": 598,
+        "time_in_clip_sec": 3.0
+      }
+    }
+  },
+  {
+    "filename": "golfdb_VZU1_tdgJOI.mp4",
+    "youtube_id": "VZU1_tdgJOI",
+    "golfdb_index": 374,
+    "player": "JUSTIN ROSE",
+    "club": "driver",
+    "view": "other",
+    "fps": 30,
+    "trim_start_sec": 17.133,
+    "trim_end_sec": 21.2,
+    "impact_time_sec": 2.4,
+    "events": {
+      "pre": {
+        "original_frame": 181,
+        "time_in_clip_sec": -11.1
+      },
+      "address": {
+        "original_frame": 544,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 565,
+        "time_in_clip_sec": 1.7
+      },
+      "mid_backswing": {
+        "original_frame": 571,
+        "time_in_clip_sec": 1.9
+      },
+      "top": {
+        "original_frame": 579,
+        "time_in_clip_sec": 2.167
+      },
+      "mid_downswing": {
+        "original_frame": 583,
+        "time_in_clip_sec": 2.3
+      },
+      "impact": {
+        "original_frame": 586,
+        "time_in_clip_sec": 2.4
+      },
+      "mid_follow_through": {
+        "original_frame": 588,
+        "time_in_clip_sec": 2.467
+      },
+      "finish": {
+        "original_frame": 606,
+        "time_in_clip_sec": 3.067
+      },
+      "post": {
+        "original_frame": 668,
+        "time_in_clip_sec": 5.133
+      }
+    }
+  },
+  {
+    "filename": "golfdb_kq2Jiw_EWw4.mp4",
+    "youtube_id": "kq2Jiw_EWw4",
+    "golfdb_index": 638,
+    "player": "PERNILLA LINDBERG",
+    "club": "driver",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 9.1,
+    "trim_end_sec": 13.033,
+    "impact_time_sec": 2.267,
+    "events": {
+      "pre": {
+        "original_frame": 151,
+        "time_in_clip_sec": -4.067
+      },
+      "address": {
+        "original_frame": 303,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 318,
+        "time_in_clip_sec": 1.5
+      },
+      "mid_backswing": {
+        "original_frame": 323,
+        "time_in_clip_sec": 1.667
+      },
+      "top": {
+        "original_frame": 333,
+        "time_in_clip_sec": 2.0
+      },
+      "mid_downswing": {
+        "original_frame": 338,
+        "time_in_clip_sec": 2.167
+      },
+      "impact": {
+        "original_frame": 341,
+        "time_in_clip_sec": 2.267
+      },
+      "mid_follow_through": {
+        "original_frame": 343,
+        "time_in_clip_sec": 2.333
+      },
+      "finish": {
+        "original_frame": 361,
+        "time_in_clip_sec": 2.933
+      },
+      "post": {
+        "original_frame": 421,
+        "time_in_clip_sec": 4.933
+      }
+    }
+  },
+  {
+    "filename": "golfdb_uk4kC3tA8oE.mp4",
+    "youtube_id": "uk4kC3tA8oE",
+    "golfdb_index": 981,
+    "player": "DUSTIN JOHNSON",
+    "club": "fairway",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 4.533,
+    "trim_end_sec": 8.433,
+    "impact_time_sec": 2.233,
+    "events": {
+      "pre": {
+        "original_frame": 61,
+        "time_in_clip_sec": -2.5
+      },
+      "address": {
+        "original_frame": 166,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 182,
+        "time_in_clip_sec": 1.533
+      },
+      "mid_backswing": {
+        "original_frame": 186,
+        "time_in_clip_sec": 1.667
+      },
+      "top": {
+        "original_frame": 194,
+        "time_in_clip_sec": 1.933
+      },
+      "mid_downswing": {
+        "original_frame": 200,
+        "time_in_clip_sec": 2.133
+      },
+      "impact": {
+        "original_frame": 203,
+        "time_in_clip_sec": 2.233
+      },
+      "mid_follow_through": {
+        "original_frame": 205,
+        "time_in_clip_sec": 2.3
+      },
+      "finish": {
+        "original_frame": 223,
+        "time_in_clip_sec": 2.9
+      },
+      "post": {
+        "original_frame": 267,
+        "time_in_clip_sec": 4.367
+      }
+    }
+  },
+  {
+    "filename": "golfdb_Cf3vKhXDY8w.mp4",
+    "youtube_id": "Cf3vKhXDY8w",
+    "golfdb_index": 1340,
+    "player": "PAULA CREAMER",
+    "club": "driver",
+    "view": "face-on",
+    "fps": 30,
+    "trim_start_sec": 91.233,
+    "trim_end_sec": 95.2,
+    "impact_time_sec": 2.333,
+    "events": {
+      "pre": {
+        "original_frame": 2592,
+        "time_in_clip_sec": -4.833
+      },
+      "address": {
+        "original_frame": 2767,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 2789,
+        "time_in_clip_sec": 1.733
+      },
+      "mid_backswing": {
+        "original_frame": 2793,
+        "time_in_clip_sec": 1.867
+      },
+      "top": {
+        "original_frame": 2800,
+        "time_in_clip_sec": 2.1
+      },
+      "mid_downswing": {
+        "original_frame": 2803,
+        "time_in_clip_sec": 2.2
+      },
+      "impact": {
+        "original_frame": 2807,
+        "time_in_clip_sec": 2.333
+      },
+      "mid_follow_through": {
+        "original_frame": 2809,
+        "time_in_clip_sec": 2.4
+      },
+      "finish": {
+        "original_frame": 2826,
+        "time_in_clip_sec": 2.967
+      },
+      "post": {
+        "original_frame": 2861,
+        "time_in_clip_sec": 4.133
+      }
+    }
+  },
+  {
+    "filename": "golfdb_zokcAdcwOT4.mp4",
+    "youtube_id": "zokcAdcwOT4",
+    "golfdb_index": 1176,
+    "player": "AMY YANG",
+    "club": "driver",
+    "view": "other",
+    "fps": 30,
+    "trim_start_sec": 13.067,
+    "trim_end_sec": 17.233,
+    "impact_time_sec": 2.4,
+    "events": {
+      "pre": {
+        "original_frame": 91,
+        "time_in_clip_sec": -10.033
+      },
+      "address": {
+        "original_frame": 422,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 439,
+        "time_in_clip_sec": 1.567
+      },
+      "mid_backswing": {
+        "original_frame": 445,
+        "time_in_clip_sec": 1.767
+      },
+      "top": {
+        "original_frame": 454,
+        "time_in_clip_sec": 2.067
+      },
+      "mid_downswing": {
+        "original_frame": 460,
+        "time_in_clip_sec": 2.267
+      },
+      "impact": {
+        "original_frame": 464,
+        "time_in_clip_sec": 2.4
+      },
+      "mid_follow_through": {
+        "original_frame": 466,
+        "time_in_clip_sec": 2.467
+      },
+      "finish": {
+        "original_frame": 487,
+        "time_in_clip_sec": 3.167
+      },
+      "post": {
+        "original_frame": 522,
+        "time_in_clip_sec": 4.333
+      }
+    }
+  },
+  {
+    "filename": "golfdb_pq6P1kIYffU.mp4",
+    "youtube_id": "pq6P1kIYffU",
+    "golfdb_index": 412,
+    "player": "BUD CAULEY",
+    "club": "driver",
+    "view": "down-the-line",
+    "fps": 30,
+    "trim_start_sec": 25.9,
+    "trim_end_sec": 29.5,
+    "impact_time_sec": 2.0,
+    "events": {
+      "pre": {
+        "original_frame": 587,
+        "time_in_clip_sec": -6.333
+      },
+      "address": {
+        "original_frame": 807,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 818,
+        "time_in_clip_sec": 1.367
+      },
+      "mid_backswing": {
+        "original_frame": 821,
+        "time_in_clip_sec": 1.467
+      },
+      "top": {
+        "original_frame": 829,
+        "time_in_clip_sec": 1.733
+      },
+      "mid_downswing": {
+        "original_frame": 834,
+        "time_in_clip_sec": 1.9
+      },
+      "impact": {
+        "original_frame": 837,
+        "time_in_clip_sec": 2.0
+      },
+      "mid_follow_through": {
+        "original_frame": 839,
+        "time_in_clip_sec": 2.067
+      },
+      "finish": {
+        "original_frame": 855,
+        "time_in_clip_sec": 2.6
+      },
+      "post": {
+        "original_frame": 919,
+        "time_in_clip_sec": 4.733
+      }
+    }
+  },
+  {
+    "filename": "golfdb_jbB8LaUIq1c.mp4",
+    "youtube_id": "jbB8LaUIq1c",
+    "golfdb_index": 456,
+    "player": "ADAM SCOTT",
+    "club": "driver",
+    "view": "face-on",
+    "fps": 30,
+    "trim_start_sec": 56.5,
+    "trim_end_sec": 60.2,
+    "impact_time_sec": 2.0,
+    "events": {
+      "pre": {
+        "original_frame": 1414,
+        "time_in_clip_sec": -9.367
+      },
+      "address": {
+        "original_frame": 1725,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 1736,
+        "time_in_clip_sec": 1.367
+      },
+      "mid_backswing": {
+        "original_frame": 1740,
+        "time_in_clip_sec": 1.5
+      },
+      "top": {
+        "original_frame": 1748,
+        "time_in_clip_sec": 1.767
+      },
+      "mid_downswing": {
+        "original_frame": 1752,
+        "time_in_clip_sec": 1.9
+      },
+      "impact": {
+        "original_frame": 1755,
+        "time_in_clip_sec": 2.0
+      },
+      "mid_follow_through": {
+        "original_frame": 1757,
+        "time_in_clip_sec": 2.067
+      },
+      "finish": {
+        "original_frame": 1776,
+        "time_in_clip_sec": 2.7
+      },
+      "post": {
+        "original_frame": 1808,
+        "time_in_clip_sec": 3.767
+      }
+    }
+  },
+  {
+    "filename": "golfdb_rX2f5waPikE.mp4",
+    "youtube_id": "rX2f5waPikE",
+    "golfdb_index": 78,
+    "player": "SANDRA GAL",
+    "club": "driver",
+    "view": "other",
+    "fps": 30,
+    "trim_start_sec": 21.167,
+    "trim_end_sec": 25.067,
+    "impact_time_sec": 2.333,
+    "events": {
+      "pre": {
+        "original_frame": 601,
+        "time_in_clip_sec": -1.133
+      },
+      "address": {
+        "original_frame": 665,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 678,
+        "time_in_clip_sec": 1.433
+      },
+      "mid_backswing": {
+        "original_frame": 686,
+        "time_in_clip_sec": 1.7
+      },
+      "top": {
+        "original_frame": 697,
+        "time_in_clip_sec": 2.067
+      },
+      "mid_downswing": {
+        "original_frame": 701,
+        "time_in_clip_sec": 2.2
+      },
+      "impact": {
+        "original_frame": 705,
+        "time_in_clip_sec": 2.333
+      },
+      "mid_follow_through": {
+        "original_frame": 707,
+        "time_in_clip_sec": 2.4
+      },
+      "finish": {
+        "original_frame": 722,
+        "time_in_clip_sec": 2.9
+      },
+      "post": {
+        "original_frame": 767,
+        "time_in_clip_sec": 4.4
+      }
+    }
+  },
+  {
+    "filename": "golfdb_PsYSYMsQsDI.mp4",
+    "youtube_id": "PsYSYMsQsDI",
+    "golfdb_index": 973,
+    "player": "KATHERINE HULL",
+    "club": "driver",
+    "view": "other",
+    "fps": 30,
+    "trim_start_sec": 7.2,
+    "trim_end_sec": 11.067,
+    "impact_time_sec": 2.267,
+    "events": {
+      "pre": {
+        "original_frame": 115,
+        "time_in_clip_sec": -3.367
+      },
+      "address": {
+        "original_frame": 246,
+        "time_in_clip_sec": 1.0
+      },
+      "toe_up": {
+        "original_frame": 262,
+        "time_in_clip_sec": 1.533
+      },
+      "mid_backswing": {
+        "original_frame": 268,
+        "time_in_clip_sec": 1.733
+      },
+      "top": {
+        "original_frame": 277,
+        "time_in_clip_sec": 2.033
+      },
+      "mid_downswing": {
+        "original_frame": 281,
+        "time_in_clip_sec": 2.167
+      },
+      "impact": {
+        "original_frame": 284,
+        "time_in_clip_sec": 2.267
+      },
+      "mid_follow_through": {
+        "original_frame": 286,
+        "time_in_clip_sec": 2.333
+      },
+      "finish": {
+        "original_frame": 302,
+        "time_in_clip_sec": 2.867
+      },
+      "post": {
+        "original_frame": 340,
+        "time_in_clip_sec": 4.133
+      }
+    }
+  }
+]

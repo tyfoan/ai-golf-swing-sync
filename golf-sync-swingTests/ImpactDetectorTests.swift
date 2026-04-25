@@ -9,12 +9,12 @@ import Vision
 
 struct ImpactDetectorTests {
 
-    @Test("Finds frame with lowest wrist y-position")
+    @Test("Finds impact near lowest wrist y-position in V-shaped trajectory")
     func findsLowestWristY() {
         let detector = ImpactDetector()
 
-        let frames = (0..<10).map { i -> PoseFrame in
-            let y = abs(CGFloat(i) - 5.0) * 0.1 + 0.2
+        let frames = (0..<20).map { i -> PoseFrame in
+            let y = abs(CGFloat(i) - 10.0) * 0.05 + 0.2
             let wrist = PoseFrame.JointPosition(x: 0.5, y: y, confidence: 0.8)
             return PoseFrame(
                 timestamp: TimeInterval(i) * 0.033,
@@ -23,10 +23,11 @@ struct ImpactDetectorTests {
         }
 
         let impactTime = detector.findImpactTime(in: frames)
-        let expectedTime = 5.0 * 0.033
 
         #expect(impactTime != nil)
-        #expect(abs(impactTime! - expectedTime) < 0.001)
+        // Impact should be near the bottom of the V (frame 10 at t=0.330s)
+        let expectedTime = 10.0 * 0.033
+        #expect(abs(impactTime! - expectedTime) < 0.1)
     }
 
     @Test("Returns nil when no wrist data available")

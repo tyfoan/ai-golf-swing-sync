@@ -122,7 +122,15 @@ final class VideoPlayerViewModel {
 
     // MARK: - Swing Playback
 
+    /// Whether a swing marker has valid timestamps for this video.
+    /// Markers recorded before the timestamp normalization fix have
+    /// host-clock values (e.g. 86400) instead of file-relative values.
+    func isSwingValid(_ swing: SwingMarker) -> Bool {
+        swing.startTime <= duration && swing.endTime <= duration + 1.0
+    }
+
     func playSwing(_ swing: SwingMarker) {
+        guard isSwingValid(swing) else { return }
         activeSwingBounds = (swing.startTime, swing.endTime)
         seek(to: swing.startTime)
         play()

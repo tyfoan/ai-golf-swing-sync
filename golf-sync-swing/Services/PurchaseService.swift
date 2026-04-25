@@ -1,0 +1,79 @@
+//
+//  PurchaseService.swift
+//  golf-sync-swing
+//
+//  Manages RevenueCat subscription state and entitlement checking.
+//  Single source of truth for premium access across the app.
+//
+
+import Foundation
+import Observation
+import RevenueCat
+import os
+
+@Observable
+final class PurchaseService {
+
+    static let shared = PurchaseService()
+
+    private(set) var isPremium = false
+    private(set) var customerInfo: CustomerInfo?
+    private(set) var isConfigured = false
+
+    static let entitlementID = "Golf Swing Sync Premium"
+
+    #if DEBUG
+    static let apiKey = "test_MXPuGlggjlfQHxlnRQsOUthWyYo"
+    #else
+    // BLOCKER: Replace with your production RevenueCat API key (appl_...)
+    // before App Store submission. Test keys do NOT process real purchases.
+    #error("Replace with production RevenueCat API key before release")
+    static let apiKey = "appl_REPLACE_WITH_PRODUCTION_KEY"
+    #endif
+
+    private init() {}
+
+    // MARK: - Configuration
+
+    func configure() {
+        guard !isConfigured else { return }
+        isConfigured = true
+
+        #if DEBUG
+        Purchases.logLevel = .debug
+        #endif
+
+        Purchases.configure(withAPIKey: Self.apiKey)
+        AppLogger.general.info("PurchaseService: RevenueCat configured")
+
+        // This unstructured Task lives as long as the singleton. Since PurchaseService.shared
+        // is never deallocated, the Task runs for the entire app lifetime, continuously receiving
+        // customerInfoStream updates from RevenueCat. No cancellation handle is needed.
+        Task { await observeCustomerInfo() }
+    }
+
+    // MARK: - Observation
+
+    private func observeCustomerInfo() async {
+        for await info in Purchases.shared.customerInfoStream {
+            customerInfo = info
+            isPremium = info.entitlements[Self.entitlementID]?.isActive == true
+            AppLogger.general.info("PurchaseService: premium=\(self.isPremium)")
+        }
+    }
+
+    // MARK: - Actions
+
+    func restorePurchases() async throws -> CustomerInfo {
+        let info = try await Purchases.shared.restorePurchases()
+        customerInfo = info
+        isPremium = info.entitlements[Self.entitlementID]?.isActive == true
+        return info
+    }
+
+    func refreshStatus() async {
+        guard let info = try? await Purchases.shared.customerInfo() else { return }
+        customerInfo = info
+        isPremium = info.entitlements[Self.entitlementID]?.isActive == true
+    }
+}

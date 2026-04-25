@@ -1,0 +1,29 @@
+{
+  "activityEntities" : [
+    "projectCreated",
+    [
+      {
+        "createdDate" : "2026-02-26T00:33:01Z",
+        "event" : "projectCreated",
+        "id" : "4C429880-F140-4E69-B58D-D944566B38E8",
+        "subtitle" : "SwingClassifier",
+        "title" : "Project Created"
+      }
+    ]
+  ],
+  "authorName" : "aleksanderogurtsov",
+  "createdDate" : "2026-02-26T00:33:01Z",
+  "description" : "",
+  "id" : "081D3610-CAD6-42E9-BAFF-DFB8DB6A8B17",
+  "license" : "",
+  "location" : "",
+  "modifiedDate" : "2026-02-26T00:33:01Z",
+  "projectName" : "SwingClassifier",
+  "settingsEntity" : {
+    "snapshotOnExtendTraining" : true,
+    "snapshotOnResumeTraining" : false
+  },
+  "taskType" : "actionClassifier",
+  "title" : "Action Classification",
+  "version" : "1.1"
+}

@@ -21,12 +21,25 @@ final class RecordingCoordinator: RecordingCoordinating {
     private(set) var isRecording = false
     private(set) var recordedDuration: TimeInterval = 0
 
+    /// Called when recording exceeds maximumDuration
+    var onMaximumDurationReached: (() -> Void)?
+
     private var recordingStartTime: Date?
     private var durationTimer: Timer?
     private var currentRecordingURL: URL?
     private var backgroundTask: UIBackgroundTaskIdentifier = .invalid
+    private var backgroundTimer: Timer?
 
     private let minimumDiskSpace: Int64 = 500 * 1024 * 1024
+    private let maximumDuration: TimeInterval = 1800
+
+    deinit {
+        durationTimer?.invalidate()
+        backgroundTimer?.invalidate()
+        if backgroundTask != .invalid {
+            UIApplication.shared.endBackgroundTask(backgroundTask)
+        }
+    }
 
     func startRecording(movieOutput: AVCaptureMovieFileOutput, delegate: AVCaptureFileOutputRecordingDelegate) -> URL? {
         guard hasEnoughDiskSpace() else { return nil }
@@ -38,8 +51,20 @@ final class RecordingCoordinator: RecordingCoordinating {
 
         currentRecordingURL = outputURL
 
-        backgroundTask = UIApplication.shared.beginBackgroundTask { [weak self] in
-            self?.endBackgroundTask()
+        let beginTask = { [weak self] in
+            guard let self else { return }
+            self.backgroundTask = UIApplication.shared.beginBackgroundTask { [weak self] in
+                self?.endBackgroundTask()
+            }
+            self.backgroundTimer = Timer.scheduledTimer(withTimeInterval: 25, repeats: false) { [weak self] _ in
+                self?.endBackgroundTask()
+            }
+        }
+
+        if Thread.isMainThread {
+            beginTask()
+        } else {
+            DispatchQueue.main.sync { beginTask() }
         }
 
         if let connection = movieOutput.connection(with: .video),
@@ -71,6 +96,7 @@ final class RecordingCoordinator: RecordingCoordinating {
 
     func markRecordingFinished() {
         isRecording = false
+        stopDurationTimer()
         endBackgroundTask()
     }
 
@@ -86,6 +112,8 @@ final class RecordingCoordinator: RecordingCoordinating {
     }
 
     private func endBackgroundTask() {
+        backgroundTimer?.invalidate()
+        backgroundTimer = nil
         if backgroundTask != .invalid {
             UIApplication.shared.endBackgroundTask(backgroundTask)
             backgroundTask = .invalid
@@ -96,6 +124,9 @@ final class RecordingCoordinator: RecordingCoordinating {
         let timer = Timer(timeInterval: 0.1, repeats: true) { [weak self] _ in
             guard let self, let startTime = self.recordingStartTime else { return }
             self.recordedDuration = Date().timeIntervalSince(startTime)
+            if self.recordedDuration >= self.maximumDuration {
+                self.onMaximumDurationReached?()
+            }
         }
         RunLoop.main.add(timer, forMode: .common)
         durationTimer = timer
