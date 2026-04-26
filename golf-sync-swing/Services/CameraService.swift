@@ -205,8 +205,9 @@ final class CameraService: NSObject {
     }
 
     func setCamera(position: AVCaptureDevice.Position) {
-        if position != currentCameraPosition {
-            setupSession(position: position, frameRate: targetFrameRate)
+        sessionQueue.async { [weak self] in
+            guard let self, position != self.currentCameraPosition else { return }
+            self.configureSession(position: position, frameRate: self.targetFrameRate)
         }
     }
 

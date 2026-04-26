@@ -72,8 +72,8 @@ final class VideoExportService {
         config: ExportConfiguration,
         progress: @escaping (Float) -> Void
     ) async throws -> URL {
-        let asset1 = AVAsset(url: video1URL)
-        let asset2 = AVAsset(url: video2URL)
+        let asset1 = AVURLAsset(url: video1URL, options: [AVURLAssetPreferPreciseDurationAndTimingKey: true])
+        let asset2 = AVURLAsset(url: video2URL, options: [AVURLAssetPreferPreciseDurationAndTimingKey: true])
 
         // Load video tracks
         guard let track1 = try await asset1.loadTracks(withMediaType: .video).first,

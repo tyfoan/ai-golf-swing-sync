@@ -194,7 +194,11 @@ final class ComparisonViewModel {
 
     func swapVideos() {
         let wasPlaying = isPlaying
-        if comparisonMode.isSynchronized { synchronizer.stop() }
+        if comparisonMode.isSynchronized {
+            player1.pause()
+            player2.pause()
+            synchronizer.stop()
+        }
         isSwapped.toggle()
         syncOffset = -syncOffset
         guard comparisonMode.isSynchronized else { return }
