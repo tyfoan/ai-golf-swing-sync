@@ -12,6 +12,7 @@
 
 import Foundation
 import AVFoundation
+import os
 
 @MainActor
 @Observable
@@ -68,7 +69,12 @@ final class ComparisonViewModel {
         self.player1 = AVPlayer(url: video1.validLocalURL ?? video1.localURL)
         self.player2 = AVPlayer(url: video2.validLocalURL ?? video2.localURL)
         self.synchronizer = synchronizer
-        self.syncOffset = swing1.contactTime - swing2.contactTime
+        if swing1.contactTime > 0 && swing2.contactTime > 0 {
+            self.syncOffset = swing1.contactTime - swing2.contactTime
+        } else {
+            self.syncOffset = 0
+            AppLogger.detection.warning("ComparisonViewModel: missing contact time(s) — synced playback will be unaligned")
+        }
 
         setupTimeObservers()
         seekToSwingStarts()
@@ -159,6 +165,7 @@ final class ComparisonViewModel {
     }
 
     func seek(to time: TimeInterval) {
+        guard time.isFinite, swing1.startTime.isFinite, swing1.endTime.isFinite else { return }
         let clamped = clamp(time, within: swing1)
         seekPlayer(player1, to: clamped)
 

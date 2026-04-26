@@ -39,6 +39,7 @@ final class VideoPlayerViewModel {
         if let observer = timeObserver {
             player.removeTimeObserver(observer)
         }
+        player.replaceCurrentItem(with: nil)
     }
 
     func cleanup() {
@@ -63,7 +64,9 @@ final class VideoPlayerViewModel {
     }
 
     private func setupNotifications() {
-        NotificationCenter.default.publisher(for: .AVPlayerItemDidPlayToEndTime, object: player.currentItem)
+        NotificationCenter.default.publisher(for: .AVPlayerItemDidPlayToEndTime)
+            .compactMap { $0.object as? AVPlayerItem }
+            .filter { [weak self] item in item === self?.player.currentItem }
             .sink { [weak self] _ in
                 self?.isPlaying = false
                 self?.seek(to: 0)

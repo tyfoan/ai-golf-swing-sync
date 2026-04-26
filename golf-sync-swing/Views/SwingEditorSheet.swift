@@ -185,6 +185,8 @@ struct SwingEditorSheet: View {
             }
             .onDisappear {
                 player?.pause()
+                player?.replaceCurrentItem(with: nil)
+                player = nil
             }
         }
     }

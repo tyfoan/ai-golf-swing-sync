@@ -122,10 +122,12 @@ final class RecordingViewModel {
                 cameraService.setupSession(position: .front, frameRate: 30)
                 try? await Task.sleep(for: .milliseconds(300))
             }
+            guard !Task.isCancelled else { return }
             if !cameraService.captureSession.isRunning {
                 cameraService.startSession()
                 try? await Task.sleep(for: .milliseconds(300))
             }
+            guard !Task.isCancelled else { return }
 
             for i in stride(from: 5, through: 1, by: -1) {
                 guard !Task.isCancelled else { return }

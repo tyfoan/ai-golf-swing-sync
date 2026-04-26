@@ -73,6 +73,13 @@ final class CameraService: NSObject {
         setupNotificationHandler()
     }
 
+    deinit {
+        notificationHandler.onInterrupted = nil
+        notificationHandler.onInterruptionEnded = nil
+        notificationHandler.onRuntimeError = nil
+        deactivateAudioSession()
+    }
+
     // MARK: - Permissions
 
     func requestPermissions() async -> Bool {
