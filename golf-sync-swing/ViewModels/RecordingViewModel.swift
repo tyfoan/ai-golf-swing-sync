@@ -78,6 +78,7 @@ final class RecordingViewModel {
                 guard let self else { return }
                 self.detectedSwings.append(clip)
                 self.playbackSpeed = 1.0
+                UINotificationFeedbackGenerator().notificationOccurred(.success)
             }
         }
     }

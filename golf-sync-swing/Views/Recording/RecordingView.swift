@@ -20,6 +20,7 @@ struct RecordingView: View {
     @State private var hasSetupCamera = false
     @State private var isTabVisible = false
     @State private var pipVisible = false
+    @State private var showDetectionFlash = false
 
     var body: some View {
         GeometryReader { _ in
@@ -93,6 +94,21 @@ struct RecordingView: View {
                         onResume: viewModel.cameraService.resumeSession
                     )
                 }
+
+                if showDetectionFlash {
+                    Color.fairwayGreen.opacity(0.35)
+                        .ignoresSafeArea()
+                        .allowsHitTesting(false)
+                        .transition(.opacity)
+                }
+            }
+        }
+        .onChange(of: viewModel.swingCount) { oldCount, newCount in
+            guard newCount > oldCount, viewModel.isRecording else { return }
+            withAnimation(.easeOut(duration: 0.15)) { showDetectionFlash = true }
+            Task {
+                try? await Task.sleep(for: .milliseconds(180))
+                withAnimation(.easeIn(duration: 0.25)) { showDetectionFlash = false }
             }
         }
         .onAppear {
