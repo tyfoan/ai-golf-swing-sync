@@ -42,6 +42,7 @@ enum ExportLayoutRenderer {
 
         let panInExport = panInExportPixels(
             userOffset: userTransform.offset,
+            userScale: userTransform.scale,
             containerSize: userTransform.containerSize,
             cellRect: cellRect
         )
@@ -72,14 +73,22 @@ enum ExportLayoutRenderer {
         return CGRect(x: minX, y: minY, width: maxX - minX, height: maxY - minY)
     }
 
+    /// `userOffset` is stored in pre-scale (storage) coordinates; the editor
+    /// applies `translate-then-scale` to the layer, so the visible shift in
+    /// the editor preview is `offset × scale`. We multiply by `userScale` here
+    /// so the export reproduces the same visible shift the user saw in the editor.
     private static func panInExportPixels(
         userOffset: CGPoint,
+        userScale: CGFloat,
         containerSize: CGSize,
         cellRect: CGRect
     ) -> CGPoint {
         guard containerSize.width > 0 && containerSize.height > 0 else { return .zero }
         let scaleX = cellRect.width / containerSize.width
         let scaleY = cellRect.height / containerSize.height
-        return CGPoint(x: userOffset.x * scaleX, y: userOffset.y * scaleY)
+        return CGPoint(
+            x: userOffset.x * userScale * scaleX,
+            y: userOffset.y * userScale * scaleY
+        )
     }
 }

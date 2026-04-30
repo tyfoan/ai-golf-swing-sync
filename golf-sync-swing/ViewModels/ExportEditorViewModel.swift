@@ -75,11 +75,22 @@ final class ExportEditorViewModel {
         let p1 = AVPlayer(url: url1)
         let p2 = AVPlayer(url: url2)
         seek(player: p1, to: s1.startTime)
-        seek(player: p2, to: s2.startTime)
+        seek(player: p2, to: Self.player2InitialPosition(s1: s1, s2: s2))
         installLoopObservers(p1: p1, p2: p2, s1: s1, s2: s2)
         self.player1 = p1
         self.player2 = p2
         play()
+    }
+
+    /// Aligns video2's playhead so the contact frame coincides with video1's
+    /// contact at the same wall-clock moment — matching the export pipeline,
+    /// which applies the same offset as a track insertion offset.
+    /// Clamped to >= 0 to avoid pre-roll seeking; in edge cases where the gap
+    /// in s2 exceeds the gap in s1 by more than s2.startTime, contact alignment
+    /// is approximate (rare; user can pinch/drag to fine-tune).
+    static func player2InitialPosition(s1: SwingTimeRange, s2: SwingTimeRange) -> TimeInterval {
+        let raw = s2.startTime + (s2.contactTime - s2.startTime) - (s1.contactTime - s1.startTime)
+        return max(0, raw)
     }
 
     func play() {
@@ -111,6 +122,10 @@ final class ExportEditorViewModel {
         if let o = loopObserver1 { player1?.removeTimeObserver(o); loopObserver1 = nil }
         if let o = loopObserver2 { player2?.removeTimeObserver(o); loopObserver2 = nil }
         player1?.pause(); player2?.pause()
+        // Drop the AVPlayerItems before releasing the players to avoid the leak/hang
+        // pattern documented in production hardening (Mar 1 2026).
+        player1?.replaceCurrentItem(with: nil)
+        player2?.replaceCurrentItem(with: nil)
         player1 = nil; player2 = nil
     }
 
@@ -121,11 +136,12 @@ final class ExportEditorViewModel {
 
     private func installLoopObservers(p1: AVPlayer, p2: AVPlayer, s1: SwingTimeRange, s2: SwingTimeRange) {
         let interval = CMTime(seconds: 1.0 / 30.0, preferredTimescale: 600)
+        let p2InitialPosition = Self.player2InitialPosition(s1: s1, s2: s2)
         loopObserver1 = p1.addPeriodicTimeObserver(forInterval: interval, queue: .main) { [weak self, weak p1] _ in
             guard let self, let player = p1 else { return }
             if player.currentTime().seconds >= s1.endTime - 0.01 {
                 self.seek(player: player, to: s1.startTime)
-                if let p2 = self.player2 { self.seek(player: p2, to: s2.startTime) }
+                if let p2 = self.player2 { self.seek(player: p2, to: p2InitialPosition) }
             }
         }
     }
