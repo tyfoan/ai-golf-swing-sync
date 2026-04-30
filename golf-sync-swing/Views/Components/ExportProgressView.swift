@@ -7,9 +7,24 @@ import SwiftUI
 
 struct ExportProgressView: View {
     let viewModel: ComparisonViewModel
+    let layoutConfig: VideoLayoutConfig?
     @Binding var isExporting: Bool
     @Binding var progress: Float
     let onDismiss: () -> Void
+
+    init(
+        viewModel: ComparisonViewModel,
+        layoutConfig: VideoLayoutConfig? = nil,
+        isExporting: Binding<Bool>,
+        progress: Binding<Float>,
+        onDismiss: @escaping () -> Void
+    ) {
+        self.viewModel = viewModel
+        self.layoutConfig = layoutConfig
+        self._isExporting = isExporting
+        self._progress = progress
+        self.onDismiss = onDismiss
+    }
 
     @State private var exportedURL: URL?
     @State private var errorMessage: String?
@@ -66,14 +81,25 @@ private extension ExportProgressView {
                 .font(.system(size: 60))
                 .foregroundStyle(.secondary)
 
-            Text("Export side-by-side comparison video")
+            Text(headlineText)
                 .font(.headline)
                 .multilineTextAlignment(.center)
 
-            qualityPicker
+            if layoutConfig == nil {
+                qualityPicker
+            }
 
             exportButton
         }
+    }
+
+    var headlineText: String {
+        guard let config = layoutConfig else {
+            return "Export side-by-side comparison video"
+        }
+        let w = Int(config.aspectRatio.exportSize.width)
+        let h = Int(config.aspectRatio.exportSize.height)
+        return "Export at \(config.aspectRatio.displayName) (\(w)×\(h))"
     }
 
     var qualityPicker: some View {
@@ -244,24 +270,34 @@ private extension ExportProgressView {
         progress = 0
         errorMessage = nil
 
-        let config = VideoExportService.ExportConfiguration(
-            resolution: selectedQuality.resolution
-        )
+        if let config = layoutConfig {
+            VideoExportService.exportComparison(
+                layoutConfig: config,
+                video1URL: url1,
+                video2URL: url2,
+                syncOffset: viewModel.syncOffset,
+                progress: { p in Task { @MainActor in progress = p } },
+                completion: handleExportResult
+            )
+        } else {
+            let config = VideoExportService.ExportConfiguration(resolution: selectedQuality.resolution)
+            VideoExportService.exportComparison(
+                video1URL: url1,
+                video2URL: url2,
+                syncOffset: viewModel.syncOffset,
+                config: config,
+                progress: { p in Task { @MainActor in progress = p } },
+                completion: handleExportResult
+            )
+        }
+    }
 
-        VideoExportService.exportComparison(
-            video1URL: url1,
-            video2URL: url2,
-            syncOffset: viewModel.syncOffset,
-            config: config,
-            progress: { p in Task { @MainActor in progress = p } },
-            completion: { result in
-                isExporting = false
-                switch result {
-                case .success(let url): exportedURL = url
-                case .failure(let error): errorMessage = error.localizedDescription
-                }
-            }
-        )
+    func handleExportResult(_ result: Result<URL, VideoExportService.ExportError>) {
+        isExporting = false
+        switch result {
+        case .success(let url): exportedURL = url
+        case .failure(let error): errorMessage = error.localizedDescription
+        }
     }
 
     func saveToPhotos() {
