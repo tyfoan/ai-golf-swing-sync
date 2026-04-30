@@ -74,12 +74,14 @@ struct ExportLayoutRendererTests {
         #expect(abs(t.tx - 540) < 1.0)
     }
 
-    @Test("Combined scale + offset: visible-unit offset reproduces fractional shift in export")
+    @Test("Combined scale + offset: pre-scale offset is multiplied by userScale in export")
     func combinedScaleAndOffset() {
-        // Editor: user pinches to 2x and drags 50pt right.
-        // Storage convention: offset = visible shift in container points (1:1 with finger).
-        // Export must reproduce the same FRACTIONAL shift: 50/200 = 25% of cell width.
-        // 25% of 1080pt cell = 270pt visible shift.
+        // Editor: user pinches to 2x and drags 50pt of finger right.
+        // Storage: offset = pre-scale (gesture divides by scale → stored offset = 25).
+        // SwiftUI render: .offset(25).scaleEffect(2) → visible 50pt of finger shift.
+        // Export must reproduce the same VISIBLE shift; with stored offset 50 (passed
+        // directly here), scale 2: pan in export = 50 × 2 × (1080/200) = 540pt.
+        // Matches video-collage's CollageVideoCompositor formula.
         let videoSize = CGSize(width: 1080, height: 1920)
         let cellRect = CGRect(x: 0, y: 0, width: 1080, height: 960)
 
@@ -95,10 +97,10 @@ struct ExportLayoutRendererTests {
             userTransform: user
         )
 
-        // At scale=2, aspect-fit (0.5) × 2 = 1.0 → bounding box 1080×1920 centered at (540, 960).
-        // Pan in export = 50 × (1080/200) = 270 → target center (540 + 270, 480) = (810, 480)
-        // tx = 810 - 540 = 270
-        #expect(abs(t.tx - 270) < 1.0)
+        // Aspect-fit (0.5) × userScale (2) = 1.0 → bounding box 1080×1920 centered at (540, 960).
+        // panX = 50 × 2 × (1080/200) = 540 → target center (540 + 540, 480) = (1080, 480)
+        // tx = 1080 - 540 = 540
+        #expect(abs(t.tx - 540) < 1.0)
     }
 
     @Test("Cell offset within render canvas is honored")

@@ -42,6 +42,7 @@ enum ExportLayoutRenderer {
 
         let panInExport = panInExportPixels(
             userOffset: userTransform.offset,
+            userScale: userTransform.scale,
             containerSize: userTransform.containerSize,
             cellRect: cellRect
         )
@@ -72,18 +73,25 @@ enum ExportLayoutRenderer {
         return CGRect(x: minX, y: minY, width: maxX - minX, height: maxY - minY)
     }
 
-    /// `userOffset` is the VISIBLE shift in editor-container points (1:1 with
-    /// finger drag at any zoom — see ZoomableVideoContainerView). The export
-    /// reproduces the same fractional shift by scaling from container points
-    /// to cell pixels. No userScale multiplication: visible == stored.
+    /// `userOffset` is stored PRE-scale. SwiftUI applies `.offset()` before
+    /// `.scaleEffect()`, so the visible shift in the editor is `offset × scale`.
+    /// We multiply by `userScale` here so the export reproduces the same
+    /// visible shift the user saw. Matches video-collage's CollageVideoCompositor:
+    ///     panX = offset.x × scale × (mediaInExport / mediaInScreen).
+    /// We use the cell-to-container ratio in place of the media-size ratio,
+    /// which is equivalent for aspect-fit content centered in the cell.
     private static func panInExportPixels(
         userOffset: CGPoint,
+        userScale: CGFloat,
         containerSize: CGSize,
         cellRect: CGRect
     ) -> CGPoint {
         guard containerSize.width > 0 && containerSize.height > 0 else { return .zero }
         let scaleX = cellRect.width / containerSize.width
         let scaleY = cellRect.height / containerSize.height
-        return CGPoint(x: userOffset.x * scaleX, y: userOffset.y * scaleY)
+        return CGPoint(
+            x: userOffset.x * userScale * scaleX,
+            y: userOffset.y * userScale * scaleY
+        )
     }
 }
