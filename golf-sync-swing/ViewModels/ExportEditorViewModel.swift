@@ -15,7 +15,9 @@ import Observation
 final class ExportEditorViewModel {
 
     let aspectRatio: ExportAspectRatio
-    var transforms: [VideoTransform]
+    var transforms: [VideoTransform] {
+        didSet { syncMuteToPlayers() }
+    }
     var isPlaying: Bool = true
 
     private(set) var player1: AVPlayer?
@@ -79,7 +81,15 @@ final class ExportEditorViewModel {
         installLoopObservers(p1: p1, p2: p2, s1: s1, s2: s2)
         self.player1 = p1
         self.player2 = p2
+        syncMuteToPlayers()
         play()
+    }
+
+    /// Mirrors `transforms[i].isMuted` onto each AVPlayer's `isMuted` so the
+    /// editor preview hears what the export will produce.
+    private func syncMuteToPlayers() {
+        if transforms.indices.contains(0) { player1?.isMuted = transforms[0].isMuted }
+        if transforms.indices.contains(1) { player2?.isMuted = transforms[1].isMuted }
     }
 
     /// Aligns video2's playhead so the contact frame coincides with video1's

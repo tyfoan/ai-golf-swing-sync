@@ -70,6 +70,7 @@ struct ExportFlowCoordinator: View {
         ExportProgressView(
             viewModel: comparisonViewModel,
             layoutConfig: config,
+            swingTrim: (swing1, swing2),
             isExporting: $isExporting,
             progress: $progress,
             onDismiss: onDismiss

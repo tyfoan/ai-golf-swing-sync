@@ -8,6 +8,7 @@ import SwiftUI
 struct ExportProgressView: View {
     let viewModel: ComparisonViewModel
     let layoutConfig: VideoLayoutConfig?
+    let swingTrim: (SwingTimeRange, SwingTimeRange)?
     @Binding var isExporting: Bool
     @Binding var progress: Float
     let onDismiss: () -> Void
@@ -15,12 +16,14 @@ struct ExportProgressView: View {
     init(
         viewModel: ComparisonViewModel,
         layoutConfig: VideoLayoutConfig? = nil,
+        swingTrim: (SwingTimeRange, SwingTimeRange)? = nil,
         isExporting: Binding<Bool>,
         progress: Binding<Float>,
         onDismiss: @escaping () -> Void
     ) {
         self.viewModel = viewModel
         self.layoutConfig = layoutConfig
+        self.swingTrim = swingTrim
         self._isExporting = isExporting
         self._progress = progress
         self.onDismiss = onDismiss
@@ -32,6 +35,7 @@ struct ExportProgressView: View {
     @State private var savedToPhotos = false
     @State private var selectedQuality: ExportQuality = .standard
     @State private var showPaywall = false
+    @State private var trimToSwing: Bool = true
 
     var body: some View {
         NavigationStack {
@@ -89,8 +93,29 @@ private extension ExportProgressView {
                 qualityPicker
             }
 
+            if swingTrim != nil {
+                trimToggle
+            }
+
             exportButton
         }
+    }
+
+    var trimToggle: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Toggle(isOn: $trimToSwing) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(trimToSwing ? "Trim to swing" : "Export full clips")
+                        .font(.subheadline.weight(.semibold))
+                    Text(trimToSwing
+                         ? "Only the detected swing window from each video"
+                         : "The full recorded clips, end to end")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+        .padding(.horizontal, 4)
     }
 
     var headlineText: String {
@@ -276,6 +301,7 @@ private extension ExportProgressView {
                 video1URL: url1,
                 video2URL: url2,
                 syncOffset: viewModel.syncOffset,
+                swingTrim: trimToSwing ? swingTrim : nil,
                 progress: { p in Task { @MainActor in progress = p } },
                 completion: handleExportResult
             )

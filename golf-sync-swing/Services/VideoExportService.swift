@@ -327,11 +327,14 @@ final class VideoExportService {
     // MARK: - Layout-config export (new)
 
     /// Export with explicit per-video transforms and an aspect-ratio-driven render size.
+    /// When `swingTrim` is provided (`(swing1, swing2)`), each video is trimmed to its
+    /// SwingTimeRange before composition; otherwise full clips are exported.
     static func exportComparison(
         layoutConfig: VideoLayoutConfig,
         video1URL: URL,
         video2URL: URL,
         syncOffset: TimeInterval,
+        swingTrim: (SwingTimeRange, SwingTimeRange)? = nil,
         progress: @escaping (Float) -> Void,
         completion: @escaping (Result<URL, ExportError>) -> Void
     ) {
@@ -342,6 +345,7 @@ final class VideoExportService {
                     video1URL: video1URL,
                     video2URL: video2URL,
                     syncOffset: syncOffset,
+                    swingTrim: swingTrim,
                     progress: progress
                 )
                 await MainActor.run { completion(.success(outputURL)) }
@@ -358,6 +362,7 @@ final class VideoExportService {
         video1URL: URL,
         video2URL: URL,
         syncOffset: TimeInterval,
+        swingTrim: (SwingTimeRange, SwingTimeRange)?,
         progress: @escaping (Float) -> Void
     ) async throws -> URL {
         let asset1 = AVURLAsset(url: video1URL, options: [AVURLAssetPreferPreciseDurationAndTimingKey: true])
@@ -368,11 +373,15 @@ final class VideoExportService {
             throw ExportError.missingVideoTrack
         }
 
-        let duration1 = try await asset1.load(.duration)
-        let duration2 = try await asset2.load(.duration)
+        let fullDuration1 = try await asset1.load(.duration)
+        let fullDuration2 = try await asset2.load(.duration)
+
+        // Compute per-video source slice (start + duration) — either the swing range or the full clip.
+        let slice1 = sliceFor(swing: swingTrim?.0, fullDuration: fullDuration1)
+        let slice2 = sliceFor(swing: swingTrim?.1, fullDuration: fullDuration2)
 
         let (v1Start, v2Start, effectiveDuration) = applySyncOffset(
-            syncOffset: syncOffset, duration1: duration1, duration2: duration2
+            syncOffset: syncOffset, duration1: slice1.duration, duration2: slice2.duration
         )
 
         let composition = AVMutableComposition()
@@ -380,19 +389,19 @@ final class VideoExportService {
               let track2c = composition.addMutableTrack(withMediaType: .video, preferredTrackID: kCMPersistentTrackID_Invalid) else {
             throw ExportError.missingVideoTrack
         }
-        try track1c.insertTimeRange(CMTimeRange(start: .zero, duration: duration1), of: track1, at: v1Start)
-        try track2c.insertTimeRange(CMTimeRange(start: .zero, duration: duration2), of: track2, at: v2Start)
+        try track1c.insertTimeRange(CMTimeRange(start: slice1.start, duration: slice1.duration), of: track1, at: v1Start)
+        try track2c.insertTimeRange(CMTimeRange(start: slice2.start, duration: slice2.duration), of: track2, at: v2Start)
 
-        // Audio per isMuted flag
+        // Audio per isMuted flag, also trimmed when applicable
         if !layoutConfig.transforms[0].isMuted,
            let audio1 = try await asset1.loadTracks(withMediaType: .audio).first,
            let audio1c = composition.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid) {
-            try? audio1c.insertTimeRange(CMTimeRange(start: .zero, duration: duration1), of: audio1, at: v1Start)
+            try? audio1c.insertTimeRange(CMTimeRange(start: slice1.start, duration: slice1.duration), of: audio1, at: v1Start)
         }
         if !layoutConfig.transforms[1].isMuted,
            let audio2 = try await asset2.loadTracks(withMediaType: .audio).first,
            let audio2c = composition.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid) {
-            try? audio2c.insertTimeRange(CMTimeRange(start: .zero, duration: duration2), of: audio2, at: v2Start)
+            try? audio2c.insertTimeRange(CMTimeRange(start: slice2.start, duration: slice2.duration), of: audio2, at: v2Start)
         }
 
         let renderSize = layoutConfig.aspectRatio.exportSize
@@ -432,6 +441,19 @@ final class VideoExportService {
         videoComposition.instructions = [instruction]
 
         return try await runExport(composition: composition, videoComposition: videoComposition, progress: progress)
+    }
+
+    /// Returns (start, duration) in source-asset time. With a SwingTimeRange we
+    /// clamp to [0, fullDuration] to defend against stale ranges; otherwise we
+    /// return the entire asset.
+    private static func sliceFor(swing: SwingTimeRange?, fullDuration: CMTime) -> (start: CMTime, duration: CMTime) {
+        guard let swing else { return (.zero, fullDuration) }
+        let fullSeconds = max(0, fullDuration.seconds)
+        let startSec = min(max(0, swing.startTime), fullSeconds)
+        let endSec = min(max(startSec, swing.endTime), fullSeconds)
+        let start = CMTime(seconds: startSec, preferredTimescale: 600)
+        let duration = CMTime(seconds: endSec - startSec, preferredTimescale: 600)
+        return (start, duration)
     }
 
     /// Splits the export render canvas in half along the arrangement axis.
