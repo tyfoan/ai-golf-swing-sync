@@ -323,4 +323,189 @@ final class VideoExportService {
         guard !exports.isEmpty else { return }
         AppLogger.storage.info("Cleaned up \(exports.count) orphaned export(s)")
     }
+
+    // MARK: - Layout-config export (new)
+
+    /// Export with explicit per-video transforms and an aspect-ratio-driven render size.
+    static func exportComparison(
+        layoutConfig: VideoLayoutConfig,
+        video1URL: URL,
+        video2URL: URL,
+        syncOffset: TimeInterval,
+        progress: @escaping (Float) -> Void,
+        completion: @escaping (Result<URL, ExportError>) -> Void
+    ) {
+        Task {
+            do {
+                let outputURL = try await performLayoutExport(
+                    layoutConfig: layoutConfig,
+                    video1URL: video1URL,
+                    video2URL: video2URL,
+                    syncOffset: syncOffset,
+                    progress: progress
+                )
+                await MainActor.run { completion(.success(outputURL)) }
+            } catch let error as ExportError {
+                await MainActor.run { completion(.failure(error)) }
+            } catch {
+                await MainActor.run { completion(.failure(.exportFailed(error.localizedDescription))) }
+            }
+        }
+    }
+
+    private static func performLayoutExport(
+        layoutConfig: VideoLayoutConfig,
+        video1URL: URL,
+        video2URL: URL,
+        syncOffset: TimeInterval,
+        progress: @escaping (Float) -> Void
+    ) async throws -> URL {
+        let asset1 = AVURLAsset(url: video1URL, options: [AVURLAssetPreferPreciseDurationAndTimingKey: true])
+        let asset2 = AVURLAsset(url: video2URL, options: [AVURLAssetPreferPreciseDurationAndTimingKey: true])
+
+        guard let track1 = try await asset1.loadTracks(withMediaType: .video).first,
+              let track2 = try await asset2.loadTracks(withMediaType: .video).first else {
+            throw ExportError.missingVideoTrack
+        }
+
+        let duration1 = try await asset1.load(.duration)
+        let duration2 = try await asset2.load(.duration)
+
+        let (v1Start, v2Start, effectiveDuration) = applySyncOffset(
+            syncOffset: syncOffset, duration1: duration1, duration2: duration2
+        )
+
+        let composition = AVMutableComposition()
+        guard let track1c = composition.addMutableTrack(withMediaType: .video, preferredTrackID: kCMPersistentTrackID_Invalid),
+              let track2c = composition.addMutableTrack(withMediaType: .video, preferredTrackID: kCMPersistentTrackID_Invalid) else {
+            throw ExportError.missingVideoTrack
+        }
+        try track1c.insertTimeRange(CMTimeRange(start: .zero, duration: duration1), of: track1, at: v1Start)
+        try track2c.insertTimeRange(CMTimeRange(start: .zero, duration: duration2), of: track2, at: v2Start)
+
+        // Audio per isMuted flag
+        if !layoutConfig.transforms[0].isMuted,
+           let audio1 = try await asset1.loadTracks(withMediaType: .audio).first,
+           let audio1c = composition.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid) {
+            try? audio1c.insertTimeRange(CMTimeRange(start: .zero, duration: duration1), of: audio1, at: v1Start)
+        }
+        if !layoutConfig.transforms[1].isMuted,
+           let audio2 = try await asset2.loadTracks(withMediaType: .audio).first,
+           let audio2c = composition.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid) {
+            try? audio2c.insertTimeRange(CMTimeRange(start: .zero, duration: duration2), of: audio2, at: v2Start)
+        }
+
+        let renderSize = layoutConfig.aspectRatio.exportSize
+        let videoComposition = try await AVMutableVideoComposition.videoComposition(withPropertiesOf: composition)
+        videoComposition.renderSize = renderSize
+        let frameRate1 = try await track1.load(.nominalFrameRate)
+        let frameRate2 = try await track2.load(.nominalFrameRate)
+        videoComposition.frameDuration = CMTime(value: 1, timescale: CMTimeScale(max(frameRate1, frameRate2, 30)))
+
+        let cells = cellRects(for: layoutConfig.aspectRatio)
+        let size1 = try await track1.load(.naturalSize)
+        let pref1 = try await track1.load(.preferredTransform)
+        let size2 = try await track2.load(.naturalSize)
+        let pref2 = try await track2.load(.preferredTransform)
+
+        let layer1 = AVMutableVideoCompositionLayerInstruction(assetTrack: track1c)
+        layer1.setTransform(
+            ExportLayoutRenderer.transform(
+                videoSize: size1, preferredTransform: pref1,
+                cellRect: cells[0], userTransform: layoutConfig.transforms[0]
+            ),
+            at: .zero
+        )
+        let layer2 = AVMutableVideoCompositionLayerInstruction(assetTrack: track2c)
+        layer2.setTransform(
+            ExportLayoutRenderer.transform(
+                videoSize: size2, preferredTransform: pref2,
+                cellRect: cells[1], userTransform: layoutConfig.transforms[1]
+            ),
+            at: .zero
+        )
+
+        let instruction = AVMutableVideoCompositionInstruction()
+        instruction.timeRange = CMTimeRange(start: .zero, duration: effectiveDuration)
+        instruction.backgroundColor = UIColor.black.cgColor
+        instruction.layerInstructions = [layer1, layer2]
+        videoComposition.instructions = [instruction]
+
+        return try await runExport(composition: composition, videoComposition: videoComposition, progress: progress)
+    }
+
+    /// Splits the export render canvas in half along the arrangement axis.
+    private static func cellRects(for aspectRatio: ExportAspectRatio) -> [CGRect] {
+        let size = aspectRatio.exportSize
+        switch aspectRatio.arrangement {
+        case .horizontal:
+            let halfW = size.width / 2
+            return [
+                CGRect(x: 0,     y: 0, width: halfW, height: size.height),
+                CGRect(x: halfW, y: 0, width: halfW, height: size.height)
+            ]
+        case .vertical:
+            let halfH = size.height / 2
+            return [
+                CGRect(x: 0, y: 0,     width: size.width, height: halfH),
+                CGRect(x: 0, y: halfH, width: size.width, height: halfH)
+            ]
+        }
+    }
+
+    private static func applySyncOffset(
+        syncOffset: TimeInterval, duration1: CMTime, duration2: CMTime
+    ) -> (v1Start: CMTime, v2Start: CMTime, effective: CMTime) {
+        if syncOffset >= 0 {
+            let v2 = CMTime(seconds: syncOffset, preferredTimescale: 600)
+            return (.zero, v2, CMTimeMaximum(duration1, CMTimeAdd(v2, duration2)))
+        } else {
+            let v1 = CMTime(seconds: -syncOffset, preferredTimescale: 600)
+            return (v1, .zero, CMTimeMaximum(CMTimeAdd(v1, duration1), duration2))
+        }
+    }
+
+    private static func runExport(
+        composition: AVMutableComposition,
+        videoComposition: AVMutableVideoComposition,
+        progress: @escaping (Float) -> Void
+    ) async throws -> URL {
+        let outputURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("export_\(UUID().uuidString).mp4")
+        var exportSucceeded = false
+        defer {
+            if !exportSucceeded { try? FileManager.default.removeItem(at: outputURL) }
+        }
+
+        var session: AVAssetExportSession?
+        for preset in [AVAssetExportPreset1920x1080, AVAssetExportPresetHighestQuality, AVAssetExportPresetMediumQuality] {
+            if let s = AVAssetExportSession(asset: composition, presetName: preset) {
+                session = s
+                break
+            }
+        }
+        guard let exportSession = session else {
+            throw ExportError.exportFailed("Could not create export session")
+        }
+
+        exportSession.videoComposition = videoComposition
+        exportSession.outputURL = outputURL
+        exportSession.outputFileType = .mp4
+
+        let progressTask = Task {
+            while !Task.isCancelled {
+                await MainActor.run { progress(exportSession.progress) }
+                try? await Task.sleep(nanoseconds: 100_000_000)
+            }
+        }
+        await exportSession.export()
+        progressTask.cancel()
+
+        if exportSession.status == .completed {
+            exportSucceeded = true
+            return outputURL
+        }
+        let msg = exportSession.error?.localizedDescription ?? "Unknown error (status: \(exportSession.status.rawValue))"
+        throw ExportError.exportFailed(msg)
+    }
 }
