@@ -380,8 +380,15 @@ final class VideoExportService {
         let slice1 = sliceFor(swing: swingTrim?.0, fullDuration: fullDuration1)
         let slice2 = sliceFor(swing: swingTrim?.1, fullDuration: fullDuration2)
 
+        // When trimming, slices have new timelines starting at zero, so the
+        // absolute-time syncOffset (= s1.contactTime - s2.contactTime) is wrong.
+        // Convert it to slice-relative: (s1.contact - s1.start) - (s2.contact - s2.start).
+        let effectiveSync = effectiveSyncOffset(
+            originalSyncOffset: syncOffset, swingTrim: swingTrim
+        )
+
         let (v1Start, v2Start, effectiveDuration) = applySyncOffset(
-            syncOffset: syncOffset, duration1: slice1.duration, duration2: slice2.duration
+            syncOffset: effectiveSync, duration1: slice1.duration, duration2: slice2.duration
         )
 
         let composition = AVMutableComposition()
@@ -441,6 +448,20 @@ final class VideoExportService {
         videoComposition.instructions = [instruction]
 
         return try await runExport(composition: composition, videoComposition: videoComposition, progress: progress)
+    }
+
+    /// When the export trims each video to its swing range, the `syncOffset`
+    /// passed in (absolute = `s1.contactTime - s2.contactTime`) no longer aligns
+    /// the contact frames in the new slice-local timelines. This converts it.
+    /// When NOT trimming, the original offset is correct.
+    static func effectiveSyncOffset(
+        originalSyncOffset: TimeInterval,
+        swingTrim: (SwingTimeRange, SwingTimeRange)?
+    ) -> TimeInterval {
+        guard let trim = swingTrim else { return originalSyncOffset }
+        let s1ContactInSlice = trim.0.contactTime - trim.0.startTime
+        let s2ContactInSlice = trim.1.contactTime - trim.1.startTime
+        return s1ContactInSlice - s2ContactInSlice
     }
 
     /// Returns (start, duration) in source-asset time. With a SwingTimeRange we
