@@ -43,7 +43,7 @@ struct ComparisonView: View {
         }
         .sheet(isPresented: $showExportSheet) { exportSheet }
         .confirmationDialog("Done", isPresented: $showDoneSheet, titleVisibility: .hidden) {
-            Button("Export Video") { showExportSheet = true }
+            Button("Save & Export") { showExportSheet = true }
             Button("Done") { dismiss() }
             Button("Cancel", role: .cancel) { }
         }
@@ -184,11 +184,22 @@ private extension ComparisonView {
 
     @ViewBuilder
     var exportSheet: some View {
-        if let viewModel = viewModel {
-            ExportProgressView(
-                viewModel: viewModel, isExporting: $isExporting,
-                progress: $exportProgress, onDismiss: { showExportSheet = false }
+        if let viewModel = viewModel,
+           let url1 = video1.validLocalURL,
+           let url2 = video2.validLocalURL {
+            ExportFlowCoordinator(
+                video1URL: url1,
+                video2URL: url2,
+                swing1: swing1,
+                swing2: swing2,
+                syncOffset: viewModel.syncOffset,
+                comparisonViewModel: viewModel,
+                onDismiss: { showExportSheet = false }
             )
+        } else {
+            Text("Videos unavailable")
+                .padding()
+                .onAppear { showExportSheet = false }
         }
     }
 }
