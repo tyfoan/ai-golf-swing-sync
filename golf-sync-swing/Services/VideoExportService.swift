@@ -412,34 +412,43 @@ final class VideoExportService {
         }
 
         let renderSize = layoutConfig.aspectRatio.exportSize
-        let videoComposition = try await AVMutableVideoComposition.videoComposition(withPropertiesOf: composition)
-        videoComposition.renderSize = renderSize
-        let frameRate1 = try await track1.load(.nominalFrameRate)
-        let frameRate2 = try await track2.load(.nominalFrameRate)
-        videoComposition.frameDuration = CMTime(value: 1, timescale: CMTimeScale(max(frameRate1, frameRate2, 30)))
-
         let cells = cellRects(for: layoutConfig.aspectRatio)
         let size1 = try await track1.load(.naturalSize)
         let pref1 = try await track1.load(.preferredTransform)
         let size2 = try await track2.load(.naturalSize)
         let pref2 = try await track2.load(.preferredTransform)
+        let frameRate1 = try await track1.load(.nominalFrameRate)
+        let frameRate2 = try await track2.load(.nominalFrameRate)
 
+        // Configure the custom compositor with both cells. The compositor
+        // crops each frame to its cellRect — that's the entire reason it exists
+        // (standard AVFoundation layer instructions cannot clip per-cell).
+        let cellConfigs: [CellConfiguration] = [
+            CellConfiguration(
+                cellRect: cells[0], videoTrackID: track1c.trackID,
+                naturalSize: size1, preferredTransform: pref1,
+                userScale: layoutConfig.transforms[0].scale,
+                userOffset: layoutConfig.transforms[0].offset,
+                containerSize: layoutConfig.transforms[0].containerSize
+            ),
+            CellConfiguration(
+                cellRect: cells[1], videoTrackID: track2c.trackID,
+                naturalSize: size2, preferredTransform: pref2,
+                userScale: layoutConfig.transforms[1].scale,
+                userOffset: layoutConfig.transforms[1].offset,
+                containerSize: layoutConfig.transforms[1].containerSize
+            )
+        ]
+        CollageVideoCompositor.configureShared(cells: cellConfigs)
+
+        let videoComposition = AVMutableVideoComposition()
+        videoComposition.customVideoCompositorClass = CollageVideoCompositor.self
+        videoComposition.renderSize = renderSize
+        videoComposition.frameDuration = CMTime(value: 1, timescale: CMTimeScale(max(frameRate1, frameRate2, 30)))
+
+        // Layer instructions just identify the tracks; the compositor positions them.
         let layer1 = AVMutableVideoCompositionLayerInstruction(assetTrack: track1c)
-        layer1.setTransform(
-            ExportLayoutRenderer.transform(
-                videoSize: size1, preferredTransform: pref1,
-                cellRect: cells[0], userTransform: layoutConfig.transforms[0]
-            ),
-            at: .zero
-        )
         let layer2 = AVMutableVideoCompositionLayerInstruction(assetTrack: track2c)
-        layer2.setTransform(
-            ExportLayoutRenderer.transform(
-                videoSize: size2, preferredTransform: pref2,
-                cellRect: cells[1], userTransform: layoutConfig.transforms[1]
-            ),
-            at: .zero
-        )
 
         let instruction = AVMutableVideoCompositionInstruction()
         instruction.timeRange = CMTimeRange(start: .zero, duration: effectiveDuration)
