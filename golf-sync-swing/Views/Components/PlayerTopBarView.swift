@@ -12,6 +12,7 @@ struct PlayerTopBarView: View {
     let playbackMode: VideoPlaybackMode
     let onDismiss: () -> Void
     let onSwitchMode: (VideoPlaybackMode) -> Void
+    let onExport: () -> Void
 
     var body: some View {
         HStack {
@@ -68,7 +69,7 @@ struct PlayerTopBarView: View {
     // MARK: - Share
 
     private var shareButton: some View {
-        Button { } label: {
+        Button(action: onExport) {
             Image(systemName: "square.and.arrow.up")
                 .font(.body)
                 .foregroundStyle(.white)
@@ -76,5 +77,6 @@ struct PlayerTopBarView: View {
                 .background(Color.appTeal)
                 .clipShape(Circle())
         }
+        .accessibilityLabel("Export video")
     }
 }

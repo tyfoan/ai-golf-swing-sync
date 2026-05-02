@@ -19,6 +19,7 @@ struct SingleVideoPlayerView: View {
     @State private var selectedSwingId: UUID?
     @State private var showSwingEditor = false
     @State private var editingSwing: SwingMarker?
+    @State private var showExportSheet = false
 
     var body: some View {
         ZStack {
@@ -31,6 +32,13 @@ struct SingleVideoPlayerView: View {
         .onAppear(perform: handleAppear)
         .onDisappear { viewModel?.cleanup() }
         .sheet(isPresented: $showSwingEditor) { swingEditorSheet }
+        .sheet(isPresented: $showExportSheet) {
+            SingleVideoExportSheet(
+                video: video,
+                mode: playbackMode,
+                onDismiss: { showExportSheet = false }
+            )
+        }
     }
 }
 
@@ -44,7 +52,8 @@ private extension SingleVideoPlayerView {
                 PlayerTopBarView(
                     playbackMode: playbackMode,
                     onDismiss: { dismiss() },
-                    onSwitchMode: switchMode
+                    onSwitchMode: switchMode,
+                    onExport: { showExportSheet = true }
                 )
                 videoArea(vm: vm)
                 controlsSection(vm: vm)
