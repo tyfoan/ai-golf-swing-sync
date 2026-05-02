@@ -2,9 +2,7 @@
 //  ComparisonView.swift
 //  golf-sync-swing
 //
-//  Dark immersive side-by-side video comparison.
-//  Default mode: independent swing loops (free).
-//  Synced/Onion/Overlay modes require premium.
+//  Dark immersive video comparison with side-by-side, stacked, and sequential modes.
 //
 
 import SwiftUI
@@ -20,7 +18,6 @@ struct ComparisonView: View {
     @State private var showExportSheet = false
     @State private var exportProgress: Float = 0
     @State private var isExporting = false
-    @State private var showDoneSheet = false
     @State private var showPaywall = false
     @Environment(\.scenePhase) private var scenePhase
 
@@ -42,11 +39,6 @@ struct ComparisonView: View {
             if phase == .background { viewModel?.pause() }
         }
         .sheet(isPresented: $showExportSheet) { exportSheet }
-        .confirmationDialog("Done", isPresented: $showDoneSheet, titleVisibility: .hidden) {
-            Button("Save & Export") { showExportSheet = true }
-            Button("Done") { dismiss() }
-            Button("Cancel", role: .cancel) { }
-        }
         .fullScreenCover(isPresented: $showPaywall) {
             AppPaywallView(source: .featureGate, onDismiss: { showPaywall = false })
         }
@@ -59,16 +51,24 @@ private extension ComparisonView {
     func contentStack(viewModel: ComparisonViewModel) -> some View {
         VStack(spacing: 0) {
             topBar(viewModel: viewModel)
-            ComparisonVideoAreaView(viewModel: viewModel)
+            ZStack(alignment: .bottomTrailing) {
+                ComparisonVideoAreaView(viewModel: viewModel)
+                circleButton(icon: "arrow.left.arrow.right", accessibilityLabel: "Swap videos") {
+                    viewModel.swapVideos()
+                }
+                .padding(16)
+            }
             controlsPanel(viewModel: viewModel)
         }
     }
 
     func topBar(viewModel: ComparisonViewModel) -> some View {
         HStack {
-            circleButton(icon: "xmark", accessibilityLabel: "Close comparison") { showDoneSheet = true }
+            circleButton(icon: "xmark", accessibilityLabel: "Close comparison") { dismiss() }
             Spacer()
-            circleButton(icon: "arrow.left.arrow.right", accessibilityLabel: "Swap videos") { viewModel.swapVideos() }
+            circleButton(icon: "square.and.arrow.up", accessibilityLabel: "Export comparison") {
+                showExportSheet = true
+            }
         }
         .padding(.horizontal, 16).padding(.top, 8)
     }
@@ -96,14 +96,13 @@ private extension ComparisonView {
             modePicker(viewModel: viewModel)
             premiumControls(viewModel: viewModel)
             ComparisonControlsView(viewModel: viewModel)
-            doneButton
         }
         .padding(.horizontal, 20).padding(.vertical, 12)
     }
 
     @ViewBuilder
     func syncOffsetRow(viewModel: ComparisonViewModel) -> some View {
-        if viewModel.comparisonMode.isSynchronized {
+        if viewModel.comparisonMode == .sideBySide {
             SyncOffsetStrip(viewModel: viewModel)
         }
     }
@@ -151,35 +150,24 @@ private extension ComparisonView {
 
     @ViewBuilder
     func premiumControls(viewModel: ComparisonViewModel) -> some View {
-        if viewModel.comparisonMode == .onionSkin {
-            onionSkinSlider(viewModel: viewModel)
+        if viewModel.comparisonMode == .stacked {
+            stackedOpacitySlider(viewModel: viewModel)
         }
     }
 
-    func onionSkinSlider(viewModel: ComparisonViewModel) -> some View {
+    func stackedOpacitySlider(viewModel: ComparisonViewModel) -> some View {
         HStack(spacing: 8) {
             Image(systemName: "circle.lefthalf.filled")
                 .font(.caption).foregroundStyle(.white.opacity(0.5))
             Slider(value: Binding(
-                get: { viewModel.onionSkinOpacity },
-                set: { viewModel.onionSkinOpacity = $0 }
+                get: { viewModel.stackedOpacity },
+                set: { viewModel.stackedOpacity = $0 }
             ), in: 0.1...0.9)
             .tint(Color.appTeal)
             Image(systemName: "circle.righthalf.filled")
                 .font(.caption).foregroundStyle(.white.opacity(0.5))
         }
         .transition(.opacity.combined(with: .move(edge: .top)))
-    }
-
-    var doneButton: some View {
-        Button { showDoneSheet = true } label: {
-            Text("DONE")
-                .font(.headline).fontWeight(.bold).foregroundStyle(.white)
-                .frame(width: 200, height: 48)
-                .background(Color.appTeal)
-                .clipShape(RoundedRectangle(cornerRadius: 24))
-        }
-        .padding(.bottom, 4)
     }
 
     @ViewBuilder

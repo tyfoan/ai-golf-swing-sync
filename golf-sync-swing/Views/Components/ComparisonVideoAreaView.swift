@@ -3,7 +3,7 @@
 //  golf-sync-swing
 //
 //  Renders dual video players in the active ComparisonMode:
-//  side-by-side, synced side-by-side, onion skin, or overlay.
+//  side-by-side, stacked (with opacity blend), or sequential.
 //
 
 import SwiftUI
@@ -25,12 +25,12 @@ private extension ComparisonVideoAreaView {
     @ViewBuilder
     func modeLayout(geometry: GeometryProxy) -> some View {
         switch viewModel.comparisonMode {
-        case .sideBySide, .sideBySideSynced:
+        case .sideBySide:
             sideBySideLayout(geometry: geometry)
-        case .onionSkin:
-            onionSkinLayout(geometry: geometry)
-        case .overlay:
-            overlayLayout(geometry: geometry)
+        case .stacked:
+            stackedLayout(geometry: geometry)
+        case .sequential:
+            sequentialLayout(geometry: geometry)
         }
     }
 
@@ -42,28 +42,31 @@ private extension ComparisonVideoAreaView {
         .frame(maxHeight: .infinity)
     }
 
-    func onionSkinLayout(geometry: GeometryProxy) -> some View {
+    func stackedLayout(geometry: GeometryProxy) -> some View {
         ZStack {
             VideoPlayerView(player: viewModel.effectivePlayer1)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
             VideoPlayerView(player: viewModel.effectivePlayer2)
-                .opacity(viewModel.onionSkinOpacity)
+                .opacity(viewModel.stackedOpacity)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
         }
         .frame(width: geometry.size.width, height: geometry.size.height)
         .onTapGesture { viewModel.togglePlayPause() }
     }
 
-    func overlayLayout(geometry: GeometryProxy) -> some View {
+    func sequentialLayout(geometry: GeometryProxy) -> some View {
         ZStack {
-            VideoPlayerView(player: viewModel.effectivePlayer1)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-            VideoPlayerView(player: viewModel.effectivePlayer2)
-                .blendMode(.screen)
+            VideoPlayerView(player: activeSequentialPlayer)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
         }
         .frame(width: geometry.size.width, height: geometry.size.height)
         .onTapGesture { viewModel.togglePlayPause() }
+    }
+
+    var activeSequentialPlayer: AVPlayer {
+        viewModel.currentSequentialSwing == 0
+            ? viewModel.effectivePlayer1
+            : viewModel.effectivePlayer2
     }
 }
 
