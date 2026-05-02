@@ -212,8 +212,12 @@ final class ComparisonViewModel {
     func setPlaybackRate(_ rate: Float) {
         playbackRate = rate
         guard isPlaying else { return }
-        player1.rate = rate
-        player2.rate = rate
+        if usesSynchronizer {
+            player1.rate = rate
+            player2.rate = rate
+        } else {
+            playSequential()
+        }
     }
 
     func stepFrame(forward: Bool) {
@@ -225,6 +229,10 @@ final class ComparisonViewModel {
     }
 
     func swapVideos() {
+        // Sequential mode plays one swing at a time, so "swap" has no
+        // meaningful semantics — videos are not concurrent. Make it a no-op.
+        guard comparisonMode != .sequential else { return }
+
         let wasPlaying = isPlaying
         if usesSynchronizer {
             player1.pause()
