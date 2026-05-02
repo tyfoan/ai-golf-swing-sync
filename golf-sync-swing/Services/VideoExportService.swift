@@ -434,57 +434,89 @@ final class VideoExportService {
         let frameDuration = CMTime(value: 1, timescale: CMTimeScale(max(frameRate1, frameRate2, 30)))
 
         let videoComposition: AVMutableVideoComposition
-
         switch layoutConfig.mode {
         case .sequential:
-            // Tracks are already inserted back-to-back; standard composition handles
-            // single-track-at-a-time playback automatically (no overlap, no per-cell crop).
-            videoComposition = try await AVMutableVideoComposition.videoComposition(withPropertiesOf: composition)
-            videoComposition.renderSize = renderSize
-            videoComposition.frameDuration = frameDuration
-
+            videoComposition = try await buildSequentialComposition(
+                composition: composition, renderSize: renderSize, frameDuration: frameDuration
+            )
         case .sideBySide, .stacked:
-            // For stacked, both cells share the full canvas; for sideBySide each takes its half.
-            let cellRectsForLayout: [CGRect] = (layoutConfig.mode == .stacked)
-                ? [CGRect(origin: .zero, size: renderSize), CGRect(origin: .zero, size: renderSize)]
-                : cells
-
-            let cellConfigs: [CellConfiguration] = [
-                CellConfiguration(
-                    cellRect: cellRectsForLayout[0], videoTrackID: track1c.trackID,
-                    naturalSize: size1, preferredTransform: pref1,
-                    userScale: layoutConfig.transforms[0].scale,
-                    userOffset: layoutConfig.transforms[0].offset,
-                    containerSize: layoutConfig.transforms[0].containerSize
-                ),
-                CellConfiguration(
-                    cellRect: cellRectsForLayout[1], videoTrackID: track2c.trackID,
-                    naturalSize: size2, preferredTransform: pref2,
-                    userScale: layoutConfig.transforms[1].scale,
-                    userOffset: layoutConfig.transforms[1].offset,
-                    containerSize: layoutConfig.transforms[1].containerSize
-                )
-            ]
-            let compositorLayout: CompositorLayout = (layoutConfig.mode == .stacked)
-                ? .stacked(opacity: layoutConfig.stackedOpacity ?? 0.5)
-                : .sideBySide
-            CollageVideoCompositor.configureShared(cells: cellConfigs, layout: compositorLayout)
-
-            videoComposition = AVMutableVideoComposition()
-            videoComposition.customVideoCompositorClass = CollageVideoCompositor.self
-            videoComposition.renderSize = renderSize
-            videoComposition.frameDuration = frameDuration
-
-            let layer1 = AVMutableVideoCompositionLayerInstruction(assetTrack: track1c)
-            let layer2 = AVMutableVideoCompositionLayerInstruction(assetTrack: track2c)
-            let instruction = AVMutableVideoCompositionInstruction()
-            instruction.timeRange = CMTimeRange(start: .zero, duration: effectiveDuration)
-            instruction.backgroundColor = UIColor.black.cgColor
-            instruction.layerInstructions = [layer1, layer2]
-            videoComposition.instructions = [instruction]
+            videoComposition = buildParallelComposition(
+                layoutConfig: layoutConfig,
+                track1c: track1c, track2c: track2c,
+                cells: cells,
+                size1: size1, pref1: pref1, size2: size2, pref2: pref2,
+                renderSize: renderSize, frameDuration: frameDuration,
+                effectiveDuration: effectiveDuration
+            )
         }
 
         return try await runExport(composition: composition, videoComposition: videoComposition, progress: progress)
+    }
+
+    private static func buildSequentialComposition(
+        composition: AVMutableComposition,
+        renderSize: CGSize,
+        frameDuration: CMTime
+    ) async throws -> AVMutableVideoComposition {
+        // Tracks already inserted back-to-back by performLayoutExport.
+        // Standard composition handles single-track-at-a-time playback automatically.
+        let videoComposition = try await AVMutableVideoComposition.videoComposition(withPropertiesOf: composition)
+        videoComposition.renderSize = renderSize
+        videoComposition.frameDuration = frameDuration
+        return videoComposition
+    }
+
+    private static func buildParallelComposition(
+        layoutConfig: VideoLayoutConfig,
+        track1c: AVMutableCompositionTrack,
+        track2c: AVMutableCompositionTrack,
+        cells: [CGRect],
+        size1: CGSize,
+        pref1: CGAffineTransform,
+        size2: CGSize,
+        pref2: CGAffineTransform,
+        renderSize: CGSize,
+        frameDuration: CMTime,
+        effectiveDuration: CMTime
+    ) -> AVMutableVideoComposition {
+        let cellRectsForLayout: [CGRect] = (layoutConfig.mode == .stacked)
+            ? [CGRect(origin: .zero, size: renderSize), CGRect(origin: .zero, size: renderSize)]
+            : cells
+
+        let cellConfigs: [CellConfiguration] = [
+            CellConfiguration(
+                cellRect: cellRectsForLayout[0], videoTrackID: track1c.trackID,
+                naturalSize: size1, preferredTransform: pref1,
+                userScale: layoutConfig.transforms[0].scale,
+                userOffset: layoutConfig.transforms[0].offset,
+                containerSize: layoutConfig.transforms[0].containerSize
+            ),
+            CellConfiguration(
+                cellRect: cellRectsForLayout[1], videoTrackID: track2c.trackID,
+                naturalSize: size2, preferredTransform: pref2,
+                userScale: layoutConfig.transforms[1].scale,
+                userOffset: layoutConfig.transforms[1].offset,
+                containerSize: layoutConfig.transforms[1].containerSize
+            )
+        ]
+        let compositorLayout: CompositorLayout = (layoutConfig.mode == .stacked)
+            ? .stacked(opacity: layoutConfig.stackedOpacity ?? 0.5)
+            : .sideBySide
+        CollageVideoCompositor.configureShared(cells: cellConfigs, layout: compositorLayout)
+
+        let videoComposition = AVMutableVideoComposition()
+        videoComposition.customVideoCompositorClass = CollageVideoCompositor.self
+        videoComposition.renderSize = renderSize
+        videoComposition.frameDuration = frameDuration
+
+        let layer1 = AVMutableVideoCompositionLayerInstruction(assetTrack: track1c)
+        let layer2 = AVMutableVideoCompositionLayerInstruction(assetTrack: track2c)
+        let instruction = AVMutableVideoCompositionInstruction()
+        instruction.timeRange = CMTimeRange(start: .zero, duration: effectiveDuration)
+        instruction.backgroundColor = UIColor.black.cgColor
+        instruction.layerInstructions = [layer1, layer2]
+        videoComposition.instructions = [instruction]
+        return videoComposition
     }
 
     /// When the export trims each video to its swing range, the `syncOffset`

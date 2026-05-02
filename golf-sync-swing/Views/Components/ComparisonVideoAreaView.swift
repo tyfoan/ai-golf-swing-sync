@@ -47,7 +47,7 @@ private extension ComparisonVideoAreaView {
             VideoPlayerView(player: viewModel.effectivePlayer1)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
             VideoPlayerView(player: viewModel.effectivePlayer2)
-                .opacity(viewModel.stackedOpacity)
+                .opacity(Double(viewModel.stackedOpacity))
                 .clipShape(RoundedRectangle(cornerRadius: 12))
         }
         .frame(width: geometry.size.width, height: geometry.size.height)

@@ -31,7 +31,7 @@ final class ComparisonViewModel {
     var comparisonMode: ComparisonMode = .sideBySide {
         didSet { onModeChanged() }
     }
-    var stackedOpacity: Double = 0.5
+    var stackedOpacity: CGFloat = 0.5
     var currentSequentialSwing: Int = 0   // 0 = swing1 playing, 1 = swing2 playing
 
     nonisolated(unsafe) private var timeObserver1: Any?

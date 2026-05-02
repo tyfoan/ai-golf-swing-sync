@@ -53,4 +53,22 @@ enum ComparisonMode: String, CaseIterable, Identifiable {
         case .sideBySide, .sequential:  return false
         }
     }
+
+    /// The default export aspect ratio when entering the export editor for this mode.
+    /// SideBySide → 16:9 HSTACK is the natural default; the others fill a portrait canvas.
+    var defaultExportAspect: ExportAspectRatio {
+        switch self {
+        case .sideBySide: return .sideBySide
+        case .stacked, .sequential: return .tikTokVertical
+        }
+    }
+
+    /// Whether the editor should expose a "Swing 1 / Swing 2" picker.
+    /// Only sequential mode edits one swing at a time.
+    var showsSequentialPicker: Bool {
+        switch self {
+        case .sequential:               return true
+        case .sideBySide, .stacked:     return false
+        }
+    }
 }

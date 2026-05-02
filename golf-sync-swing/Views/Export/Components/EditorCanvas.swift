@@ -23,7 +23,7 @@ struct EditorCanvas: View {
 
     var body: some View {
         VStack(spacing: 12) {
-            if mode == .sequential {
+            if mode.showsSequentialPicker {
                 sequentialPicker
             }
             GeometryReader { geo in

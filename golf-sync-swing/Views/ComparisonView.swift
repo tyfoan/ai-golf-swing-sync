@@ -158,8 +158,8 @@ private extension ComparisonView {
             Image(systemName: "circle.lefthalf.filled")
                 .font(.caption).foregroundStyle(.white.opacity(0.5))
             Slider(value: Binding(
-                get: { viewModel.stackedOpacity },
-                set: { viewModel.stackedOpacity = $0 }
+                get: { Double(viewModel.stackedOpacity) },
+                set: { viewModel.stackedOpacity = CGFloat($0) }
             ), in: 0.1...0.9)
             .tint(Color.appTeal)
             Image(systemName: "circle.righthalf.filled")
