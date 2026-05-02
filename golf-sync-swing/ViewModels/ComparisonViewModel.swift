@@ -4,10 +4,10 @@
 //
 //  Orchestrates dual-player playback within swing bounds.
 //
-//  Two modes:
-//  - Side-by-side (free): Both videos loop their own swing independently.
-//  - Synchronized (paid): Player1 is time reference; player2 follows
-//    at (time - syncOffset) via a PlaybackSynchronizer.
+//  Three modes (all use a baseline of impact-frame sync):
+//  - sideBySide: both videos visible, manual synchronizer keeps them aligned.
+//  - stacked: both visible at full canvas, blended at stackedOpacity.
+//  - sequential: one player plays at a time, advances on loop.
 //
 
 import Foundation
@@ -31,7 +31,8 @@ final class ComparisonViewModel {
     var comparisonMode: ComparisonMode = .sideBySide {
         didSet { onModeChanged() }
     }
-    var onionSkinOpacity: Double = 0.5
+    var stackedOpacity: Double = 0.5
+    var currentSequentialSwing: Int = 0   // 0 = swing1 playing, 1 = swing2 playing
 
     nonisolated(unsafe) private var timeObserver1: Any?
     nonisolated(unsafe) private var timeObserver2: Any?
@@ -118,8 +119,14 @@ final class ComparisonViewModel {
         currentTime = time
         loopIfNeeded(player: player1, swing: swing1, isReference: true)
 
-        guard comparisonMode.isSynchronized, isPlaying else { return }
+        guard usesSynchronizer, isPlaying else { return }
         synchronizer.correctDriftIfNeeded(referenceTime: time)
+    }
+
+    /// Sequential mode runs only one player at a time, no synchronizer.
+    /// Both other modes use the manual synchronizer.
+    private var usesSynchronizer: Bool {
+        comparisonMode != .sequential
     }
 
     private func onPlayer2Tick(_ time: TimeInterval) {
@@ -133,13 +140,26 @@ final class ComparisonViewModel {
         let time = CMTimeGetSeconds(player.currentTime())
         guard time >= swing.endTime - 0.01 else { return }
 
-        guard comparisonMode.isSynchronized else {
-            seekPlayer(player, to: swing.startTime)
+        if comparisonMode == .sequential {
+            advanceSequentialSwing()
             return
         }
-        // In synced mode, only the reference player triggers a joint loop.
+        // sideBySide / stacked: only the reference player triggers a joint loop.
         guard isReference else { return }
         seekToSwingStarts()
+    }
+
+    private func advanceSequentialSwing() {
+        currentSequentialSwing = (currentSequentialSwing + 1) % 2
+        if currentSequentialSwing == 0 {
+            seekPlayer(player1, to: swing1.startTime)
+            player1.rate = playbackRate
+            player2.pause()
+        } else {
+            seekPlayer(player2, to: swing2.startTime)
+            player2.rate = playbackRate
+            player1.pause()
+        }
     }
 
     // MARK: - Playback Controls
@@ -149,13 +169,25 @@ final class ComparisonViewModel {
     }
 
     func play() {
-        if comparisonMode.isSynchronized {
+        if usesSynchronizer {
             startSynchronizer()
             synchronizer.resync(referenceTime: currentTime)
+            player1.rate = playbackRate
+            player2.rate = playbackRate
+        } else {
+            playSequential()
         }
-        player1.rate = playbackRate
-        player2.rate = playbackRate
         isPlaying = true
+    }
+
+    private func playSequential() {
+        if currentSequentialSwing == 0 {
+            player1.rate = playbackRate
+            player2.pause()
+        } else {
+            player2.rate = playbackRate
+            player1.pause()
+        }
     }
 
     func pause() {
@@ -169,7 +201,7 @@ final class ComparisonViewModel {
         let clamped = clamp(time, within: swing1)
         seekPlayer(player1, to: clamped)
 
-        if comparisonMode.isSynchronized {
+        if usesSynchronizer {
             synchronizer.resync(referenceTime: clamped)
         } else {
             seekPlayer2Proportionally(clamped)
@@ -194,14 +226,14 @@ final class ComparisonViewModel {
 
     func swapVideos() {
         let wasPlaying = isPlaying
-        if comparisonMode.isSynchronized {
+        if usesSynchronizer {
             player1.pause()
             player2.pause()
             synchronizer.stop()
         }
         isSwapped.toggle()
         syncOffset = -syncOffset
-        guard comparisonMode.isSynchronized else { return }
+        guard usesSynchronizer else { return }
         startSynchronizer()
         synchronizer.resync(referenceTime: currentTime)
         if wasPlaying {
@@ -258,8 +290,10 @@ final class ComparisonViewModel {
     }
 
     private func onModeChanged() {
-        guard comparisonMode.isSynchronized else {
+        guard usesSynchronizer else {
             synchronizer.stop()
+            // Reset sequential state on mode entry
+            currentSequentialSwing = 0
             return
         }
         startSynchronizer()
