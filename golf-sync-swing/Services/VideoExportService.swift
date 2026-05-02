@@ -620,4 +620,79 @@ final class VideoExportService {
         let msg = exportSession.error?.localizedDescription ?? "Unknown error (status: \(exportSession.status.rawValue))"
         throw ExportError.exportFailed(msg)
     }
+
+    // MARK: - Single-video export
+
+    /// Export a single source video to a temp file URL (caller saves to Photos).
+    /// - When `swings` is nil, the full source is transcoded as-is.
+    /// - When `swings` is non-empty, the swing slices are concatenated back-to-back.
+    static func exportSingleVideo(
+        videoURL: URL,
+        swings: [SwingTimeRange]?,
+        progress: @escaping (Float) -> Void,
+        completion: @escaping (Result<URL, ExportError>) -> Void
+    ) {
+        Task {
+            do {
+                let outputURL = try await performSingleVideoExport(
+                    videoURL: videoURL, swings: swings, progress: progress
+                )
+                await MainActor.run { completion(.success(outputURL)) }
+            } catch let e as ExportError {
+                await MainActor.run { completion(.failure(e)) }
+            } catch {
+                await MainActor.run { completion(.failure(.exportFailed(error.localizedDescription))) }
+            }
+        }
+    }
+
+    private static func performSingleVideoExport(
+        videoURL: URL,
+        swings: [SwingTimeRange]?,
+        progress: @escaping (Float) -> Void
+    ) async throws -> URL {
+        let asset = AVURLAsset(url: videoURL, options: [AVURLAssetPreferPreciseDurationAndTimingKey: true])
+        guard let videoTrack = try await asset.loadTracks(withMediaType: .video).first else {
+            throw ExportError.missingVideoTrack
+        }
+        let audioTrack = try await asset.loadTracks(withMediaType: .audio).first
+        let fullDuration = try await asset.load(.duration)
+
+        let composition = AVMutableComposition()
+        guard let videoTrackC = composition.addMutableTrack(
+            withMediaType: .video, preferredTrackID: kCMPersistentTrackID_Invalid
+        ) else { throw ExportError.missingVideoTrack }
+
+        let audioTrackC = composition.addMutableTrack(
+            withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid
+        )
+
+        let slices: [(start: CMTime, duration: CMTime)]
+        if let swings, !swings.isEmpty {
+            slices = swings.sorted { $0.startTime < $1.startTime }.map { swing in
+                let s = CMTime(seconds: max(0, swing.startTime), preferredTimescale: 600)
+                let d = CMTime(seconds: max(0.05, swing.endTime - swing.startTime), preferredTimescale: 600)
+                return (s, d)
+            }
+        } else {
+            slices = [(.zero, fullDuration)]
+        }
+
+        var insertAt: CMTime = .zero
+        for slice in slices {
+            try videoTrackC.insertTimeRange(CMTimeRange(start: slice.start, duration: slice.duration),
+                                            of: videoTrack, at: insertAt)
+            if let audioTrack, let audioTrackC {
+                try? audioTrackC.insertTimeRange(CMTimeRange(start: slice.start, duration: slice.duration),
+                                                 of: audioTrack, at: insertAt)
+            }
+            insertAt = CMTimeAdd(insertAt, slice.duration)
+        }
+
+        let videoComposition = try await AVMutableVideoComposition.videoComposition(withPropertiesOf: composition)
+        let nominalFPS = try await videoTrack.load(.nominalFrameRate)
+        videoComposition.frameDuration = CMTime(value: 1, timescale: CMTimeScale(max(nominalFPS, 30)))
+
+        return try await runExport(composition: composition, videoComposition: videoComposition, progress: progress)
+    }
 }
