@@ -22,17 +22,20 @@ final class CollageVideoCompositor: NSObject, AVVideoCompositing {
     // MARK: - Shared configuration
 
     private static var sharedCells: [CellConfiguration] = []
+    private static var sharedLayout: CompositorLayout = .sideBySide
     private static let configLock = NSLock()
 
-    static func configureShared(cells: [CellConfiguration]) {
+    static func configureShared(cells: [CellConfiguration], layout: CompositorLayout = .sideBySide) {
         configLock.lock()
         sharedCells = cells
+        sharedLayout = layout
         configLock.unlock()
     }
 
     // MARK: - Instance state
 
     private var cells: [CellConfiguration] = []
+    private var layout: CompositorLayout = .sideBySide
     private let ciContext: CIContext
     private let renderQueue = DispatchQueue(label: "com.golfsyncswing.compositor", qos: .userInitiated)
     private var renderContext: AVVideoCompositionRenderContext?
@@ -54,6 +57,7 @@ final class CollageVideoCompositor: NSObject, AVVideoCompositing {
         super.init()
         Self.configLock.lock()
         cells = Self.sharedCells
+        layout = Self.sharedLayout
         Self.configLock.unlock()
     }
 
@@ -127,10 +131,10 @@ final class CollageVideoCompositor: NSObject, AVVideoCompositing {
         let canvasRect = CGRect(origin: .zero, size: renderContext.size)
         var output = CIImage(color: CIColor.black).cropped(to: canvasRect)
 
-        for cell in cells {
-            if let cellImage = renderCell(cell, request: request, canvasSize: renderContext.size) {
-                output = cellImage.composited(over: output)
-            }
+        for (index, cell) in cells.enumerated() {
+            guard let cellImage = renderCell(cell, request: request, canvasSize: renderContext.size) else { continue }
+            let toComposite = applyLayoutFilter(cellImage, cellIndex: index)
+            output = toComposite.composited(over: output)
         }
 
         output = output.cropped(to: canvasRect)
@@ -204,5 +208,20 @@ final class CollageVideoCompositor: NSObject, AVVideoCompositing {
             height: min(cell.cellRect.height, canvasSize.height)
         )
         return image.cropped(to: cropRect)
+    }
+
+    /// For stacked layout, video 2 is rendered with reduced alpha so video 1
+    /// shows through. Video 1 (cellIndex 0) renders fully opaque. Side-by-side
+    /// is identity (no filter).
+    private func applyLayoutFilter(_ image: CIImage, cellIndex: Int) -> CIImage {
+        switch layout {
+        case .sideBySide:
+            return image
+        case .stacked(let opacity):
+            guard cellIndex == 1 else { return image }
+            return image.applyingFilter("CIColorMatrix", parameters: [
+                "inputAVector": CIVector(x: 0, y: 0, z: 0, w: opacity)
+            ])
+        }
     }
 }

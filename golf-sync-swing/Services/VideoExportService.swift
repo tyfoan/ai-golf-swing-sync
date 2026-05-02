@@ -396,19 +396,31 @@ final class VideoExportService {
               let track2c = composition.addMutableTrack(withMediaType: .video, preferredTrackID: kCMPersistentTrackID_Invalid) else {
             throw ExportError.missingVideoTrack
         }
-        try track1c.insertTimeRange(CMTimeRange(start: slice1.start, duration: slice1.duration), of: track1, at: v1Start)
-        try track2c.insertTimeRange(CMTimeRange(start: slice2.start, duration: slice2.duration), of: track2, at: v2Start)
+        // For sequential mode, track2 plays AFTER track1 (back-to-back).
+        // For sideBySide / stacked, both tracks play in parallel from their offsets.
+        let track1InsertAt: CMTime
+        let track2InsertAt: CMTime
+        if layoutConfig.mode == .sequential {
+            track1InsertAt = .zero
+            track2InsertAt = slice1.duration
+        } else {
+            track1InsertAt = v1Start
+            track2InsertAt = v2Start
+        }
+
+        try track1c.insertTimeRange(CMTimeRange(start: slice1.start, duration: slice1.duration), of: track1, at: track1InsertAt)
+        try track2c.insertTimeRange(CMTimeRange(start: slice2.start, duration: slice2.duration), of: track2, at: track2InsertAt)
 
         // Audio per isMuted flag, also trimmed when applicable
         if !layoutConfig.transforms[0].isMuted,
            let audio1 = try await asset1.loadTracks(withMediaType: .audio).first,
            let audio1c = composition.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid) {
-            try? audio1c.insertTimeRange(CMTimeRange(start: slice1.start, duration: slice1.duration), of: audio1, at: v1Start)
+            try? audio1c.insertTimeRange(CMTimeRange(start: slice1.start, duration: slice1.duration), of: audio1, at: track1InsertAt)
         }
         if !layoutConfig.transforms[1].isMuted,
            let audio2 = try await asset2.loadTracks(withMediaType: .audio).first,
            let audio2c = composition.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid) {
-            try? audio2c.insertTimeRange(CMTimeRange(start: slice2.start, duration: slice2.duration), of: audio2, at: v2Start)
+            try? audio2c.insertTimeRange(CMTimeRange(start: slice2.start, duration: slice2.duration), of: audio2, at: track2InsertAt)
         }
 
         let renderSize = layoutConfig.aspectRatio.exportSize
@@ -419,42 +431,58 @@ final class VideoExportService {
         let pref2 = try await track2.load(.preferredTransform)
         let frameRate1 = try await track1.load(.nominalFrameRate)
         let frameRate2 = try await track2.load(.nominalFrameRate)
+        let frameDuration = CMTime(value: 1, timescale: CMTimeScale(max(frameRate1, frameRate2, 30)))
 
-        // Configure the custom compositor with both cells. The compositor
-        // crops each frame to its cellRect — that's the entire reason it exists
-        // (standard AVFoundation layer instructions cannot clip per-cell).
-        let cellConfigs: [CellConfiguration] = [
-            CellConfiguration(
-                cellRect: cells[0], videoTrackID: track1c.trackID,
-                naturalSize: size1, preferredTransform: pref1,
-                userScale: layoutConfig.transforms[0].scale,
-                userOffset: layoutConfig.transforms[0].offset,
-                containerSize: layoutConfig.transforms[0].containerSize
-            ),
-            CellConfiguration(
-                cellRect: cells[1], videoTrackID: track2c.trackID,
-                naturalSize: size2, preferredTransform: pref2,
-                userScale: layoutConfig.transforms[1].scale,
-                userOffset: layoutConfig.transforms[1].offset,
-                containerSize: layoutConfig.transforms[1].containerSize
-            )
-        ]
-        CollageVideoCompositor.configureShared(cells: cellConfigs)
+        let videoComposition: AVMutableVideoComposition
 
-        let videoComposition = AVMutableVideoComposition()
-        videoComposition.customVideoCompositorClass = CollageVideoCompositor.self
-        videoComposition.renderSize = renderSize
-        videoComposition.frameDuration = CMTime(value: 1, timescale: CMTimeScale(max(frameRate1, frameRate2, 30)))
+        switch layoutConfig.mode {
+        case .sequential:
+            // Tracks are already inserted back-to-back; standard composition handles
+            // single-track-at-a-time playback automatically (no overlap, no per-cell crop).
+            videoComposition = try await AVMutableVideoComposition.videoComposition(withPropertiesOf: composition)
+            videoComposition.renderSize = renderSize
+            videoComposition.frameDuration = frameDuration
 
-        // Layer instructions just identify the tracks; the compositor positions them.
-        let layer1 = AVMutableVideoCompositionLayerInstruction(assetTrack: track1c)
-        let layer2 = AVMutableVideoCompositionLayerInstruction(assetTrack: track2c)
+        case .sideBySide, .stacked:
+            // For stacked, both cells share the full canvas; for sideBySide each takes its half.
+            let cellRectsForLayout: [CGRect] = (layoutConfig.mode == .stacked)
+                ? [CGRect(origin: .zero, size: renderSize), CGRect(origin: .zero, size: renderSize)]
+                : cells
 
-        let instruction = AVMutableVideoCompositionInstruction()
-        instruction.timeRange = CMTimeRange(start: .zero, duration: effectiveDuration)
-        instruction.backgroundColor = UIColor.black.cgColor
-        instruction.layerInstructions = [layer1, layer2]
-        videoComposition.instructions = [instruction]
+            let cellConfigs: [CellConfiguration] = [
+                CellConfiguration(
+                    cellRect: cellRectsForLayout[0], videoTrackID: track1c.trackID,
+                    naturalSize: size1, preferredTransform: pref1,
+                    userScale: layoutConfig.transforms[0].scale,
+                    userOffset: layoutConfig.transforms[0].offset,
+                    containerSize: layoutConfig.transforms[0].containerSize
+                ),
+                CellConfiguration(
+                    cellRect: cellRectsForLayout[1], videoTrackID: track2c.trackID,
+                    naturalSize: size2, preferredTransform: pref2,
+                    userScale: layoutConfig.transforms[1].scale,
+                    userOffset: layoutConfig.transforms[1].offset,
+                    containerSize: layoutConfig.transforms[1].containerSize
+                )
+            ]
+            let compositorLayout: CompositorLayout = (layoutConfig.mode == .stacked)
+                ? .stacked(opacity: layoutConfig.stackedOpacity ?? 0.5)
+                : .sideBySide
+            CollageVideoCompositor.configureShared(cells: cellConfigs, layout: compositorLayout)
+
+            videoComposition = AVMutableVideoComposition()
+            videoComposition.customVideoCompositorClass = CollageVideoCompositor.self
+            videoComposition.renderSize = renderSize
+            videoComposition.frameDuration = frameDuration
+
+            let layer1 = AVMutableVideoCompositionLayerInstruction(assetTrack: track1c)
+            let layer2 = AVMutableVideoCompositionLayerInstruction(assetTrack: track2c)
+            let instruction = AVMutableVideoCompositionInstruction()
+            instruction.timeRange = CMTimeRange(start: .zero, duration: effectiveDuration)
+            instruction.backgroundColor = UIColor.black.cgColor
+            instruction.layerInstructions = [layer1, layer2]
+            videoComposition.instructions = [instruction]
+        }
 
         return try await runExport(composition: composition, videoComposition: videoComposition, progress: progress)
     }

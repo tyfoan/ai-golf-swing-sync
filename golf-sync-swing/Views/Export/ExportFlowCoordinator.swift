@@ -2,7 +2,8 @@
 //  ExportFlowCoordinator.swift
 //  golf-sync-swing
 //
-//  Hosts the 3-step export flow: aspect picker → editor → progress.
+//  Hosts the 2-step export flow: editor → progress.
+//  Aspect picking is inline in the editor.
 //
 
 import SwiftUI
@@ -16,40 +17,33 @@ struct ExportFlowCoordinator: View {
     let comparisonViewModel: ComparisonViewModel
     let onDismiss: () -> Void
 
-    @State private var step: Step = .picker
-    @State private var selectedAspect: ExportAspectRatio?
+    @State private var step: Step = .editor
     @State private var pendingConfig: VideoLayoutConfig?
     @State private var isExporting = false
     @State private var progress: Float = 0
 
     enum Step: Equatable {
-        case picker
-        case editor(ExportAspectRatio)
+        case editor
         case progress(VideoLayoutConfig)
     }
 
     var body: some View {
         Group {
             switch step {
-            case .picker:
-                AspectRatioPickerView(
-                    onSelect: { aspect in
-                        selectedAspect = aspect
-                        step = .editor(aspect)
-                    },
-                    onCancel: onDismiss
-                )
-            case .editor(let aspect):
-                editor(aspect: aspect)
+            case .editor:
+                editor()
             case .progress(let config):
                 progressSheet(config: config)
             }
         }
     }
 
-    private func editor(aspect: ExportAspectRatio) -> some View {
+    private func editor() -> some View {
+        let defaultAspect = defaultAspectFor(mode: comparisonViewModel.comparisonMode)
         let vm = ExportEditorViewModel(
-            aspectRatio: aspect,
+            aspectRatio: defaultAspect,
+            mode: comparisonViewModel.comparisonMode,
+            stackedOpacity: CGFloat(comparisonViewModel.stackedOpacity),
             video1URL: video1URL,
             video2URL: video2URL,
             swing1: swing1,
@@ -58,12 +52,21 @@ struct ExportFlowCoordinator: View {
         )
         return ExportEditorView(
             viewModel: vm,
-            onCancel: { step = .picker },
+            onCancel: onDismiss,
             onExport: { config in
                 pendingConfig = config
                 step = .progress(config)
             }
         )
+    }
+
+    /// Sequential and Stacked default to 9:16 (more natural full-canvas);
+    /// Side-by-Side defaults to 16:9 (HSTACK).
+    private func defaultAspectFor(mode: ComparisonMode) -> ExportAspectRatio {
+        switch mode {
+        case .sideBySide: return .sideBySide
+        case .stacked, .sequential: return .tikTokVertical
+        }
     }
 
     private func progressSheet(config: VideoLayoutConfig) -> some View {

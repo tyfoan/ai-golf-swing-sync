@@ -14,7 +14,10 @@ import Observation
 @Observable
 final class ExportEditorViewModel {
 
-    let aspectRatio: ExportAspectRatio
+    var aspectRatio: ExportAspectRatio
+    let mode: ComparisonMode
+    var stackedOpacity: CGFloat
+    var currentSequentialEditSwing: Int = 0   // 0 or 1 — which swing the user is framing
     var transforms: [VideoTransform] {
         didSet { syncMuteToPlayers() }
     }
@@ -34,6 +37,8 @@ final class ExportEditorViewModel {
 
     init(
         aspectRatio: ExportAspectRatio,
+        mode: ComparisonMode,
+        stackedOpacity: CGFloat = 0.5,
         video1URL: URL,
         video2URL: URL,
         swing1: SwingTimeRange,
@@ -41,6 +46,8 @@ final class ExportEditorViewModel {
         syncOffset: TimeInterval
     ) {
         self.aspectRatio = aspectRatio
+        self.mode = mode
+        self.stackedOpacity = stackedOpacity
         self.video1URL = video1URL
         self.video2URL = video2URL
         self.swing1 = swing1
@@ -50,8 +57,10 @@ final class ExportEditorViewModel {
     }
 
     /// Test-only init — no AVPlayers, just transforms.
-    private init(aspectRatio: ExportAspectRatio) {
+    private init(aspectRatio: ExportAspectRatio, mode: ComparisonMode = .sideBySide) {
         self.aspectRatio = aspectRatio
+        self.mode = mode
+        self.stackedOpacity = 0.5
         self.video1URL = nil
         self.video2URL = nil
         self.swing1 = nil
@@ -60,8 +69,8 @@ final class ExportEditorViewModel {
         self.transforms = Self.defaultTransforms()
     }
 
-    static func makeForTesting(aspectRatio: ExportAspectRatio) -> ExportEditorViewModel {
-        ExportEditorViewModel(aspectRatio: aspectRatio)
+    static func makeForTesting(aspectRatio: ExportAspectRatio, mode: ComparisonMode = .sideBySide) -> ExportEditorViewModel {
+        ExportEditorViewModel(aspectRatio: aspectRatio, mode: mode)
     }
 
     private static func defaultTransforms() -> [VideoTransform] {
@@ -125,7 +134,12 @@ final class ExportEditorViewModel {
     }
 
     func buildLayoutConfig() -> VideoLayoutConfig {
-        VideoLayoutConfig(aspectRatio: aspectRatio, transforms: transforms)
+        VideoLayoutConfig(
+            aspectRatio: aspectRatio,
+            mode: mode,
+            stackedOpacity: mode == .stacked ? stackedOpacity : nil,
+            transforms: transforms
+        )
     }
 
     func cleanup() {
