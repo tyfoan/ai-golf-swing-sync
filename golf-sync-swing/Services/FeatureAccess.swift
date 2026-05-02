@@ -9,9 +9,7 @@
 import Foundation
 
 enum PremiumFeature: String, CaseIterable {
-    case synchronizedPlayback
-    case onionSkinMode
-    case overlayMode
+    case advancedComparisonModes
     // TODO: Gate pose estimation behind premium when real-time skeleton overlay ships
     case poseEstimation
     case exportHD
