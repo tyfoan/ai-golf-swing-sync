@@ -16,8 +16,6 @@ struct ComparisonView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var viewModel: ComparisonViewModel?
     @State private var showExportSheet = false
-    @State private var exportProgress: Float = 0
-    @State private var isExporting = false
     @State private var showPaywall = false
     @Environment(\.scenePhase) private var scenePhase
 
@@ -102,7 +100,7 @@ private extension ComparisonView {
 
     @ViewBuilder
     func syncOffsetRow(viewModel: ComparisonViewModel) -> some View {
-        if viewModel.comparisonMode == .sideBySide {
+        if viewModel.comparisonMode.showsSyncOffsetStrip {
             SyncOffsetStrip(viewModel: viewModel)
         }
     }
@@ -150,7 +148,7 @@ private extension ComparisonView {
 
     @ViewBuilder
     func premiumControls(viewModel: ComparisonViewModel) -> some View {
-        if viewModel.comparisonMode == .stacked {
+        if viewModel.comparisonMode.showsOpacitySlider {
             stackedOpacitySlider(viewModel: viewModel)
         }
     }

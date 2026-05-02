@@ -152,13 +152,13 @@ final class ComparisonViewModel {
     private func advanceSequentialSwing() {
         currentSequentialSwing = (currentSequentialSwing + 1) % 2
         if currentSequentialSwing == 0 {
-            seekPlayer(player1, to: swing1.startTime)
-            player1.rate = playbackRate
-            player2.pause()
+            seekPlayer(effectivePlayer1, to: effectiveSwing1.startTime)
+            effectivePlayer1.rate = playbackRate
+            effectivePlayer2.pause()
         } else {
-            seekPlayer(player2, to: swing2.startTime)
-            player2.rate = playbackRate
-            player1.pause()
+            seekPlayer(effectivePlayer2, to: effectiveSwing2.startTime)
+            effectivePlayer2.rate = playbackRate
+            effectivePlayer1.pause()
         }
     }
 
@@ -182,11 +182,11 @@ final class ComparisonViewModel {
 
     private func playSequential() {
         if currentSequentialSwing == 0 {
-            player1.rate = playbackRate
-            player2.pause()
+            effectivePlayer1.rate = playbackRate
+            effectivePlayer2.pause()
         } else {
-            player2.rate = playbackRate
-            player1.pause()
+            effectivePlayer2.rate = playbackRate
+            effectivePlayer1.pause()
         }
     }
 
