@@ -16,6 +16,7 @@ struct OnboardingView: View {
 
     @State private var currentPage = 0
     @State private var showPaywall = false
+    @State private var skipVisible = false
 
     private let pages = OnboardingFeature.pages
 
@@ -35,6 +36,7 @@ struct OnboardingView: View {
                 onDismiss: { finishOnboarding() }
             )
         }
+        .onAppear { revealSkipAfterDelay() }
     }
 
     // MARK: - Skip
@@ -43,10 +45,21 @@ struct OnboardingView: View {
         HStack {
             Spacer()
             Button("Skip") { skipAll() }
-                .font(.subheadline)
-                .foregroundStyle(Color.white.opacity(0.5))
+                .font(.caption)
+                .foregroundStyle(Color.white.opacity(0.3))
                 .padding(.trailing, 24)
                 .padding(.top, 12)
+                .opacity(skipVisible ? 1 : 0)
+        }
+    }
+
+    private func revealSkipAfterDelay() {
+        guard !skipVisible else { return }
+        Task {
+            try? await Task.sleep(nanoseconds: 1_000_000_000)
+            await MainActor.run {
+                withAnimation(.easeIn(duration: 0.3)) { skipVisible = true }
+            }
         }
     }
 
@@ -122,7 +135,7 @@ struct OnboardingView: View {
     }
 
     private var buttonTitle: String {
-        isLastPage ? "Get Started" : "Continue"
+        pages[currentPage].ctaTitle
     }
 
     // MARK: - Navigation
