@@ -366,8 +366,10 @@ struct AppPaywallView: View {
     }
 
     private func preferredDefault(from packages: [Package]) -> Package? {
-        // Annual pre-selected: 44.1% 12-month retention vs 3.4% weekly (RevenueCat 2025)
-        packages.first { $0.packageType == .annual }
+        // Weekly pre-selected: trial-start rate is the primary metric for first paywall.
+        // Annual remains visible as the alternative.
+        packages.first { $0.packageType == .weekly }
+            ?? packages.first { $0.packageType == .annual }
             ?? packages.first
     }
 
