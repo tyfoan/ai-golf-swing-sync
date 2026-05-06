@@ -73,14 +73,14 @@ final class DetectionOrchestrator: @unchecked Sendable {
         AppLogger.detection.info("DetectionOrchestrator: started")
     }
 
-    func stop() {
+    func stop(caller: String = #function, file: String = #fileID) {
         processingQueue.sync {
             self.isActiveLock.lock()
             self.isActive = false
             self.isActiveLock.unlock()
         }
         poseDetector.clearBuffer()
-        AppLogger.detection.info("DetectionOrchestrator: stopped")
+        AppLogger.detection.info("DetectionOrchestrator: stopped (caller=\(caller) file=\(file))")
     }
 
     // MARK: - Frame Processing
@@ -104,6 +104,15 @@ final class DetectionOrchestrator: @unchecked Sendable {
     }
 
     private func handleFrame(pixelBuffer: CVPixelBuffer, timestamp: TimeInterval) {
+        // Bail early if stop() was called while this frame was queued. Without
+        // this, a backlog of queued frames forces processingQueue.sync (in stop)
+        // to wait for hundreds of pose-detection passes, freezing the UI for
+        // seconds when the user taps Stop.
+        isActiveLock.lock()
+        let active = isActive
+        isActiveLock.unlock()
+        guard active else { return }
+
         let _ = poseDetector.processFrame(pixelBuffer: pixelBuffer, timestamp: timestamp)
 
         // Skip detection during cooldown — just buffer frames for impact analysis.

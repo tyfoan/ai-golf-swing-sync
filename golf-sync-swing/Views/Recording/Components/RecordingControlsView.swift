@@ -12,10 +12,6 @@ struct RecordingControlsView: View {
 
     var body: some View {
         VStack(spacing: 20) {
-            if viewModel.isRecording {
-                actionButtons
-            }
-
             if viewModel.state == .idle {
                 startRecordingButton
             } else if viewModel.isRecording {
@@ -25,36 +21,6 @@ struct RecordingControlsView: View {
             }
         }
         .padding(.bottom, 100)
-    }
-
-    // MARK: - Action Buttons (during recording)
-
-    private var actionButtons: some View {
-        HStack(spacing: 24) {
-            Button(action: viewModel.cyclePlaybackSpeed) {
-                Text(String(format: "%.2gx", viewModel.playbackSpeed))
-                    .font(.subheadline.bold())
-                    .foregroundStyle(.white)
-                    .frame(width: 50, height: 50)
-                    .background(Color.gray.opacity(0.5))
-                    .clipShape(Circle())
-            }
-
-            Button {
-                if let index = viewModel.replayingSwingIndex ?? viewModel.detectedSwings.indices.last {
-                    viewModel.toggleFavorite(at: index)
-                }
-            } label: {
-                let isFavorite = viewModel.currentReplaySwing?.isFavorite
-                    ?? viewModel.detectedSwings.last?.isFavorite ?? false
-                Image(systemName: isFavorite ? "star.fill" : "star")
-                    .font(.title2)
-                    .foregroundStyle(isFavorite ? .yellow : .white)
-                    .frame(width: 50, height: 50)
-                    .background(Color.gray.opacity(0.5))
-                    .clipShape(Circle())
-            }
-        }
     }
 
     // MARK: - Button Variants

@@ -31,11 +31,10 @@ final class RecordingViewModel {
     var errorMessage: String?
     var mainViewShowsReplay: Bool = false
     var replayingSwingIndex: Int? = nil
-    var pipDisplayMode: PipDisplayMode {
-        if mainViewShowsReplay { return .liveCamera }
-        if lastDetectedSwing != nil { return .lastSwingReplay }
-        return .liveCamera
-    }
+    // PiP is always the live camera now — replays go straight to the main view.
+    // Running a SwingReplayView in PiP simultaneously with one in main caused
+    // FigSharedMemPool/PlayerRemoteXPC churn on the in-progress recording file.
+    var pipDisplayMode: PipDisplayMode { .liveCamera }
     var isLoadingReplay: Bool = false
 
     // MARK: - Dependencies
@@ -57,6 +56,7 @@ final class RecordingViewModel {
     var countdownValue: Int { if case .countdown(let v) = state { return v }; return 0 }
     var isRecording: Bool { state == .recording }
     var isFinalizingVideo: Bool { state == .finalizingVideo }
+    var isSaving: Bool { state == .saving }
     var isReviewing: Bool { state == .reviewing }
     var swingCount: Int { detectedSwings.count }
     var isFrontCamera: Bool { cameraService.currentCameraPosition == .front }
@@ -78,6 +78,11 @@ final class RecordingViewModel {
                 guard let self else { return }
                 self.detectedSwings.append(clip)
                 self.playbackSpeed = 1.0
+                // Detection feedback only — haptic + green flash + swing-count
+                // badge in the top bar. We do NOT play the in-progress recording
+                // file: opening it with AVURLAsset causes iOS to terminate the
+                // recording (FigApplicationStateMonitor interrupt). Replay is
+                // available after the user stops recording.
                 UINotificationFeedbackGenerator().notificationOccurred(.success)
             }
         }
@@ -95,6 +100,7 @@ final class RecordingViewModel {
             Task { @MainActor [weak self] in
                 guard let self else { return }
                 if let error {
+                    AppLogger.camera.error("RecordingViewModel: onRecordingFinished error=\(error.localizedDescription)")
                     self.errorMessage = error.localizedDescription
                     self.detectionOrchestrator.stop()
                     self.cameraService.onFrameCaptured = nil
@@ -119,16 +125,13 @@ final class RecordingViewModel {
         state = .countdown(remaining: 5)
 
         countdownTask = Task {
-            if !cameraService.captureSession.isRunning, !cameraService.isSessionConfiguredForCurrentParams {
-                cameraService.setupSession(position: .front, frameRate: 30)
-                try? await Task.sleep(for: .milliseconds(300))
-            }
+            let started = await ensureSessionRunning()
             guard !Task.isCancelled else { return }
-            if !cameraService.captureSession.isRunning {
-                cameraService.startSession()
-                try? await Task.sleep(for: .milliseconds(300))
+            guard started else {
+                state = .idle
+                errorMessage = "Camera could not start. Try closing and reopening the app."
+                return
             }
-            guard !Task.isCancelled else { return }
 
             for i in stride(from: 5, through: 1, by: -1) {
                 guard !Task.isCancelled else { return }
@@ -139,6 +142,27 @@ final class RecordingViewModel {
 
             beginRecording()
         }
+    }
+
+    /// Configure (if needed) and start the capture session, then poll until
+    /// it's actually running. Uses `resumeSession` so the audio session is
+    /// reactivated when iOS deactivated it after a previous recording — plain
+    /// `startSession` skips that step and silently no-ops on the second start.
+    private func ensureSessionRunning(timeout: TimeInterval = 3.0) async -> Bool {
+        if cameraService.captureSession.isRunning { return true }
+
+        if !cameraService.isSessionConfiguredForCurrentParams {
+            cameraService.setupSession(position: .front, frameRate: 30)
+            try? await Task.sleep(for: .milliseconds(300))
+        }
+
+        cameraService.resumeSession()
+
+        let deadline = Date().addingTimeInterval(timeout)
+        while !cameraService.captureSession.isRunning && Date() < deadline {
+            try? await Task.sleep(for: .milliseconds(100))
+        }
+        return cameraService.captureSession.isRunning
     }
 
     private func beginRecording() {
@@ -189,6 +213,7 @@ final class RecordingViewModel {
         }
         mainViewShowsReplay.toggle()
         isLoadingReplay = mainViewShowsReplay
+        AppLogger.ui.info("swapMainAndPip: mainViewShowsReplay=\(self.mainViewShowsReplay) loadingReplay=\(self.isLoadingReplay)")
     }
 
     func showSwing(at index: Int) {

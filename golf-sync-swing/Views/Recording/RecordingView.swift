@@ -5,7 +5,6 @@
 //  Main recording view container. Composes sub-views:
 //    RecordingTopBar        - Cancel, timer, swing count
 //    RecordingControlsView  - Start/stop/save buttons
-//    RecordingPiPView       - Picture-in-picture overlay
 //
 
 import SwiftUI
@@ -19,7 +18,6 @@ struct RecordingView: View {
     @State private var showingError = false
     @State private var hasSetupCamera = false
     @State private var isTabVisible = false
-    @State private var pipVisible = false
     @State private var showDetectionFlash = false
 
     var body: some View {
@@ -27,9 +25,9 @@ struct RecordingView: View {
             ZStack {
                 Color.black.ignoresSafeArea()
 
-                mainContentView
+                CameraPreviewView(session: viewModel.cameraService.captureSession)
+                    .id("main-camera-\(viewModel.cameraService.sessionConfigurationId)")
                     .ignoresSafeArea()
-                    .animation(.easeInOut(duration: 0.3), value: viewModel.mainViewShowsReplay)
 
                 if viewModel.state == .idle {
                     PositioningGuideOverlay()
@@ -52,33 +50,11 @@ struct RecordingView: View {
                     RecordingControlsView(viewModel: viewModel)
                 }
 
-                if viewModel.isLoadingReplay {
-                    ReplayLoadingOverlay()
-                        .animation(.easeInOut(duration: 0.3), value: viewModel.isLoadingReplay)
-                }
-
-                if viewModel.isRecording && viewModel.swingCount > 0 {
-                    RecordingPiPView(
-                        pipDisplayMode: viewModel.pipDisplayMode,
-                        sessionConfigurationId: viewModel.cameraService.sessionConfigurationId,
-                        captureSession: viewModel.cameraService.captureSession,
-                        lastSwing: viewModel.pipSwing,
-                        recordingURL: viewModel.recordingURL,
-                        playbackSpeed: viewModel.playbackSpeed,
-                        onTap: viewModel.swapMainAndPip
-                    )
-                    .scaleEffect(pipVisible ? 1.0 : 0.5)
-                    .opacity(pipVisible ? 1.0 : 0)
-                    .animation(.spring(response: 0.4, dampingFraction: 0.7), value: pipVisible)
-                    .onAppear { pipVisible = true }
-                    .onDisappear { pipVisible = false }
-                }
-
                 if viewModel.isCountingDown {
                     CountdownView(count: viewModel.countdownValue) { viewModel.cancel() }
                 }
 
-                if viewModel.isFinalizingVideo {
+                if viewModel.isFinalizingVideo || viewModel.isSaving {
                     FinalizingVideoOverlay(swingCount: viewModel.swingCount)
                 }
 
@@ -139,27 +115,6 @@ struct RecordingView: View {
         }
         .onChange(of: viewModel.errorMessage) { _, newError in
             if newError != nil { showingError = true }
-        }
-    }
-
-    // MARK: - Main Content
-
-    @ViewBuilder
-    private var mainContentView: some View {
-        if viewModel.mainViewShowsReplay, let swing = viewModel.pipSwing, let url = viewModel.recordingURL {
-            SwingReplayView(
-                videoURL: url,
-                startTime: swing.startTime,
-                endTime: swing.endTime,
-                playbackSpeed: viewModel.playbackSpeed,
-                onLoaded: viewModel.replayDidLoad
-            )
-            .id("main-replay-\(swing.id)")
-            .transition(.opacity)
-        } else {
-            CameraPreviewView(session: viewModel.cameraService.captureSession)
-                .id("main-camera-\(viewModel.cameraService.sessionConfigurationId)")
-                .transition(.opacity)
         }
     }
 

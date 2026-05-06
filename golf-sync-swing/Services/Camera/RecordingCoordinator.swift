@@ -23,6 +23,10 @@ final class RecordingCoordinator: RecordingCoordinating {
 
     /// Called when recording exceeds maximumDuration
     var onMaximumDurationReached: (() -> Void)?
+    /// Called every timer tick with the current recorded duration so observers
+    /// (e.g. an @Observable CameraService) can mirror the value into a stored
+    /// property — SwiftUI doesn't observe across non-Observable objects.
+    var onDurationTick: ((TimeInterval) -> Void)?
 
     private var recordingStartTime: Date?
     private var durationTimer: Timer?
@@ -124,6 +128,7 @@ final class RecordingCoordinator: RecordingCoordinating {
         let timer = Timer(timeInterval: 0.1, repeats: true) { [weak self] _ in
             guard let self, let startTime = self.recordingStartTime else { return }
             self.recordedDuration = Date().timeIntervalSince(startTime)
+            self.onDurationTick?(self.recordedDuration)
             if self.recordedDuration >= self.maximumDuration {
                 self.onMaximumDurationReached?()
             }

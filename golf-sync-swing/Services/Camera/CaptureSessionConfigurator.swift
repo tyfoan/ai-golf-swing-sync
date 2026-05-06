@@ -107,7 +107,11 @@ final class CaptureSessionConfigurator {
 
         // Movie file output
         let movieOutput = AVCaptureMovieFileOutput()
-        movieOutput.movieFragmentInterval = CMTime(seconds: 5, preferredTimescale: 1)
+        // 1-second fragments keep the in-progress file readable for mid-recording
+        // replay playback. Larger intervals (e.g., 5s) leave SwingReplayView's
+        // AVURLAsset stuck waiting for the next moov flush when a swing finishes
+        // mid-fragment.
+        movieOutput.movieFragmentInterval = CMTime(seconds: 1, preferredTimescale: 1)
         var configuredMovieOutput: AVCaptureMovieFileOutput?
         if session.canAddOutput(movieOutput) {
             session.addOutput(movieOutput)

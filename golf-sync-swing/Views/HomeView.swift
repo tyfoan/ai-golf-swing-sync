@@ -7,16 +7,13 @@
 
 import SwiftUI
 import SwiftData
-import os
 
 struct HomeView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \SwingVideo.createdAt, order: .reverse) private var videos: [SwingVideo]
 
-    @State private var showVideoPicker = false
     @State private var selectedSwings: [SwingSelection] = []
     @State private var navigationPath = NavigationPath()
-    @State private var importError: String?
 
     var body: some View {
         NavigationStack(path: $navigationPath) {
@@ -42,17 +39,7 @@ struct HomeView: View {
             .background(Color.sandLight)
             .preferredColorScheme(.light)
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button { showVideoPicker = true } label: {
-                        Image(systemName: "plus")
-                    }
-                }
                 ToolbarItem(placement: .topBarLeading) { clearButton }
-            }
-            .sheet(isPresented: $showVideoPicker) {
-                VideoPickerView(isPresented: $showVideoPicker) { url in
-                    importVideo(from: url)
-                }
             }
             .navigationDestination(for: SwingVideo.self) { video in
                 SingleVideoPlayerView(video: video)
@@ -62,14 +49,6 @@ struct HomeView: View {
                     video1: dest.video1, video2: dest.video2,
                     swing1: dest.swing1, swing2: dest.swing2
                 )
-            }
-            .alert("Import Error", isPresented: Binding(
-                get: { importError != nil },
-                set: { if !$0 { importError = nil } }
-            )) {
-                Button("OK") { importError = nil }
-            } message: {
-                Text(importError ?? "")
             }
         }
     }
@@ -182,21 +161,6 @@ private extension HomeView {
                 videos: $0.value
             ) }
             .sorted { $0.sortDate > $1.sortDate }
-    }
-}
-
-// MARK: - Import
-
-private extension HomeView {
-    func importVideo(from url: URL) {
-        Task {
-            do {
-                try await VideoImportService().importVideo(from: url, into: modelContext)
-            } catch {
-                importError = "Could not import video: \(error.localizedDescription)"
-                AppLogger.storage.error("Error importing video: \(error.localizedDescription)")
-            }
-        }
     }
 }
 

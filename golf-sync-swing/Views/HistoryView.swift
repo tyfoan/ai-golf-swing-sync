@@ -5,14 +5,10 @@
 
 import SwiftUI
 import SwiftData
-import os
 
 struct HistoryView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \SwingVideo.createdAt, order: .reverse) private var videos: [SwingVideo]
-
-    @State private var showVideoPicker = false
-    @State private var importError: String?
 
     var body: some View {
         NavigationStack {
@@ -41,23 +37,10 @@ struct HistoryView: View {
             .preferredColorScheme(.light)
             .navigationTitle("Recordings")
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        showVideoPicker = true
-                    } label: {
-                        Image(systemName: "plus")
-                    }
-                }
-
                 ToolbarItem(placement: .topBarLeading) {
                     if !videos.isEmpty {
                         EditButton()
                     }
-                }
-            }
-            .sheet(isPresented: $showVideoPicker) {
-                VideoPickerView(isPresented: $showVideoPicker) { url in
-                    importVideo(from: url)
                 }
             }
             .confirmationDialog(
@@ -72,25 +55,6 @@ struct HistoryView: View {
                 Button("Cancel", role: .cancel) { pendingDeleteOffsets = nil }
             } message: {
                 Text("This recording and its swings will be permanently deleted.")
-            }
-            .alert("Import Error", isPresented: Binding(
-                get: { importError != nil },
-                set: { if !$0 { importError = nil } }
-            )) {
-                Button("OK") { importError = nil }
-            } message: {
-                Text(importError ?? "")
-            }
-        }
-    }
-
-    private func importVideo(from url: URL) {
-        Task {
-            do {
-                try await VideoImportService().importVideo(from: url, into: modelContext)
-            } catch {
-                importError = "Could not import video: \(error.localizedDescription)"
-                AppLogger.storage.error("Error importing video: \(error.localizedDescription)")
             }
         }
     }

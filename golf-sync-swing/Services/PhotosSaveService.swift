@@ -53,7 +53,11 @@ struct PhotosSaveService: PhotosSaving {
             .appendingPathExtension("mov")
         defer { try? FileManager.default.removeItem(at: outputURL) }
 
-        guard let exporter = AVAssetExportSession(asset: composition, presetName: AVAssetExportPresetHighestQuality) else {
+        // Passthrough preset copies the source video bitstream without re-encoding,
+        // which is dramatically faster (near file-copy speed) than HighestQuality
+        // for the trim+save flow. The source is already an h264 .mov from
+        // AVCaptureMovieFileOutput, so re-encoding adds no quality and burns time.
+        guard let exporter = AVAssetExportSession(asset: composition, presetName: AVAssetExportPresetPassthrough) else {
             throw PhotosSaveError.exportFailed("Cannot create export session")
         }
 

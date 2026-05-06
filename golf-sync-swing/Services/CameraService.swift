@@ -23,7 +23,10 @@ final class CameraService: NSObject {
 
     var isSessionRunning = false
     var isRecording = false
-    var recordedDuration: TimeInterval { recordingCoordinator.recordedDuration }
+    /// Mirrored from RecordingCoordinator's timer via `onDurationTick`. Stored
+    /// (not computed) so SwiftUI's @Observable can track changes — the
+    /// coordinator itself isn't @Observable.
+    var recordedDuration: TimeInterval = 0
     var sessionConfigurationId: Int = 0
     var droppedFrameCount: Int = 0
     var currentError: CameraError?
@@ -71,6 +74,9 @@ final class CameraService: NSObject {
     override init() {
         super.init()
         setupNotificationHandler()
+        recordingCoordinator.onDurationTick = { [weak self] duration in
+            DispatchQueue.main.async { self?.recordedDuration = duration }
+        }
     }
 
     deinit {
