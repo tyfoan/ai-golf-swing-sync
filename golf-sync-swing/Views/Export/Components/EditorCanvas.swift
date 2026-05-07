@@ -38,7 +38,7 @@ struct EditorCanvas: View {
     @ViewBuilder
     private func canvasContent(canvas: CGSize) -> some View {
         switch mode {
-        case .sideBySide:
+        case .sideBySide, .topBottom:
             sideBySideTiles
         case .stacked:
             stackedTiles

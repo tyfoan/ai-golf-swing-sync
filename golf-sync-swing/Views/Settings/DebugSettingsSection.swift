@@ -17,6 +17,8 @@ struct DebugSettingsSection: View {
 
     @Environment(\.modelContext) private var modelContext
 
+    @AppStorage(FeatureAccess.devPremiumOverrideKey) private var devPremiumOverride = false
+
     @State private var showPaywall = false
     @State private var showOnboarding = false
     @State private var confirmReset = false
@@ -133,6 +135,7 @@ struct DebugSettingsSection: View {
         Section {
             onboardingRow
             paywallRow
+            premiumOverrideRow
             subscriptionStatusRow
             togglePremiumRow
             reviewPromptRow
@@ -143,6 +146,27 @@ struct DebugSettingsSection: View {
         } footer: {
             Text("This section is only visible in DEBUG builds.")
         }
+    }
+
+    // MARK: - Premium Override
+
+    private var premiumOverrideRow: some View {
+        Toggle(isOn: $devPremiumOverride) {
+            HStack(spacing: 8) {
+                Image(systemName: "crown.fill")
+                    .font(.caption)
+                    .foregroundStyle(.orange)
+                    .frame(width: 20)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Premium Override")
+                        .font(.subheadline)
+                    Text("Force-unlock all premium features locally")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+        .tint(.orange)
     }
 
     // MARK: - Onboarding

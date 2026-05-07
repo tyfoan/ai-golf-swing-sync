@@ -1,0 +1,63 @@
+{
+  "dataset": {
+    "total": 1400,
+    "normal_speed": 758,
+    "slow_motion": 642
+  },
+  "phase_durations_normal_speed": {
+    "backswing": {
+      "mean_frames": 13.497361477572559,
+      "median_frames": 12.5,
+      "std_frames": 4.902411059789791,
+      "min_frames": 8,
+      "max_frames": 75,
+      "mean_ms": 449.9120492524186,
+      "median_ms": 416.6666666666667,
+      "p5_frames": 9.0,
+      "p25_frames": 11.0,
+      "p75_frames": 14.0,
+      "p95_frames": 20.0
+    },
+    "downswing": {
+      "mean_frames": 7.8680738786279685,
+      "median_frames": 8.0,
+      "std_frames": 2.1801477122691475,
+      "min_frames": 5,
+      "max_frames": 35,
+      "mean_ms": 262.26912928759896,
+      "median_ms": 266.6666666666667,
+      "p5_frames": 6.0,
+      "p25_frames": 7.0,
+      "p75_frames": 8.0,
+      "p95_frames": 9.0
+    },
+    "follow_through": {
+      "mean_frames": 21.42084432717678,
+      "median_frames": 20.0,
+      "std_frames": 8.501804143441795,
+      "min_frames": 10,
+      "max_frames": 126,
+      "mean_ms": 714.028144239226,
+      "median_ms": 666.6666666666666,
+      "p5_frames": 14.0,
+      "p25_frames": 17.0,
+      "p75_frames": 23.0,
+      "p95_frames": 32.0
+    },
+    "full_swing": {
+      "mean_frames": 42.78627968337731,
+      "median_frames": 40.0,
+      "std_frames": 13.39600703064346,
+      "min_frames": 27,
+      "max_frames": 194,
+      "mean_ms": 1426.2093227792436,
+      "median_ms": 1333.3333333333333,
+      "p5_frames": 32.0,
+      "p25_frames": 37.0,
+      "p75_frames": 45.0,
+      "p95_frames": 56.0
+    }
+  },
+  "optimal_clip_length": null,
+  "recommendations": []
+}

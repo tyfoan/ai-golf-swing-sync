@@ -36,6 +36,7 @@ struct SingleVideoPlayerView: View {
             SingleVideoExportSheet(
                 video: video,
                 mode: playbackMode,
+                selectedSwing: selectedSwing,
                 onDismiss: { showExportSheet = false }
             )
         }

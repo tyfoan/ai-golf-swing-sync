@@ -46,6 +46,7 @@ struct golf_sync_swingApp: App {
         PurchaseService.shared.configure()
         VideoPathMigrationService.migrateIfNeeded(modelContainer: sharedModelContainer)
         VideoExportService.cleanupOrphanedExports()
+        ProSwingSeeder.seedIfNeeded(container: sharedModelContainer)
     }
 
     @Environment(\.scenePhase) private var scenePhase

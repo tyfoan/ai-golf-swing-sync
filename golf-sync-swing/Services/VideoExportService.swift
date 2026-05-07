@@ -439,7 +439,7 @@ final class VideoExportService {
             videoComposition = try await buildSequentialComposition(
                 composition: composition, renderSize: renderSize, frameDuration: frameDuration
             )
-        case .sideBySide, .stacked:
+        case .sideBySide, .topBottom, .stacked:
             videoComposition = buildParallelComposition(
                 layoutConfig: layoutConfig,
                 track1c: track1c, track2c: track2c,

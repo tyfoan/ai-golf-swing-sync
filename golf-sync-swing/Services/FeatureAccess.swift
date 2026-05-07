@@ -19,6 +19,7 @@ enum PremiumFeature: String, CaseIterable {
 struct FeatureAccess {
     static func isUnlocked(_ feature: PremiumFeature) -> Bool {
         #if DEBUG
+        if devPremiumOverride { return true }
         if ScreenshotModeService.shared.isEnabled { return true }
         #endif
         return PurchaseService.shared.isPremium
@@ -26,8 +27,17 @@ struct FeatureAccess {
 
     static var isPremiumUser: Bool {
         #if DEBUG
+        if devPremiumOverride { return true }
         if ScreenshotModeService.shared.isEnabled { return true }
         #endif
         return PurchaseService.shared.isPremium
     }
+
+    #if DEBUG
+    static let devPremiumOverrideKey = "dev.premiumOverride"
+
+    private static var devPremiumOverride: Bool {
+        UserDefaults.standard.bool(forKey: devPremiumOverrideKey)
+    }
+    #endif
 }

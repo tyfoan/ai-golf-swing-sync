@@ -1,0 +1,26 @@
+{
+  "backswing": {
+    "total": 865,
+    "size_mb": 290.7
+  },
+  "downswing": {
+    "total": 748,
+    "size_mb": 256.4
+  },
+  "follow_through": {
+    "total": 1397,
+    "size_mb": 474.3
+  },
+  "impact": {
+    "total": 743,
+    "size_mb": 258.7
+  },
+  "no_swing": {
+    "total": 1483,
+    "size_mb": 480.6
+  },
+  "_total": {
+    "clips": 5236,
+    "size_mb": 1760.7
+  }
+}

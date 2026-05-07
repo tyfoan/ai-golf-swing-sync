@@ -27,6 +27,8 @@ private extension ComparisonVideoAreaView {
         switch viewModel.comparisonMode {
         case .sideBySide:
             sideBySideLayout(geometry: geometry)
+        case .topBottom:
+            topBottomLayout(geometry: geometry)
         case .stacked:
             stackedLayout(geometry: geometry)
         case .sequential:
@@ -40,6 +42,14 @@ private extension ComparisonVideoAreaView {
             videoPanel(player: viewModel.effectivePlayer2, width: geometry.size.width / 2 - 1)
         }
         .frame(maxHeight: .infinity)
+    }
+
+    func topBottomLayout(geometry: GeometryProxy) -> some View {
+        VStack(spacing: 2) {
+            videoPanel(player: viewModel.effectivePlayer1, height: geometry.size.height / 2 - 1)
+            videoPanel(player: viewModel.effectivePlayer2, height: geometry.size.height / 2 - 1)
+        }
+        .frame(maxWidth: .infinity)
     }
 
     func stackedLayout(geometry: GeometryProxy) -> some View {
@@ -76,6 +86,13 @@ private extension ComparisonVideoAreaView {
     func videoPanel(player: AVPlayer, width: CGFloat) -> some View {
         VideoPlayerView(player: player)
             .frame(width: width)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .onTapGesture { viewModel.togglePlayPause() }
+    }
+
+    func videoPanel(player: AVPlayer, height: CGFloat) -> some View {
+        VideoPlayerView(player: player)
+            .frame(height: height)
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .onTapGesture { viewModel.togglePlayPause() }
     }

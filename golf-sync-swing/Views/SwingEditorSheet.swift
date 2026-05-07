@@ -48,27 +48,26 @@ struct SwingEditorSheet: View {
                     .font(.title)
                     .fontWeight(.bold)
 
-                Spacer()
-
                 // Video preview frame
                 ZStack {
                     if let image = currentFrame {
                         Image(uiImage: image)
                             .resizable()
                             .aspectRatio(contentMode: .fit)
-                            .frame(maxWidth: 200)
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                            .frame(maxWidth: .infinity, maxHeight: 240)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
                     } else if let thumbnailData = video.thumbnailData,
                               let uiImage = UIImage(data: thumbnailData) {
                         Image(uiImage: uiImage)
                             .resizable()
                             .aspectRatio(contentMode: .fit)
-                            .frame(maxWidth: 200)
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                            .frame(maxWidth: .infinity, maxHeight: 240)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
                     } else {
-                        RoundedRectangle(cornerRadius: 8)
+                        RoundedRectangle(cornerRadius: 12)
                             .fill(Color.secondary.opacity(0.3))
-                            .frame(width: 200, height: 150)
+                            .frame(maxWidth: .infinity, maxHeight: 240)
+                            .aspectRatio(16/9, contentMode: .fit)
                     }
 
                     // Current time overlay
@@ -85,6 +84,7 @@ struct SwingEditorSheet: View {
                             .padding(8)
                     }
                 }
+                .padding(.horizontal)
 
                 Text("Drag the sliders to align with the Start, Contact, and End of the swing.")
                     .font(.subheadline)

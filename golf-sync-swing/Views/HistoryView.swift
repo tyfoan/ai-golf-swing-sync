@@ -8,7 +8,9 @@ import SwiftData
 
 struct HistoryView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query(sort: \SwingVideo.createdAt, order: .reverse) private var videos: [SwingVideo]
+    @Query(sort: \SwingVideo.createdAt, order: .reverse) private var allVideos: [SwingVideo]
+
+    private var videos: [SwingVideo] { allVideos.filter { !$0.isPro } }
 
     var body: some View {
         NavigationStack {

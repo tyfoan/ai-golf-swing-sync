@@ -14,13 +14,14 @@ struct HomeView: View {
 
     @State private var selectedSwings: [SwingSelection] = []
     @State private var navigationPath = NavigationPath()
+    @State private var showPaywall = false
 
     var body: some View {
         NavigationStack(path: $navigationPath) {
             VStack(spacing: 0) {
                 header
 
-                if videos.isEmpty {
+                if userVideos.isEmpty && proVideos.isEmpty {
                     ContentUnavailableView(
                         "No Swings Yet",
                         systemImage: "figure.golf",
@@ -28,11 +29,7 @@ struct HomeView: View {
                     )
                     .frame(maxHeight: .infinity)
                 } else {
-                    SwingSelectionListView(
-                        groups: groupedVideos,
-                        selectedSwings: selectedSwings,
-                        onSwingTap: toggleSwingSelection
-                    )
+                    swingPickerScroll
                     bottomCTA
                 }
             }
@@ -50,6 +47,35 @@ struct HomeView: View {
                     swing1: dest.swing1, swing2: dest.swing2
                 )
             }
+            .fullScreenCover(isPresented: $showPaywall) {
+                AppPaywallView(source: .featureGate, onDismiss: { showPaywall = false })
+            }
+        }
+    }
+
+    private var swingPickerScroll: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                if !proVideos.isEmpty {
+                    ProSwingsCarouselView(
+                        videos: proVideos,
+                        selectedSwings: selectedSwings,
+                        onTap: toggleSwingSelection
+                    )
+                }
+                if !userVideos.isEmpty {
+                    Text("MY SWINGS")
+                        .font(.headline).fontWeight(.bold)
+                        .foregroundStyle(Color.charcoal)
+                        .padding(.horizontal)
+                    SwingSelectionListContent(
+                        groups: groupedUserVideos,
+                        selectedSwings: selectedSwings,
+                        onSwingTap: toggleSwingSelection
+                    )
+                }
+            }
+            .padding(.vertical, 8)
         }
     }
 }
@@ -130,6 +156,11 @@ private extension HomeView {
         guard let v1 = videos.first(where: { $0.id == sel1.videoId }),
               let v2 = videos.first(where: { $0.id == sel2.videoId }) else { return }
 
+        if (v1.isPro || v2.isPro) && !FeatureAccess.isPremiumUser {
+            showPaywall = true
+            return
+        }
+
         navigationPath.append(ComparisonDestination(
             video1: v1, video2: v2,
             swing1: sel1.swingTimeRange, swing2: sel2.swingTimeRange
@@ -148,9 +179,17 @@ private extension HomeView {
         return f
     }()
 
-    var groupedVideos: [VideoDateGroup] {
+    var proVideos: [SwingVideo] {
+        videos.filter { $0.isPro && !$0.swings.isEmpty }
+    }
+
+    var userVideos: [SwingVideo] {
+        videos.filter { !$0.isPro }
+    }
+
+    var groupedUserVideos: [VideoDateGroup] {
         let calendar = Calendar.current
-        let groups = Dictionary(grouping: videos) {
+        let groups = Dictionary(grouping: userVideos) {
             calendar.startOfDay(for: $0.createdAt)
         }
 

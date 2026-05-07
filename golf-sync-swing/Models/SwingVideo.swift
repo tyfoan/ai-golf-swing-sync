@@ -65,6 +65,26 @@ final class SwingVideo {
         return formatter.string(fromByteCount: bytes)
     }
 
+    /// True for app-bundled professional reference swings (seeded via ProSwingSeeder).
+    /// Identified by the relative-path prefix where the seeder writes them.
+    var isPro: Bool {
+        localURLString.hasPrefix(ProSwingSeeder.proPathPrefix)
+    }
+
+    /// Display name for pro swings; nil for user recordings.
+    /// Looked up from the catalog by bundle filename (the file's basename on disk).
+    var proDisplayName: String? {
+        guard isPro else { return nil }
+        let basename = localURL.deletingPathExtension().lastPathComponent
+        return ProSwingCatalog.all.first { $0.bundleFilename == basename }?.displayName
+    }
+
+    var proClub: String? {
+        guard isPro else { return nil }
+        let basename = localURL.deletingPathExtension().lastPathComponent
+        return ProSwingCatalog.all.first { $0.bundleFilename == basename }?.club
+    }
+
     // MARK: - Init
 
     init(localURL: URL, duration: TimeInterval, fps: Double, thumbnailData: Data? = nil) {

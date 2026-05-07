@@ -64,6 +64,14 @@ final class ScreenshotDataService {
                 video.createdAt = entry.date
                 video.hasBeenAnalyzed = true
                 video.analysisDate = entry.date
+
+                // Demo clips are 1:30–2:00 long; middle of clip is reliably in the action
+                // (t=0 is letterbox; preset contact times are seconds-not-percent and miss).
+                let thumbnailTime = video.duration * 0.5
+                if let betterThumbnail = ThumbnailService.shared.generateThumbnail(for: destURL, at: thumbnailTime) {
+                    video.thumbnailData = betterThumbnail
+                }
+
                 context.insert(video)
 
                 let marker = buildMarker(for: entry, videoDuration: video.duration)
@@ -98,9 +106,16 @@ final class ScreenshotDataService {
 
     private func buildMarker(for entry: ScheduleEntry, videoDuration: TimeInterval) -> SwingMarker {
         let timing = entry.timing
-        let start = min(timing.start, videoDuration * 0.1)
-        let contact = min(timing.contact, videoDuration * 0.6)
-        let end = min(timing.end, videoDuration * 0.9)
+
+        // Demo clips are full YouTube clips with fade-in/letterbox at the start.
+        // Center the swing window at the middle of the video so swing thumbnails
+        // (extracted at contactTime in SwingThumbnailView) land on real content,
+        // while preserving the preset's pre/post-contact balance.
+        let preDuration = timing.contact - timing.start
+        let postDuration = timing.end - timing.contact
+        let contact = videoDuration * 0.5
+        let start = max(0, contact - preDuration)
+        let end = min(videoDuration, contact + postDuration)
 
         let marker = SwingMarker(startTime: start, contactTime: contact, endTime: end)
         marker.isAutoDetected = true

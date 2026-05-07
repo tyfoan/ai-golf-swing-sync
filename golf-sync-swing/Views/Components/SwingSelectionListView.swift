@@ -7,20 +7,18 @@
 
 import SwiftUI
 
-struct SwingSelectionListView: View {
+struct SwingSelectionListContent: View {
     let groups: [VideoDateGroup]
     let selectedSwings: [SwingSelection]
     let onSwingTap: (SwingMarker, SwingVideo) -> Void
 
     var body: some View {
-        ScrollView {
-            LazyVStack(alignment: .leading, spacing: 20) {
-                ForEach(groups, id: \.date) { group in
-                    dateSection(group)
-                }
+        LazyVStack(alignment: .leading, spacing: 20) {
+            ForEach(groups, id: \.date) { group in
+                dateSection(group)
             }
-            .padding()
         }
+        .padding(.horizontal)
     }
 
     // MARK: - Date Section

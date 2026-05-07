@@ -3,7 +3,8 @@
 //  golf-sync-swing
 //
 //  Bottom sheet for exporting a single source video to Photos.
-//  No editor, no aspect picker — saves in source aspect.
+//  Three targets: full video, all swings concatenated, or just the
+//  currently-selected swing. No editor, no aspect picker.
 //
 
 import SwiftUI
@@ -11,22 +12,54 @@ import Photos
 
 struct SingleVideoExportSheet: View {
     let video: SwingVideo
-    let mode: VideoPlaybackMode
+    let selectedSwing: SwingMarker?
     let onDismiss: () -> Void
 
+    @State private var selection: ExportSelection
     @State private var isExporting = false
     @State private var progress: Float = 0
     @State private var errorMessage: String?
     @State private var savedConfirmation = false
 
+    init(video: SwingVideo, mode: VideoPlaybackMode, selectedSwing: SwingMarker?, onDismiss: @escaping () -> Void) {
+        self.video = video
+        self.selectedSwing = selectedSwing
+        self.onDismiss = onDismiss
+        _selection = State(initialValue: Self.defaultSelection(mode: mode, selectedSwing: selectedSwing, video: video))
+    }
+
+    enum ExportSelection: Hashable {
+        case fullVideo, allSwings, currentSwing
+
+        var label: String {
+            switch self {
+            case .fullVideo:    return "Full Video"
+            case .allSwings:    return "All Swings"
+            case .currentSwing: return "This Swing"
+            }
+        }
+    }
+
+    private static func defaultSelection(mode: VideoPlaybackMode, selectedSwing: SwingMarker?, video: SwingVideo) -> ExportSelection {
+        if selectedSwing != nil && mode == .swingsOnly { return .currentSwing }
+        if mode == .swingsOnly && !video.swings.isEmpty { return .allSwings }
+        return .fullVideo
+    }
+
     var body: some View {
         VStack(spacing: 16) {
             handle
             content
+            Spacer(minLength: 0)
         }
-        .padding(20)
+        .padding(.horizontal, 20)
+        .padding(.top, 8)
+        .padding(.bottom, 24)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(.systemBackground))
-        .presentationDetents([.fraction(0.42)])
+        .presentationDetents([.fraction(0.5)])
+        .presentationBackground(Color(.systemBackground))
+        .presentationDragIndicator(.hidden)
     }
 
     @ViewBuilder
@@ -46,76 +79,105 @@ struct SingleVideoExportSheet: View {
         Capsule()
             .fill(Color.gray.opacity(0.3))
             .frame(width: 36, height: 4)
-            .padding(.top, 4)
     }
 
     private var idleContent: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 16) {
+            selectionPicker
+
             Image(systemName: "square.and.arrow.up.fill")
-                .font(.system(size: 44))
+                .font(.system(size: 40))
                 .foregroundStyle(Color.appTeal)
-            Text(title).font(.headline)
-            Text(subtitle).font(.caption).foregroundStyle(.secondary).multilineTextAlignment(.center)
+
+            VStack(spacing: 4) {
+                Text(title).font(.headline)
+                Text(subtitle).font(.caption).foregroundStyle(.secondary).multilineTextAlignment(.center)
+            }
+
             Button(action: startExport) {
                 Text("Export to Photos")
                     .font(.headline).fontWeight(.bold).foregroundStyle(.white)
-                    .frame(maxWidth: .infinity, minHeight: 48)
+                    .frame(maxWidth: .infinity, minHeight: 52)
                     .background(canExport ? Color.appTeal : Color.gray)
-                    .clipShape(RoundedRectangle(cornerRadius: 24))
+                    .clipShape(RoundedRectangle(cornerRadius: 26))
             }
             .disabled(!canExport)
+            .padding(.top, 4)
         }
+    }
+
+    private var selectionPicker: some View {
+        Picker("Export", selection: $selection) {
+            Text(ExportSelection.fullVideo.label).tag(ExportSelection.fullVideo)
+            if !video.swings.isEmpty {
+                Text(ExportSelection.allSwings.label).tag(ExportSelection.allSwings)
+            }
+            if selectedSwing != nil {
+                Text(ExportSelection.currentSwing.label).tag(ExportSelection.currentSwing)
+            }
+        }
+        .pickerStyle(.segmented)
     }
 
     private var progressContent: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 16) {
             ProgressView(value: progress).tint(Color.appTeal)
-            Text("\(Int(progress * 100))% — Exporting…").font(.caption)
+            Text("\(Int(progress * 100))% — Exporting…").font(.subheadline)
         }
+        .padding(.top, 32)
     }
 
     private var successContent: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 16) {
             Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 44))
+                .font(.system(size: 48))
                 .foregroundStyle(.green)
             Text("Saved to Photos").font(.headline)
             Button("Done", action: onDismiss).buttonStyle(.borderedProminent)
         }
+        .padding(.top, 16)
     }
 
     private func errorContent(_ message: String) -> some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 16) {
             Image(systemName: "exclamationmark.triangle.fill")
                 .font(.system(size: 44))
                 .foregroundStyle(.orange)
             Text("Export failed").font(.headline)
-            Text(message).font(.caption).foregroundStyle(.secondary)
+            Text(message).font(.caption).foregroundStyle(.secondary).multilineTextAlignment(.center)
             Button("Close", action: onDismiss).buttonStyle(.bordered)
         }
+        .padding(.top, 8)
     }
 
     private var title: String {
-        mode == .swingsOnly ? "Export Swings Only" : "Export Full Video"
+        switch selection {
+        case .fullVideo:    return "Export Full Video"
+        case .allSwings:    return "Export All Swings"
+        case .currentSwing: return "Export This Swing"
+        }
     }
 
     private var subtitle: String {
-        switch mode {
-        case .swingsOnly:
-            let count = video.swings.count
-            let totalSeconds = video.swings.reduce(0.0) { $0 + ($1.endTime - $1.startTime) }
-            let s = String(format: "%.1f", totalSeconds)
-            return "\(count) swing\(count == 1 ? "" : "s") · ~\(s) seconds total"
+        switch selection {
         case .fullVideo:
-            let m = Int(video.duration) / 60
-            let s = Int(video.duration) % 60
-            return String(format: "Duration: %d:%02d", m, s)
+            return String(format: "Duration: %d:%02d", Int(video.duration) / 60, Int(video.duration) % 60)
+        case .allSwings:
+            let count = video.swings.count
+            let total = video.swings.reduce(0.0) { $0 + ($1.endTime - $1.startTime) }
+            return "\(count) swing\(count == 1 ? "" : "s") · ~\(String(format: "%.1f", total))s total"
+        case .currentSwing:
+            guard let s = selectedSwing else { return "" }
+            return String(format: "~%.1f seconds", s.endTime - s.startTime)
         }
     }
 
     private var canExport: Bool {
-        if mode == .swingsOnly { return !video.swings.isEmpty }
-        return true
+        switch selection {
+        case .fullVideo:    return true
+        case .allSwings:    return !video.swings.isEmpty
+        case .currentSwing: return selectedSwing != nil
+        }
     }
 
     private func startExport() {
@@ -123,9 +185,7 @@ struct SingleVideoExportSheet: View {
             errorMessage = "Video file unavailable"
             return
         }
-        let swings: [SwingTimeRange]? = (mode == .swingsOnly)
-            ? video.swings.map { SwingTimeRange(startTime: $0.startTime, contactTime: $0.contactTime, endTime: $0.endTime) }
-            : nil
+        let swings = swingRanges()
         isExporting = true
         VideoExportService.exportSingleVideo(
             videoURL: url, swings: swings,
@@ -140,6 +200,18 @@ struct SingleVideoExportSheet: View {
                 }
             }
         )
+    }
+
+    private func swingRanges() -> [SwingTimeRange]? {
+        switch selection {
+        case .fullVideo:
+            return nil
+        case .allSwings:
+            return video.swings.map { SwingTimeRange(startTime: $0.startTime, contactTime: $0.contactTime, endTime: $0.endTime) }
+        case .currentSwing:
+            guard let s = selectedSwing else { return nil }
+            return [SwingTimeRange(startTime: s.startTime, contactTime: s.contactTime, endTime: s.endTime)]
+        }
     }
 
     private func saveToPhotos(url: URL) {

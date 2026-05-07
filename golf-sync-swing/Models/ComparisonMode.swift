@@ -10,6 +10,7 @@ import Foundation
 
 enum ComparisonMode: String, CaseIterable, Identifiable {
     case sideBySide = "Side-by-Side"
+    case topBottom  = "Top / Bottom"
     case stacked    = "Stacked"
     case sequential = "Sequential"
 
@@ -18,6 +19,7 @@ enum ComparisonMode: String, CaseIterable, Identifiable {
     var iconName: String {
         switch self {
         case .sideBySide: return "rectangle.split.2x1"
+        case .topBottom:  return "rectangle.split.1x2"
         case .stacked:    return "square.on.square"
         case .sequential: return "arrow.right.to.line"
         }
@@ -25,8 +27,8 @@ enum ComparisonMode: String, CaseIterable, Identifiable {
 
     var premiumFeature: PremiumFeature? {
         switch self {
-        case .sideBySide: return nil
-        case .stacked, .sequential: return .advancedComparisonModes
+        case .sideBySide, .topBottom: return nil
+        case .stacked, .sequential:   return .advancedComparisonModes
         }
     }
 
@@ -36,12 +38,12 @@ enum ComparisonMode: String, CaseIterable, Identifiable {
     }
 
     /// Whether the sync-offset adjustment strip should be visible.
-    /// Only sideBySide exposes manual sync drift; stacked is locked to its
+    /// Side-by-side and top-bottom expose manual sync drift; stacked is locked to its
     /// computed offset and sequential has no concept of concurrent drift.
     var showsSyncOffsetStrip: Bool {
         switch self {
-        case .sideBySide:           return true
-        case .stacked, .sequential: return false
+        case .sideBySide, .topBottom: return true
+        case .stacked, .sequential:   return false
         }
     }
 
@@ -49,17 +51,17 @@ enum ComparisonMode: String, CaseIterable, Identifiable {
     /// Only stacked has a user-tunable opacity blend.
     var showsOpacitySlider: Bool {
         switch self {
-        case .stacked:                  return true
-        case .sideBySide, .sequential:  return false
+        case .stacked:                              return true
+        case .sideBySide, .topBottom, .sequential:  return false
         }
     }
 
     /// The default export aspect ratio when entering the export editor for this mode.
-    /// SideBySide → 16:9 HSTACK is the natural default; the others fill a portrait canvas.
+    /// SideBySide → 16:9 HSTACK; topBottom → 9:16 VSTACK; the others fill a portrait canvas.
     var defaultExportAspect: ExportAspectRatio {
         switch self {
         case .sideBySide: return .sideBySide
-        case .stacked, .sequential: return .tikTokVertical
+        case .topBottom, .stacked, .sequential: return .tikTokVertical
         }
     }
 
@@ -67,8 +69,8 @@ enum ComparisonMode: String, CaseIterable, Identifiable {
     /// Only sequential mode edits one swing at a time.
     var showsSequentialPicker: Bool {
         switch self {
-        case .sequential:               return true
-        case .sideBySide, .stacked:     return false
+        case .sequential:                          return true
+        case .sideBySide, .topBottom, .stacked:    return false
         }
     }
 }

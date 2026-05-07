@@ -1,0 +1,291 @@
+{
+  "annotation_checks": {
+    "status": "PASS",
+    "total_annotations": 1400,
+    "valid": 1399,
+    "invalid": 1,
+    "normal_speed": 758,
+    "slow_motion": 642,
+    "usable_normal_speed": 758,
+    "unique_youtube_ids": 580,
+    "event_length_errors": 0,
+    "monotonic_errors": 1,
+    "negative_frame_errors": 0,
+    "sample_issues": [
+      "ID 677: non-monotonic events"
+    ]
+  },
+  "clip_checks": {
+    "status": "PASS",
+    "total_clips": 5207,
+    "class_counts": {
+      "backswing": 865,
+      "downswing": 719,
+      "follow_through": 1397,
+      "impact": 743,
+      "no_swing": 1483
+    },
+    "missing_classes": [],
+    "sampled": 10,
+    "passed": 10,
+    "failed": 0,
+    "details": [
+      {
+        "file": "downswing/golfdb_0917_downswing.mp4",
+        "checks": {
+          "readable": true,
+          "frame_count": true,
+          "fps_in_range": true,
+          "resolution_ok": true,
+          "first_frame_readable": true,
+          "frame_not_black": true
+        },
+        "frame_count": 15,
+        "fps": 30.0,
+        "resolution": "1920x1080",
+        "fourcc": "h264",
+        "overall": "PASS"
+      },
+      {
+        "file": "backswing/golfdb_0428_backswing.mp4",
+        "checks": {
+          "readable": true,
+          "frame_count": true,
+          "fps_in_range": true,
+          "resolution_ok": true,
+          "first_frame_readable": true,
+          "frame_not_black": true
+        },
+        "frame_count": 15,
+        "fps": 30.0,
+        "resolution": "1920x1080",
+        "fourcc": "h264",
+        "overall": "PASS"
+      },
+      {
+        "file": "follow_through/golfdb_1321_follow_through_w0.mp4",
+        "checks": {
+          "readable": true,
+          "frame_count": true,
+          "fps_in_range": true,
+          "resolution_ok": true,
+          "first_frame_readable": true,
+          "frame_not_black": true
+        },
+        "frame_count": 15,
+        "fps": 30.0,
+        "resolution": "1920x1080",
+        "fourcc": "h264",
+        "overall": "PASS"
+      },
+      {
+        "file": "follow_through/golfdb_0158_follow_through_w0.mp4",
+        "checks": {
+          "readable": true,
+          "frame_count": true,
+          "fps_in_range": true,
+          "resolution_ok": true,
+          "first_frame_readable": true,
+          "frame_not_black": true
+        },
+        "frame_count": 15,
+        "fps": 30.0,
+        "resolution": "1920x1080",
+        "fourcc": "h264",
+        "overall": "PASS"
+      },
+      {
+        "file": "follow_through/golfdb_1158_follow_through_w1.mp4",
+        "checks": {
+          "readable": true,
+          "frame_count": true,
+          "fps_in_range": true,
+          "resolution_ok": true,
+          "first_frame_readable": true,
+          "frame_not_black": true
+        },
+        "frame_count": 15,
+        "fps": 30.0,
+        "resolution": "1920x1080",
+        "fourcc": "h264",
+        "overall": "PASS"
+      },
+      {
+        "file": "downswing/golfdb_0014_downswing.mp4",
+        "checks": {
+          "readable": true,
+          "frame_count": true,
+          "fps_in_range": true,
+          "resolution_ok": true,
+          "first_frame_readable": true,
+          "frame_not_black": true
+        },
+        "frame_count": 15,
+        "fps": 30.0,
+        "resolution": "1920x1080",
+        "fourcc": "h264",
+        "overall": "PASS"
+      },
+      {
+        "file": "backswing/golfdb_0116_backswing.mp4",
+        "checks": {
+          "readable": true,
+          "frame_count": true,
+          "fps_in_range": true,
+          "resolution_ok": true,
+          "first_frame_readable": true,
+          "frame_not_black": true
+        },
+        "frame_count": 15,
+        "fps": 30.0,
+        "resolution": "1920x1080",
+        "fourcc": "h264",
+        "overall": "PASS"
+      },
+      {
+        "file": "no_swing/golfdb_0947_no_swing_pre.mp4",
+        "checks": {
+          "readable": true,
+          "frame_count": true,
+          "fps_in_range": true,
+          "resolution_ok": true,
+          "first_frame_readable": true,
+          "frame_not_black": true
+        },
+        "frame_count": 15,
+        "fps": 30.0,
+        "resolution": "1920x1080",
+        "fourcc": "h264",
+        "overall": "PASS"
+      },
+      {
+        "file": "backswing/golfdb_0540_backswing.mp4",
+        "checks": {
+          "readable": true,
+          "frame_count": true,
+          "fps_in_range": true,
+          "resolution_ok": true,
+          "first_frame_readable": true,
+          "frame_not_black": true
+        },
+        "frame_count": 15,
+        "fps": 30.0,
+        "resolution": "1920x1080",
+        "fourcc": "h264",
+        "overall": "PASS"
+      },
+      {
+        "file": "no_swing/golfdb_0799_no_swing_post.mp4",
+        "checks": {
+          "readable": true,
+          "frame_count": true,
+          "fps_in_range": true,
+          "resolution_ok": true,
+          "first_frame_readable": true,
+          "frame_not_black": true
+        },
+        "frame_count": 15,
+        "fps": 30.0,
+        "resolution": "1920x1080",
+        "fourcc": "h264",
+        "overall": "PASS"
+      }
+    ]
+  },
+  "purity_checks": {
+    "status": "PASS",
+    "overall_avg_purity": 0.784,
+    "by_class": {
+      "backswing": {
+        "sampled": 20,
+        "computed": 20,
+        "avg_purity": 0.847,
+        "median_purity": 0.867,
+        "min_purity": 0.6,
+        "max_purity": 1.0
+      },
+      "downswing": {
+        "sampled": 20,
+        "computed": 20,
+        "avg_purity": 0.543,
+        "median_purity": 0.533,
+        "min_purity": 0.333,
+        "max_purity": 0.667
+      },
+      "follow_through": {
+        "sampled": 20,
+        "computed": 20,
+        "avg_purity": 0.997,
+        "median_purity": 1.0,
+        "min_purity": 0.933,
+        "max_purity": 1.0
+      },
+      "impact": {
+        "sampled": 20,
+        "computed": 20,
+        "avg_purity": 0.533,
+        "median_purity": 0.533,
+        "min_purity": 0.533,
+        "max_purity": 0.533
+      },
+      "no_swing": {
+        "sampled": 20,
+        "computed": 20,
+        "avg_purity": 1.0,
+        "median_purity": 1.0,
+        "min_purity": 1.0,
+        "max_purity": 1.0
+      }
+    }
+  },
+  "inference_simulation": {
+    "status": "PASS",
+    "videos_tested": 3,
+    "impacts_detected": 3,
+    "detection_rate": 1.0,
+    "videos": [
+      {
+        "anno_id": 1143,
+        "youtube_id": "IVRbQrq2JHo",
+        "total_frames": 6079,
+        "fps": 30.0,
+        "gt_impact_frame": 5292,
+        "total_windows": 26,
+        "swing_windows": 20,
+        "impact_windows": 3,
+        "impact_detected": true,
+        "detected_window_idx": 9,
+        "impact_error_frames": 4
+      },
+      {
+        "anno_id": 1013,
+        "youtube_id": "a8sz0AGo3-k",
+        "total_frames": 12826,
+        "fps": 59.9,
+        "gt_impact_frame": 542,
+        "total_windows": 25,
+        "swing_windows": 19,
+        "impact_windows": 1,
+        "impact_detected": true,
+        "detected_window_idx": 13,
+        "impact_error_frames": 0
+      },
+      {
+        "anno_id": 1305,
+        "youtube_id": "THJhOepkkqs",
+        "total_frames": 3211,
+        "fps": 30.0,
+        "gt_impact_frame": 765,
+        "total_windows": 26,
+        "swing_windows": 20,
+        "impact_windows": 0,
+        "impact_detected": true,
+        "detected_window_idx": 13,
+        "impact_error_frames": 7
+      }
+    ]
+  },
+  "health_score": 100.0,
+  "errors": [],
+  "elapsed_seconds": 1.9
+}
