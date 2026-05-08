@@ -93,19 +93,11 @@ private struct ProSwingCard: View {
     }
 
     private var thumbnailLayer: some View {
-        ZStack {
+        Group {
             if let data = video.thumbnailData, let image = UIImage(data: data) {
                 Image(uiImage: image)
                     .resizable()
                     .scaledToFill()
-                    .frame(width: cardWidth, height: cardHeight)
-                    .blur(radius: 8)
-                    .scaleEffect(1.08)
-                Color.black.opacity(0.18)
-                Image(uiImage: image)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: cardWidth, height: cardHeight)
             } else {
                 Color.charcoal.opacity(0.2)
             }
