@@ -9,6 +9,9 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- **Curated pro swing library expansion**: Bundled 19 dataset-derived pro reference clips trimmed from local GolfDB/YouTube labels with 2s setup/follow-through context
+- **Pro swing asset builder**: Added `scripts/build_pro_swing_assets.py` to regenerate bundled pro clips from local labeled training assets
+- **Pro swing 16:9 backups**: Preserved original generated wide clips under `backups/pro-swings-original-16x9/` before cropping app assets
 - **Onboarding flow**: 3-page onboarding (Welcome, Auto-Sync, Pro Benefits) with animated icons, highlight lists, page indicators, skip button
 - **Custom paywall**: Full-screen paywall with animated hero, feature list, weekly/annual subscription options, savings badge, free trial detection
 - **OnboardingService**: First-launch detection and onboarding completion state via UserDefaults
@@ -20,6 +23,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Debug: Reset Onboarding**: Debug-only button in Settings to re-show onboarding
 
 ### Changed
+- **Pro swing video framing**: Bundled pro clips now use bbox-aware 3:2 landscape crops, with earlier 16:9 and 4:5 generated sets retained under `backups/`
+- **Pro swing cards**: Carousel thumbnails now fit the full contact frame over a blurred background instead of center-cropping off-edge players
 - **App entry point**: Shows OnboardingView on first launch, MainTabView on subsequent launches
 - **SettingsView paywall**: Now uses custom AppPaywallView instead of RevenueCatUI default PaywallView
 - **ComparisonView mode picker**: Locked modes now open paywall instead of being disabled
