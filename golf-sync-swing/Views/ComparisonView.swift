@@ -90,19 +90,11 @@ private extension ComparisonView {
     func controlsPanel(viewModel: ComparisonViewModel) -> some View {
         VStack(spacing: 12) {
             ComparisonTimelineSlider(viewModel: viewModel)
-            syncOffsetRow(viewModel: viewModel)
             modePicker(viewModel: viewModel)
             premiumControls(viewModel: viewModel)
             ComparisonControlsView(viewModel: viewModel)
         }
         .padding(.horizontal, 20).padding(.vertical, 12)
-    }
-
-    @ViewBuilder
-    func syncOffsetRow(viewModel: ComparisonViewModel) -> some View {
-        if viewModel.comparisonMode.showsSyncOffsetStrip {
-            SyncOffsetStrip(viewModel: viewModel)
-        }
     }
 
     func modePicker(viewModel: ComparisonViewModel) -> some View {
@@ -173,12 +165,13 @@ private extension ComparisonView {
         if let viewModel = viewModel,
            let url1 = video1.validLocalURL,
            let url2 = video2.validLocalURL {
+            let swapped = viewModel.isSwapped
             ExportFlowCoordinator(
-                video1URL: url1,
-                video2URL: url2,
-                swing1: swing1,
-                swing2: swing2,
-                syncOffset: viewModel.syncOffset,
+                video1URL: swapped ? url2 : url1,
+                video2URL: swapped ? url1 : url2,
+                swing1: swapped ? swing2 : swing1,
+                swing2: swapped ? swing1 : swing2,
+                syncOffset: swapped ? -viewModel.syncOffset : viewModel.syncOffset,
                 comparisonViewModel: viewModel,
                 onDismiss: { showExportSheet = false }
             )

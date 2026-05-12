@@ -30,9 +30,6 @@ protocol PlaybackSynchronizing: AnyObject {
         followerBounds: SwingTimeRange
     )
 
-    /// Update the sync offset (e.g., user adjustment via SyncOffsetStrip).
-    func updateOffset(_ offset: TimeInterval)
-
     /// Correct follower drift relative to reference position.
     /// Called from the reference player's time observer.
     func correctDriftIfNeeded(referenceTime: TimeInterval)

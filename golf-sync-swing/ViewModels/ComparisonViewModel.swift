@@ -36,23 +36,26 @@ final class ComparisonViewModel {
 
     nonisolated(unsafe) private var timeObserver1: Any?
     nonisolated(unsafe) private var timeObserver2: Any?
-    private var isSwapped = false
+    private(set) var isSwapped = false
+    private var loopInProgress = false
     private let synchronizer: PlaybackSynchronizing
 
     static let playbackRates: [Float] = [0.125, 0.25, 0.5, 1.0]
 
-    // MARK: - Effective (swapped) accessors
+    // MARK: - Display ordering (swap is purely visual)
 
-    var effectivePlayer1: AVPlayer { isSwapped ? player2 : player1 }
-    var effectivePlayer2: AVPlayer { isSwapped ? player1 : player2 }
-    var effectiveSwing1: SwingTimeRange { isSwapped ? swing2 : swing1 }
-    var effectiveSwing2: SwingTimeRange { isSwapped ? swing1 : swing2 }
+    /// Players in render order. First entry renders left/top/back, second renders
+    /// right/bottom/front. `isSwapped` flips the pair; sync logic stays on
+    /// player1 (reference) and player2 (follower).
+    var orderedPlayers: [AVPlayer] {
+        isSwapped ? [player2, player1] : [player1, player2]
+    }
 
-    /// Timeline duration = reference swing duration (respects swap).
-    var totalDuration: TimeInterval { effectiveSwing1.duration }
+    /// Timeline duration is always the reference swing (player1).
+    var totalDuration: TimeInterval { swing1.duration }
 
-    /// Time relative to swing start, for display (respects swap).
-    var displayTime: TimeInterval { max(0, currentTime - effectiveSwing1.startTime) }
+    /// Time relative to reference swing start, for display.
+    var displayTime: TimeInterval { max(0, currentTime - swing1.startTime) }
 
     // MARK: - Init
 
@@ -123,20 +126,20 @@ final class ComparisonViewModel {
         synchronizer.correctDriftIfNeeded(referenceTime: time)
     }
 
+    private func onPlayer2Tick(_ time: TimeInterval) {
+        loopIfNeeded(player: player2, swing: swing2, isReference: false)
+    }
+
     /// Sequential mode runs only one player at a time, no synchronizer.
     /// Both other modes use the manual synchronizer.
     private var usesSynchronizer: Bool {
         comparisonMode != .sequential
     }
 
-    private func onPlayer2Tick(_ time: TimeInterval) {
-        loopIfNeeded(player: player2, swing: swing2, isReference: false)
-    }
-
     // MARK: - Looping
 
     private func loopIfNeeded(player: AVPlayer, swing: SwingTimeRange, isReference: Bool) {
-        guard isPlaying else { return }
+        guard isPlaying, !loopInProgress else { return }
         let time = CMTimeGetSeconds(player.currentTime())
         guard time >= swing.endTime - 0.01 else { return }
 
@@ -146,19 +149,30 @@ final class ComparisonViewModel {
         }
         // sideBySide / stacked: only the reference player triggers a joint loop.
         guard isReference else { return }
-        seekToSwingStarts()
+        loopToTimelineStart()
+    }
+
+    private func loopToTimelineStart() {
+        loopInProgress = true
+        let cmTime = CMTime(seconds: swing1.startTime, preferredTimescale: 600)
+        let tolerance = CMTime(seconds: 0.04, preferredTimescale: 600)
+        player1.seek(to: cmTime, toleranceBefore: tolerance, toleranceAfter: tolerance) { [weak self] _ in
+            DispatchQueue.main.async { self?.loopInProgress = false }
+        }
+        currentTime = swing1.startTime
+        synchronizer.resync(referenceTime: swing1.startTime)
     }
 
     private func advanceSequentialSwing() {
         currentSequentialSwing = (currentSequentialSwing + 1) % 2
         if currentSequentialSwing == 0 {
-            seekPlayer(effectivePlayer1, to: effectiveSwing1.startTime)
-            effectivePlayer1.rate = playbackRate
-            effectivePlayer2.pause()
+            seekPlayer(player1, to: swing1.startTime)
+            player1.rate = playbackRate
+            player2.pause()
         } else {
-            seekPlayer(effectivePlayer2, to: effectiveSwing2.startTime)
-            effectivePlayer2.rate = playbackRate
-            effectivePlayer1.pause()
+            seekPlayer(player2, to: swing2.startTime)
+            player2.rate = playbackRate
+            player1.pause()
         }
     }
 
@@ -182,11 +196,11 @@ final class ComparisonViewModel {
 
     private func playSequential() {
         if currentSequentialSwing == 0 {
-            effectivePlayer1.rate = playbackRate
-            effectivePlayer2.pause()
+            player1.rate = playbackRate
+            player2.pause()
         } else {
-            effectivePlayer2.rate = playbackRate
-            effectivePlayer1.pause()
+            player2.rate = playbackRate
+            player1.pause()
         }
     }
 
@@ -194,6 +208,7 @@ final class ComparisonViewModel {
         player1.pause()
         player2.pause()
         isPlaying = false
+        loopInProgress = false
     }
 
     func seek(to time: TimeInterval) {
@@ -228,40 +243,12 @@ final class ComparisonViewModel {
         seek(to: newTime)
     }
 
+    /// Swap is purely visual: flips which panel renders which player. The
+    /// synchronizer still treats player1 as reference and player2 as follower,
+    /// so playback state, sync offset, and timeline are untouched.
     func swapVideos() {
-        // Sequential mode plays one swing at a time, so "swap" has no
-        // meaningful semantics — videos are not concurrent. Make it a no-op.
         guard comparisonMode != .sequential else { return }
-
-        let wasPlaying = isPlaying
-        if usesSynchronizer {
-            player1.pause()
-            player2.pause()
-            synchronizer.stop()
-        }
         isSwapped.toggle()
-        syncOffset = -syncOffset
-        guard usesSynchronizer else { return }
-        startSynchronizer()
-        synchronizer.resync(referenceTime: currentTime)
-        if wasPlaying {
-            effectivePlayer1.rate = playbackRate
-            effectivePlayer2.rate = playbackRate
-        }
-    }
-
-    // MARK: - Sync Offset (synced modes)
-
-    func adjustSyncOffset(by delta: TimeInterval) {
-        syncOffset += delta
-        synchronizer.updateOffset(syncOffset)
-        synchronizer.resync(referenceTime: currentTime)
-    }
-
-    func setSyncOffset(_ offset: TimeInterval) {
-        syncOffset = offset
-        synchronizer.updateOffset(syncOffset)
-        synchronizer.resync(referenceTime: currentTime)
     }
 
     // MARK: - Progress
@@ -310,8 +297,8 @@ final class ComparisonViewModel {
 
     private func startSynchronizer() {
         synchronizer.start(
-            reference: effectivePlayer1, follower: effectivePlayer2,
-            offset: syncOffset, followerBounds: effectiveSwing2
+            reference: player1, follower: player2,
+            offset: syncOffset, followerBounds: swing2
         )
     }
 

@@ -46,16 +46,6 @@ enum ComparisonMode: String, CaseIterable, Identifiable {
         return FeatureAccess.isUnlocked(feature)
     }
 
-    /// Whether the sync-offset adjustment strip should be visible.
-    /// Side-by-side and top-bottom expose manual sync drift; stacked is locked to its
-    /// computed offset and sequential has no concept of concurrent drift.
-    var showsSyncOffsetStrip: Bool {
-        switch self {
-        case .sideBySide, .topBottom: return true
-        case .stacked, .sequential:   return false
-        }
-    }
-
     /// Whether the opacity slider control should be visible.
     /// Only stacked has a user-tunable opacity blend.
     var showsOpacitySlider: Bool {

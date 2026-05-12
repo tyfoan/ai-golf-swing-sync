@@ -21,9 +21,14 @@ final class ManualPlaybackSynchronizer: PlaybackSynchronizing {
     private var followerBounds: SwingTimeRange?
 
     private let maxDrift: TimeInterval
+    private let correctionThreshold: TimeInterval
 
-    init(maxDrift: TimeInterval = 0.04) {
+    private var seekToken: UInt = 0
+    private var inFlightSeek: UInt?
+
+    init(maxDrift: TimeInterval = 0.04, correctionThreshold: TimeInterval = 0.15) {
         self.maxDrift = maxDrift
+        self.correctionThreshold = correctionThreshold
     }
 
     // MARK: - PlaybackSynchronizing
@@ -39,17 +44,13 @@ final class ManualPlaybackSynchronizer: PlaybackSynchronizing {
         self.followerBounds = followerBounds
     }
 
-    func updateOffset(_ offset: TimeInterval) {
-        self.offset = offset
-    }
-
     func correctDriftIfNeeded(referenceTime: TimeInterval) {
-        guard let follower, let bounds = followerBounds else { return }
+        guard let follower, let bounds = followerBounds, inFlightSeek == nil else { return }
         let expected = clampToBounds(referenceTime - offset, bounds: bounds)
         let actual = CMTimeGetSeconds(follower.currentTime())
         let drift = abs(actual - expected)
 
-        guard drift > maxDrift else { return }
+        guard drift > correctionThreshold else { return }
         seekFollower(to: expected)
     }
 
@@ -62,6 +63,7 @@ final class ManualPlaybackSynchronizer: PlaybackSynchronizing {
     func stop() {
         follower = nil
         followerBounds = nil
+        inFlightSeek = nil
     }
 
     // MARK: - Private
@@ -71,7 +73,17 @@ final class ManualPlaybackSynchronizer: PlaybackSynchronizing {
     }
 
     private func seekFollower(to time: TimeInterval) {
+        guard let follower else { return }
+        seekToken &+= 1
+        let myToken = seekToken
+        inFlightSeek = myToken
         let cmTime = CMTime(seconds: time, preferredTimescale: 600)
-        follower?.seek(to: cmTime, toleranceBefore: .zero, toleranceAfter: .zero)
+        let tolerance = CMTime(seconds: maxDrift, preferredTimescale: 600)
+        follower.seek(to: cmTime, toleranceBefore: tolerance, toleranceAfter: tolerance) { [weak self] _ in
+            DispatchQueue.main.async {
+                guard let self, self.inFlightSeek == myToken else { return }
+                self.inFlightSeek = nil
+            }
+        }
     }
 }

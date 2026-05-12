@@ -38,27 +38,29 @@ private extension ComparisonVideoAreaView {
 
     func sideBySideLayout(geometry: GeometryProxy) -> some View {
         HStack(spacing: 2) {
-            videoPanel(player: viewModel.effectivePlayer1, width: geometry.size.width / 2 - 1)
-            videoPanel(player: viewModel.effectivePlayer2, width: geometry.size.width / 2 - 1)
+            ForEach(viewModel.orderedPlayers, id: \.self) { player in
+                videoPanel(player: player, width: geometry.size.width / 2 - 1)
+            }
         }
         .frame(maxHeight: .infinity)
     }
 
     func topBottomLayout(geometry: GeometryProxy) -> some View {
         VStack(spacing: 2) {
-            videoPanel(player: viewModel.effectivePlayer1, height: geometry.size.height / 2 - 1)
-            videoPanel(player: viewModel.effectivePlayer2, height: geometry.size.height / 2 - 1)
+            ForEach(viewModel.orderedPlayers, id: \.self) { player in
+                videoPanel(player: player, height: geometry.size.height / 2 - 1)
+            }
         }
         .frame(maxWidth: .infinity)
     }
 
     func stackedLayout(geometry: GeometryProxy) -> some View {
         ZStack {
-            VideoPlayerView(player: viewModel.effectivePlayer1)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-            VideoPlayerView(player: viewModel.effectivePlayer2)
-                .opacity(Double(viewModel.stackedOpacity))
-                .clipShape(RoundedRectangle(cornerRadius: 12))
+            ForEach(Array(viewModel.orderedPlayers.enumerated()), id: \.offset) { index, player in
+                VideoPlayerView(player: player)
+                    .opacity(index == 0 ? 1.0 : Double(viewModel.stackedOpacity))
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+            }
         }
         .frame(width: geometry.size.width, height: geometry.size.height)
         .onTapGesture { viewModel.togglePlayPause() }
@@ -66,17 +68,11 @@ private extension ComparisonVideoAreaView {
 
     func sequentialLayout(geometry: GeometryProxy) -> some View {
         ZStack {
-            VideoPlayerView(player: activeSequentialPlayer)
+            VideoPlayerView(player: viewModel.orderedPlayers[viewModel.currentSequentialSwing])
                 .clipShape(RoundedRectangle(cornerRadius: 12))
         }
         .frame(width: geometry.size.width, height: geometry.size.height)
         .onTapGesture { viewModel.togglePlayPause() }
-    }
-
-    var activeSequentialPlayer: AVPlayer {
-        viewModel.currentSequentialSwing == 0
-            ? viewModel.effectivePlayer1
-            : viewModel.effectivePlayer2
     }
 }
 
