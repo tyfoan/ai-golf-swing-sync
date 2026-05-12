@@ -72,6 +72,12 @@ final class ComparisonViewModel {
         self.swing2 = swing2
         self.player1 = AVPlayer(url: video1.validLocalURL ?? video1.localURL)
         self.player2 = AVPlayer(url: video2.validLocalURL ?? video2.localURL)
+        // Keep playback locked to the requested rate even when the player's
+        // buffer is briefly thin — otherwise heavier follower decodes (HEVC
+        // user clips contending with the H.264 pro clip) silently pause
+        // themselves and look like frozen playback to the user.
+        self.player1.automaticallyWaitsToMinimizeStalling = false
+        self.player2.automaticallyWaitsToMinimizeStalling = false
         self.synchronizer = synchronizer
         if swing1.contactTime > 0 && swing2.contactTime > 0 {
             self.syncOffset = swing1.contactTime - swing2.contactTime

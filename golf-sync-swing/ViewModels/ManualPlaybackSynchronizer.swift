@@ -20,14 +20,20 @@ final class ManualPlaybackSynchronizer: PlaybackSynchronizing {
     private var offset: TimeInterval = 0
     private var followerBounds: SwingTimeRange?
 
-    private let maxDrift: TimeInterval
+    private let seekTolerance: TimeInterval
     private let correctionThreshold: TimeInterval
 
     private var seekToken: UInt = 0
     private var inFlightSeek: UInt?
 
-    init(maxDrift: TimeInterval = 0.04, correctionThreshold: TimeInterval = 0.15) {
-        self.maxDrift = maxDrift
+    /// `seekTolerance` is the per-seek precision passed to `AVPlayer.seek`. A
+    /// tighter value forces the player to decode from the nearest I-frame —
+    /// cheap for the bundled H.264 pro clips but punitive on user-recorded
+    /// HEVC, which causes the follower to visibly stutter. 100 ms gives
+    /// AVFoundation room to land on a friendly frame while still staying
+    /// well below `correctionThreshold` so we don't induce re-seek loops.
+    init(seekTolerance: TimeInterval = 0.1, correctionThreshold: TimeInterval = 0.15) {
+        self.seekTolerance = seekTolerance
         self.correctionThreshold = correctionThreshold
     }
 
@@ -78,7 +84,7 @@ final class ManualPlaybackSynchronizer: PlaybackSynchronizing {
         let myToken = seekToken
         inFlightSeek = myToken
         let cmTime = CMTime(seconds: time, preferredTimescale: 600)
-        let tolerance = CMTime(seconds: maxDrift, preferredTimescale: 600)
+        let tolerance = CMTime(seconds: seekTolerance, preferredTimescale: 600)
         follower.seek(to: cmTime, toleranceBefore: tolerance, toleranceAfter: tolerance) { [weak self] _ in
             DispatchQueue.main.async {
                 guard let self, self.inFlightSeek == myToken else { return }
