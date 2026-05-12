@@ -17,17 +17,12 @@ struct FinalizingVideoOverlay: View {
         ZStack {
             Color.black.opacity(0.7).ignoresSafeArea()
 
-            VStack(spacing: 16) {
-                ProgressView()
-                    .scaleEffect(1.5)
-                    .tint(.white)
-                Text("Saving Video...")
-                    .font(.headline)
-                    .foregroundStyle(.white)
-                Text("\(swingCount) swing\(swingCount == 1 ? "" : "s") detected")
-                    .font(.subheadline)
-                    .foregroundStyle(.white.opacity(0.7))
-            }
+            OperationProgressView(
+                title: "Saving Video...",
+                subtitle: "\(swingCount) swing\(swingCount == 1 ? "" : "s") detected"
+            )
+            .tint(.white)
+            .foregroundStyle(.white)
             .padding(32)
             .background(.ultraThinMaterial)
             .clipShape(RoundedRectangle(cornerRadius: 16))

@@ -199,17 +199,12 @@ private extension ExportProgressView {
 
 private extension ExportProgressView {
     var exportingView: some View {
-        VStack(spacing: 16) {
-            ProgressView(value: Double(progress))
-                .progressViewStyle(.linear)
-
-            Text("Exporting... \(Int(progress * 100))%")
-                .font(.headline)
-
-            Text("This may take a moment")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-        }
+        OperationProgressView(
+            title: "Exporting... \(Int(progress * 100))%",
+            subtitle: "This may take a moment",
+            progress: Double(progress)
+        )
+        .tint(Color.fairwayGreen)
     }
 }
 

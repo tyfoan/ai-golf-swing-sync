@@ -120,10 +120,12 @@ struct SingleVideoExportSheet: View {
     }
 
     private var progressContent: some View {
-        VStack(spacing: 16) {
-            ProgressView(value: progress).tint(Color.appTeal)
-            Text("\(Int(progress * 100))% — Exporting…").font(.subheadline)
-        }
+        OperationProgressView(
+            title: "Exporting… \(Int(progress * 100))%",
+            subtitle: "This may take a moment",
+            progress: Double(progress)
+        )
+        .tint(Color.appTeal)
         .padding(.top, 32)
     }
 
