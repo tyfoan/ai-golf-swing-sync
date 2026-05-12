@@ -708,14 +708,13 @@ final class VideoExportService {
         let audioTrack = try await asset.loadTracks(withMediaType: .audio).first
         let fullDuration = try await asset.load(.duration)
         let sourceTransform = try await videoTrack.load(.preferredTransform)
+        let naturalSize = try await videoTrack.load(.naturalSize)
+        let nominalFPS = try await videoTrack.load(.nominalFrameRate)
 
         let composition = AVMutableComposition()
         guard let videoTrackC = composition.addMutableTrack(
             withMediaType: .video, preferredTrackID: kCMPersistentTrackID_Invalid
         ) else { throw ExportError.missingVideoTrack }
-        // Carry the source rotation onto the composition track so portrait
-        // clips don't render sideways through the auto-derived video composition.
-        videoTrackC.preferredTransform = sourceTransform
 
         let audioTrackC = composition.addMutableTrack(
             withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid
@@ -743,9 +742,26 @@ final class VideoExportService {
             insertAt = CMTimeAdd(insertAt, slice.duration)
         }
 
-        let videoComposition = try await AVMutableVideoComposition.videoComposition(withPropertiesOf: composition)
-        let nominalFPS = try await videoTrack.load(.nominalFrameRate)
+        // Build the composition explicitly. `videoComposition(withPropertiesOf:)`
+        // is unreliable here: it produces a portrait renderSize for a portrait
+        // source but leaves the layer instruction at identity, so the landscape
+        // pixels get squeezed into the portrait canvas (looks rotated + cropped).
+        // Set renderSize to the rotated display size and apply the source
+        // preferredTransform on the layer instruction ourselves.
+        let displayed = naturalSize.applying(sourceTransform)
+        let renderSize = CGSize(width: abs(displayed.width), height: abs(displayed.height))
+
+        let videoComposition = AVMutableVideoComposition()
+        videoComposition.renderSize = renderSize
         videoComposition.frameDuration = CMTime(value: 1, timescale: CMTimeScale(max(nominalFPS, 30)))
+
+        let instruction = AVMutableVideoCompositionInstruction()
+        instruction.timeRange = CMTimeRange(start: .zero, duration: composition.duration)
+        instruction.backgroundColor = UIColor.black.cgColor
+        let layerInstruction = AVMutableVideoCompositionLayerInstruction(assetTrack: videoTrackC)
+        layerInstruction.setTransform(sourceTransform, at: .zero)
+        instruction.layerInstructions = [layerInstruction]
+        videoComposition.instructions = [instruction]
 
         return try await runExport(composition: composition, videoComposition: videoComposition, handle: handle, progress: progress)
     }
