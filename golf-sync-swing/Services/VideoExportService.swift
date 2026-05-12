@@ -436,6 +436,12 @@ final class VideoExportService {
         let videoComposition: AVMutableVideoComposition
         switch layoutConfig.mode {
         case .sequential:
+            // Sequential mode uses the auto-derived composition (no custom compositor),
+            // so portrait clips render sideways unless we forward the source rotation
+            // onto the composition tracks. Parallel modes route through
+            // CollageVideoCompositor which applies preferredTransform per-pixel.
+            track1c.preferredTransform = pref1
+            track2c.preferredTransform = pref2
             videoComposition = try await buildSequentialComposition(
                 composition: composition, renderSize: renderSize, frameDuration: frameDuration
             )
@@ -657,11 +663,15 @@ final class VideoExportService {
         }
         let audioTrack = try await asset.loadTracks(withMediaType: .audio).first
         let fullDuration = try await asset.load(.duration)
+        let sourceTransform = try await videoTrack.load(.preferredTransform)
 
         let composition = AVMutableComposition()
         guard let videoTrackC = composition.addMutableTrack(
             withMediaType: .video, preferredTrackID: kCMPersistentTrackID_Invalid
         ) else { throw ExportError.missingVideoTrack }
+        // Carry the source rotation onto the composition track so portrait
+        // clips don't render sideways through the auto-derived video composition.
+        videoTrackC.preferredTransform = sourceTransform
 
         let audioTrackC = composition.addMutableTrack(
             withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid
