@@ -9,12 +9,32 @@ import UIKit
 import Photos
 import os
 
+/// Caller-side cancel handle for an in-flight export. The service wires the
+/// `AVAssetExportSession` in once it's constructed; tapping cancel forwards
+/// to `cancelExport()`, which makes the running `await session.export()`
+/// return with `status == .cancelled`.
+final class ExportHandle: @unchecked Sendable {
+    private let lock = NSLock()
+    private var session: AVAssetExportSession?
+
+    func cancel() {
+        lock.lock(); defer { lock.unlock() }
+        session?.cancelExport()
+    }
+
+    fileprivate func attach(_ session: AVAssetExportSession) {
+        lock.lock(); defer { lock.unlock() }
+        self.session = session
+    }
+}
+
 final class VideoExportService {
 
     enum ExportError: LocalizedError {
         case missingVideoTrack
         case exportFailed(String)
         case photoLibraryAccessDenied
+        case cancelled
 
         var errorDescription: String? {
             switch self {
@@ -24,6 +44,8 @@ final class VideoExportService {
                 return "Export failed: \(message)"
             case .photoLibraryAccessDenied:
                 return "Photo library access denied"
+            case .cancelled:
+                return "Export cancelled"
             }
         }
     }
@@ -33,6 +55,7 @@ final class VideoExportService {
     }
 
     /// Export side-by-side comparison video
+    @discardableResult
     static func exportComparison(
         video1URL: URL,
         video2URL: URL,
@@ -40,7 +63,8 @@ final class VideoExportService {
         config: ExportConfiguration = ExportConfiguration(),
         progress: @escaping (Float) -> Void,
         completion: @escaping (Result<URL, ExportError>) -> Void
-    ) {
+    ) -> ExportHandle {
+        let handle = ExportHandle()
         Task {
             do {
                 let outputURL = try await performExport(
@@ -48,6 +72,7 @@ final class VideoExportService {
                     video2URL: video2URL,
                     syncOffset: syncOffset,
                     config: config,
+                    handle: handle,
                     progress: progress
                 )
                 await MainActor.run {
@@ -63,6 +88,7 @@ final class VideoExportService {
                 }
             }
         }
+        return handle
     }
 
     private static func performExport(
@@ -70,6 +96,7 @@ final class VideoExportService {
         video2URL: URL,
         syncOffset: TimeInterval,
         config: ExportConfiguration,
+        handle: ExportHandle,
         progress: @escaping (Float) -> Void
     ) async throws -> URL {
         let asset1 = AVURLAsset(url: video1URL, options: [AVURLAssetPreferPreciseDurationAndTimingKey: true])
@@ -209,6 +236,7 @@ final class VideoExportService {
         session.videoComposition = videoComposition
         session.outputURL = outputURL
         session.outputFileType = .mp4
+        handle.attach(session)
 
         // Monitor progress
         let progressTask = Task {
@@ -226,10 +254,12 @@ final class VideoExportService {
         if session.status == .completed {
             exportSucceeded = true
             return outputURL
-        } else {
-            let errorMessage = session.error?.localizedDescription ?? "Unknown error (status: \(session.status.rawValue))"
-            throw ExportError.exportFailed(errorMessage)
         }
+        if session.status == .cancelled {
+            throw ExportError.cancelled
+        }
+        let errorMessage = session.error?.localizedDescription ?? "Unknown error (status: \(session.status.rawValue))"
+        throw ExportError.exportFailed(errorMessage)
     }
 
     private static func calculateTransform(
@@ -329,6 +359,7 @@ final class VideoExportService {
     /// Export with explicit per-video transforms and an aspect-ratio-driven render size.
     /// When `swingTrim` is provided (`(swing1, swing2)`), each video is trimmed to its
     /// SwingTimeRange before composition; otherwise full clips are exported.
+    @discardableResult
     static func exportComparison(
         layoutConfig: VideoLayoutConfig,
         video1URL: URL,
@@ -337,7 +368,8 @@ final class VideoExportService {
         swingTrim: (SwingTimeRange, SwingTimeRange)? = nil,
         progress: @escaping (Float) -> Void,
         completion: @escaping (Result<URL, ExportError>) -> Void
-    ) {
+    ) -> ExportHandle {
+        let handle = ExportHandle()
         Task {
             do {
                 let outputURL = try await performLayoutExport(
@@ -346,6 +378,7 @@ final class VideoExportService {
                     video2URL: video2URL,
                     syncOffset: syncOffset,
                     swingTrim: swingTrim,
+                    handle: handle,
                     progress: progress
                 )
                 await MainActor.run { completion(.success(outputURL)) }
@@ -355,6 +388,7 @@ final class VideoExportService {
                 await MainActor.run { completion(.failure(.exportFailed(error.localizedDescription))) }
             }
         }
+        return handle
     }
 
     private static func performLayoutExport(
@@ -363,6 +397,7 @@ final class VideoExportService {
         video2URL: URL,
         syncOffset: TimeInterval,
         swingTrim: (SwingTimeRange, SwingTimeRange)?,
+        handle: ExportHandle,
         progress: @escaping (Float) -> Void
     ) async throws -> URL {
         let asset1 = AVURLAsset(url: video1URL, options: [AVURLAssetPreferPreciseDurationAndTimingKey: true])
@@ -456,7 +491,7 @@ final class VideoExportService {
             )
         }
 
-        return try await runExport(composition: composition, videoComposition: videoComposition, progress: progress)
+        return try await runExport(composition: composition, videoComposition: videoComposition, handle: handle, progress: progress)
     }
 
     private static func buildSequentialComposition(
@@ -586,6 +621,7 @@ final class VideoExportService {
     private static func runExport(
         composition: AVMutableComposition,
         videoComposition: AVMutableVideoComposition,
+        handle: ExportHandle,
         progress: @escaping (Float) -> Void
     ) async throws -> URL {
         let outputURL = FileManager.default.temporaryDirectory
@@ -609,6 +645,7 @@ final class VideoExportService {
         exportSession.videoComposition = videoComposition
         exportSession.outputURL = outputURL
         exportSession.outputFileType = .mp4
+        handle.attach(exportSession)
 
         let progressTask = Task {
             while !Task.isCancelled {
@@ -623,6 +660,9 @@ final class VideoExportService {
             exportSucceeded = true
             return outputURL
         }
+        if exportSession.status == .cancelled {
+            throw ExportError.cancelled
+        }
         let msg = exportSession.error?.localizedDescription ?? "Unknown error (status: \(exportSession.status.rawValue))"
         throw ExportError.exportFailed(msg)
     }
@@ -632,16 +672,18 @@ final class VideoExportService {
     /// Export a single source video to a temp file URL (caller saves to Photos).
     /// - When `swings` is nil, the full source is transcoded as-is.
     /// - When `swings` is non-empty, the swing slices are concatenated back-to-back.
+    @discardableResult
     static func exportSingleVideo(
         videoURL: URL,
         swings: [SwingTimeRange]?,
         progress: @escaping (Float) -> Void,
         completion: @escaping (Result<URL, ExportError>) -> Void
-    ) {
+    ) -> ExportHandle {
+        let handle = ExportHandle()
         Task {
             do {
                 let outputURL = try await performSingleVideoExport(
-                    videoURL: videoURL, swings: swings, progress: progress
+                    videoURL: videoURL, swings: swings, handle: handle, progress: progress
                 )
                 await MainActor.run { completion(.success(outputURL)) }
             } catch let e as ExportError {
@@ -650,11 +692,13 @@ final class VideoExportService {
                 await MainActor.run { completion(.failure(.exportFailed(error.localizedDescription))) }
             }
         }
+        return handle
     }
 
     private static func performSingleVideoExport(
         videoURL: URL,
         swings: [SwingTimeRange]?,
+        handle: ExportHandle,
         progress: @escaping (Float) -> Void
     ) async throws -> URL {
         let asset = AVURLAsset(url: videoURL, options: [AVURLAssetPreferPreciseDurationAndTimingKey: true])
@@ -703,6 +747,6 @@ final class VideoExportService {
         let nominalFPS = try await videoTrack.load(.nominalFrameRate)
         videoComposition.frameDuration = CMTime(value: 1, timescale: CMTimeScale(max(nominalFPS, 30)))
 
-        return try await runExport(composition: composition, videoComposition: videoComposition, progress: progress)
+        return try await runExport(composition: composition, videoComposition: videoComposition, handle: handle, progress: progress)
     }
 }

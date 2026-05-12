@@ -42,6 +42,7 @@ struct ExportProgressView: View {
     @State private var selectedQuality: ExportQuality = .standard
     @State private var showPaywall = false
     @State private var trimToSwing: Bool = true
+    @State private var exportHandle: ExportHandle?
 
     var body: some View {
         NavigationStack {
@@ -53,8 +54,10 @@ struct ExportProgressView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { onDismiss() }
-                        .disabled(isExporting)
+                    Button("Cancel") {
+                        exportHandle?.cancel()
+                        onDismiss()
+                    }
                 }
             }
         }
@@ -62,6 +65,7 @@ struct ExportProgressView: View {
         .fullScreenCover(isPresented: $showPaywall) {
             AppPaywallView(source: .featureGate, onDismiss: { showPaywall = false })
         }
+        .onDisappear { exportHandle?.cancel() }
     }
 }
 
@@ -296,7 +300,7 @@ private extension ExportProgressView {
         errorMessage = nil
 
         if let config = layoutConfig {
-            VideoExportService.exportComparison(
+            exportHandle = VideoExportService.exportComparison(
                 layoutConfig: config,
                 video1URL: video1URL,
                 video2URL: video2URL,
@@ -307,7 +311,7 @@ private extension ExportProgressView {
             )
         } else {
             let config = VideoExportService.ExportConfiguration(resolution: selectedQuality.resolution)
-            VideoExportService.exportComparison(
+            exportHandle = VideoExportService.exportComparison(
                 video1URL: video1URL,
                 video2URL: video2URL,
                 syncOffset: syncOffset,
@@ -320,9 +324,16 @@ private extension ExportProgressView {
 
     func handleExportResult(_ result: Result<URL, VideoExportService.ExportError>) {
         isExporting = false
+        exportHandle = nil
         switch result {
-        case .success(let url): exportedURL = url
-        case .failure(let error): errorMessage = error.localizedDescription
+        case .success(let url):
+            exportedURL = url
+        case .failure(.cancelled):
+            // Cancel path: the view's Cancel button already triggered
+            // onDismiss before this completion arrived. Nothing to do.
+            break
+        case .failure(let error):
+            errorMessage = error.localizedDescription
         }
     }
 
