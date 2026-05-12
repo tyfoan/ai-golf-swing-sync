@@ -26,28 +26,40 @@ extension OnboardingFeature {
 
     static let killer = OnboardingFeature(
         id: 0,
-        preHeadline: "BUILT FOR SERIOUS GOLFERS",
-        headlineLines: ["Your swing", "vs a pro's.", "Auto-synced."],
-        subtitle: "AI lines you up frame by frame at the moment of impact.",
-        ctaTitle: "Continue",
+        preHeadline: String(localized: "BUILT FOR SERIOUS GOLFERS", comment: "Onboarding page 1 eyebrow (small uppercase line above headline)"),
+        headlineLines: [
+            String(localized: "Your swing", comment: "Onboarding page 1 headline, line 1 of 3"),
+            String(localized: "vs a pro's.", comment: "Onboarding page 1 headline, line 2 of 3"),
+            String(localized: "Auto-synced.", comment: "Onboarding page 1 headline, line 3 of 3")
+        ],
+        subtitle: String(localized: "AI lines you up frame by frame at the moment of impact.", comment: "Onboarding page 1 subtitle under the headline"),
+        ctaTitle: String(localized: "Continue", comment: "Onboarding primary button (advances to next page)"),
         heroBuilder: { AnyView(KillerSyncMockup()) }
     )
 
     static let camera = OnboardingFeature(
         id: 1,
-        preHeadline: "ZERO-TAP CAPTURE",
-        headlineLines: ["Just point.", "It knows when", "you swing."],
-        subtitle: "Detects, trims, and saves every swing automatically.",
-        ctaTitle: "Continue",
+        preHeadline: String(localized: "ZERO-TAP CAPTURE", comment: "Onboarding page 2 eyebrow"),
+        headlineLines: [
+            String(localized: "Just point.", comment: "Onboarding page 2 headline, line 1 of 3"),
+            String(localized: "It knows when", comment: "Onboarding page 2 headline, line 2 of 3"),
+            String(localized: "you swing.", comment: "Onboarding page 2 headline, line 3 of 3")
+        ],
+        subtitle: String(localized: "Detects, trims, and saves every swing automatically.", comment: "Onboarding page 2 subtitle"),
+        ctaTitle: String(localized: "Continue", comment: "Onboarding primary button (advances to next page)"),
         heroBuilder: { AnyView(SmartCameraMockup()) }
     )
 
     static let tools = OnboardingFeature(
         id: 2,
-        preHeadline: "FRAME BY FRAME",
-        headlineLines: ["Spot the fix.", "Send it to", "your coach."],
-        subtitle: "8× slow-mo, drawing tools, HD export.",
-        ctaTitle: "Get Started",
+        preHeadline: String(localized: "FRAME BY FRAME", comment: "Onboarding page 3 eyebrow"),
+        headlineLines: [
+            String(localized: "Spot the fix.", comment: "Onboarding page 3 headline, line 1 of 3"),
+            String(localized: "Send it to", comment: "Onboarding page 3 headline, line 2 of 3"),
+            String(localized: "your coach.", comment: "Onboarding page 3 headline, line 3 of 3")
+        ],
+        subtitle: String(localized: "8× slow-mo, pro library, HD export.", comment: "Onboarding page 3 subtitle"),
+        ctaTitle: String(localized: "Get Started", comment: "Onboarding final-page button that dismisses onboarding"),
         heroBuilder: { AnyView(SlowMoToolsMockup()) }
     )
 }

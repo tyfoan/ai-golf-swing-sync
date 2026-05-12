@@ -28,6 +28,7 @@ struct CustomPaywallView: View {
     var body: some View {
         ZStack {
             background
+            PaywallDimpleLayer().ignoresSafeArea()
             content
             closeButton
             toastOverlay
@@ -62,23 +63,43 @@ struct CustomPaywallView: View {
             VStack(alignment: .leading, spacing: 22) {
                 PaywallHero(source: source)
                 PaywallFeatureList()
-                bottomBlock
+                PaywallFooter(onRestore: handleRestore)
+                    .padding(.top, 4)
             }
             .padding(.horizontal, 24)
             .padding(.top, 56)
             .padding(.bottom, 24)
         }
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            stickyBottomBlock
+        }
     }
 
-    private var bottomBlock: some View {
-        VStack(spacing: 14) {
+    private var stickyBottomBlock: some View {
+        VStack(spacing: 12) {
             errorBanner
             PaywallPlanPicker(plans: viewModel.plans, selectedId: Binding(
                 get: { viewModel.selectedPlanId },
                 set: { viewModel.selectedPlanId = $0 }
             ))
             PaywallCTA(plan: viewModel.selectedPlan(), isWorking: isWorking, onTap: handlePurchase)
-            PaywallFooter(onRestore: handleRestore)
+        }
+        .padding(.horizontal, 24)
+        .padding(.top, 12)
+        .padding(.bottom, 6)
+        .background(alignment: .top) {
+            ZStack(alignment: .top) {
+                Color.onboardingDark
+                LinearGradient(
+                    colors: [Color.onboardingDark.opacity(0), Color.onboardingDark],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .frame(height: 28)
+                .offset(y: -28)
+            }
+            .ignoresSafeArea(edges: .bottom)
+            .allowsHitTesting(false)
         }
     }
 

@@ -39,7 +39,8 @@ struct ExportEditorView: View {
                     .clipShape(Circle())
             }
             Spacer()
-            Text("Export").foregroundStyle(.white).font(.headline)
+            Text("Export", comment: "Sheet header title for the export editor (noun — 'the Export screen', not an action button)")
+                .foregroundStyle(.white).font(.headline)
             Spacer()
             Color.clear.frame(width: 36, height: 36)
         }
@@ -90,7 +91,7 @@ struct ExportEditorView: View {
         Button {
             onExport(viewModel.buildLayoutConfig())
         } label: {
-            Text("Export")
+            Text("Export", comment: "Primary CTA button label that triggers the export action (verb — 'Export now / Save', not a noun title)")
                 .font(.headline).fontWeight(.bold).foregroundStyle(.white)
                 .frame(maxWidth: .infinity, minHeight: 52)
                 .background(Color.appTeal)

@@ -16,20 +16,20 @@ struct RecordingTipsSheet: View {
                 VStack(alignment: .leading, spacing: 24) {
                     TipCard(
                         number: 1,
-                        title: "Camera Placement",
-                        description: "Place your phone on a tripod or stable surface, facing your swing. Ensure your full body is visible."
+                        title: String(localized: "Camera Placement", comment: "Recording tip card title"),
+                        description: String(localized: "Place your phone on a tripod or stable surface, facing your swing. Ensure your full body is visible.", comment: "Recording tip 1 body — short sheet version")
                     )
 
                     TipCard(
                         number: 2,
-                        title: "Lighting",
-                        description: "Record in well-lit conditions. Natural daylight works best for pose detection."
+                        title: String(localized: "Lighting", comment: "Recording tip card title"),
+                        description: String(localized: "Record in well-lit conditions. Natural daylight works best for pose detection.", comment: "Recording tip 2 body — short sheet version")
                     )
 
                     TipCard(
                         number: 3,
-                        title: "Distance",
-                        description: "Stand 8-12 feet from the camera for optimal pose tracking."
+                        title: String(localized: "Distance", comment: "Recording tip card title (distance from camera to subject)"),
+                        description: String(localized: "Stand 8-12 feet from the camera for optimal pose tracking.", comment: "Recording tip 3 body — short sheet version")
                     )
                 }
                 .padding()

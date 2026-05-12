@@ -23,7 +23,8 @@ final class PurchaseService {
     static let entitlementID = "Golf Swing Sync Premium"
 
     #if DEBUG
-    static let apiKey = "test_MXPuGlggjlfQHxlnRQsOUthWyYo"
+    // Swap to "test_MXPuGlggjlfQHxlnRQsOUthWyYo" to point at the RC Test Store project.
+    static let apiKey = "appl_SrTcnIuqMXaqoRYvaecigbeOOoW"
     #else
     static let apiKey = "appl_SrTcnIuqMXaqoRYvaecigbeOOoW"
     #endif

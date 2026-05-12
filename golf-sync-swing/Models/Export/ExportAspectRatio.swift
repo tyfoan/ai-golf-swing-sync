@@ -7,6 +7,7 @@
 //
 
 import CoreGraphics
+import Foundation
 
 enum ExportAspectRatio: String, CaseIterable, Identifiable {
     case sideBySide        // 16:9 (also covers "Landscape")
@@ -25,17 +26,17 @@ enum ExportAspectRatio: String, CaseIterable, Identifiable {
 
     var displayName: String {
         switch self {
-        case .sideBySide:        return "Side-by-side"
-        case .tikTokVertical:    return "Vertical (TikTok)"
-        case .square:            return "Square"
-        case .instagramPortrait: return "Instagram 4:5"
-        case .classicLandscape:  return "Classic 4:3"
-        case .classicPortrait:   return "Classic 3:4"
-        case .photoPortrait:     return "Photo 2:3"
-        case .photoLandscape:    return "Photo 3:2"
-        case .cinemascope:       return "Cinemascope"
-        case .ultraWide:         return "Ultra-wide"
-        case .tallBanner:        return "Tall Banner"
+        case .sideBySide:        return String(localized: "Side-by-side")
+        case .tikTokVertical:    return String(localized: "Vertical (TikTok)")
+        case .square:            return String(localized: "Square")
+        case .instagramPortrait: return String(localized: "Instagram 4:5")
+        case .classicLandscape:  return String(localized: "Classic 4:3")
+        case .classicPortrait:   return String(localized: "Classic 3:4")
+        case .photoPortrait:     return String(localized: "Photo 2:3")
+        case .photoLandscape:    return String(localized: "Photo 3:2")
+        case .cinemascope:       return String(localized: "Cinemascope")
+        case .ultraWide:         return String(localized: "Ultra-wide")
+        case .tallBanner:        return String(localized: "Tall Banner")
         }
     }
 

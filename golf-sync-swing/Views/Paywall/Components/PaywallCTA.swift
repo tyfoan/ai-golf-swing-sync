@@ -17,8 +17,8 @@ struct PaywallCTA: View {
 
     var body: some View {
         VStack(spacing: 6) {
-            actionButton
             subline
+            actionButton
         }
     }
 
@@ -57,23 +57,25 @@ struct PaywallCTA: View {
     }
 
     private var label: String {
-        guard let plan else { return "Continue" }
+        guard let plan else { return String(localized: "Continue", comment: "Paywall CTA placeholder while plans are loading") }
         switch plan.kind {
         case .lifetime:
-            return "Buy Forever — \(plan.priceString)"
+            return String(localized: "Buy Forever — \(plan.priceString)", comment: "Paywall lifetime CTA button label with price")
         case .annual where plan.trialString != nil:
-            return "Start \(plan.trialString ?? "")"
+            return String(localized: "Start \(plan.trialString ?? "")", comment: "Paywall trial-start CTA (e.g. 'Start 7-day free trial')")
         case .annual:
-            return "Subscribe — \(plan.priceString)"
+            return String(localized: "Subscribe — \(plan.priceString)", comment: "Paywall annual subscribe CTA with price")
         case .weekly where plan.trialString != nil:
-            return "Start \(plan.trialString ?? "")"
+            return String(localized: "Start \(plan.trialString ?? "")", comment: "Paywall trial-start CTA (e.g. 'Start 3-day free trial')")
         case .weekly:
-            return "Subscribe — \(plan.priceString)"
+            return String(localized: "Subscribe — \(plan.priceString)", comment: "Paywall weekly subscribe CTA with price")
         }
     }
 
     private var sublineText: String {
         guard let plan else { return " " }
-        return plan.kind == .lifetime ? "One-time payment." : "Cancel anytime."
+        return plan.kind == .lifetime
+            ? String(localized: "One-time payment.", comment: "Subline under paywall CTA for the lifetime plan")
+            : String(localized: "Cancel anytime.", comment: "Subline under paywall CTA for subscription plans")
     }
 }

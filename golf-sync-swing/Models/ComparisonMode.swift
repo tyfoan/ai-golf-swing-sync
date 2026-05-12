@@ -16,6 +16,15 @@ enum ComparisonMode: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
+    var displayName: String {
+        switch self {
+        case .sideBySide: return String(localized: "Side-by-Side", comment: "Comparison mode: two videos side by side")
+        case .topBottom:  return String(localized: "Top / Bottom", comment: "Comparison mode: one video stacked above the other")
+        case .stacked:    return String(localized: "Stacked", comment: "Comparison mode: videos overlaid with opacity blend")
+        case .sequential: return String(localized: "Sequential", comment: "Comparison mode: videos play one after the other")
+        }
+    }
+
     var iconName: String {
         switch self {
         case .sideBySide: return "rectangle.split.2x1"

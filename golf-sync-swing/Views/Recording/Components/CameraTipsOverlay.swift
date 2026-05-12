@@ -14,20 +14,20 @@ struct CameraTipsOverlay: View {
     private let tips = [
         RecordingTip(
             number: 1,
-            title: "Camera Placement",
-            description: "Make sure your camera is directly in front of you (facing your swing), or facing the direction the ball will go. Your phone can be on the ground or on a stand, just as long as it's propped up to capture your whole body for the entire swing.",
+            title: String(localized: "Camera Placement", comment: "Recording tip card title"),
+            description: String(localized: "Make sure your camera is directly in front of you (facing your swing), or facing the direction the ball will go. Your phone can be on the ground or on a stand, just as long as it's propped up to capture your whole body for the entire swing.", comment: "Recording tip 1 body — full instructions overlay version"),
             systemIcon: "iphone.gen3"
         ),
         RecordingTip(
             number: 2,
-            title: "Lighting",
-            description: "Record in well-lit conditions for best results. Natural daylight works best for pose detection. Avoid backlit situations where you appear as a silhouette.",
+            title: String(localized: "Lighting", comment: "Recording tip card title"),
+            description: String(localized: "Record in well-lit conditions for best results. Natural daylight works best for pose detection. Avoid backlit situations where you appear as a silhouette.", comment: "Recording tip 2 body — full instructions overlay version"),
             systemIcon: "sun.max.fill"
         ),
         RecordingTip(
             number: 3,
-            title: "Distance",
-            description: "Stand 8-12 feet from the camera for optimal pose tracking. Make sure your full body is visible throughout the entire swing motion.",
+            title: String(localized: "Distance", comment: "Recording tip card title (distance from camera to subject)"),
+            description: String(localized: "Stand 8-12 feet from the camera for optimal pose tracking. Make sure your full body is visible throughout the entire swing motion.", comment: "Recording tip 3 body — full instructions overlay version"),
             systemIcon: "ruler.fill"
         )
     ]

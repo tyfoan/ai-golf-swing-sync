@@ -31,6 +31,7 @@ final class RecordingViewModel {
     var errorMessage: String?
     var mainViewShowsReplay: Bool = false
     var replayingSwingIndex: Int? = nil
+    var requiresLibraryUpgrade: Bool = false
     // PiP is always the live camera now — replays go straight to the main view.
     // Running a SwingReplayView in PiP simultaneously with one in main caused
     // FigSharedMemPool/PlayerRemoteXPC churn on the in-progress recording file.
@@ -252,6 +253,12 @@ final class RecordingViewModel {
 
     func saveToPhotos() async {
         guard let url = recordingURL else { return }
+
+        if let modelContext, !LibraryGateService.canAddSwing(in: modelContext) {
+            requiresLibraryUpgrade = true
+            return
+        }
+
         state = .saving
 
         let authorized = await PhotosSaveService.requestAuthorization()

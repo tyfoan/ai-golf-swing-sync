@@ -208,4 +208,11 @@ private extension SingleVideoPlayerView {
 enum VideoPlaybackMode: String, CaseIterable {
     case swingsOnly = "Swings Only"
     case fullVideo = "Full Video"
+
+    var displayName: String {
+        switch self {
+        case .swingsOnly: return String(localized: "Swings Only", comment: "Playback mode showing detected swings only")
+        case .fullVideo:  return String(localized: "Full Video", comment: "Playback mode showing the entire recorded video")
+        }
+    }
 }

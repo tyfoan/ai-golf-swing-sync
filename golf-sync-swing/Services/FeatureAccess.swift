@@ -10,7 +10,6 @@ import Foundation
 
 enum PremiumFeature: String, CaseIterable {
     case advancedComparisonModes
-    // TODO: Gate pose estimation behind premium when real-time skeleton overlay ships
     case poseEstimation
     case exportHD
     case exportNoWatermark

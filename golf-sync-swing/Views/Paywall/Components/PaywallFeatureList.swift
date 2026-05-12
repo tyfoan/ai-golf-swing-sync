@@ -22,20 +22,20 @@ struct PaywallFeatureList: View {
         .init(
             id: "auto-sync",
             symbol: "figure.golf",
-            title: "Auto-sync at impact",
-            subtitle: "Frame-perfect alignment with any pro."
+            title: String(localized: "Auto-sync at impact", comment: "Paywall feature row 1 title"),
+            subtitle: String(localized: "Frame-perfect alignment with any pro.", comment: "Paywall feature row 1 subtitle")
         ),
         .init(
-            id: "slowmo",
-            symbol: "slowmo",
-            title: "Slow-mo + drawing tools",
-            subtitle: "8× slow-motion, lines, angles, HD export."
+            id: "pro-library",
+            symbol: "rectangle.stack.fill",
+            title: String(localized: "Pro swing library", comment: "Paywall feature row 2 title"),
+            subtitle: String(localized: "Compare to pros in onion-skin & 8× slow-mo.", comment: "Paywall feature row 2 subtitle (onion-skin = transparency overlay comparison mode)")
         ),
         .init(
-            id: "onion",
-            symbol: "square.on.square",
-            title: "Onion-skin & overlay",
-            subtitle: "Compare like a coach."
+            id: "hd-export",
+            symbol: "square.and.arrow.up.fill",
+            title: String(localized: "HD export", comment: "Paywall feature row 3 title"),
+            subtitle: String(localized: "Share-ready, no watermark, multi-aspect.", comment: "Paywall feature row 3 subtitle")
         )
     ]
 }

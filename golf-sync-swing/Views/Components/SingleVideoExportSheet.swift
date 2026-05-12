@@ -33,9 +33,9 @@ struct SingleVideoExportSheet: View {
 
         var label: String {
             switch self {
-            case .fullVideo:    return "Full Video"
-            case .allSwings:    return "All Swings"
-            case .currentSwing: return "This Swing"
+            case .fullVideo:    return String(localized: "Full Video")
+            case .allSwings:    return String(localized: "All Swings")
+            case .currentSwing: return String(localized: "This Swing")
             }
         }
     }
@@ -143,7 +143,7 @@ struct SingleVideoExportSheet: View {
             Image(systemName: "exclamationmark.triangle.fill")
                 .font(.system(size: 44))
                 .foregroundStyle(.orange)
-            Text("Export failed").font(.headline)
+            Text("Export Failed").font(.headline)
             Text(message).font(.caption).foregroundStyle(.secondary).multilineTextAlignment(.center)
             Button("Close", action: onDismiss).buttonStyle(.bordered)
         }
@@ -152,23 +152,27 @@ struct SingleVideoExportSheet: View {
 
     private var title: String {
         switch selection {
-        case .fullVideo:    return "Export Full Video"
-        case .allSwings:    return "Export All Swings"
-        case .currentSwing: return "Export This Swing"
+        case .fullVideo:    return String(localized: "Export Full Video")
+        case .allSwings:    return String(localized: "Export All Swings")
+        case .currentSwing: return String(localized: "Export This Swing")
         }
     }
 
     private var subtitle: String {
         switch selection {
         case .fullVideo:
-            return String(format: "Duration: %d:%02d", Int(video.duration) / 60, Int(video.duration) % 60)
+            let minutes = Int(video.duration) / 60
+            let seconds = Int(video.duration) % 60
+            return String(localized: "Duration: \(minutes):\(String(format: "%02d", seconds))", comment: "Video duration in m:ss format")
         case .allSwings:
             let count = video.swings.count
             let total = video.swings.reduce(0.0) { $0 + ($1.endTime - $1.startTime) }
-            return "\(count) swing\(count == 1 ? "" : "s") · ~\(String(format: "%.1f", total))s total"
+            let totalText = String(format: "%.1f", total)
+            return String(localized: "^[\(count) swing](inflect: true) · ~\(totalText)s total", comment: "Swing-count summary on export sheet (inflected plural + total seconds)")
         case .currentSwing:
             guard let s = selectedSwing else { return "" }
-            return String(format: "~%.1f seconds", s.endTime - s.startTime)
+            let seconds = String(format: "%.1f", s.endTime - s.startTime)
+            return String(localized: "~\(seconds) seconds", comment: "Duration of selected swing in seconds")
         }
     }
 

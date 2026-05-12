@@ -120,9 +120,7 @@ private extension PaywallPlan {
 
     static func equivalentWeekly(for annual: Package) -> String? {
         let perWeek = annual.storeProduct.price / 52
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.locale = annual.storeProduct.priceFormatter?.locale ?? .current
+        guard let formatter = annual.storeProduct.priceFormatter else { return nil }
         guard let formatted = formatter.string(from: NSDecimalNumber(decimal: perWeek)) else { return nil }
         return "≈ \(formatted)/wk"
     }
