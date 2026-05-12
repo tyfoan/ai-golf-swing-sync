@@ -192,7 +192,10 @@ struct SingleVideoExportSheet: View {
             let count = video.swings.count
             let total = video.swings.reduce(0.0) { $0 + ($1.endTime - $1.startTime) }
             let totalText = String(format: "%.1f", total)
-            return String(localized: "^[\(count) swing](inflect: true) · ~\(totalText)s total", comment: "Swing-count summary on export sheet (inflected plural + total seconds)")
+            if count == 1 {
+                return String(localized: "1 swing · ~\(totalText)s total", comment: "Swing-count summary on export sheet (singular)")
+            }
+            return String(localized: "\(count) swings · ~\(totalText)s total", comment: "Swing-count summary on export sheet (plural)")
         case .currentSwing:
             guard let s = selectedSwing else { return "" }
             let seconds = String(format: "%.1f", s.endTime - s.startTime)
