@@ -59,8 +59,13 @@ struct ExportFlowCoordinator: View {
     }
 
     private func progressSheet(config: VideoLayoutConfig) -> some View {
+        // The URL/syncOffset/swing triple all arrive from `ComparisonView`
+        // already swap-aware; passing them straight through keeps the
+        // exporter inputs internally consistent regardless of swap state.
         ExportProgressView(
-            viewModel: comparisonViewModel,
+            video1URL: video1URL,
+            video2URL: video2URL,
+            syncOffset: syncOffset,
             layoutConfig: config,
             swingTrim: (swing1, swing2),
             isExporting: $isExporting,

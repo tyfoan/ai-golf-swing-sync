@@ -6,7 +6,9 @@
 import SwiftUI
 
 struct ExportProgressView: View {
-    let viewModel: ComparisonViewModel
+    let video1URL: URL
+    let video2URL: URL
+    let syncOffset: TimeInterval
     let layoutConfig: VideoLayoutConfig?
     let swingTrim: (SwingTimeRange, SwingTimeRange)?
     @Binding var isExporting: Bool
@@ -14,14 +16,18 @@ struct ExportProgressView: View {
     let onDismiss: () -> Void
 
     init(
-        viewModel: ComparisonViewModel,
+        video1URL: URL,
+        video2URL: URL,
+        syncOffset: TimeInterval,
         layoutConfig: VideoLayoutConfig? = nil,
         swingTrim: (SwingTimeRange, SwingTimeRange)? = nil,
         isExporting: Binding<Bool>,
         progress: Binding<Float>,
         onDismiss: @escaping () -> Void
     ) {
-        self.viewModel = viewModel
+        self.video1URL = video1URL
+        self.video2URL = video2URL
+        self.syncOffset = syncOffset
         self.layoutConfig = layoutConfig
         self.swingTrim = swingTrim
         self._isExporting = isExporting
@@ -285,12 +291,6 @@ private extension ExportProgressView {
 
 private extension ExportProgressView {
     func startExport() {
-        guard let url1 = viewModel.video1.validLocalURL,
-              let url2 = viewModel.video2.validLocalURL else {
-            errorMessage = "One or both video files are missing. Please re-import the videos."
-            return
-        }
-
         isExporting = true
         progress = 0
         errorMessage = nil
@@ -298,9 +298,9 @@ private extension ExportProgressView {
         if let config = layoutConfig {
             VideoExportService.exportComparison(
                 layoutConfig: config,
-                video1URL: url1,
-                video2URL: url2,
-                syncOffset: viewModel.syncOffset,
+                video1URL: video1URL,
+                video2URL: video2URL,
+                syncOffset: syncOffset,
                 swingTrim: trimToSwing ? swingTrim : nil,
                 progress: { p in Task { @MainActor in progress = p } },
                 completion: handleExportResult
@@ -308,9 +308,9 @@ private extension ExportProgressView {
         } else {
             let config = VideoExportService.ExportConfiguration(resolution: selectedQuality.resolution)
             VideoExportService.exportComparison(
-                video1URL: url1,
-                video2URL: url2,
-                syncOffset: viewModel.syncOffset,
+                video1URL: video1URL,
+                video2URL: video2URL,
+                syncOffset: syncOffset,
                 config: config,
                 progress: { p in Task { @MainActor in progress = p } },
                 completion: handleExportResult
