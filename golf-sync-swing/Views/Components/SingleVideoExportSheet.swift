@@ -20,6 +20,7 @@ struct SingleVideoExportSheet: View {
     @State private var progress: Float = 0
     @State private var errorMessage: String?
     @State private var savedConfirmation = false
+    @State private var exportHandle: ExportHandle?
 
     init(video: SwingVideo, mode: VideoPlaybackMode, selectedSwing: SwingMarker?, onDismiss: @escaping () -> Void) {
         self.video = video
@@ -47,19 +48,24 @@ struct SingleVideoExportSheet: View {
     }
 
     var body: some View {
-        VStack(spacing: 16) {
-            handle
-            content
-            Spacer(minLength: 0)
+        NavigationStack {
+            VStack(spacing: 24) {
+                content
+            }
+            .padding()
+            .navigationTitle("Export Video")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        exportHandle?.cancel()
+                        onDismiss()
+                    }
+                }
+            }
         }
-        .padding(.horizontal, 20)
-        .padding(.top, 8)
-        .padding(.bottom, 24)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(.systemBackground))
-        .presentationDetents([.fraction(0.5)])
-        .presentationBackground(Color(.systemBackground))
-        .presentationDragIndicator(.hidden)
+        .presentationDetents([.medium])
+        .onDisappear { exportHandle?.cancel() }
     }
 
     @ViewBuilder
@@ -75,35 +81,39 @@ struct SingleVideoExportSheet: View {
         }
     }
 
-    private var handle: some View {
-        Capsule()
-            .fill(Color.gray.opacity(0.3))
-            .frame(width: 36, height: 4)
-    }
-
     private var idleContent: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 20) {
             selectionPicker
 
-            Image(systemName: "square.and.arrow.up.fill")
-                .font(.system(size: 40))
-                .foregroundStyle(Color.appTeal)
+            Image(systemName: "square.and.arrow.up")
+                .font(.system(size: 60))
+                .foregroundStyle(.secondary)
 
             VStack(spacing: 4) {
-                Text(title).font(.headline)
-                Text(subtitle).font(.caption).foregroundStyle(.secondary).multilineTextAlignment(.center)
+                Text(title)
+                    .font(.headline)
+                    .multilineTextAlignment(.center)
+                Text(subtitle)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
             }
 
-            Button(action: startExport) {
-                Text("Export to Photos")
-                    .font(.headline).fontWeight(.bold).foregroundStyle(.white)
-                    .frame(maxWidth: .infinity, minHeight: 52)
-                    .background(canExport ? Color.appTeal : Color.gray)
-                    .clipShape(RoundedRectangle(cornerRadius: 26))
-            }
-            .disabled(!canExport)
-            .padding(.top, 4)
+            exportButton
         }
+    }
+
+    private var exportButton: some View {
+        Button(action: startExport) {
+            Text("Export to Photos")
+                .font(.headline)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(canExport ? Color.fairwayGreen : Color.gray)
+                .foregroundStyle(.white)
+                .cornerRadius(12)
+        }
+        .disabled(!canExport)
     }
 
     private var selectionPicker: some View {
@@ -125,31 +135,43 @@ struct SingleVideoExportSheet: View {
             subtitle: "This may take a moment",
             progress: Double(progress)
         )
-        .tint(Color.appTeal)
-        .padding(.top, 32)
+        .tint(Color.fairwayGreen)
     }
 
     private var successContent: some View {
         VStack(spacing: 16) {
             Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 48))
-                .foregroundStyle(.green)
+                .font(.system(size: 60))
+                .foregroundStyle(Color.fairwayGreen)
             Text("Saved to Photos").font(.headline)
-            Button("Done", action: onDismiss).buttonStyle(.borderedProminent)
+            Button { onDismiss() } label: {
+                Text("Done")
+                    .font(.headline)
+                    .frame(maxWidth: .infinity).padding()
+                    .background(Color.fairwayGreen)
+                    .foregroundStyle(.white).cornerRadius(12)
+            }
         }
-        .padding(.top, 16)
     }
 
     private func errorContent(_ message: String) -> some View {
         VStack(spacing: 16) {
-            Image(systemName: "exclamationmark.triangle.fill")
-                .font(.system(size: 44))
-                .foregroundStyle(.orange)
+            Image(systemName: "exclamationmark.triangle")
+                .font(.system(size: 60))
+                .foregroundStyle(.red)
             Text("Export Failed").font(.headline)
-            Text(message).font(.caption).foregroundStyle(.secondary).multilineTextAlignment(.center)
-            Button("Close", action: onDismiss).buttonStyle(.bordered)
+            Text(message)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+            Button { errorMessage = nil } label: {
+                Text("Try Again")
+                    .font(.headline)
+                    .frame(maxWidth: .infinity).padding()
+                    .background(Color.fairwayGreen)
+                    .foregroundStyle(.white).cornerRadius(12)
+            }
         }
-        .padding(.top, 8)
     }
 
     private var title: String {
@@ -193,14 +215,18 @@ struct SingleVideoExportSheet: View {
         }
         let swings = swingRanges()
         isExporting = true
-        VideoExportService.exportSingleVideo(
+        exportHandle = VideoExportService.exportSingleVideo(
             videoURL: url, swings: swings,
             progress: { p in Task { @MainActor in progress = p } },
             completion: { result in
                 isExporting = false
+                exportHandle = nil
                 switch result {
                 case .success(let outputURL):
                     saveToPhotos(url: outputURL)
+                case .failure(.cancelled):
+                    // Cancel button already triggered onDismiss; nothing to do.
+                    break
                 case .failure(let err):
                     errorMessage = err.localizedDescription
                 }
