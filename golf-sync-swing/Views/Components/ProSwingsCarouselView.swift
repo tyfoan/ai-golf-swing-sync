@@ -97,7 +97,7 @@ private struct ProSwingCard: View {
             if let data = video.thumbnailData, let image = UIImage(data: data) {
                 Image(uiImage: image)
                     .resizable()
-                    .aspectRatio(contentMode: .fill)
+                    .scaledToFill()
             } else {
                 Color.charcoal.opacity(0.2)
             }

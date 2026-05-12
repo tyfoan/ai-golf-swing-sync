@@ -73,6 +73,7 @@ struct SettingsView: View {
             Text("About")
         }
 
+        supportSection
         legalSection
 
         #if DEBUG
@@ -80,28 +81,35 @@ struct SettingsView: View {
         #endif
     }
 
+    private var supportSection: some View {
+        Section {
+            externalLinkRow(
+                "Contact Support",
+                url: "mailto:examply.app@gmail.com?subject=Golf%20Sync%20Swing%20Support"
+            )
+        } header: {
+            Text("Support")
+        }
+    }
+
     private var legalSection: some View {
         Section {
-            Link(destination: URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!) {
-                HStack {
-                    Text("Terms of Use")
-                    Spacer()
-                    Image(systemName: "arrow.up.forward")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-            }
-            Link(destination: URL(string: "https://withcoach.app/privacy")!) {
-                HStack {
-                    Text("Privacy Policy")
-                    Spacer()
-                    Image(systemName: "arrow.up.forward")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-            }
+            externalLinkRow("Terms of Use", url: "https://www.withcoach.app/terms")
+            externalLinkRow("Privacy Policy", url: "https://www.withcoach.app/privacy")
         } header: {
             Text("Legal")
+        }
+    }
+
+    private func externalLinkRow(_ title: String, url: String) -> some View {
+        Link(destination: URL(string: url)!) {
+            HStack {
+                Text(title)
+                Spacer()
+                Image(systemName: "arrow.up.forward")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
         }
     }
 

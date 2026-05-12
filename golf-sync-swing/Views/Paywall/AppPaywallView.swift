@@ -2,15 +2,13 @@
 //  AppPaywallView.swift
 //  golf-sync-swing
 //
-//  Thin wrapper over RevenueCatUI.PaywallView. Layout, copy, and plan
-//  selection are managed in the RevenueCat dashboard's Paywall Editor —
-//  designers iterate without an app rebuild. This file only forwards
-//  purchase / restore / dismissal events back to PurchaseService.
+//  Public paywall entry point. Hosts CustomPaywallView (hand-built
+//  SwiftUI). The wrapper exists so the three call sites (Onboarding /
+//  FeatureGate / Settings) keep an unchanging API even if we swap the
+//  underlying paywall implementation again.
 //
 
 import SwiftUI
-import RevenueCat
-import RevenueCatUI
 
 struct AppPaywallView: View {
 
@@ -18,20 +16,6 @@ struct AppPaywallView: View {
     let onDismiss: () -> Void
 
     var body: some View {
-        PaywallView(displayCloseButton: true)
-            .onPurchaseCompleted { _ in
-                Task {
-                    await PurchaseService.shared.refreshStatus()
-                    onDismiss()
-                }
-            }
-            .onRestoreCompleted { customerInfo in
-                guard customerInfo.entitlements[PurchaseService.entitlementID]?.isActive == true else { return }
-                Task {
-                    await PurchaseService.shared.refreshStatus()
-                    onDismiss()
-                }
-            }
-            .onRequestedDismissal { onDismiss() }
+        CustomPaywallView(source: source, onDismiss: onDismiss)
     }
 }

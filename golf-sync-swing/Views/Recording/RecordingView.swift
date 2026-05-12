@@ -116,6 +116,11 @@ struct RecordingView: View {
         .onChange(of: viewModel.errorMessage) { _, newError in
             if newError != nil { showingError = true }
         }
+        .fullScreenCover(isPresented: Bindable(viewModel).requiresLibraryUpgrade) {
+            AppPaywallView(source: .featureGate) {
+                viewModel.requiresLibraryUpgrade = false
+            }
+        }
     }
 
     // MARK: - Lifecycle

@@ -131,7 +131,7 @@ private extension ComparisonView {
                 }
             } label: {
                 HStack {
-                    Label(mode.rawValue, systemImage: mode.iconName)
+                    Label(mode.displayName, systemImage: mode.iconName)
                     if mode == viewModel.comparisonMode {
                         Image(systemName: "checkmark")
                     }
@@ -141,7 +141,7 @@ private extension ComparisonView {
             Button {
                 showPaywall = true
             } label: {
-                Label("\(mode.rawValue) (Pro)", systemImage: "lock.fill")
+                Label(String(localized: "\(mode.displayName) (Pro)", comment: "Mode picker label for premium-locked modes"), systemImage: "lock.fill")
             }
         }
     }

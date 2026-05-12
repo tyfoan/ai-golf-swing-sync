@@ -348,17 +348,17 @@ enum ExportQuality: String, CaseIterable, Identifiable {
 
     var label: String {
         switch self {
-        case .standard: return "Standard"
-        case .high:     return "HD"
-        case .ultra:    return "Full HD"
+        case .standard: return String(localized: "Standard")
+        case .high:     return String(localized: "HD")
+        case .ultra:    return String(localized: "Full HD")
         }
     }
 
     var detail: String {
         switch self {
-        case .standard: return "720 x 1280 - Smaller file"
-        case .high:     return "1080 x 1920 - Recommended"
-        case .ultra:    return "1440 x 2560 - Best quality"
+        case .standard: return String(localized: "720 x 1280 - Smaller file")
+        case .high:     return String(localized: "1080 x 1920 - Recommended")
+        case .ultra:    return String(localized: "1440 x 2560 - Best quality")
         }
     }
 

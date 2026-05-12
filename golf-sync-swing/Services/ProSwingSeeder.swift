@@ -17,7 +17,7 @@ enum ProSwingSeeder {
     static let proPathPrefix = "Videos/Pros/"
 
     private static let seedVersionKey = "proSwingSeedVersion"
-    private static let currentSeedVersion = 1
+    private static let currentSeedVersion = 5
 
     static func seedIfNeeded(container: ModelContainer) {
         let context = ModelContext(container)
@@ -61,40 +61,72 @@ enum ProSwingSeeder {
             return
         }
 
-        let destURL = ProsDirectory.url.appendingPathComponent("\(descriptor.bundleFilename).mp4")
-        if !FileManager.default.fileExists(atPath: destURL.path) {
-            do { try FileManager.default.copyItem(at: bundleURL, to: destURL) }
-            catch {
-                AppLogger.general.error("ProSwing copy failed for \(descriptor.bundleFilename): \(error.localizedDescription)")
-                return
-            }
+        guard copyBundleVideo(from: bundleURL, descriptor: descriptor) != nil else {
+            return
         }
+        let destURL = ProsDirectory.url.appendingPathComponent("\(descriptor.bundleFilename).mp4")
 
-        if proRecordExists(filename: descriptor.bundleFilename, context: context) { return }
+        if let existing = proRecord(filename: descriptor.bundleFilename, context: context) {
+            update(existing, with: descriptor)
+            return
+        }
 
         let thumbnail = ThumbnailService.shared.generateThumbnail(for: destURL, at: descriptor.contactTime)
         let video = SwingVideo(localURL: destURL, duration: descriptor.duration, fps: 30, thumbnailData: thumbnail)
-        video.hasBeenAnalyzed = true
-        video.analysisDate = Date()
-
-        let marker = SwingMarker(
-            startTime: descriptor.startTime,
-            contactTime: descriptor.contactTime,
-            endTime: descriptor.endTime
-        )
-        marker.detectionConfidence = 1.0
-        marker.video = video
-        video.swings.append(marker)
-
+        update(video, with: descriptor)
         context.insert(video)
     }
 
-    private static func proRecordExists(filename: String, context: ModelContext) -> Bool {
+    private static func proRecord(filename: String, context: ModelContext) -> SwingVideo? {
         let needle = "\(proPathPrefix)\(filename)"
         let descriptor = FetchDescriptor<SwingVideo>(
             predicate: #Predicate { $0.localURLString.starts(with: needle) }
         )
-        return (try? context.fetchCount(descriptor)) ?? 0 > 0
+        return try? context.fetch(descriptor).first
+    }
+
+    private static func copyBundleVideo(from bundleURL: URL, descriptor: ProSwingDescriptor) -> URL? {
+        let destURL = ProsDirectory.url.appendingPathComponent("\(descriptor.bundleFilename).mp4")
+        do {
+            if FileManager.default.fileExists(atPath: destURL.path) {
+                try FileManager.default.removeItem(at: destURL)
+            }
+            try FileManager.default.copyItem(at: bundleURL, to: destURL)
+            return destURL
+        } catch {
+            AppLogger.general.error("ProSwing copy failed for \(descriptor.bundleFilename): \(error.localizedDescription)")
+            return nil
+        }
+    }
+
+    private static func update(_ video: SwingVideo, with descriptor: ProSwingDescriptor) {
+        video.duration = descriptor.duration
+        video.fps = 30
+        video.hasBeenAnalyzed = true
+        video.analysisDate = Date()
+
+        if let marker = video.swings.first {
+            update(marker, with: descriptor)
+        } else {
+            let marker = SwingMarker(
+                startTime: descriptor.startTime,
+                contactTime: descriptor.contactTime,
+                endTime: descriptor.endTime
+            )
+            update(marker, with: descriptor)
+            marker.video = video
+            video.swings.append(marker)
+        }
+    }
+
+    private static func update(_ marker: SwingMarker, with descriptor: ProSwingDescriptor) {
+        marker.updateTimes(
+            start: descriptor.startTime,
+            contact: descriptor.contactTime,
+            end: descriptor.endTime
+        )
+        marker.isAutoDetected = true
+        marker.detectionConfidence = 1.0
     }
 }
 

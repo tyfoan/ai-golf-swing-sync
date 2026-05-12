@@ -23,12 +23,10 @@ final class PurchaseService {
     static let entitlementID = "Golf Swing Sync Premium"
 
     #if DEBUG
-    static let apiKey = "test_MXPuGlggjlfQHxlnRQsOUthWyYo"
+    // Swap to "test_MXPuGlggjlfQHxlnRQsOUthWyYo" to point at the RC Test Store project.
+    static let apiKey = "appl_SrTcnIuqMXaqoRYvaecigbeOOoW"
     #else
-    // BLOCKER: Replace with your production RevenueCat API key (appl_...)
-    // before App Store submission. Test keys do NOT process real purchases.
-    #error("Replace with production RevenueCat API key before release")
-    static let apiKey = "appl_REPLACE_WITH_PRODUCTION_KEY"
+    static let apiKey = "appl_SrTcnIuqMXaqoRYvaecigbeOOoW"
     #endif
 
     private init() {}

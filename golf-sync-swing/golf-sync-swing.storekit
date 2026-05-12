@@ -1,0 +1,105 @@
+{
+  "identifier" : "5C2A8C7F-1D44-4D6E-A8B1-3F1F8D6E1A01",
+  "nonRenewingSubscriptions" : [],
+  "products" : [
+    {
+      "displayPrice" : "79.99",
+      "familyShareable" : false,
+      "internalID" : "B1F9C3D2-7E5A-4A2A-9C5B-1A0E2B6D7F11",
+      "localizations" : [
+        {
+          "description" : "One-time lifetime access to all premium features.",
+          "displayName" : "Lifetime",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "golfswing.lifetime",
+      "referenceName" : "Lifetime",
+      "type" : "NonConsumable"
+    }
+  ],
+  "settings" : {
+    "_applicationInternalID" : "0000000000",
+    "_developerTeamID" : "J2R9272WYX",
+    "_failTransactionsEnabled" : false,
+    "_locale" : "en_US",
+    "_storefront" : "USA",
+    "_storeKitErrors" : [
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Load Products"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Purchase"
+      }
+    ]
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "A7E3F1C2-5D8B-4F2A-9E1A-2B6D7F11C3D2",
+      "localizations" : [],
+      "name" : "Golf Swing Sync Premium",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [],
+          "codeOffers" : [],
+          "displayPrice" : "4.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "C3D2A1B0-9E8D-4C6F-8A5B-7F11C3D2A1B0",
+          "introductoryOffer" : {
+            "internalID" : "D4E3B2C1-A0F9-4D7E-9B6C-8A12D4E3B2C1",
+            "paymentMode" : "free",
+            "subscriptionPeriod" : "P3D"
+          },
+          "localizations" : [
+            {
+              "description" : "Weekly access to all premium features.",
+              "displayName" : "Weekly",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "golfswing.weekly",
+          "recurringSubscriptionPeriod" : "P1W",
+          "referenceName" : "Weekly",
+          "subscriptionGroupID" : "A7E3F1C2-5D8B-4F2A-9E1A-2B6D7F11C3D2",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : []
+        },
+        {
+          "adHocOffers" : [],
+          "codeOffers" : [],
+          "displayPrice" : "49.99",
+          "familyShareable" : false,
+          "groupNumber" : 2,
+          "internalID" : "E5F4C3D2-B1A0-4E8F-AC7D-9B23E5F4C3D2",
+          "introductoryOffer" : {
+            "internalID" : "F6E5D4C3-B2A1-4F9E-BD8C-AC34F6E5D4C3",
+            "paymentMode" : "free",
+            "subscriptionPeriod" : "P1W"
+          },
+          "localizations" : [
+            {
+              "description" : "Annual access to all premium features.",
+              "displayName" : "Annual",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "golfswing.annual",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "Annual",
+          "subscriptionGroupID" : "A7E3F1C2-5D8B-4F2A-9E1A-2B6D7F11C3D2",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : []
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 4,
+    "minor" : 0
+  }
+}

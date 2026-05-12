@@ -48,7 +48,7 @@ struct PlayerTopBarView: View {
                     onSwitchMode(mode)
                 } label: {
                     HStack {
-                        Text(mode.rawValue)
+                        Text(mode.displayName)
                         if mode == playbackMode {
                             Image(systemName: "checkmark")
                         }
