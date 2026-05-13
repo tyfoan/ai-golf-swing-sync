@@ -44,7 +44,7 @@ struct PositioningGuideOverlay: View {
         }
     }
 
-    private func ruleRow(icon: String, text: String) -> some View {
+    private func ruleRow(icon: String, text: LocalizedStringKey) -> some View {
         HStack(spacing: 16) {
             Image(systemName: icon)
                 .font(.title2.weight(.semibold))

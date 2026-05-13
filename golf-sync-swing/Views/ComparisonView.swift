@@ -106,7 +106,7 @@ private extension ComparisonView {
             HStack(spacing: 4) {
                 Image(systemName: viewModel.comparisonMode.iconName)
                     .font(.caption)
-                Text(viewModel.comparisonMode.rawValue)
+                Text(viewModel.comparisonMode.displayName)
                     .font(.subheadline).fontWeight(.medium)
                 Image(systemName: "chevron.up.chevron.down").font(.caption)
             }

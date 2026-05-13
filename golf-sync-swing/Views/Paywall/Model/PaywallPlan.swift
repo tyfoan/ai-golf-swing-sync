@@ -42,9 +42,9 @@ extension PaywallPlan {
             kind: .lifetime,
             priceString: package.storeProduct.localizedPriceString,
             trialString: nil,
-            savingsBadge: "ONE-TIME · FOREVER",
+            savingsBadge: String(localized: "ONE-TIME · FOREVER", comment: "Paywall badge above the lifetime plan card"),
             equivalentString: nil,
-            lineUnderPrice: "Pay once, yours forever",
+            lineUnderPrice: String(localized: "Pay once, yours forever", comment: "Paywall subline under the lifetime plan price"),
             package: package
         )
     }
@@ -57,7 +57,9 @@ extension PaywallPlan {
             trialString: trialEligible ? trial(for: package) : nil,
             savingsBadge: savingsBadge(annual: package, weekly: weekly),
             equivalentString: equivalentWeekly(for: package),
-            lineUnderPrice: trialEligible ? "Save 81% vs weekly" : "Billed yearly",
+            lineUnderPrice: trialEligible
+                ? String(localized: "Save 81% vs weekly", comment: "Paywall subline under the annual plan price when a trial is offered")
+                : String(localized: "Billed yearly", comment: "Paywall subline under the annual plan price when no trial is offered"),
             package: package
         )
     }
@@ -70,7 +72,9 @@ extension PaywallPlan {
             trialString: trialEligible ? trial(for: package) : nil,
             savingsBadge: nil,
             equivalentString: nil,
-            lineUnderPrice: trialEligible ? "Most flexible" : "Billed weekly",
+            lineUnderPrice: trialEligible
+                ? String(localized: "Most flexible", comment: "Paywall subline under the weekly plan price when a trial is offered")
+                : String(localized: "Billed weekly", comment: "Paywall subline under the weekly plan price when no trial is offered"),
             package: package
         )
     }
@@ -86,17 +90,15 @@ private extension PaywallPlan {
             intro.paymentMode == .freeTrial
         else { return nil }
         let count = intro.subscriptionPeriod.value
-        let unit = unitLabel(for: intro.subscriptionPeriod.unit, count: count)
-        return "\(count)-\(unit) free trial"
-    }
-
-    static func unitLabel(for unit: SubscriptionPeriod.Unit, count: Int) -> String {
-        let plural = count != 1
-        switch unit {
-        case .day:   return plural ? "day"   : "day"   // "3-day" reads well singular
-        case .week:  return plural ? "week"  : "week"
-        case .month: return plural ? "month" : "month"
-        case .year:  return plural ? "year"  : "year"
+        switch intro.subscriptionPeriod.unit {
+        case .day:
+            return String(localized: "\(count)-day free trial", comment: "Paywall trial duration label (compound modifier, e.g. \"3-day free trial\")")
+        case .week:
+            return String(localized: "\(count)-week free trial", comment: "Paywall trial duration label (compound modifier, e.g. \"1-week free trial\")")
+        case .month:
+            return String(localized: "\(count)-month free trial", comment: "Paywall trial duration label (compound modifier)")
+        case .year:
+            return String(localized: "\(count)-year free trial", comment: "Paywall trial duration label (compound modifier)")
         }
     }
 
@@ -104,8 +106,10 @@ private extension PaywallPlan {
         guard
             let weekly,
             let percent = savingsPercent(annual: annual, weekly: weekly)
-        else { return "BEST VALUE" }
-        return "BEST VALUE · SAVE \(percent)%"
+        else {
+            return String(localized: "BEST VALUE", comment: "Paywall badge on the annual plan when actual savings can't be computed")
+        }
+        return String(localized: "BEST VALUE · SAVE \(percent)%", comment: "Paywall badge on the annual plan — placeholder is the saving percent vs weekly")
     }
 
     static func savingsPercent(annual: Package, weekly: Package) -> Int? {

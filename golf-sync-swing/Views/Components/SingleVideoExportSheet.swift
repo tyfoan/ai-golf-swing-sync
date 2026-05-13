@@ -131,8 +131,8 @@ struct SingleVideoExportSheet: View {
 
     private var progressContent: some View {
         OperationProgressView(
-            title: "Exporting… \(Int(progress * 100))%",
-            subtitle: "This may take a moment",
+            title: String(localized: "Exporting… \(Int(progress * 100))%", comment: "Export progress title with percent complete (0–100)"),
+            subtitle: String(localized: "This may take a moment", comment: "Subtitle under the export progress bar"),
             progress: Double(progress)
         )
         .tint(Color.fairwayGreen)

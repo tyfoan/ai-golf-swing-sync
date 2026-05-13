@@ -57,7 +57,7 @@ struct PlayerTopBarView: View {
             }
         } label: {
             HStack(spacing: 4) {
-                Text(playbackMode.rawValue)
+                Text(playbackMode.displayName)
                     .font(.subheadline).fontWeight(.semibold)
                 Image(systemName: "chevron.down")
                     .font(.caption2)

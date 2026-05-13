@@ -120,7 +120,7 @@ struct PaywallPlanCard: View {
             )
     }
 
-    private var planTitle: String {
+    private var planTitle: LocalizedStringKey {
         switch plan.kind {
         case .lifetime: return "Lifetime"
         case .annual:   return "Annual"
