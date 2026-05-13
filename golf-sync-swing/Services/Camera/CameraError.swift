@@ -23,21 +23,33 @@ enum CameraError: LocalizedError, Equatable {
 
     var errorDescription: String? {
         switch self {
-        case .permissionDenied: return "Camera access denied. Please enable in Settings."
-        case .permissionRestricted: return "Camera access is restricted on this device."
-        case .noVideoDevice: return "No camera available on this device."
-        case .noAudioDevice: return "No microphone available on this device."
-        case .configurationFailed(let reason): return "Camera configuration failed: \(reason)"
-        case .insufficientStorage: return "Not enough storage space. Please free up at least 500MB."
+        case .permissionDenied:
+            return String(localized: "Camera access denied. Please enable in Settings.", comment: "CameraError: user has denied camera permission in iOS Settings")
+        case .permissionRestricted:
+            return String(localized: "Camera access is restricted on this device.", comment: "CameraError: camera is disabled by parental controls or MDM")
+        case .noVideoDevice:
+            return String(localized: "No camera available on this device.", comment: "CameraError: hardware has no camera (rare — simulator or stripped device)")
+        case .noAudioDevice:
+            return String(localized: "No microphone available on this device.", comment: "CameraError: hardware has no microphone")
+        case .configurationFailed(let reason):
+            return String(localized: "Camera configuration failed: \(reason)", comment: "CameraError: AVCaptureSession configuration failed — placeholder is the underlying reason")
+        case .insufficientStorage:
+            return String(localized: "Not enough storage space. Please free up at least 500MB.", comment: "CameraError: device free space below the threshold needed to record")
         case .sessionInterrupted(let reason):
             switch reason {
-            case .audioInUse: return "Recording interrupted by another audio app."
-            case .videoInUse: return "Camera is being used by another app."
-            case .backgrounded: return "Recording paused because app went to background."
-            case .systemPressure: return "Recording paused due to system resource constraints."
-            case .unknown: return "Recording was interrupted."
+            case .audioInUse:
+                return String(localized: "Recording interrupted by another audio app.", comment: "CameraError: another app is using audio (e.g. phone call, voice memo)")
+            case .videoInUse:
+                return String(localized: "Camera is being used by another app.", comment: "CameraError: another app holds the camera (rare on iOS)")
+            case .backgrounded:
+                return String(localized: "Recording paused because app went to background.", comment: "CameraError: user backgrounded the app mid-recording")
+            case .systemPressure:
+                return String(localized: "Recording paused due to system resource constraints.", comment: "CameraError: AVCaptureSessionInterruptionReasonSystemPressure (thermal or resource throttling)")
+            case .unknown:
+                return String(localized: "Recording was interrupted.", comment: "CameraError: unspecified session interruption")
             }
-        case .recordingFailed(let reason): return "Recording failed: \(reason)"
+        case .recordingFailed(let reason):
+            return String(localized: "Recording failed: \(reason)", comment: "CameraError: AVCaptureMovieFileOutput failed — placeholder is the underlying reason")
         }
     }
 }

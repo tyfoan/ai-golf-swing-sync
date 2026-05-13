@@ -39,13 +39,13 @@ final class VideoExportService {
         var errorDescription: String? {
             switch self {
             case .missingVideoTrack:
-                return "Could not load video track"
+                return String(localized: "Could not load video track", comment: "ExportError: the source asset has no playable video track")
             case .exportFailed(let message):
-                return "Export failed: \(message)"
+                return String(localized: "Export failed: \(message)", comment: "ExportError: AVAssetExportSession failure — placeholder is the underlying reason")
             case .photoLibraryAccessDenied:
-                return "Photo library access denied"
+                return String(localized: "Photo library access denied", comment: "ExportError: user has denied Photos write permission")
             case .cancelled:
-                return "Export cancelled"
+                return String(localized: "Export cancelled", comment: "ExportError: user tapped Cancel mid-export")
             }
         }
     }

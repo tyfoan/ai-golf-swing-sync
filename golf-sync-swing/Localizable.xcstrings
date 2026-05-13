@@ -151,24 +151,6 @@
     "%lld swings detected": {
       "comment": "Subtitle on the saving overlay — translators should add a one/other plural variation",
       "localizations": {
-        "en": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "1 swing detected"
-                }
-              },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%lld swings detected"
-                }
-              }
-            }
-          }
-        },
         "de": {
           "variations": {
             "plural": {
@@ -182,6 +164,24 @@
                 "stringUnit": {
                   "state": "translated",
                   "value": "%lld Schwünge erkannt"
+                }
+              }
+            }
+          }
+        },
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "1 swing detected"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld swings detected"
                 }
               }
             }
@@ -234,24 +234,6 @@
     "%lld swings · ~%@s total": {
       "comment": "Swing-count summary on export sheet — translators should add a one/other plural variation",
       "localizations": {
-        "en": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "1 swing · ~%@s total"
-                }
-              },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%lld swings · ~%@s total"
-                }
-              }
-            }
-          }
-        },
         "de": {
           "variations": {
             "plural": {
@@ -265,6 +247,24 @@
                 "stringUnit": {
                   "state": "translated",
                   "value": "%lld Schwünge · ~%@ s gesamt"
+                }
+              }
+            }
+          }
+        },
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "1 swing · ~%@s total"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld swings · ~%@s total"
                 }
               }
             }
@@ -758,6 +758,35 @@
         }
       }
     },
+    "Analysis failed: %@": {
+      "comment": "SyncEngineError: motion-sync analysis failure — placeholder is the underlying reason",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Analyse fehlgeschlagen: %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Échec de l’analyse : %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "解析に失敗しました: %@"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "분석 실패: %@"
+          }
+        }
+      }
+    },
     "Auto-sync at impact": {
       "comment": "Paywall feature row 1 title",
       "localizations": {
@@ -993,6 +1022,93 @@
         }
       }
     },
+    "Camera access denied. Please enable in Settings.": {
+      "comment": "CameraError: user has denied camera permission in iOS Settings",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kamerazugriff verweigert. Aktiviere ihn in den Einstellungen."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Accès à la caméra refusé. Active-le dans les Réglages."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "カメラへのアクセスが拒否されました。設定で許可してください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "카메라 접근이 거부되었습니다. 설정에서 허용해 주세요."
+          }
+        }
+      }
+    },
+    "Camera access is restricted on this device.": {
+      "comment": "CameraError: camera is disabled by parental controls or MDM",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Kamerazugriff ist auf diesem Gerät eingeschränkt."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L’accès à la caméra est restreint sur cet appareil."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この端末ではカメラへのアクセスが制限されています。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 기기에서는 카메라 접근이 제한되어 있습니다."
+          }
+        }
+      }
+    },
+    "Camera configuration failed: %@": {
+      "comment": "CameraError: AVCaptureSession configuration failed — placeholder is the underlying reason",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kamerakonfiguration fehlgeschlagen: %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Échec de la configuration de la caméra : %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "カメラの構成に失敗しました: %@"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "카메라 구성 실패: %@"
+          }
+        }
+      }
+    },
     "Camera could not start. Try closing and reopening the app.": {
       "comment": "Error message shown when the capture session fails to start during the recording countdown",
       "localizations": {
@@ -1018,6 +1134,64 @@
           "stringUnit": {
             "state": "translated",
             "value": "카메라를 시작할 수 없습니다. 앱을 종료한 뒤 다시 실행해 주세요."
+          }
+        }
+      }
+    },
+    "Camera is being used by another app.": {
+      "comment": "CameraError: another app holds the camera (rare on iOS)",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Kamera wird von einer anderen App verwendet."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La caméra est utilisée par une autre app."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "カメラは別のアプリで使用中です。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "다른 앱에서 카메라를 사용 중입니다."
+          }
+        }
+      }
+    },
+    "Camera session is not running.": {
+      "comment": "Error message when the user taps record but the AVCaptureSession is not active",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Kamera-Sitzung läuft nicht."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La session caméra n’est pas active."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "カメラ セッションが起動していません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "카메라 세션이 실행 중이 아닙니다."
           }
         }
       }
@@ -1462,6 +1636,35 @@
         }
       }
     },
+    "Could not load video track": {
+      "comment": "ExportError: the source asset has no playable video track",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Videospur konnte nicht geladen werden"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible de charger la piste vidéo"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "動画トラックを読み込めません"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "비디오 트랙을 불러올 수 없습니다"
+          }
+        }
+      }
+    },
     "Data Error": {
       "comment": "The title of an alert that can be shown when there is an error loading or saving data.",
       "isCommentAutoGenerated": true,
@@ -1791,16 +1994,16 @@
     "Duration: %lld:%@": {
       "comment": "Video duration on export sheet, formatted as m:ss",
       "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Duration: %1$lld:%2$@"
-          }
-        },
         "de": {
           "stringUnit": {
             "state": "translated",
             "value": "Dauer: %lld:%@"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Duration: %1$lld:%2$@"
           }
         },
         "fr": {
@@ -2150,6 +2353,35 @@
         }
       }
     },
+    "Export cancelled": {
+      "comment": "ExportError: user tapped Cancel mid-export",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Export abgebrochen"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Export annulé"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "書き出しをキャンセルしました"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "내보내기가 취소되었습니다"
+          }
+        }
+      }
+    },
     "Export comparison": {
       "comment": "Accessibility label for the export button on the comparison view.",
       "localizations": {
@@ -2175,6 +2407,35 @@
           "stringUnit": {
             "state": "translated",
             "value": "비교 내보내기"
+          }
+        }
+      }
+    },
+    "Export failed: %@": {
+      "comment": "ExportError: AVAssetExportSession failure — placeholder is the underlying reason\nPhotosSaveError: AVAssetExportSession failure — placeholder is the underlying reason",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Export fehlgeschlagen: %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Échec de l’export : %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "書き出しに失敗しました: %@"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "내보내기 실패: %@"
           }
         }
       }
@@ -3127,6 +3388,64 @@
         }
       }
     },
+    "No camera available on this device.": {
+      "comment": "CameraError: hardware has no camera (rare — simulator or stripped device)",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auf diesem Gerät ist keine Kamera verfügbar."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucune caméra disponible sur cet appareil."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この端末では利用できるカメラがありません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 기기에는 사용 가능한 카메라가 없습니다."
+          }
+        }
+      }
+    },
+    "No microphone available on this device.": {
+      "comment": "CameraError: hardware has no microphone",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auf diesem Gerät ist kein Mikrofon verfügbar."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucun micro disponible sur cet appareil."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この端末では利用できるマイクがありません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 기기에는 사용 가능한 마이크가 없습니다."
+          }
+        }
+      }
+    },
     "No previous purchases found.": {
       "comment": "Result of Restore Purchases when no prior purchase is associated with the user's Apple ID",
       "localizations": {
@@ -3212,6 +3531,35 @@
           "stringUnit": {
             "state": "translated",
             "value": "감지된 스윙이 없습니다. \"+ 추가\"를 눌러 수동으로 표시하세요."
+          }
+        }
+      }
+    },
+    "Not enough storage space. Please free up at least 500MB.": {
+      "comment": "CameraError: device free space below the threshold needed to record",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nicht genügend Speicherplatz. Gib mindestens 500 MB frei."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Espace de stockage insuffisant. Libère au moins 500 Mo."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "空き容量が不足しています。500 MB 以上を確保してください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "저장 공간이 부족합니다. 최소 500MB를 확보해 주세요."
           }
         }
       }
@@ -3454,8 +3802,37 @@
         }
       }
     },
+    "Photo library access denied": {
+      "comment": "ExportError: user has denied Photos write permission",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zugriff auf die Fotomediathek verweigert"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Accès à la photothèque refusé"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "写真ライブラリへのアクセスが拒否されました"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "사진 라이브러리 접근이 거부되었습니다"
+          }
+        }
+      }
+    },
     "Photos access denied. Please enable in Settings.": {
-      "comment": "Error shown after Save when the user has denied Photos write permission",
+      "comment": "Error shown after Save when the user has denied Photos write permission\nPhotosSaveError: user has denied Photos write permission",
       "localizations": {
         "de": {
           "stringUnit": {
@@ -4043,6 +4420,180 @@
           "stringUnit": {
             "state": "translated",
             "value": "녹화 팁"
+          }
+        }
+      }
+    },
+    "Recording failed: %@": {
+      "comment": "CameraError: AVCaptureMovieFileOutput failed — placeholder is the underlying reason",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aufnahme fehlgeschlagen: %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Échec de l’enregistrement : %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "録画に失敗しました: %@"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "녹화 실패: %@"
+          }
+        }
+      }
+    },
+    "Recording file not found": {
+      "comment": "RecordingSaveError: the recorded movie file is missing from disk at save time",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aufnahmedatei nicht gefunden"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fichier d’enregistrement introuvable"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "録画ファイルが見つかりません"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "녹화 파일을 찾을 수 없습니다"
+          }
+        }
+      }
+    },
+    "Recording interrupted by another audio app.": {
+      "comment": "CameraError: another app is using audio (e.g. phone call, voice memo)",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aufnahme von einer anderen Audio-App unterbrochen."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistrement interrompu par une autre app audio."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "他のオーディオアプリにより録画が中断されました。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "다른 오디오 앱에 의해 녹화가 중단되었습니다."
+          }
+        }
+      }
+    },
+    "Recording paused because app went to background.": {
+      "comment": "CameraError: user backgrounded the app mid-recording",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aufnahme angehalten, weil die App in den Hintergrund ging."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistrement en pause : l’app est passée en arrière-plan."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アプリがバックグラウンドに移行したため、録画を一時停止しました。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "앱이 백그라운드로 전환되어 녹화가 일시정지되었습니다."
+          }
+        }
+      }
+    },
+    "Recording paused due to system resource constraints.": {
+      "comment": "CameraError: AVCaptureSessionInterruptionReasonSystemPressure (thermal or resource throttling)",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aufnahme aufgrund von Systemauslastung angehalten."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistrement en pause à cause de contraintes système."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "システム リソースの制約により録画を一時停止しました。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "시스템 자원 제약으로 인해 녹화가 일시정지되었습니다."
+          }
+        }
+      }
+    },
+    "Recording was interrupted.": {
+      "comment": "CameraError: unspecified session interruption",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Aufnahme wurde unterbrochen."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L’enregistrement a été interrompu."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "録画が中断されました。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "녹화가 중단되었습니다."
           }
         }
       }
@@ -5504,16 +6055,16 @@
       "comment": "A title and description for a tip, followed by an illustration of the tip's icon. The first argument is the tip number. The second argument is the tip title. The third argument is the tip description. The fourth argument is the system name of the icon to use.",
       "isCommentAutoGenerated": true,
       "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tip #%1$lld - %2$@"
-          }
-        },
         "de": {
           "stringUnit": {
             "state": "translated",
             "value": "Tipp #%lld – %@"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tip #%1$lld - %2$@"
           }
         },
         "fr": {
@@ -5830,6 +6381,35 @@
           "stringUnit": {
             "state": "translated",
             "value": "세로 (TikTok)"
+          }
+        }
+      }
+    },
+    "Video file unavailable": {
+      "comment": "Error message shown when the source video file at the recorded URL can't be found",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Videodatei nicht verfügbar"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fichier vidéo indisponible"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "動画ファイルが利用できません"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "영상 파일을 사용할 수 없음"
           }
         }
       }

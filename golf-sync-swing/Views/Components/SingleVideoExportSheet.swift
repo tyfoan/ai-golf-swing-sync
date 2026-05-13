@@ -211,7 +211,7 @@ struct SingleVideoExportSheet: View {
 
     private func startExport() {
         guard let url = video.validLocalURL else {
-            errorMessage = "Video file unavailable"
+            errorMessage = String(localized: "Video file unavailable", comment: "Error message shown when the source video file at the recorded URL can't be found")
             return
         }
         let swings = swingRanges()

@@ -59,7 +59,8 @@ enum RecordingSaveError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .fileNotFound: return "Recording file not found"
+        case .fileNotFound:
+            return String(localized: "Recording file not found", comment: "RecordingSaveError: the recorded movie file is missing from disk at save time")
         }
     }
 }

@@ -169,7 +169,7 @@ final class RecordingViewModel {
     private func beginRecording() {
         guard cameraService.isSessionRunning else {
             state = .idle
-            errorMessage = "Camera session is not running."
+            errorMessage = String(localized: "Camera session is not running.", comment: "Error message when the user taps record but the AVCaptureSession is not active")
             return
         }
         guard let url = cameraService.startRecording() else {
