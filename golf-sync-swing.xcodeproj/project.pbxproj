@@ -244,6 +244,12 @@
 				ko,
 				de,
 				fr,
+				"zh-Hans",
+				es,
+				sv,
+				"pt-BR",
+				th,
+				it,
 				Base,
 			);
 			mainGroup = 88649A252F2C322400DB5D4D;
