@@ -38,7 +38,7 @@ struct golf_sync_swingApp: App {
             }
             self.sharedModelContainer = fallbackContainer
             self._showDataError = State(initialValue: true)
-            self._dataErrorMessage = State(initialValue: "Unable to save data permanently. Your recordings may not persist between sessions.")
+            self._dataErrorMessage = State(initialValue: String(localized: "Unable to save data permanently. Your recordings may not persist between sessions.", comment: "Alert shown at launch when persistent SwiftData storage fails and the app falls back to in-memory storage"))
         }
 
         self._showOnboarding = State(initialValue: !OnboardingService.shared.hasCompletedOnboarding)

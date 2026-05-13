@@ -131,8 +131,8 @@ struct SingleVideoExportSheet: View {
 
     private var progressContent: some View {
         OperationProgressView(
-            title: "Exporting… \(Int(progress * 100))%",
-            subtitle: "This may take a moment",
+            title: String(localized: "Exporting… \(Int(progress * 100))%", comment: "Export progress title with percent complete (0–100)"),
+            subtitle: String(localized: "This may take a moment", comment: "Subtitle under the export progress bar"),
             progress: Double(progress)
         )
         .tint(Color.fairwayGreen)
@@ -187,19 +187,17 @@ struct SingleVideoExportSheet: View {
         case .fullVideo:
             let minutes = Int(video.duration) / 60
             let seconds = Int(video.duration) % 60
-            return String(localized: "Duration: \(minutes):\(String(format: "%02d", seconds))", comment: "Video duration in m:ss format")
+            let padded = seconds.formatted(.number.precision(.integerLength(2)))
+            return String(localized: "Duration: \(minutes):\(padded)", comment: "Video duration on export sheet, formatted as m:ss")
         case .allSwings:
             let count = video.swings.count
             let total = video.swings.reduce(0.0) { $0 + ($1.endTime - $1.startTime) }
-            let totalText = String(format: "%.1f", total)
-            if count == 1 {
-                return String(localized: "1 swing · ~\(totalText)s total", comment: "Swing-count summary on export sheet (singular)")
-            }
-            return String(localized: "\(count) swings · ~\(totalText)s total", comment: "Swing-count summary on export sheet (plural)")
+            let totalText = total.formatted(.number.precision(.fractionLength(1)))
+            return String(localized: "\(count) swings · ~\(totalText)s total", comment: "Swing-count summary on export sheet — translators should add a one/other plural variation")
         case .currentSwing:
             guard let s = selectedSwing else { return "" }
-            let seconds = String(format: "%.1f", s.endTime - s.startTime)
-            return String(localized: "~\(seconds) seconds", comment: "Duration of selected swing in seconds")
+            let seconds = (s.endTime - s.startTime).formatted(.number.precision(.fractionLength(1)))
+            return String(localized: "~\(seconds) seconds", comment: "Duration of the currently-selected swing")
         }
     }
 
@@ -213,7 +211,7 @@ struct SingleVideoExportSheet: View {
 
     private func startExport() {
         guard let url = video.validLocalURL else {
-            errorMessage = "Video file unavailable"
+            errorMessage = String(localized: "Video file unavailable", comment: "Error message shown when the source video file at the recorded URL can't be found")
             return
         }
         let swings = swingRanges()

@@ -93,8 +93,10 @@ enum PhotosSaveError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .exportFailed(let reason): return "Export failed: \(reason)"
-        case .authorizationDenied: return "Photos access denied. Please enable in Settings."
+        case .exportFailed(let reason):
+            return String(localized: "Export failed: \(reason)", comment: "PhotosSaveError: AVAssetExportSession failure — placeholder is the underlying reason")
+        case .authorizationDenied:
+            return String(localized: "Photos access denied. Please enable in Settings.", comment: "PhotosSaveError: user has denied Photos write permission")
         }
     }
 }

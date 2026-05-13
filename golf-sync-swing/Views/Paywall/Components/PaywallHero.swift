@@ -62,7 +62,7 @@ struct PaywallHero: View {
         .padding(.top, 4)
     }
 
-    private var headlineLines: [String] {
+    private var headlineLines: [LocalizedStringKey] {
         switch source {
         case .onboarding:
             return ["Your swing", "vs a pro's.", "Frame-locked."]
@@ -73,7 +73,7 @@ struct PaywallHero: View {
         }
     }
 
-    private var subheadlineText: String {
+    private var subheadlineText: LocalizedStringKey {
         switch source {
         case .onboarding:
             return "AI lines you up frame by frame at the moment of impact."

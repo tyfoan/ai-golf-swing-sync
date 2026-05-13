@@ -16,6 +16,6 @@ struct MuteToggleButton: View {
                 .padding(8)
                 .background(Circle().fill(.black.opacity(0.55)))
         }
-        .accessibilityLabel(isMuted ? "Unmute" : "Mute")
+        .accessibilityLabel(isMuted ? Text("Unmute") : Text("Mute"))
     }
 }

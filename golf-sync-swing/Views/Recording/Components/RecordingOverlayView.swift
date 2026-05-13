@@ -18,8 +18,8 @@ struct FinalizingVideoOverlay: View {
             Color.black.opacity(0.7).ignoresSafeArea()
 
             OperationProgressView(
-                title: "Saving Video...",
-                subtitle: "\(swingCount) swing\(swingCount == 1 ? "" : "s") detected"
+                title: String(localized: "Saving Video...", comment: "Overlay title shown while a finished recording is being saved to Photos"),
+                subtitle: String(localized: "\(swingCount) swings detected", comment: "Subtitle on the saving overlay — translators should add a one/other plural variation")
             )
             .tint(.white)
             .foregroundStyle(.white)
@@ -48,7 +48,7 @@ struct ReplayIndicatorOverlay: View {
                         .font(.headline)
                         .foregroundStyle(.white)
                 }
-                Text("Confidence: \(Int(confidence * 100))%")
+                Text("Confidence: \((confidence * 100).formatted(.number.precision(.fractionLength(0))))%")
                     .font(.subheadline)
                     .foregroundStyle(.white.opacity(0.8))
             }

@@ -30,7 +30,7 @@ struct PlayerTopBarView: View {
 
     private var backButton: some View {
         Button(action: onDismiss) {
-            Image(systemName: "chevron.left")
+            Image(systemName: "chevron.backward")
                 .font(.body).fontWeight(.semibold)
                 .foregroundStyle(.white)
                 .frame(width: 36, height: 36)
@@ -57,7 +57,7 @@ struct PlayerTopBarView: View {
             }
         } label: {
             HStack(spacing: 4) {
-                Text(playbackMode.rawValue)
+                Text(playbackMode.displayName)
                     .font(.subheadline).fontWeight(.semibold)
                 Image(systemName: "chevron.down")
                     .font(.caption2)

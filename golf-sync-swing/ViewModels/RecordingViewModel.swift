@@ -130,7 +130,7 @@ final class RecordingViewModel {
             guard !Task.isCancelled else { return }
             guard started else {
                 state = .idle
-                errorMessage = "Camera could not start. Try closing and reopening the app."
+                errorMessage = String(localized: "Camera could not start. Try closing and reopening the app.", comment: "Error message shown when the capture session fails to start during the recording countdown")
                 return
             }
 
@@ -169,7 +169,7 @@ final class RecordingViewModel {
     private func beginRecording() {
         guard cameraService.isSessionRunning else {
             state = .idle
-            errorMessage = "Camera session is not running."
+            errorMessage = String(localized: "Camera session is not running.", comment: "Error message when the user taps record but the AVCaptureSession is not active")
             return
         }
         guard let url = cameraService.startRecording() else {
@@ -263,7 +263,7 @@ final class RecordingViewModel {
 
         let authorized = await PhotosSaveService.requestAuthorization()
         guard authorized else {
-            errorMessage = "Photos access denied. Please enable in Settings."
+            errorMessage = String(localized: "Photos access denied. Please enable in Settings.", comment: "Error shown after Save when the user has denied Photos write permission")
             state = .reviewing
             return
         }

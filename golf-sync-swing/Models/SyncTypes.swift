@@ -39,7 +39,7 @@ enum SyncEngineError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .analysisFailure(let message):
-            return "Analysis failed: \(message)"
+            return String(localized: "Analysis failed: \(message)", comment: "SyncEngineError: motion-sync analysis failure — placeholder is the underlying reason")
         }
     }
 }

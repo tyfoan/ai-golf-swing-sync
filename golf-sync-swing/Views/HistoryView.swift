@@ -113,7 +113,7 @@ struct VideoHistoryRow: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
 
-                    Label("\(video.swings.count) swing\(video.swings.count == 1 ? "" : "s")", systemImage: "figure.golf")
+                    Label("^[\(video.swings.count) swing](inflect: true)", systemImage: "figure.golf")
                         .font(.caption)
                         .foregroundColor(video.swings.isEmpty ? .secondary : .fairwayGreen)
                 }
