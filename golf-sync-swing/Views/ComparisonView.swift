@@ -71,7 +71,7 @@ private extension ComparisonView {
         .padding(.horizontal, 16).padding(.top, 8)
     }
 
-    func circleButton(icon: String, accessibilityLabel: String, action: @escaping () -> Void) -> some View {
+    func circleButton(icon: String, accessibilityLabel: LocalizedStringKey, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Image(systemName: icon)
                 .font(.body).fontWeight(.semibold)

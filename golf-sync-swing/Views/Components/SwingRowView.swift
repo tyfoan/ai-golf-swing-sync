@@ -80,11 +80,13 @@ struct SwingRowView: View {
 
     private func formatTime(_ time: TimeInterval) -> String {
         let seconds = Int(time) % 60
-        let milliseconds = Int((time.truncatingRemainder(dividingBy: 1)) * 100)
-        return String(format: "%d.%02d", seconds, milliseconds)
+        let hundredths = (time.truncatingRemainder(dividingBy: 1) * 100).rounded(.down)
+        let combined = Double(seconds) + hundredths / 100
+        return combined.formatted(.number.precision(.fractionLength(2)))
     }
 
     private func formatDuration(_ duration: TimeInterval) -> String {
-        return String(format: "%.2fs", duration)
+        let value = duration.formatted(.number.precision(.fractionLength(2)))
+        return String(localized: "\(value)s", comment: "Swing duration in seconds, e.g. \"1.23s\"")
     }
 }

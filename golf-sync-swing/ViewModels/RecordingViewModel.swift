@@ -130,7 +130,7 @@ final class RecordingViewModel {
             guard !Task.isCancelled else { return }
             guard started else {
                 state = .idle
-                errorMessage = "Camera could not start. Try closing and reopening the app."
+                errorMessage = String(localized: "Camera could not start. Try closing and reopening the app.", comment: "Error message shown when the capture session fails to start during the recording countdown")
                 return
             }
 
@@ -263,7 +263,7 @@ final class RecordingViewModel {
 
         let authorized = await PhotosSaveService.requestAuthorization()
         guard authorized else {
-            errorMessage = "Photos access denied. Please enable in Settings."
+            errorMessage = String(localized: "Photos access denied. Please enable in Settings.", comment: "Error shown after Save when the user has denied Photos write permission")
             state = .reviewing
             return
         }

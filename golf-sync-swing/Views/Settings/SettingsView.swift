@@ -101,7 +101,7 @@ struct SettingsView: View {
         }
     }
 
-    private func externalLinkRow(_ title: String, url: String) -> some View {
+    private func externalLinkRow(_ title: LocalizedStringKey, url: String) -> some View {
         Link(destination: URL(string: url)!) {
             HStack {
                 Text(title)
@@ -137,7 +137,7 @@ struct SettingsView: View {
                 Text("Upgrade to Premium")
                     .fontWeight(.semibold)
                 Spacer()
-                Image(systemName: "chevron.right")
+                Image(systemName: "chevron.forward")
                     .foregroundStyle(.secondary)
             }
         }
@@ -151,7 +151,7 @@ struct SettingsView: View {
                 Image(systemName: "gear")
                 Text("Manage Subscription")
                 Spacer()
-                Image(systemName: "chevron.right")
+                Image(systemName: "chevron.forward")
                     .foregroundStyle(.secondary)
             }
         }
@@ -183,10 +183,10 @@ struct SettingsView: View {
             let info = try await purchaseService.restorePurchases()
             let active = info.entitlements[PurchaseService.entitlementID]?.isActive == true
             restoreMessage = active
-                ? "Premium access restored successfully."
-                : "No previous purchases found."
+                ? String(localized: "Premium access restored successfully.", comment: "Confirmation after Restore Purchases finds an active premium entitlement")
+                : String(localized: "No previous purchases found.", comment: "Result of Restore Purchases when no prior purchase is associated with the user's Apple ID")
         } catch {
-            restoreMessage = "Restore failed: \(error.localizedDescription)"
+            restoreMessage = String(localized: "Restore failed: \(error.localizedDescription)", comment: "Restore Purchases failure — placeholder is the system-provided error description")
         }
     }
 

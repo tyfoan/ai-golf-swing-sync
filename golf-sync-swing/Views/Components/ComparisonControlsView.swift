@@ -37,7 +37,7 @@ struct ComparisonControlsView: View {
                 .background(Color.white.opacity(0.1))
                 .clipShape(Circle())
         }
-        .accessibilityLabel(forward ? "Next frame" : "Previous frame")
+        .accessibilityLabel(forward ? Text("Next frame") : Text("Previous frame"))
     }
 
     private var playPauseButton: some View {
@@ -49,7 +49,7 @@ struct ComparisonControlsView: View {
                 .background(Color.white.opacity(0.15))
                 .clipShape(Circle())
         }
-        .accessibilityLabel(viewModel.isPlaying ? "Pause" : "Play")
+        .accessibilityLabel(viewModel.isPlaying ? Text("Pause") : Text("Play"))
     }
 
     // MARK: - Speed Pill
@@ -82,8 +82,9 @@ struct ComparisonControlsView: View {
     // MARK: - Formatting
 
     private func formatRate(_ rate: Float) -> String {
-        rate == 1.0
-            ? "1x"
-            : (rate >= 0.5 ? String(format: "%.1fx", rate) : String(format: "%.3fx", rate))
+        if rate == 1.0 { return String(localized: "1x", comment: "Playback speed pill at normal speed") }
+        let digits = rate >= 0.5 ? 1 : 3
+        let value = Double(rate).formatted(.number.precision(.fractionLength(digits)))
+        return String(localized: "\(value)x", comment: "Playback speed pill, e.g. \"0.5x\" or \"0.125x\"")
     }
 }

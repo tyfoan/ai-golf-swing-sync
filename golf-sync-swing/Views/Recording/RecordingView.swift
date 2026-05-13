@@ -105,7 +105,7 @@ struct RecordingView: View {
                 }
             }
         } message: {
-            Text(viewModel.errorMessage ?? viewModel.cameraService.currentError?.errorDescription ?? "An unknown error occurred")
+            Text(viewModel.errorMessage ?? viewModel.cameraService.currentError?.errorDescription ?? String(localized: "An unknown error occurred", comment: "Fallback recording-error alert body when neither the ViewModel nor CameraService provided a message"))
         }
         .onChange(of: scenePhase) { oldPhase, newPhase in
             handleScenePhaseChange(from: oldPhase, to: newPhase)

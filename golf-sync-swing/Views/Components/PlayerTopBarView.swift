@@ -30,7 +30,7 @@ struct PlayerTopBarView: View {
 
     private var backButton: some View {
         Button(action: onDismiss) {
-            Image(systemName: "chevron.left")
+            Image(systemName: "chevron.backward")
                 .font(.body).fontWeight(.semibold)
                 .foregroundStyle(.white)
                 .frame(width: 36, height: 36)
