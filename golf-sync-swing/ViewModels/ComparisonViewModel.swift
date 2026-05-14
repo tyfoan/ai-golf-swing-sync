@@ -119,10 +119,12 @@ final class ComparisonViewModel {
     }
 
     private func onModeChanged(from old: ComparisonMode) {
-        // Sequential ↔ synced changes the track time offsets; must full-rebuild.
-        // Synced ↔ synced only changes layer instructions; cheap update.
-        let needsStructuralRebuild = (old == .sequential) != (comparisonMode == .sequential)
-        if needsStructuralRebuild {
+        // If either side of the transition restructures the timeline (i.e.
+        // sequential involved), full-rebuild. Otherwise it's a layer-only
+        // change and a cheap videoComposition swap suffices.
+        let needsRebuild = old.layoutStrategy.requiresStructuralRebuild
+            || comparisonMode.layoutStrategy.requiresStructuralRebuild
+        if needsRebuild {
             rebuildComposition(seekToStart: true)
         } else {
             updateVideoComposition()

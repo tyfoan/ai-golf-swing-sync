@@ -29,10 +29,39 @@ struct ComparisonComposition {
     let videoTracks: [AVCompositionTrack]
 }
 
+/// Impact-aligned timing for the synced modes (sideBySide, topBottom, stacked).
+/// Each track's pre/post gap is the difference between its lead-in /
+/// follow-through and the longer clip's — those gaps are filled with held
+/// freeze frames by FreezeFrameInserter so the shorter clip's slot is never
+/// black during the longer clip's playback.
+struct SyncedTiming {
+    let preGap1: TimeInterval
+    let preGap2: TimeInterval
+    let postGap1: TimeInterval
+    let postGap2: TimeInterval
+    let impactTime: TimeInterval
+    let totalDuration: TimeInterval
+
+    init(swing1: SwingTimeRange, swing2: SwingTimeRange) {
+        // Clamp to non-negative: a malformed SwingTimeRange where contactTime
+        // sits outside [startTime, endTime] would otherwise produce negative
+        // gaps and a negative composition insertion offset.
+        let leadIn1 = max(0, swing1.contactTime - swing1.startTime)
+        let leadIn2 = max(0, swing2.contactTime - swing2.startTime)
+        let followThrough1 = max(0, swing1.endTime - swing1.contactTime)
+        let followThrough2 = max(0, swing2.endTime - swing2.contactTime)
+        self.impactTime = max(leadIn1, leadIn2)
+        self.totalDuration = impactTime + max(followThrough1, followThrough2)
+        self.preGap1 = impactTime - leadIn1
+        self.preGap2 = impactTime - leadIn2
+        self.postGap1 = totalDuration - impactTime - followThrough1
+        self.postGap2 = totalDuration - impactTime - followThrough2
+    }
+}
+
 final class ComparisonCompositionBuilder {
 
     private let targetFrameRate: Int32 = 30
-    private let maxRenderEdge: CGFloat = 1920
 
     func build(
         video1: SwingVideo, video2: SwingVideo,
@@ -40,35 +69,25 @@ final class ComparisonCompositionBuilder {
         mode: ComparisonMode, isSwapped: Bool, stackedOpacity: CGFloat
     ) -> ComparisonComposition? {
         guard let asset1 = loadAsset(video1), let asset2 = loadAsset(video2) else { return nil }
-        switch mode {
-        case .sequential:
+        if mode == .sequential {
             return buildSequential(asset1, asset2, swing1: swing1, swing2: swing2, isSwapped: isSwapped)
-        case .sideBySide, .topBottom, .stacked:
-            return buildSynced(
-                asset1, asset2, swing1: swing1, swing2: swing2,
-                mode: mode, isSwapped: isSwapped, stackedOpacity: stackedOpacity
-            )
         }
+        return buildSynced(asset1, asset2, swing1: swing1, swing2: swing2,
+                           mode: mode, isSwapped: isSwapped, stackedOpacity: stackedOpacity)
     }
 
     /// Cheap update path for changes that don't restructure tracks (mode
     /// transitions WITHIN synced modes, swap, stacked opacity). Returns nil
-    /// for sequential mode — that requires a full structural rebuild.
+    /// for sequential mode — its `requiresStructuralRebuild` strategy says so.
     func makeVideoComposition(
         forTracks tracks: [AVCompositionTrack],
         totalDuration: TimeInterval,
         mode: ComparisonMode, isSwapped: Bool, stackedOpacity: CGFloat
     ) -> AVMutableVideoComposition? {
-        guard mode != .sequential, tracks.count >= 2 else { return nil }
-        let track1 = tracks[0]
-        let track2 = tracks[1]
-        let canvas = renderSize(for: mode, tracks: [track1, track2])
-        let slots = slots(for: mode, in: canvas, isSwapped: isSwapped)
-        let layouts: [TrackLayout] = [
-            TrackLayout(track: track1, slot: slots[0], opacity: opacity(for: mode, index: 0, stackedOpacity: stackedOpacity), enabledRange: nil),
-            TrackLayout(track: track2, slot: slots[1], opacity: opacity(for: mode, index: 1, stackedOpacity: stackedOpacity), enabledRange: nil)
-        ]
-        return makeVideoComposition(canvas: canvas, totalDuration: totalDuration, layouts: layouts)
+        let strategy = mode.layoutStrategy
+        guard !strategy.requiresStructuralRebuild, tracks.count >= 2 else { return nil }
+        let layouts = syncedLayouts(tracks: tracks, strategy: strategy, isSwapped: isSwapped, stackedOpacity: stackedOpacity)
+        return makeVideoComposition(canvas: strategy.canvasSize(for: tracks), totalDuration: totalDuration, layouts: layouts)
     }
 
     // MARK: - Synced (impact-aligned)
@@ -78,49 +97,46 @@ final class ComparisonCompositionBuilder {
         swing1: SwingTimeRange, swing2: SwingTimeRange,
         mode: ComparisonMode, isSwapped: Bool, stackedOpacity: CGFloat
     ) -> ComparisonComposition? {
-        // Clamp to non-negative: a malformed SwingTimeRange where contactTime
-        // sits outside [startTime, endTime] would otherwise produce negative
-        // gaps and a negative composition insertion offset.
-        let leadIn1 = max(0, swing1.contactTime - swing1.startTime)
-        let leadIn2 = max(0, swing2.contactTime - swing2.startTime)
-        let followThrough1 = max(0, swing1.endTime - swing1.contactTime)
-        let followThrough2 = max(0, swing2.endTime - swing2.contactTime)
-        let impactTime = max(leadIn1, leadIn2)
-        let totalDuration = impactTime + max(followThrough1, followThrough2)
-        guard totalDuration > 0 else { return nil }
-
+        let timing = SyncedTiming(swing1: swing1, swing2: swing2)
+        guard timing.totalDuration > 0 else { return nil }
         let composition = AVMutableComposition()
-        let preGap1 = impactTime - leadIn1
-        let preGap2 = impactTime - leadIn2
-        let postGap1 = totalDuration - impactTime - followThrough1
-        let postGap2 = totalDuration - impactTime - followThrough2
-        guard let videoTrack1 = insertSyncedVideoTrack(asset1, swing: swing1, preGap: preGap1, postGap: postGap1, into: composition),
-              let videoTrack2 = insertSyncedVideoTrack(asset2, swing: swing2, preGap: preGap2, postGap: postGap2, into: composition) else {
+        guard let tracks = insertSyncedTracks(asset1, asset2, swing1: swing1, swing2: swing2, timing: timing, into: composition) else {
             return nil
         }
-        insertAudio(asset1, range: swing1, into: composition, atCompositionTime: preGap1)
-        insertAudio(asset2, range: swing2, into: composition, atCompositionTime: preGap2)
+        let strategy = mode.layoutStrategy
+        let layouts = syncedLayouts(tracks: tracks, strategy: strategy, isSwapped: isSwapped, stackedOpacity: stackedOpacity)
+        let videoComposition = makeVideoComposition(canvas: strategy.canvasSize(for: tracks), totalDuration: timing.totalDuration, layouts: layouts)
+        return assembleComposition(composition: composition, videoComposition: videoComposition,
+                                   totalDuration: timing.totalDuration, contactTime: timing.impactTime, tracks: tracks)
+    }
 
-        let canvas = renderSize(for: mode, tracks: [videoTrack1, videoTrack2])
-        let slots = slots(for: mode, in: canvas, isSwapped: isSwapped)
-        let layouts: [TrackLayout] = [
-            TrackLayout(track: videoTrack1, slot: slots[0], opacity: opacity(for: mode, index: 0, stackedOpacity: stackedOpacity), enabledRange: nil),
-            TrackLayout(track: videoTrack2, slot: slots[1], opacity: opacity(for: mode, index: 1, stackedOpacity: stackedOpacity), enabledRange: nil)
-        ]
+    private func insertSyncedTracks(
+        _ asset1: AVAsset, _ asset2: AVAsset,
+        swing1: SwingTimeRange, swing2: SwingTimeRange,
+        timing: SyncedTiming, into composition: AVMutableComposition
+    ) -> [AVCompositionTrack]? {
+        guard let videoTrack1 = insertSyncedVideoTrack(asset1, swing: swing1, preGap: timing.preGap1, postGap: timing.postGap1, into: composition),
+              let videoTrack2 = insertSyncedVideoTrack(asset2, swing: swing2, preGap: timing.preGap2, postGap: timing.postGap2, into: composition) else {
+            return nil
+        }
+        insertAudio(asset1, range: swing1, into: composition, atCompositionTime: timing.preGap1)
+        insertAudio(asset2, range: swing2, into: composition, atCompositionTime: timing.preGap2)
+        return [videoTrack1, videoTrack2]
+    }
 
-        let videoComposition = makeVideoComposition(canvas: canvas, totalDuration: totalDuration, layouts: layouts)
-        let playerItem = AVPlayerItem(asset: composition)
-        playerItem.videoComposition = videoComposition
-        playerItem.audioMix = makeAudioMix(composition: composition)
-        playerItem.preferredForwardBufferDuration = 2.0
-
-        return ComparisonComposition(
-            playerItem: playerItem,
-            totalDuration: totalDuration,
-            contactTime: impactTime,
-            frameDuration: 1.0 / Double(targetFrameRate),
-            videoTracks: [videoTrack1, videoTrack2]
-        )
+    private func syncedLayouts(
+        tracks: [AVCompositionTrack], strategy: ComparisonLayoutStrategy,
+        isSwapped: Bool, stackedOpacity: CGFloat
+    ) -> [TrackLayout] {
+        let canvas = strategy.canvasSize(for: tracks)
+        let slots = strategy.slots(in: canvas, isSwapped: isSwapped)
+        return tracks.enumerated().map { index, track in
+            TrackLayout(
+                track: track, slot: slots[index],
+                opacity: strategy.opacity(forIndex: index, stackedOpacity: stackedOpacity),
+                enabledRange: nil
+            )
+        }
     }
 
     // MARK: - Sequential
@@ -130,41 +146,63 @@ final class ComparisonCompositionBuilder {
         swing1: SwingTimeRange, swing2: SwingTimeRange, isSwapped: Bool
     ) -> ComparisonComposition? {
         let composition = AVMutableComposition()
-        let firstRange = isSwapped ? swing2 : swing1
-        let firstAsset = isSwapped ? asset2 : asset1
-        let secondRange = isSwapped ? swing1 : swing2
-        let secondAsset = isSwapped ? asset1 : asset2
+        let (firstAsset, firstRange) = isSwapped ? (asset2, swing2) : (asset1, swing1)
+        let (secondAsset, secondRange) = isSwapped ? (asset1, swing1) : (asset2, swing2)
+        guard let tracks = insertSequentialTracks(
+            firstAsset, firstRange: firstRange, secondAsset, secondRange: secondRange, into: composition
+        ) else { return nil }
+        let totalDuration = firstRange.duration + secondRange.duration
+        let strategy = SequentialLayout()
+        let canvas = strategy.canvasSize(for: tracks)
+        let layouts = sequentialLayouts(tracks: tracks, canvas: canvas, firstDuration: firstRange.duration, secondDuration: secondRange.duration)
+        let videoComposition = makeVideoComposition(canvas: canvas, totalDuration: totalDuration, layouts: layouts)
+        return assembleComposition(composition: composition, videoComposition: videoComposition,
+                                   totalDuration: totalDuration, contactTime: nil, tracks: tracks)
+    }
 
+    private func insertSequentialTracks(
+        _ firstAsset: AVAsset, firstRange: SwingTimeRange,
+        _ secondAsset: AVAsset, secondRange: SwingTimeRange,
+        into composition: AVMutableComposition
+    ) -> [AVCompositionTrack]? {
         guard let videoTrack1 = insertVideo(firstAsset, range: firstRange, into: composition, atCompositionTime: 0),
               let videoTrack2 = insertVideo(secondAsset, range: secondRange, into: composition, atCompositionTime: firstRange.duration) else {
             return nil
         }
         insertAudio(firstAsset, range: firstRange, into: composition, atCompositionTime: 0)
         insertAudio(secondAsset, range: secondRange, into: composition, atCompositionTime: firstRange.duration)
+        return [videoTrack1, videoTrack2]
+    }
 
-        let totalDuration = firstRange.duration + secondRange.duration
-        let canvas = renderSize(for: .sequential, tracks: [videoTrack1, videoTrack2])
+    private func sequentialLayouts(
+        tracks: [AVCompositionTrack], canvas: CGSize,
+        firstDuration: TimeInterval, secondDuration: TimeInterval
+    ) -> [TrackLayout] {
         let fullSlot = CGRect(origin: .zero, size: canvas)
-        let layouts: [TrackLayout] = [
-            TrackLayout(track: videoTrack1, slot: fullSlot, opacity: 1.0,
-                        enabledRange: CMTimeRange(start: .zero, duration: CMTime(seconds: firstRange.duration, preferredTimescale: 600))),
-            TrackLayout(track: videoTrack2, slot: fullSlot, opacity: 1.0,
-                        enabledRange: CMTimeRange(start: CMTime(seconds: firstRange.duration, preferredTimescale: 600),
-                                                  duration: CMTime(seconds: secondRange.duration, preferredTimescale: 600)))
+        let firstDur = CMTime(seconds: firstDuration, preferredTimescale: 600)
+        let secondDur = CMTime(seconds: secondDuration, preferredTimescale: 600)
+        return [
+            TrackLayout(track: tracks[0], slot: fullSlot, opacity: 1.0,
+                        enabledRange: CMTimeRange(start: .zero, duration: firstDur)),
+            TrackLayout(track: tracks[1], slot: fullSlot, opacity: 1.0,
+                        enabledRange: CMTimeRange(start: firstDur, duration: secondDur))
         ]
+    }
 
-        let videoComposition = makeVideoComposition(canvas: canvas, totalDuration: totalDuration, layouts: layouts)
+    // MARK: - Final Assembly
+
+    private func assembleComposition(
+        composition: AVMutableComposition, videoComposition: AVMutableVideoComposition,
+        totalDuration: TimeInterval, contactTime: TimeInterval?, tracks: [AVCompositionTrack]
+    ) -> ComparisonComposition {
         let playerItem = AVPlayerItem(asset: composition)
         playerItem.videoComposition = videoComposition
         playerItem.audioMix = makeAudioMix(composition: composition)
         playerItem.preferredForwardBufferDuration = 2.0
-
         return ComparisonComposition(
-            playerItem: playerItem,
-            totalDuration: totalDuration,
-            contactTime: nil,
-            frameDuration: 1.0 / Double(targetFrameRate),
-            videoTracks: [videoTrack1, videoTrack2]
+            playerItem: playerItem, totalDuration: totalDuration,
+            contactTime: contactTime, frameDuration: 1.0 / Double(targetFrameRate),
+            videoTracks: tracks
         )
     }
 
@@ -183,11 +221,8 @@ final class ComparisonCompositionBuilder {
               let track = composition.addMutableTrack(withMediaType: .video, preferredTrackID: kCMPersistentTrackID_Invalid) else {
             return nil
         }
-        let timeRange = CMTimeRange(
-            start: CMTime(seconds: range.startTime, preferredTimescale: 600),
-            duration: CMTime(seconds: range.duration, preferredTimescale: 600)
-        )
-        try? track.insertTimeRange(timeRange, of: sourceTrack, at: CMTime(seconds: time, preferredTimescale: 600))
+        let sourceRange = cmTimeRange(from: range)
+        try? track.insertTimeRange(sourceRange, of: sourceTrack, at: CMTime(seconds: time, preferredTimescale: 600))
         track.preferredTransform = sourceTrack.preferredTransform
         return track
     }
@@ -200,17 +235,11 @@ final class ComparisonCompositionBuilder {
         into composition: AVMutableComposition
     ) -> AVCompositionTrack? {
         guard let sourceTrack = asset.tracks(withMediaType: .video).first else { return nil }
-        let sourceRange = CMTimeRange(
-            start: CMTime(seconds: swing.startTime, preferredTimescale: 600),
-            duration: CMTime(seconds: swing.duration, preferredTimescale: 600)
-        )
         return try? FreezeFrameInserter.insertVideo(
-            sourceTrack: sourceTrack,
-            sourceRange: sourceRange,
+            sourceTrack: sourceTrack, sourceRange: cmTimeRange(from: swing),
             preGap: CMTime(seconds: preGap, preferredTimescale: 600),
             postGap: CMTime(seconds: postGap, preferredTimescale: 600),
-            targetFrameRate: targetFrameRate,
-            into: composition
+            targetFrameRate: targetFrameRate, into: composition
         )
     }
 
@@ -222,14 +251,17 @@ final class ComparisonCompositionBuilder {
               let track = composition.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid) else {
             return
         }
-        let timeRange = CMTimeRange(
+        try? track.insertTimeRange(cmTimeRange(from: range), of: sourceTrack, at: CMTime(seconds: time, preferredTimescale: 600))
+    }
+
+    private func cmTimeRange(from range: SwingTimeRange) -> CMTimeRange {
+        CMTimeRange(
             start: CMTime(seconds: range.startTime, preferredTimescale: 600),
             duration: CMTime(seconds: range.duration, preferredTimescale: 600)
         )
-        try? track.insertTimeRange(timeRange, of: sourceTrack, at: CMTime(seconds: time, preferredTimescale: 600))
     }
 
-    // MARK: - Layout
+    // MARK: - Video Composition
 
     private struct TrackLayout {
         let track: AVCompositionTrack
@@ -239,113 +271,57 @@ final class ComparisonCompositionBuilder {
         let enabledRange: CMTimeRange?
     }
 
-    private func renderSize(for mode: ComparisonMode, tracks: [AVCompositionTrack]) -> CGSize {
-        let sizes = tracks.map { displayedSize(of: $0) }
-        let widths = sizes.map { $0.width }
-        let heights = sizes.map { $0.height }
-        let raw: CGSize
-        switch mode {
-        case .sideBySide:  raw = CGSize(width: widths.reduce(0, +), height: heights.max() ?? 0)
-        case .topBottom:   raw = CGSize(width: widths.max() ?? 0, height: heights.reduce(0, +))
-        case .stacked, .sequential: raw = CGSize(width: widths.max() ?? 0, height: heights.max() ?? 0)
-        }
-        return cap(raw, longestEdge: maxRenderEdge)
-    }
-
-    private func slots(for mode: ComparisonMode, in canvas: CGSize, isSwapped: Bool) -> [CGRect] {
-        let full = CGRect(origin: .zero, size: canvas)
-        switch mode {
-        case .sideBySide:
-            let half = CGRect(x: 0, y: 0, width: canvas.width / 2, height: canvas.height)
-            let right = CGRect(x: canvas.width / 2, y: 0, width: canvas.width / 2, height: canvas.height)
-            return isSwapped ? [right, half] : [half, right]
-        case .topBottom:
-            let top = CGRect(x: 0, y: 0, width: canvas.width, height: canvas.height / 2)
-            let bottom = CGRect(x: 0, y: canvas.height / 2, width: canvas.width, height: canvas.height / 2)
-            return isSwapped ? [bottom, top] : [top, bottom]
-        case .stacked, .sequential:
-            return [full, full]
-        }
-    }
-
-    private func opacity(for mode: ComparisonMode, index: Int, stackedOpacity: CGFloat) -> CGFloat {
-        guard mode == .stacked, index == 1 else { return 1.0 }
-        return stackedOpacity
-    }
-
-    private func displayedSize(of track: AVCompositionTrack) -> CGSize {
-        let raw = CGRect(origin: .zero, size: track.naturalSize).applying(track.preferredTransform)
-        return CGSize(width: abs(raw.width), height: abs(raw.height))
-    }
-
-    private func cap(_ size: CGSize, longestEdge: CGFloat) -> CGSize {
-        let longest = max(size.width, size.height)
-        let scale = longest > longestEdge ? longestEdge / longest : 1.0
-        return CGSize(width: even(size.width * scale), height: even(size.height * scale))
-    }
-
-    /// Force even dimensions — hardware video codecs reject odd renderSize.
-    private func even(_ value: CGFloat) -> CGFloat {
-        max(2, round(value / 2) * 2)
-    }
-
-    // MARK: - Video Composition
-
     private func makeVideoComposition(canvas: CGSize, totalDuration: TimeInterval, layouts: [TrackLayout]) -> AVMutableVideoComposition {
         let composition = AVMutableVideoComposition()
         composition.renderSize = canvas
         composition.frameDuration = CMTime(value: 1, timescale: CMTimeScale(targetFrameRate))
-
         let instruction = AVMutableVideoCompositionInstruction()
         instruction.timeRange = CMTimeRange(start: .zero, duration: CMTime(seconds: totalDuration, preferredTimescale: 600))
-        instruction.layerInstructions = layouts.map { makeLayerInstruction(for: $0, canvas: canvas) }.reversed()
+        // layerInstructions are rendered top-down (index 0 on top). We pass layouts
+        // in [track1, track2] order but reverse so track1 renders ABOVE track2.
+        instruction.layerInstructions = layouts.map { makeLayerInstruction(for: $0) }.reversed()
         composition.instructions = [instruction]
         return composition
     }
 
-    /// Note: layerInstructions are rendered TOP-DOWN in the array — i.e. the
-    /// first instruction is the topmost layer. We pass layouts in [track1, track2]
-    /// order but reverse before assigning so track1 renders ABOVE track2 in stacked
-    /// mode (matching the prior dual-AVPlayerLayer rendering order).
-    private func makeLayerInstruction(for layout: TrackLayout, canvas: CGSize) -> AVMutableVideoCompositionLayerInstruction {
+    private func makeLayerInstruction(for layout: TrackLayout) -> AVMutableVideoCompositionLayerInstruction {
         let instruction = AVMutableVideoCompositionLayerInstruction(assetTrack: layout.track)
-        let transform = layoutTransform(for: layout.track, in: layout.slot)
-        instruction.setTransform(transform, at: .zero)
-        if let range = layout.enabledRange {
-            // Sequential mode: hide outside the track's slot, show inside.
-            // Skip the t=0 hide if the slot starts at zero, otherwise two
-            // setOpacity calls at the same time race for which wins.
-            if range.start > .zero {
-                instruction.setOpacity(0.0, at: .zero)
-            }
-            instruction.setOpacity(Float(layout.opacity), at: range.start)
-            instruction.setOpacity(0.0, at: range.end)
-        } else {
-            instruction.setOpacity(Float(layout.opacity), at: .zero)
-        }
+        instruction.setTransform(layoutTransform(for: layout.track, in: layout.slot), at: .zero)
+        applyOpacity(layout: layout, to: instruction)
         return instruction
     }
 
+    /// Sequential mode tracks have an enabledRange — hide outside, show inside.
+    /// Skip the t=0 hide if the slot starts at zero, otherwise two setOpacity
+    /// calls at the same time race for which wins.
+    private func applyOpacity(layout: TrackLayout, to instruction: AVMutableVideoCompositionLayerInstruction) {
+        guard let range = layout.enabledRange else {
+            instruction.setOpacity(Float(layout.opacity), at: .zero)
+            return
+        }
+        if range.start > .zero {
+            instruction.setOpacity(0.0, at: .zero)
+        }
+        instruction.setOpacity(Float(layout.opacity), at: range.start)
+        instruction.setOpacity(0.0, at: range.end)
+    }
+
     private func layoutTransform(for track: AVCompositionTrack, in slot: CGRect) -> CGAffineTransform {
-        let displayed = displayedSize(of: track)
+        let displayed = LayoutSizing.displayedSize(of: track)
         guard displayed.width > 0, displayed.height > 0 else { return track.preferredTransform }
         let scale = min(slot.width / displayed.width, slot.height / displayed.height)
-        let scaledSize = CGSize(width: displayed.width * scale, height: displayed.height * scale)
-        let tx = slot.midX - scaledSize.width / 2
-        let ty = slot.midY - scaledSize.height / 2
+        let tx = slot.midX - displayed.width * scale / 2
+        let ty = slot.midY - displayed.height * scale / 2
         return track.preferredTransform
             .concatenating(CGAffineTransform(scaleX: scale, y: scale))
             .concatenating(CGAffineTransform(translationX: tx, y: ty))
     }
 
-    // MARK: - Audio Mix
-
     /// Default: video1's audio plays, video2 is muted. Matches the prior
     /// dual-player default (single clean impact thwack at export time too).
     private func makeAudioMix(composition: AVMutableComposition) -> AVAudioMix {
         let mix = AVMutableAudioMix()
-        let audioTracks = composition.tracks(withMediaType: .audio)
-        mix.inputParameters = audioTracks.enumerated().map { index, track in
+        mix.inputParameters = composition.tracks(withMediaType: .audio).enumerated().map { index, track in
             let params = AVMutableAudioMixInputParameters(track: track)
             params.setVolume(index == 0 ? 1.0 : 0.0, at: .zero)
             return params
