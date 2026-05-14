@@ -47,6 +47,29 @@ final class ComparisonCompositionBuilder {
         }
     }
 
+    /// Cheap update path for changes that don't restructure tracks (mode
+    /// transitions WITHIN synced modes, swap, stacked opacity). Returns nil
+    /// if called for a sequential composition or if the existing playerItem
+    /// can't be inspected.
+    func makeVideoComposition(
+        for playerItem: AVPlayerItem,
+        mode: ComparisonMode, isSwapped: Bool, stackedOpacity: CGFloat
+    ) -> AVMutableVideoComposition? {
+        guard mode != .sequential else { return nil }
+        let videoTracks = playerItem.asset.tracks(withMediaType: .video)
+        guard videoTracks.count >= 2,
+              let track1 = videoTracks[0] as? AVCompositionTrack,
+              let track2 = videoTracks[1] as? AVCompositionTrack else { return nil }
+        let canvas = renderSize(for: mode, tracks: [track1, track2])
+        let slots = slots(for: mode, in: canvas, isSwapped: isSwapped)
+        let layouts: [TrackLayout] = [
+            TrackLayout(track: track1, slot: slots[0], opacity: opacity(for: mode, index: 0, stackedOpacity: stackedOpacity), enabledRange: nil),
+            TrackLayout(track: track2, slot: slots[1], opacity: opacity(for: mode, index: 1, stackedOpacity: stackedOpacity), enabledRange: nil)
+        ]
+        let duration = CMTimeGetSeconds(playerItem.asset.duration)
+        return makeVideoComposition(canvas: canvas, totalDuration: duration, layouts: layouts)
+    }
+
     // MARK: - Synced (impact-aligned)
 
     private func buildSynced(
