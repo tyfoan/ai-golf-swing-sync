@@ -25,9 +25,14 @@ struct RecordingView: View {
             ZStack {
                 Color.black.ignoresSafeArea()
 
-                CameraPreviewView(session: viewModel.cameraService.captureSession)
-                    .id("main-camera-\(viewModel.cameraService.sessionConfigurationId)")
-                    .ignoresSafeArea()
+                CameraPreviewView(
+                    session: viewModel.cameraService.captureSession,
+                    rotationSubjectProvider: { [weak service = viewModel.cameraService] layer in
+                        service?.makePreviewRotationSubject(for: layer)
+                    }
+                )
+                .id("main-camera-\(viewModel.cameraService.sessionConfigurationId)")
+                .ignoresSafeArea()
 
                 if viewModel.state == .idle {
                     PositioningGuideOverlay()

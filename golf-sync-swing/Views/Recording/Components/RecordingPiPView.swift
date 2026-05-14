@@ -13,6 +13,7 @@ struct RecordingPiPView: View {
     let pipDisplayMode: PipDisplayMode
     let sessionConfigurationId: Int
     let captureSession: AVCaptureSession
+    let rotationSubjectProvider: ((AVCaptureVideoPreviewLayer) -> CaptureRotationSubject?)?
     let lastSwing: SwingClip?
     let recordingURL: URL?
     let playbackSpeed: Float
@@ -52,7 +53,7 @@ struct RecordingPiPView: View {
     @ViewBuilder
     private var content: some View {
         if pipDisplayMode == .liveCamera {
-            CameraPreviewView(session: captureSession)
+            CameraPreviewView(session: captureSession, rotationSubjectProvider: rotationSubjectProvider)
                 .id("pip-camera-\(sessionConfigurationId)")
         } else if let swing = lastSwing, let url = recordingURL {
             SwingReplayView(videoURL: url, startTime: swing.startTime, endTime: swing.endTime, playbackSpeed: playbackSpeed, showControls: false)

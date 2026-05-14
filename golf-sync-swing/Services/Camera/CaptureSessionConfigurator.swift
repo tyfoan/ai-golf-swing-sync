@@ -86,13 +86,10 @@ final class CaptureSessionConfigurator {
             session.addOutput(videoOutput)
             configuredVideoOutput = videoOutput
 
-            if let connection = videoOutput.connection(with: .video) {
-                if connection.isVideoRotationAngleSupported(90) {
-                    connection.videoRotationAngle = 90
-                }
-                if connection.isVideoMirroringSupported {
-                    connection.isVideoMirrored = false
-                }
+            // Rotation is applied later by CaptureRotationSubject (device-correct angle).
+            if let connection = videoOutput.connection(with: .video),
+               connection.isVideoMirroringSupported {
+                connection.isVideoMirrored = false
             }
         }
 
@@ -117,13 +114,10 @@ final class CaptureSessionConfigurator {
             session.addOutput(movieOutput)
             configuredMovieOutput = movieOutput
 
-            if let connection = movieOutput.connection(with: .video) {
-                if connection.isVideoRotationAngleSupported(90) {
-                    connection.videoRotationAngle = 90
-                }
-                if config.position == .front && connection.isVideoMirroringSupported {
-                    connection.isVideoMirrored = true
-                }
+            // Rotation is applied later by CaptureRotationSubject (device-correct angle).
+            if let connection = movieOutput.connection(with: .video),
+               config.position == .front, connection.isVideoMirroringSupported {
+                connection.isVideoMirrored = true
             }
         }
 

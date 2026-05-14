@@ -47,6 +47,9 @@ final class CameraService: NSObject {
     // MARK: - Internal State
 
     private var movieFileOutput: AVCaptureMovieFileOutput?
+    private var videoDataOutput: AVCaptureVideoDataOutput?
+    private var currentVideoDevice: AVCaptureDevice?
+    private var captureRotationSubject: CaptureRotationSubject?
     private var isAudioSessionConfigured = false
     private var isSessionConfigured = false
     /// sessionQueue-only — not @Published, no main-thread requirement
@@ -144,14 +147,41 @@ final class CameraService: NSObject {
         }
 
         movieFileOutput = outputs.movieFileOutput
+        videoDataOutput = outputs.videoDataOutput
+        currentVideoDevice = outputs.videoDeviceInput?.device
         currentCameraPosition = position
         targetFrameRate = frameRate
         isSessionConfigured = true
+
+        rebuildCaptureRotation()
 
         DispatchQueue.main.async {
             self.sessionConfigurationId += 1
             self.currentError = nil
         }
+    }
+
+    // MARK: - Rotation
+
+    /// Builds a `CaptureRotationSubject` that drives the device-correct rotation
+    /// angle for a single preview layer. Each `CameraPreviewView` (main + PiP)
+    /// owns its own subject, since AVCaptureSession creates a distinct
+    /// connection per preview layer. Returns nil if the device isn't configured
+    /// yet — the caller should ask again once the session is up.
+    func makePreviewRotationSubject(for layer: AVCaptureVideoPreviewLayer) -> CaptureRotationSubject? {
+        guard let device = currentVideoDevice else { return nil }
+        return CaptureRotationSubject(device: device, previewLayer: layer)
+    }
+
+    private func rebuildCaptureRotation() {
+        guard let device = currentVideoDevice else {
+            captureRotationSubject = nil
+            return
+        }
+        let subject = CaptureRotationSubject(device: device, previewLayer: nil)
+        subject.register(captureConnection: videoDataOutput?.connection(with: .video))
+        subject.register(captureConnection: movieFileOutput?.connection(with: .video))
+        captureRotationSubject = subject
     }
 
     // MARK: - Session Control
