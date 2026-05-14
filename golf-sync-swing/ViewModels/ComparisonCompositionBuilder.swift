@@ -78,12 +78,16 @@ final class ComparisonCompositionBuilder {
         swing1: SwingTimeRange, swing2: SwingTimeRange,
         mode: ComparisonMode, isSwapped: Bool, stackedOpacity: CGFloat
     ) -> ComparisonComposition? {
-        let leadIn1 = swing1.contactTime - swing1.startTime
-        let leadIn2 = swing2.contactTime - swing2.startTime
-        let followThrough1 = swing1.endTime - swing1.contactTime
-        let followThrough2 = swing2.endTime - swing2.contactTime
+        // Clamp to non-negative: a malformed SwingTimeRange where contactTime
+        // sits outside [startTime, endTime] would otherwise produce negative
+        // gaps and a negative composition insertion offset.
+        let leadIn1 = max(0, swing1.contactTime - swing1.startTime)
+        let leadIn2 = max(0, swing2.contactTime - swing2.startTime)
+        let followThrough1 = max(0, swing1.endTime - swing1.contactTime)
+        let followThrough2 = max(0, swing2.endTime - swing2.contactTime)
         let impactTime = max(leadIn1, leadIn2)
         let totalDuration = impactTime + max(followThrough1, followThrough2)
+        guard totalDuration > 0 else { return nil }
 
         let composition = AVMutableComposition()
         let preGap1 = impactTime - leadIn1
