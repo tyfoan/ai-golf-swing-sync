@@ -19,6 +19,13 @@ import os
 @Observable
 final class CameraService: NSObject {
 
+    // MARK: - Shared Instance
+
+    /// Process-wide camera handle. The capture session is a process-level resource,
+    /// and onboarding pre-warms permission + session config so the Recording tab
+    /// can show a live preview the moment it mounts.
+    static let shared = CameraService()
+
     // MARK: - Observable State
 
     var isSessionRunning = false

@@ -44,7 +44,7 @@ final class RecordingViewModel {
 
     // MARK: - Collaborators
 
-    let cameraService = CameraService()
+    let cameraService = CameraService.shared
     private let detectionOrchestrator = DetectionOrchestrator()
     private let photosSaveService = PhotosSaveService()
     private let videoStorageService = VideoStorageService.shared

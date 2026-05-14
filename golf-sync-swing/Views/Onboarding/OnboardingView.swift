@@ -2,10 +2,10 @@
 //  OnboardingView.swift
 //  golf-sync-swing
 //
-//  Full-screen onboarding flow: 3 benefit pages followed by
-//  a paywall. Dismisses into the main app on completion.
+//  Full-screen onboarding flow: 3 benefit pages → paywall →
+//  camera permission. Dismisses into the main app on completion.
 //
-//  Flow: Welcome → Auto-Sync → Pro Benefits → Paywall → Main App
+//  Flow: Welcome → Auto-Sync → Pro Benefits → Paywall → Camera Access → Main App
 //
 
 import SwiftUI
@@ -15,7 +15,7 @@ struct OnboardingView: View {
     let onComplete: () -> Void
 
     @State private var currentPage = 0
-    @State private var showPaywall = false
+    @State private var sheet: OnboardingSheet?
     @State private var skipVisible = false
 
     private let pages = OnboardingFeature.pages
@@ -30,13 +30,23 @@ struct OnboardingView: View {
                 actionButton
             }
         }
-        .fullScreenCover(isPresented: $showPaywall) {
-            AppPaywallView(
-                source: .onboarding,
-                onDismiss: { finishOnboarding() }
-            )
+        .fullScreenCover(item: $sheet) { sheet in
+            switch sheet {
+            case .paywall:
+                AppPaywallView(
+                    source: .onboarding,
+                    onDismiss: { self.sheet = .cameraPermission }
+                )
+            case .cameraPermission:
+                CameraPermissionPageView { finishOnboarding() }
+            }
         }
         .onAppear { revealSkipAfterDelay() }
+    }
+
+    private enum OnboardingSheet: Identifiable {
+        case paywall, cameraPermission
+        var id: Self { self }
     }
 
     // MARK: - Skip
@@ -146,7 +156,7 @@ struct OnboardingView: View {
 
     private func advancePage() {
         guard !isLastPage else {
-            showPaywall = true
+            sheet = .paywall
             return
         }
         withAnimation {
@@ -156,10 +166,11 @@ struct OnboardingView: View {
 
     /// Skip goes directly to paywall (skipping remaining onboarding pages).
     private func skipAll() {
-        showPaywall = true
+        sheet = .paywall
     }
 
     private func finishOnboarding() {
+        sheet = nil
         OnboardingService.shared.completeOnboarding()
         onComplete()
     }

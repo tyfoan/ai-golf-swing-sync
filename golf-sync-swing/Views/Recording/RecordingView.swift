@@ -16,7 +16,6 @@ struct RecordingView: View {
     @Environment(\.modelContext) private var modelContext
     @State private var viewModel = RecordingViewModel()
     @State private var showingError = false
-    @State private var hasSetupCamera = false
     @State private var isTabVisible = false
     @State private var showDetectionFlash = false
 
@@ -134,15 +133,13 @@ struct RecordingView: View {
         isTabVisible = true
         Task {
             let granted = await viewModel.cameraService.requestPermissions()
-            if granted {
-                if !hasSetupCamera {
-                    viewModel.cameraService.setupSession(position: .front, frameRate: 30)
-                    hasSetupCamera = true
-                    try? await Task.sleep(for: .milliseconds(100))
-                }
-                if !viewModel.cameraService.isSessionRunning && !viewModel.isRecording {
-                    viewModel.cameraService.resumeSession()
-                }
+            guard granted else { return }
+            if !viewModel.cameraService.isSessionConfiguredForCurrentParams {
+                viewModel.cameraService.setupSession(position: .front, frameRate: 30)
+                try? await Task.sleep(for: .milliseconds(100))
+            }
+            if !viewModel.cameraService.isSessionRunning && !viewModel.isRecording {
+                viewModel.cameraService.resumeSession()
             }
         }
     }

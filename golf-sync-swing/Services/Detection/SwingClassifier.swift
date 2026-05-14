@@ -17,14 +17,27 @@ import os
 
 final class SwingClassifier: SwingDetecting, @unchecked Sendable {
 
-    private let model: MLModel?
+    private var _model: MLModel?
+    private let modelLock = NSLock()
     private let windowSize: Int
     private let swingConfidenceThreshold: Double
+
+    private var model: MLModel? {
+        modelLock.lock()
+        defer { modelLock.unlock() }
+        return _model
+    }
 
     init(windowSize: Int = 15, swingConfidenceThreshold: Double = 0.85) {
         self.windowSize = windowSize
         self.swingConfidenceThreshold = swingConfidenceThreshold
-        self.model = Self.loadModel()
+        Task.detached(priority: .userInitiated) { [weak self] in
+            let loaded = await Self.loadModel()
+            guard let self else { return }
+            self.modelLock.lock()
+            self._model = loaded
+            self.modelLock.unlock()
+        }
     }
 
     func analyze(frames: [PoseFrame]) -> SwingEvent {
@@ -109,7 +122,7 @@ final class SwingClassifier: SwingDetecting, @unchecked Sendable {
 
     // MARK: - Model Loading
 
-    private static func loadModel() -> MLModel? {
+    private static func loadModel() async -> MLModel? {
         let config = MLModelConfiguration()
         config.computeUnits = .cpuAndNeuralEngine
 
@@ -119,7 +132,7 @@ final class SwingClassifier: SwingDetecting, @unchecked Sendable {
         }
 
         do {
-            let model = try MLModel(contentsOf: url, configuration: config)
+            let model = try await MLModel.load(contentsOf: url, configuration: config)
             AppLogger.detection.info("SwingClassifier: model loaded successfully")
             return model
         } catch {
