@@ -23,6 +23,10 @@ struct ComparisonComposition {
     /// Composition time where both impacts coincide. Nil for sequential mode.
     let contactTime: TimeInterval?
     let frameDuration: TimeInterval
+    /// Concrete track references kept around so opacity/swap updates don't
+    /// have to re-fetch by casting `AVAssetTrack` (whose runtime type isn't
+    /// guaranteed to bridge cleanly on all iOS versions).
+    let videoTracks: [AVCompositionTrack]
 }
 
 final class ComparisonCompositionBuilder {
@@ -49,25 +53,22 @@ final class ComparisonCompositionBuilder {
 
     /// Cheap update path for changes that don't restructure tracks (mode
     /// transitions WITHIN synced modes, swap, stacked opacity). Returns nil
-    /// if called for a sequential composition or if the existing playerItem
-    /// can't be inspected.
+    /// for sequential mode — that requires a full structural rebuild.
     func makeVideoComposition(
-        for playerItem: AVPlayerItem,
+        forTracks tracks: [AVCompositionTrack],
+        totalDuration: TimeInterval,
         mode: ComparisonMode, isSwapped: Bool, stackedOpacity: CGFloat
     ) -> AVMutableVideoComposition? {
-        guard mode != .sequential else { return nil }
-        let videoTracks = playerItem.asset.tracks(withMediaType: .video)
-        guard videoTracks.count >= 2,
-              let track1 = videoTracks[0] as? AVCompositionTrack,
-              let track2 = videoTracks[1] as? AVCompositionTrack else { return nil }
+        guard mode != .sequential, tracks.count >= 2 else { return nil }
+        let track1 = tracks[0]
+        let track2 = tracks[1]
         let canvas = renderSize(for: mode, tracks: [track1, track2])
         let slots = slots(for: mode, in: canvas, isSwapped: isSwapped)
         let layouts: [TrackLayout] = [
             TrackLayout(track: track1, slot: slots[0], opacity: opacity(for: mode, index: 0, stackedOpacity: stackedOpacity), enabledRange: nil),
             TrackLayout(track: track2, slot: slots[1], opacity: opacity(for: mode, index: 1, stackedOpacity: stackedOpacity), enabledRange: nil)
         ]
-        let duration = CMTimeGetSeconds(playerItem.asset.duration)
-        return makeVideoComposition(canvas: canvas, totalDuration: duration, layouts: layouts)
+        return makeVideoComposition(canvas: canvas, totalDuration: totalDuration, layouts: layouts)
     }
 
     // MARK: - Synced (impact-aligned)
@@ -109,7 +110,8 @@ final class ComparisonCompositionBuilder {
             playerItem: playerItem,
             totalDuration: totalDuration,
             contactTime: impactTime,
-            frameDuration: 1.0 / Double(targetFrameRate)
+            frameDuration: 1.0 / Double(targetFrameRate),
+            videoTracks: [videoTrack1, videoTrack2]
         )
     }
 
@@ -153,7 +155,8 @@ final class ComparisonCompositionBuilder {
             playerItem: playerItem,
             totalDuration: totalDuration,
             contactTime: nil,
-            frameDuration: 1.0 / Double(targetFrameRate)
+            frameDuration: 1.0 / Double(targetFrameRate),
+            videoTracks: [videoTrack1, videoTrack2]
         )
     }
 
@@ -247,9 +250,13 @@ final class ComparisonCompositionBuilder {
 
     private func cap(_ size: CGSize, longestEdge: CGFloat) -> CGSize {
         let longest = max(size.width, size.height)
-        guard longest > longestEdge else { return CGSize(width: round(size.width), height: round(size.height)) }
-        let scale = longestEdge / longest
-        return CGSize(width: round(size.width * scale), height: round(size.height * scale))
+        let scale = longest > longestEdge ? longestEdge / longest : 1.0
+        return CGSize(width: even(size.width * scale), height: even(size.height * scale))
+    }
+
+    /// Force even dimensions — hardware video codecs reject odd renderSize.
+    private func even(_ value: CGFloat) -> CGFloat {
+        max(2, round(value / 2) * 2)
     }
 
     // MARK: - Video Composition
@@ -274,11 +281,17 @@ final class ComparisonCompositionBuilder {
         let instruction = AVMutableVideoCompositionLayerInstruction(assetTrack: layout.track)
         let transform = layoutTransform(for: layout.track, in: layout.slot)
         instruction.setTransform(transform, at: .zero)
-        instruction.setOpacity(Float(layout.opacity), at: .zero)
         if let range = layout.enabledRange {
-            instruction.setOpacity(0.0, at: .zero)
+            // Sequential mode: hide outside the track's slot, show inside.
+            // Skip the t=0 hide if the slot starts at zero, otherwise two
+            // setOpacity calls at the same time race for which wins.
+            if range.start > .zero {
+                instruction.setOpacity(0.0, at: .zero)
+            }
             instruction.setOpacity(Float(layout.opacity), at: range.start)
             instruction.setOpacity(0.0, at: range.end)
+        } else {
+            instruction.setOpacity(Float(layout.opacity), at: .zero)
         }
         return instruction
     }

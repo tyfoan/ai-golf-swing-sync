@@ -53,6 +53,7 @@ final class ComparisonViewModel {
     nonisolated(unsafe) private var timeObserver: Any?
     private let builder = ComparisonCompositionBuilder()
     private var composition: ComparisonComposition?
+    private var isLooping = false
 
     static let playbackRates: [Float] = [0.125, 0.25, 0.5, 1.0]
 
@@ -111,7 +112,7 @@ final class ComparisonViewModel {
     private func updateVideoComposition() {
         guard let comp = composition,
               let videoComposition = builder.makeVideoComposition(
-                  for: comp.playerItem,
+                  forTracks: comp.videoTracks, totalDuration: comp.totalDuration,
                   mode: comparisonMode, isSwapped: isSwapped, stackedOpacity: stackedOpacity
               ) else { return }
         comp.playerItem.videoComposition = videoComposition
@@ -137,14 +138,22 @@ final class ComparisonViewModel {
 
     private func onTick(_ time: TimeInterval) {
         currentTime = time
-        guard isPlaying, totalDuration > 0, time >= totalDuration - 0.01 else { return }
+        guard isPlaying, !isLooping, totalDuration > 0, time >= totalDuration - 0.01 else { return }
         loopToStart()
     }
 
     private func loopToStart() {
-        seekPlayer(to: 0)
+        isLooping = true
+        let cmTime = CMTime.zero
+        let tolerance = CMTime(seconds: 0.04, preferredTimescale: 600)
+        player.seek(to: cmTime, toleranceBefore: tolerance, toleranceAfter: tolerance) { [weak self] _ in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                self.isLooping = false
+                if self.isPlaying { self.player.rate = self.playbackRate }
+            }
+        }
         currentTime = 0
-        if isPlaying { player.rate = playbackRate }
     }
 
     // MARK: - Playback Controls
@@ -165,6 +174,7 @@ final class ComparisonViewModel {
     func pause() {
         player.pause()
         isPlaying = false
+        isLooping = false
     }
 
     func seek(to time: TimeInterval) {
