@@ -86,12 +86,16 @@ final class ComparisonCompositionBuilder {
         let totalDuration = impactTime + max(followThrough1, followThrough2)
 
         let composition = AVMutableComposition()
-        guard let videoTrack1 = insertVideo(asset1, range: swing1, into: composition, atCompositionTime: impactTime - leadIn1),
-              let videoTrack2 = insertVideo(asset2, range: swing2, into: composition, atCompositionTime: impactTime - leadIn2) else {
+        let preGap1 = impactTime - leadIn1
+        let preGap2 = impactTime - leadIn2
+        let postGap1 = totalDuration - impactTime - followThrough1
+        let postGap2 = totalDuration - impactTime - followThrough2
+        guard let videoTrack1 = insertVideoWithFreezeFrames(asset1, range: swing1, into: composition, preGap: preGap1, postGap: postGap1),
+              let videoTrack2 = insertVideoWithFreezeFrames(asset2, range: swing2, into: composition, preGap: preGap2, postGap: postGap2) else {
             return nil
         }
-        insertAudio(asset1, range: swing1, into: composition, atCompositionTime: impactTime - leadIn1)
-        insertAudio(asset2, range: swing2, into: composition, atCompositionTime: impactTime - leadIn2)
+        insertAudio(asset1, range: swing1, into: composition, atCompositionTime: preGap1)
+        insertAudio(asset2, range: swing2, into: composition, atCompositionTime: preGap2)
 
         let canvas = renderSize(for: mode, tracks: [videoTrack1, videoTrack2])
         let slots = slots(for: mode, in: canvas, isSwapped: isSwapped)
@@ -180,6 +184,51 @@ final class ComparisonCompositionBuilder {
             duration: CMTime(seconds: range.duration, preferredTimescale: 600)
         )
         try? track.insertTimeRange(timeRange, of: sourceTrack, at: CMTime(seconds: time, preferredTimescale: 600))
+        track.preferredTransform = sourceTrack.preferredTransform
+        return track
+    }
+
+    /// For synced modes: places the swing's main range plus held first/last
+    /// frames covering any pre/post gap relative to the other track. Without
+    /// this, the shorter clip's slot renders black during the longer clip's
+    /// lead-in / follow-through. We freeze (don't loop or interpolate) — that
+    /// matches the standard side-by-side swing-tool convention: hold the
+    /// address pose at start, hold the finish pose at end.
+    private func insertVideoWithFreezeFrames(
+        _ asset: AVAsset, range: SwingTimeRange,
+        into composition: AVMutableComposition,
+        preGap: TimeInterval, postGap: TimeInterval
+    ) -> AVCompositionTrack? {
+        guard let sourceTrack = asset.tracks(withMediaType: .video).first,
+              let track = composition.addMutableTrack(withMediaType: .video, preferredTrackID: kCMPersistentTrackID_Invalid) else {
+            return nil
+        }
+        let oneFrame = CMTime(value: 1, timescale: CMTimeScale(targetFrameRate))
+        let oneFrameSeconds = 1.0 / Double(targetFrameRate)
+        let minFreezeSeconds = oneFrameSeconds * 2
+        let mainStart = CMTime(seconds: range.startTime, preferredTimescale: 600)
+        let mainDuration = CMTime(seconds: range.duration, preferredTimescale: 600)
+        var cursor: CMTime = .zero
+
+        if preGap >= minFreezeSeconds {
+            let freezeSrc = CMTimeRange(start: mainStart, duration: oneFrame)
+            try? track.insertTimeRange(freezeSrc, of: sourceTrack, at: cursor)
+            let stretchTarget = CMTime(seconds: preGap, preferredTimescale: 600)
+            track.scaleTimeRange(CMTimeRange(start: cursor, duration: oneFrame), toDuration: stretchTarget)
+            cursor = cursor + stretchTarget
+        }
+
+        try? track.insertTimeRange(CMTimeRange(start: mainStart, duration: mainDuration), of: sourceTrack, at: cursor)
+        cursor = cursor + mainDuration
+
+        if postGap >= minFreezeSeconds, range.duration >= oneFrameSeconds {
+            let lastFrameStart = mainStart + mainDuration - oneFrame
+            let freezeSrc = CMTimeRange(start: lastFrameStart, duration: oneFrame)
+            try? track.insertTimeRange(freezeSrc, of: sourceTrack, at: cursor)
+            let stretchTarget = CMTime(seconds: postGap, preferredTimescale: 600)
+            track.scaleTimeRange(CMTimeRange(start: cursor, duration: oneFrame), toDuration: stretchTarget)
+        }
+
         track.preferredTransform = sourceTrack.preferredTransform
         return track
     }
