@@ -175,9 +175,14 @@ final class CameraService: NSObject {
     /// owns its own subject, since AVCaptureSession creates a distinct
     /// connection per preview layer. Returns nil if the device isn't configured
     /// yet — the caller should ask again once the session is up.
+    ///
+    /// `currentVideoDevice` is written on `sessionQueue`; sync there to read
+    /// so we don't race with a configureSession that's still in flight.
     func makePreviewRotationSubject(for layer: AVCaptureVideoPreviewLayer) -> CaptureRotationSubject? {
-        guard let device = currentVideoDevice else { return nil }
-        return CaptureRotationSubject(device: device, previewLayer: layer)
+        sessionQueue.sync {
+            guard let device = currentVideoDevice else { return nil }
+            return CaptureRotationSubject(device: device, previewLayer: layer)
+        }
     }
 
     private func rebuildCaptureRotation() {
