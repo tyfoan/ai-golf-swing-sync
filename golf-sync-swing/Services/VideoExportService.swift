@@ -131,26 +131,30 @@ final class VideoExportService {
         let size2 = try await track2.load(.naturalSize)
         let transform2 = try await track2.load(.preferredTransform)
 
-        // Create composition
+        // Create composition. Video1/Video2 are inserted at impact-aligned
+        // offsets with freeze-frame fill in any pre/post gap so the exported
+        // MP4 doesn't have black bars when the clips have asymmetric lead-in
+        // / follow-through windows. Shared with in-app playback via
+        // FreezeFrameInserter so both pipelines render identical timelines.
         let composition = AVMutableComposition()
 
-        guard let compositionTrack1 = composition.addMutableTrack(
-            withMediaType: .video,
-            preferredTrackID: kCMPersistentTrackID_Invalid
-        ),
-              let compositionTrack2 = composition.addMutableTrack(
-                withMediaType: .video,
-                preferredTrackID: kCMPersistentTrackID_Invalid
+        let timeRange1 = CMTimeRange(start: .zero, duration: duration1)
+        let timeRange2 = CMTimeRange(start: .zero, duration: duration2)
+        let preGap1 = video1StartTime
+        let postGap1 = CMTimeSubtract(effectiveDuration, CMTimeAdd(video1StartTime, duration1))
+        let preGap2 = video2StartTime
+        let postGap2 = CMTimeSubtract(effectiveDuration, CMTimeAdd(video2StartTime, duration2))
+
+        guard let compositionTrack1 = try FreezeFrameInserter.insertVideo(
+                sourceTrack: track1, sourceRange: timeRange1,
+                preGap: preGap1, postGap: postGap1, into: composition
+              ),
+              let compositionTrack2 = try FreezeFrameInserter.insertVideo(
+                sourceTrack: track2, sourceRange: timeRange2,
+                preGap: preGap2, postGap: postGap2, into: composition
               ) else {
             throw ExportError.missingVideoTrack
         }
-
-        // Insert video tracks
-        let timeRange1 = CMTimeRange(start: .zero, duration: duration1)
-        try compositionTrack1.insertTimeRange(timeRange1, of: track1, at: video1StartTime)
-
-        let timeRange2 = CMTimeRange(start: .zero, duration: duration2)
-        try compositionTrack2.insertTimeRange(timeRange2, of: track2, at: video2StartTime)
 
         // Add audio tracks if available
         if let audioTrack1 = try await asset1.loadTracks(withMediaType: .audio).first,
@@ -427,24 +431,50 @@ final class VideoExportService {
         )
 
         let composition = AVMutableComposition()
-        guard let track1c = composition.addMutableTrack(withMediaType: .video, preferredTrackID: kCMPersistentTrackID_Invalid),
-              let track2c = composition.addMutableTrack(withMediaType: .video, preferredTrackID: kCMPersistentTrackID_Invalid) else {
-            throw ExportError.missingVideoTrack
-        }
         // For sequential mode, track2 plays AFTER track1 (back-to-back).
-        // For sideBySide / stacked, both tracks play in parallel from their offsets.
+        // For sideBySide / topBottom / stacked, both tracks play in parallel from
+        // their impact-aligned offsets — and the shorter swing's slot needs
+        // freeze-frame fill so the exported MP4 doesn't have black bars during
+        // the longer clip's lead-in / follow-through. Same convention as
+        // in-app playback (FreezeFrameInserter is shared by both pipelines).
+        let track1c: AVMutableCompositionTrack
+        let track2c: AVMutableCompositionTrack
         let track1InsertAt: CMTime
         let track2InsertAt: CMTime
+        let sourceRange1 = CMTimeRange(start: slice1.start, duration: slice1.duration)
+        let sourceRange2 = CMTimeRange(start: slice2.start, duration: slice2.duration)
+
         if layoutConfig.mode == .sequential {
+            guard let t1 = composition.addMutableTrack(withMediaType: .video, preferredTrackID: kCMPersistentTrackID_Invalid),
+                  let t2 = composition.addMutableTrack(withMediaType: .video, preferredTrackID: kCMPersistentTrackID_Invalid) else {
+                throw ExportError.missingVideoTrack
+            }
+            track1c = t1
+            track2c = t2
             track1InsertAt = .zero
             track2InsertAt = slice1.duration
+            try track1c.insertTimeRange(sourceRange1, of: track1, at: track1InsertAt)
+            try track2c.insertTimeRange(sourceRange2, of: track2, at: track2InsertAt)
         } else {
             track1InsertAt = v1Start
             track2InsertAt = v2Start
+            let preGap1 = v1Start
+            let postGap1 = CMTimeSubtract(effectiveDuration, CMTimeAdd(v1Start, slice1.duration))
+            let preGap2 = v2Start
+            let postGap2 = CMTimeSubtract(effectiveDuration, CMTimeAdd(v2Start, slice2.duration))
+            guard let t1 = try FreezeFrameInserter.insertVideo(
+                    sourceTrack: track1, sourceRange: sourceRange1,
+                    preGap: preGap1, postGap: postGap1, into: composition
+                  ),
+                  let t2 = try FreezeFrameInserter.insertVideo(
+                    sourceTrack: track2, sourceRange: sourceRange2,
+                    preGap: preGap2, postGap: postGap2, into: composition
+                  ) else {
+                throw ExportError.missingVideoTrack
+            }
+            track1c = t1
+            track2c = t2
         }
-
-        try track1c.insertTimeRange(CMTimeRange(start: slice1.start, duration: slice1.duration), of: track1, at: track1InsertAt)
-        try track2c.insertTimeRange(CMTimeRange(start: slice2.start, duration: slice2.duration), of: track2, at: track2InsertAt)
 
         // Audio per isMuted flag, also trimmed when applicable
         if !layoutConfig.transforms[0].isMuted,
