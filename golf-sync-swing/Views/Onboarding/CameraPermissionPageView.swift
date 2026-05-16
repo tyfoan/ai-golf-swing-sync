@@ -119,15 +119,10 @@ struct CameraPermissionPageView: View {
                 comment: "Button label shown on the onboarding camera permission page while the iOS system permission alert is presented"
             )
         }
-        return permissionResolved
-            ? String(
-                localized: "Continue",
-                comment: "Button on the onboarding camera permission page that advances to the main app after permission has been resolved"
-            )
-            : String(
-                localized: "Allow Camera Access",
-                comment: "Primary CTA on the onboarding camera permission page that triggers the iOS camera and microphone permission prompts"
-            )
+        return String(
+            localized: "Continue",
+            comment: "Button on the onboarding camera permission page that advances to the main app after permission has been resolved"
+        )
     }
 
     // MARK: - Actions
