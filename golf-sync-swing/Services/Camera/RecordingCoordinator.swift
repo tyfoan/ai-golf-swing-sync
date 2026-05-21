@@ -12,7 +12,15 @@ import UIKit
 protocol RecordingCoordinating {
     var isRecording: Bool { get }
     var recordedDuration: TimeInterval { get }
-    func startRecording(movieOutput: AVCaptureMovieFileOutput, delegate: AVCaptureFileOutputRecordingDelegate) -> URL?
+    /// Validates preconditions and returns the destination URL synchronously, then
+    /// dispatches the AVFoundation bootstrap (which can take 100–300 ms) onto
+    /// `sessionQueue` so the caller's thread (typically main) is never blocked.
+    /// Returns nil when preconditions fail (insufficient disk, already recording).
+    func startRecording(
+        movieOutput: AVCaptureMovieFileOutput,
+        delegate: AVCaptureFileOutputRecordingDelegate,
+        sessionQueue: DispatchQueue
+    ) -> URL?
     func stopRecording(movieOutput: AVCaptureMovieFileOutput?)
 }
 
@@ -45,7 +53,11 @@ final class RecordingCoordinator: RecordingCoordinating {
         }
     }
 
-    func startRecording(movieOutput: AVCaptureMovieFileOutput, delegate: AVCaptureFileOutputRecordingDelegate) -> URL? {
+    func startRecording(
+        movieOutput: AVCaptureMovieFileOutput,
+        delegate: AVCaptureFileOutputRecordingDelegate,
+        sessionQueue: DispatchQueue
+    ) -> URL? {
         guard hasEnoughDiskSpace() else { return nil }
         guard !movieOutput.isRecording else { return nil }
 
@@ -53,37 +65,39 @@ final class RecordingCoordinator: RecordingCoordinating {
             .appendingPathComponent(UUID().uuidString)
             .appendingPathExtension("mov")
 
+        // Synchronous setup: URL allocation, background-task registration, and
+        // UI-bound timer must happen on the caller's (main) thread so we can
+        // return the URL immediately to the view model.
         currentRecordingURL = outputURL
-
-        let beginTask = { [weak self] in
-            guard let self else { return }
-            self.backgroundTask = UIApplication.shared.beginBackgroundTask { [weak self] in
-                self?.endBackgroundTask()
-            }
-            self.backgroundTimer = Timer.scheduledTimer(withTimeInterval: 25, repeats: false) { [weak self] _ in
-                self?.endBackgroundTask()
-            }
-        }
-
-        if Thread.isMainThread {
-            beginTask()
-        } else {
-            DispatchQueue.main.sync { beginTask() }
-        }
-
-        if let connection = movieOutput.connection(with: .video),
-           connection.isVideoStabilizationSupported {
-            connection.preferredVideoStabilizationMode = .auto
-        }
-
-        movieOutput.startRecording(to: outputURL, recordingDelegate: delegate)
-
+        beginBackgroundTask()
         isRecording = true
         recordedDuration = 0
         recordingStartTime = Date()
         startDurationTimer()
 
+        // Bootstrap AVFoundation off-main. `movieOutput.startRecording(to:)`
+        // spins up the encoder + file writer (100–300 ms); doing it here would
+        // freeze the UI during the post-countdown beat. Errors from the writer
+        // surface via the delegate's `didFinishRecordingTo:error:` callback.
+        sessionQueue.async { [weak movieOutput, weak delegate] in
+            guard let movieOutput, let delegate else { return }
+            if let connection = movieOutput.connection(with: .video),
+               connection.isVideoStabilizationSupported {
+                connection.preferredVideoStabilizationMode = .auto
+            }
+            movieOutput.startRecording(to: outputURL, recordingDelegate: delegate)
+        }
+
         return outputURL
+    }
+
+    private func beginBackgroundTask() {
+        backgroundTask = UIApplication.shared.beginBackgroundTask { [weak self] in
+            self?.endBackgroundTask()
+        }
+        backgroundTimer = Timer.scheduledTimer(withTimeInterval: 25, repeats: false) { [weak self] _ in
+            self?.endBackgroundTask()
+        }
     }
 
     func stopRecording(movieOutput: AVCaptureMovieFileOutput?) {

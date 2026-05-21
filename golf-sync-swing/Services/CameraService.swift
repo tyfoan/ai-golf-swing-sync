@@ -264,10 +264,14 @@ final class CameraService: NSObject {
     func startRecording() -> URL? {
         guard let movieOutput = movieFileOutput else { return nil }
 
-        var url: URL?
-        sessionQueue.sync {
-            url = recordingCoordinator.startRecording(movieOutput: movieOutput, delegate: self)
-        }
+        // Coordinator validates preconditions and returns a URL synchronously,
+        // then dispatches the AVFoundation bootstrap onto `sessionQueue` so the
+        // main thread is never blocked by `movieOutput.startRecording(to:)`.
+        let url = recordingCoordinator.startRecording(
+            movieOutput: movieOutput,
+            delegate: self,
+            sessionQueue: sessionQueue
+        )
 
         if url == nil {
             DispatchQueue.main.async {
