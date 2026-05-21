@@ -7,33 +7,35 @@ import SwiftUI
 import SwiftData
 
 struct MainTabView: View {
-    @State private var selectedTab = 0
+    @Environment(AppRouter.self) private var router
 
     var body: some View {
-        TabView(selection: $selectedTab) {
+        @Bindable var router = router
+
+        TabView(selection: $router.selectedTab) {
             RecordingView()
                 .tabItem {
                     Label("Camera", systemImage: "camera.fill")
                 }
-                .tag(0)
+                .tag(AppRouter.Tab.camera)
 
             HistoryView()
                 .tabItem {
                     Label("History", systemImage: "clock.fill")
                 }
-                .tag(1)
+                .tag(AppRouter.Tab.history)
 
             HomeView()
                 .tabItem {
                     Label("Compare", systemImage: "square.split.2x1.fill")
                 }
-                .tag(2)
+                .tag(AppRouter.Tab.compare)
 
             SettingsView()
                 .tabItem {
                     Label("Settings", systemImage: "gearshape.fill")
                 }
-                .tag(3)
+                .tag(AppRouter.Tab.settings)
         }
         .tint(.appTeal)
     }
@@ -41,5 +43,6 @@ struct MainTabView: View {
 
 #Preview {
     MainTabView()
+        .environment(AppRouter())
         .modelContainer(for: [SwingVideo.self, SwingMarker.self, ComparisonSession.self], inMemory: true)
 }

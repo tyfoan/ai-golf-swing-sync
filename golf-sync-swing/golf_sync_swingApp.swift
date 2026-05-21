@@ -12,6 +12,7 @@ struct golf_sync_swingApp: App {
     @State private var showDataError = false
     @State private var dataErrorMessage = ""
     @State private var showOnboarding: Bool
+    @State private var router = AppRouter()
 
     private let sharedModelContainer: ModelContainer
 
@@ -78,6 +79,7 @@ struct golf_sync_swingApp: App {
             }
         } else {
             MainTabView()
+                .environment(router)
         }
     }
 }

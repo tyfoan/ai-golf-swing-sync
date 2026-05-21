@@ -37,6 +37,15 @@ enum PipDisplayMode: Equatable {
     case lastSwingReplay
 }
 
+// MARK: - Save Outcome
+
+/// Captured after `saveToPhotos()` completes so the post-save card knows
+/// which recording to point the user at and how many swings to summarise.
+struct SaveOutcome: Equatable {
+    let videoID: UUID
+    let swingCount: Int
+}
+
 // MARK: - Swing Clip
 
 /// Detected swing clip during recording

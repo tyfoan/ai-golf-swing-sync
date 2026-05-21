@@ -32,6 +32,7 @@ final class RecordingViewModel {
     var mainViewShowsReplay: Bool = false
     var replayingSwingIndex: Int? = nil
     var requiresLibraryUpgrade: Bool = false
+    private(set) var saveOutcome: SaveOutcome?
     // PiP is always the live camera now — replays go straight to the main view.
     // Running a SwingReplayView in PiP simultaneously with one in main caused
     // FigSharedMemPool/PlayerRemoteXPC churn on the in-progress recording file.
@@ -167,7 +168,11 @@ final class RecordingViewModel {
     }
 
     private func beginRecording() {
-        guard cameraService.isSessionRunning else {
+        // Source of truth: AVCaptureSession's own state. The @Observable mirror
+        // `isSessionRunning` is updated via DispatchQueue.main.async and can lag
+        // behind the real session — `ensureSessionRunning()` polls the real one
+        // and we must agree, or we false-error mid-countdown.
+        guard cameraService.captureSession.isRunning else {
             state = .idle
             errorMessage = String(localized: "Camera session is not running.", comment: "Error message when the user taps record but the AVCaptureSession is not active")
             return
@@ -253,56 +258,69 @@ final class RecordingViewModel {
 
     func saveToPhotos() async {
         guard let url = recordingURL else { return }
-
-        if let modelContext, !LibraryGateService.canAddSwing(in: modelContext) {
-            requiresLibraryUpgrade = true
-            return
-        }
-
+        guard !libraryGateBlocksSave() else { requiresLibraryUpgrade = true; return }
         state = .saving
-
-        let authorized = await PhotosSaveService.requestAuthorization()
-        guard authorized else {
-            errorMessage = String(localized: "Photos access denied. Please enable in Settings.", comment: "Error shown after Save when the user has denied Photos write permission")
-            state = .reviewing
-            return
-        }
-
+        guard await ensurePhotosAuthorized() else { return }
         do {
-            // Save to Photos library
-            if detectedSwings.isEmpty {
-                try await photosSaveService.saveFullRecording(from: url)
-            } else {
-                for swing in detectedSwings {
-                    try await photosSaveService.saveClip(
-                        from: url,
-                        startTime: swing.startTime,
-                        endTime: swing.endTime
-                    )
-                }
-            }
-
-            // Persist to SwiftData for History tab
-            let persisted = await persistToSwiftData(recordingURL: url)
-
-            if persisted { try? FileManager.default.removeItem(at: url) }
-            recordingURL = nil
-            detectedSwings.removeAll()
-            mainViewShowsReplay = false
-            isLoadingReplay = false
-            replayingSwingIndex = nil
-            state = .saved
-            try? await Task.sleep(for: .seconds(1.5))
-            guard !Task.isCancelled else { state = .idle; return }
-            state = .idle
+            try await writeRecordingToPhotos(from: url)
+            let savedVideo = await persistToSwiftData(recordingURL: url)
+            finalizeSave(with: savedVideo, originalURL: url)
         } catch {
             errorMessage = error.localizedDescription
             state = .reviewing
         }
     }
 
-    private func persistToSwiftData(recordingURL: URL) async -> Bool {
+    /// Returns to idle after the saved-state hand-off has been consumed
+    /// (currently: auto-navigate to History). Distinct from `cancel()`,
+    /// which also tears down the capture session.
+    func dismissSavedState() {
+        saveOutcome = nil
+        state = .idle
+    }
+
+    private func libraryGateBlocksSave() -> Bool {
         guard let modelContext else { return false }
+        return !LibraryGateService.canAddSwing(in: modelContext)
+    }
+
+    private func ensurePhotosAuthorized() async -> Bool {
+        let authorized = await PhotosSaveService.requestAuthorization()
+        guard !authorized else { return true }
+        errorMessage = String(localized: "Photos access denied. Please enable in Settings.", comment: "Error shown after Save when the user has denied Photos write permission")
+        state = .reviewing
+        return false
+    }
+
+    private func writeRecordingToPhotos(from url: URL) async throws {
+        if detectedSwings.isEmpty {
+            try await photosSaveService.saveFullRecording(from: url)
+            return
+        }
+        for swing in detectedSwings {
+            try await photosSaveService.saveClip(
+                from: url,
+                startTime: swing.startTime,
+                endTime: swing.endTime
+            )
+        }
+    }
+
+    private func finalizeSave(with savedVideo: SwingVideo?, originalURL: URL) {
+        if let savedVideo {
+            saveOutcome = SaveOutcome(videoID: savedVideo.id, swingCount: detectedSwings.count)
+            try? FileManager.default.removeItem(at: originalURL)
+        }
+        recordingURL = nil
+        detectedSwings.removeAll()
+        mainViewShowsReplay = false
+        isLoadingReplay = false
+        replayingSwingIndex = nil
+        state = .saved
+    }
+
+    private func persistToSwiftData(recordingURL: URL) async -> SwingVideo? {
+        guard let modelContext else { return nil }
 
         do {
             let storedURL = try videoStorageService.copyVideoToStorage(from: recordingURL)
@@ -326,10 +344,10 @@ final class RecordingViewModel {
             }
 
             try modelContext.save()
-            return true
+            return swingVideo
         } catch {
             AppLogger.detection.error("Failed to persist swing data: \(error.localizedDescription)")
-            return false
+            return nil
         }
     }
 
@@ -340,6 +358,7 @@ final class RecordingViewModel {
         mainViewShowsReplay = false
         isLoadingReplay = false
         replayingSwingIndex = nil
+        saveOutcome = nil
         state = .idle
     }
 
@@ -356,6 +375,7 @@ final class RecordingViewModel {
         mainViewShowsReplay = false
         isLoadingReplay = false
         replayingSwingIndex = nil
+        saveOutcome = nil
         state = .idle
     }
 

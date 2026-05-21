@@ -8,12 +8,16 @@ import SwiftData
 
 struct HistoryView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(AppRouter.self) private var router
     @Query(sort: \SwingVideo.createdAt, order: .reverse) private var allVideos: [SwingVideo]
+
+    @State private var navigationPath = NavigationPath()
+    @State private var pendingDeleteOffsets: IndexSet?
 
     private var videos: [SwingVideo] { allVideos.filter { !$0.isPro } }
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $navigationPath) {
             Group {
                 if videos.isEmpty {
                     ContentUnavailableView(
@@ -24,7 +28,7 @@ struct HistoryView: View {
                 } else {
                     List {
                         ForEach(videos) { video in
-                            NavigationLink(destination: SingleVideoPlayerView(video: video)) {
+                            NavigationLink(value: video) {
                                 VideoHistoryRow(video: video)
                             }
                         }
@@ -38,6 +42,9 @@ struct HistoryView: View {
             .background(Color.sandLight)
             .preferredColorScheme(.light)
             .navigationTitle("Recordings")
+            .navigationDestination(for: SwingVideo.self) { video in
+                SingleVideoPlayerView(video: video)
+            }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     if !videos.isEmpty {
@@ -59,9 +66,16 @@ struct HistoryView: View {
                 Text("This recording and its swings will be permanently deleted.")
             }
         }
+        .onAppear { consumePendingVideo() }
+        .onChange(of: router.pendingHistoryVideoID) { _, _ in consumePendingVideo() }
     }
 
-    @State private var pendingDeleteOffsets: IndexSet?
+    private func consumePendingVideo() {
+        guard let id = router.consumePendingHistoryVideoID(),
+              let video = videos.first(where: { $0.id == id }) else { return }
+        if navigationPath.count > 0 { navigationPath.removeLast(navigationPath.count) }
+        navigationPath.append(video)
+    }
 
     private func deleteVideos(at offsets: IndexSet) {
         pendingDeleteOffsets = offsets
@@ -156,5 +170,6 @@ struct VideoHistoryRow: View {
 
 #Preview {
     HistoryView()
+        .environment(AppRouter())
         .modelContainer(for: [SwingVideo.self, SwingMarker.self, ComparisonSession.self], inMemory: true)
 }
