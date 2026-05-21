@@ -21,7 +21,6 @@ struct CountdownView: View {
 
             VStack(spacing: 14) {
                 countdownDigit
-                hintLabel
                 Spacer()
                 cancelButton
             }
@@ -31,15 +30,6 @@ struct CountdownView: View {
         }
         .onChange(of: count) { _, _ in animateCountdown() }
         .onAppear { animateCountdown() }
-    }
-
-    private var hintLabel: some View {
-        Text("Match the outline")
-            .font(.subheadline.weight(.medium))
-            .foregroundStyle(.white.opacity(0.85))
-            .padding(.horizontal, 14)
-            .padding(.vertical, 6)
-            .background(Capsule().fill(Color.black.opacity(0.4)))
     }
 
     private var countdownDigit: some View {
