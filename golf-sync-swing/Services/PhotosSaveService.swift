@@ -67,13 +67,15 @@ struct PhotosSaveService: PhotosSaving {
             .appendingPathExtension("mov")
         defer { try? FileManager.default.removeItem(at: outputURL) }
 
-        // HighestQuality re-encodes to H.264. Switched from .Passthrough because
-        // on HEVC sources (iPhone front camera default on iOS 26) with
-        // movieFragmentInterval=1s and slice points that don't land on
-        // keyframes, passthrough remux enters .exporting and never completes —
-        // user sees an infinite "Saving Video..." spinner. Re-encoding is
-        // slower but eliminates that hang class entirely.
-        let preset = AVAssetExportPresetHighestQuality
+        // Passthrough copies the source bitstream without re-encoding —
+        // ~10–40× faster than HighestQuality. We briefly switched to
+        // HighestQuality as insurance against a suspected HEVC-fragmented-
+        // passthrough stall, but device logs proved the clamp above was the
+        // real fix (export end status=3 / progress=1.0 / error=nil with no
+        // stall). If the hang ever returns the four os_log checkpoints will
+        // show "export begin" with no matching "export end" — at that point
+        // we'd know Passthrough is the culprit and switch the preset back.
+        let preset = AVAssetExportPresetPassthrough
         guard let exporter = AVAssetExportSession(asset: composition, presetName: preset) else {
             throw PhotosSaveError.exportFailed("Cannot create export session")
         }
