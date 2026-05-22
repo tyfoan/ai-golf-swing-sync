@@ -113,9 +113,31 @@ final class RecordingViewModel {
                     self.state = .idle
                 } else {
                     self.cameraService.pauseSession()
-                    self.state = .reviewing
+                    await self.handleRecordingFinished()
                 }
             }
+        }
+    }
+
+    /// Auto-save flow after a recording finishes. No swings detected → discard
+    /// the recording (don't clutter Photos or History with unmarked clips).
+    /// Swings detected → kick saveToPhotos directly, skipping the manual
+    /// Delete/Save Review step. The FinalizingVideoOverlay stays visible
+    /// continuously from .finalizingVideo through .saving to .saved, so there
+    /// is no UI flash mid-flow.
+    private func handleRecordingFinished() async {
+        if detectedSwings.isEmpty {
+            AppLogger.camera.info("RecordingViewModel: no swings detected, discarding recording")
+            deleteRecording()
+            return
+        }
+        await saveToPhotos()
+        // saveToPhotos sets state .saving as soon as preconditions pass. If
+        // state is still .finalizingVideo here, the save was blocked (library
+        // gate / paywall) — drop into .reviewing so the user has a manual
+        // Save/Delete fallback once they dismiss the paywall.
+        if state == .finalizingVideo {
+            state = .reviewing
         }
     }
 
