@@ -43,6 +43,14 @@ final class DetectionOrchestrator: @unchecked Sendable {
         qos: .userInitiated
     )
 
+    /// Backpressure gate. We drop new frames at intake if a previous frame
+    /// is still queued or executing on processingQueue. Without this the
+    /// async dispatch piles up CVPixelBuffers in FigSharedMemPool whenever
+    /// Vision latency spikes (thermal throttle), causing visible stutter.
+    private let inFlightLock = NSLock()
+    private var inFlight: Int = 0
+    private let heuristicsConfidenceFloor: Double = 0.7
+
     /// First frame's host-clock timestamp, used to normalize all detection
     /// timestamps to recording-relative values (file timeline starts at 0).
     private var baseTimestamp: TimeInterval?
@@ -68,6 +76,9 @@ final class DetectionOrchestrator: @unchecked Sendable {
         isActive = true
         baseTimestamp = nil
         isActiveLock.unlock()
+        inFlightLock.lock()
+        inFlight = 0
+        inFlightLock.unlock()
         poseDetector.clearBuffer()
         stateMachine.reset()
         AppLogger.detection.info("DetectionOrchestrator: started")
@@ -98,8 +109,21 @@ final class DetectionOrchestrator: @unchecked Sendable {
 
         let relativeTimestamp = timestamp - base
 
+        inFlightLock.lock()
+        let canAccept = inFlight == 0
+        if canAccept { inFlight = 1 }
+        inFlightLock.unlock()
+
+        guard canAccept else { return }
+
         processingQueue.async { [weak self] in
-            self?.handleFrame(pixelBuffer: pixelBuffer, timestamp: relativeTimestamp)
+            guard let self else { return }
+            defer {
+                self.inFlightLock.lock()
+                self.inFlight = 0
+                self.inFlightLock.unlock()
+            }
+            self.handleFrame(pixelBuffer: pixelBuffer, timestamp: relativeTimestamp)
         }
     }
 
@@ -163,6 +187,13 @@ final class DetectionOrchestrator: @unchecked Sendable {
         // so heuristics drives detection. Classifier acts as optional confidence boost.
         guard case .swingDetected(let hc, let ht) = heuristicsResult else {
             return .noSwing
+        }
+
+        // Skip the classifier when heuristics is already confident — the
+        // classifier allocates a fresh [MLMultiArray] per call, and at the
+        // +0.15 boost we'd be capping at 1.0 anyway.
+        guard hc < heuristicsConfidenceFloor else {
+            return .swingDetected(confidence: hc, timestamp: ht)
         }
 
         let classifierResult = classifier.analyze(frames: frames)

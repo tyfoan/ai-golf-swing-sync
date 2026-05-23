@@ -62,6 +62,14 @@ final class CameraService: NSObject {
     /// sessionQueue-only — not @Published, no main-thread requirement
     private var isConfiguring = false
     private var targetFrameRate: Double = 60
+
+    /// Drops arrive in thermal-throttle bursts. Each main-thread @Observable
+    /// write triggers a SwiftUI invalidation, so a burst floods the run loop.
+    /// We coalesce into a single flush per `droppedFramesFlushInterval`.
+    private var pendingDroppedFrames: Int = 0
+    private var droppedFramesFlushScheduled = false
+    private let droppedFramesLock = NSLock()
+    private let droppedFramesFlushInterval: TimeInterval = 0.25
     // Duration is read directly from recordingCoordinator — no duplicate polling timer
 
     // MARK: - Queues
@@ -374,7 +382,24 @@ extension CameraService: AVCaptureVideoDataOutputSampleBufferDelegate, AVCapture
     }
 
     func captureOutput(_ output: AVCaptureOutput, didDrop sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
-        DispatchQueue.main.async { self.droppedFrameCount += 1 }
+        droppedFramesLock.lock()
+        pendingDroppedFrames += 1
+        let shouldSchedule = !droppedFramesFlushScheduled
+        if shouldSchedule { droppedFramesFlushScheduled = true }
+        droppedFramesLock.unlock()
+
+        guard shouldSchedule else { return }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + droppedFramesFlushInterval) { [weak self] in
+            guard let self else { return }
+            self.droppedFramesLock.lock()
+            let count = self.pendingDroppedFrames
+            self.pendingDroppedFrames = 0
+            self.droppedFramesFlushScheduled = false
+            self.droppedFramesLock.unlock()
+            guard count > 0 else { return }
+            self.droppedFrameCount += count
+        }
     }
 }
 

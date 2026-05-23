@@ -16,6 +16,7 @@ import os
 final class PoseDetector: @unchecked Sendable {
 
     private let sequenceHandler = VNSequenceRequestHandler()
+    private let poseRequest = VNDetectHumanBodyPoseRequest()
     private let bufferCapacity: Int
     private var buffer: [PoseFrame]
     private var writeIndex: Int = 0
@@ -31,17 +32,18 @@ final class PoseDetector: @unchecked Sendable {
 
     // MARK: - Pose Extraction
 
+    // Called serially on DetectionOrchestrator.processingQueue. Reusing the
+    // request avoids a per-frame heap allocation (30+/sec) and lets Vision
+    // retain its internal state across the sequence.
     internal func extractPose(from pixelBuffer: CVPixelBuffer, at timestamp: TimeInterval) -> PoseFrame {
-        let request = VNDetectHumanBodyPoseRequest()
-
         do {
-            try sequenceHandler.perform([request], on: pixelBuffer)
+            try sequenceHandler.perform([poseRequest], on: pixelBuffer)
         } catch {
             AppLogger.detection.debug("Pose extraction failed: \(error.localizedDescription)")
             return PoseFrame(timestamp: timestamp, joints: [:])
         }
 
-        guard let observation = request.results?.first else {
+        guard let observation = poseRequest.results?.first else {
             return PoseFrame(timestamp: timestamp, joints: [:])
         }
 
