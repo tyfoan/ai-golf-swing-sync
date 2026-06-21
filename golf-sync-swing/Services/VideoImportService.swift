@@ -18,6 +18,7 @@ struct VideoImportService {
             modelContext.insert(video)
             try modelContext.save()
         }
+        Analytics.shared.track(.videoImported)
         let isInTempDirectory = url.path.contains(NSTemporaryDirectory()) || url.path.contains("/tmp/")
         if isInTempDirectory {
             try? FileManager.default.removeItem(at: url)
