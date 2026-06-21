@@ -1093,6 +1093,8 @@ In Amplitude: **Data → Sources → (your iOS source) → Live event stream** (
 | Finish an export | `export_completed` | `aspect_ratio`, `is_hd` |
 | Record a swing (**physical device only** — Vision pose detection does not run on simulator) | `recording_started`, `swing_detected` | — |
 
+Note which export flow actually presents the quality picker: `ExportQuality` (and thus `is_hd`/the `exportHD` gate) drives the legacy comparison export; the editor/`layoutConfig` path renders by aspect-ratio dimensions and may not show the picker, so `is_hd` reads `false` there. That's expected — read `is_hd` as "user chose HD quality in the legacy export," not "output was high-res." Confirm the behavior of each path during this check so the funnel is interpreted correctly later.
+
 Confirm `paywall_purchased` fires on a sandbox purchase, and that the Amplitude user shows a `user_id` equal to the RevenueCat App User ID once `customerInfoStream` emits.
 
 - [ ] **Step 4: Update docs**
