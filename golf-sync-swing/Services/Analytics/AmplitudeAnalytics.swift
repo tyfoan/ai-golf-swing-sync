@@ -15,7 +15,7 @@ final class AmplitudeAnalytics: AnalyticsTracking {
 
     // Client write key from the Amplitude dashboard (Settings → Projects → API Key).
     // Safe to embed, like the RevenueCat key in PurchaseService.
-    static let apiKey = "PASTE_AMPLITUDE_API_KEY_FROM_DASHBOARD"
+    static let apiKey = "85b77951a97db9e1cb193184ed2d0e7c"
 
     private let amplitude: Amplitude
 
