@@ -80,6 +80,7 @@ final class RecordingViewModel {
                 guard let self else { return }
                 self.detectedSwings.append(clip)
                 self.playbackSpeed = 1.0
+                Analytics.shared.track(.swingDetected)
                 // Detection feedback only — haptic + green flash + swing-count
                 // badge in the top bar. We do NOT play the in-progress recording
                 // file: opening it with AVURLAsset causes iOS to terminate the
@@ -211,6 +212,7 @@ final class RecordingViewModel {
         isLoadingReplay = false
         replayingSwingIndex = nil
         state = .recording
+        Analytics.shared.track(.recordingStarted)
         cameraService.onFrameCaptured = { [weak self] pixelBuffer, timestamp in
             self?.detectionOrchestrator.processFrame(
                 pixelBuffer: pixelBuffer,

@@ -33,7 +33,10 @@ struct CustomPaywallView: View {
             closeButton
             toastOverlay
         }
-        .task { await viewModel.loadOffering() }
+        .task {
+            Analytics.shared.track(.paywallShown(source: source))
+            await viewModel.loadOffering()
+        }
     }
 
     // MARK: - Background
@@ -126,7 +129,10 @@ struct CustomPaywallView: View {
     private var closeButton: some View {
         VStack {
             HStack {
-                Button(action: onDismiss) {
+                Button {
+                    Analytics.shared.track(.paywallDismissed(source: source))
+                    onDismiss()
+                } label: {
                     Image(systemName: "xmark")
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundStyle(Color.white.opacity(0.55))
@@ -186,6 +192,7 @@ struct CustomPaywallView: View {
     private func handlePurchaseOutcome(_ outcome: PaywallViewModel.PurchaseOutcome) {
         switch outcome {
         case .succeeded:
+            Analytics.shared.track(.paywallPurchased(source: source))
             onDismiss()
         case .cancelled:
             break

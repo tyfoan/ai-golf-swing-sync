@@ -38,6 +38,7 @@ struct MainTabView: View {
                 .tag(AppRouter.Tab.settings)
         }
         .tint(.appTeal)
+        .onAppear { Analytics.shared.track(.mainAppReached) }
     }
 }
 

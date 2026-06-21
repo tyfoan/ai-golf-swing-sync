@@ -17,6 +17,7 @@
 		88649EF42F32386700DB5D4D /* project_spec.md in Resources */ = {isa = PBXBuildFile; fileRef = 88649EEC2F32386700DB5D4D /* project_spec.md */; };
 		88B37B602F3FDF6700DDB85A /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 886500012F35A00100DB5D4D /* RevenueCat */; };
 		88B37B612F3FDF6700DDB85A /* RevenueCatUI in Frameworks */ = {isa = PBXBuildFile; productRef = 886500022F35A00100DB5D4D /* RevenueCatUI */; };
+		AE17A11D0000000000000001 /* AmplitudeSwift in Frameworks */ = {isa = PBXBuildFile; productRef = AE17A11D0000000000000003 /* AmplitudeSwift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -75,6 +76,7 @@
 			files = (
 				88B37B612F3FDF6700DDB85A /* RevenueCatUI in Frameworks */,
 				88B37B602F3FDF6700DDB85A /* RevenueCat in Frameworks */,
+				AE17A11D0000000000000001 /* AmplitudeSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -161,6 +163,7 @@
 			packageProductDependencies = (
 				886500012F35A00100DB5D4D /* RevenueCat */,
 				886500022F35A00100DB5D4D /* RevenueCatUI */,
+				AE17A11D0000000000000003 /* AmplitudeSwift */,
 			);
 			productName = "golf-sync-swing";
 			productReference = 88649A2E2F2C322400DB5D4D /* golf-sync-swing.app */;
@@ -258,6 +261,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				886500002F35A00100DB5D4D /* XCRemoteSwiftPackageReference "purchases-ios-spm" */,
+				AE17A11D0000000000000002 /* XCRemoteSwiftPackageReference "Amplitude-Swift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 88649A2F2F2C322400DB5D4D /* Products */;
@@ -680,6 +684,14 @@
 				minimumVersion = 5.0.0;
 			};
 		};
+		AE17A11D0000000000000002 /* XCRemoteSwiftPackageReference "Amplitude-Swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/amplitude/Amplitude-Swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -692,6 +704,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 886500002F35A00100DB5D4D /* XCRemoteSwiftPackageReference "purchases-ios-spm" */;
 			productName = RevenueCatUI;
+		};
+		AE17A11D0000000000000003 /* AmplitudeSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AE17A11D0000000000000002 /* XCRemoteSwiftPackageReference "Amplitude-Swift" */;
+			productName = AmplitudeSwift;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

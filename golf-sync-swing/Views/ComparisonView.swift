@@ -131,6 +131,9 @@ private extension ComparisonView {
             }
         } else {
             Button {
+                if let feature = mode.premiumFeature {
+                    Analytics.shared.track(.featureGateHit(feature: feature))
+                }
                 showPaywall = true
             } label: {
                 Label(String(localized: "\(mode.displayName) (Pro)", comment: "Mode picker label for premium-locked modes"), systemImage: "lock.fill")
@@ -193,6 +196,7 @@ private extension ComparisonView {
             swing1: swing1, swing2: swing2
         )
         viewModel = vm
+        Analytics.shared.track(.comparisonOpened(mode: vm.comparisonMode))
         vm.play()
     }
 }
