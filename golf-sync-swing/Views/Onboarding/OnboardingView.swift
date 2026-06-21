@@ -41,7 +41,10 @@ struct OnboardingView: View {
                 CameraPermissionPageView { finishOnboarding() }
             }
         }
-        .onAppear { revealSkipAfterDelay() }
+        .onAppear {
+            Analytics.shared.track(.onboardingStarted)
+            revealSkipAfterDelay()
+        }
     }
 
     private enum OnboardingSheet: Identifiable {
@@ -172,6 +175,7 @@ struct OnboardingView: View {
     private func finishOnboarding() {
         sheet = nil
         OnboardingService.shared.completeOnboarding()
+        Analytics.shared.track(.onboardingCompleted)
         onComplete()
     }
 }
