@@ -281,7 +281,7 @@ struct AnalyticsFacadeTests {
         let noOp = NoOpAnalytics()
         noOp.track(.swingDetected)
         noOp.identify(userId: "x")
-        #expect(Bool(true))
+        // No assertion — the test's value is that these calls don't crash or throw.
     }
 }
 ```
@@ -356,12 +356,15 @@ final class Analytics: AnalyticsTracking {
     static let shared = Analytics()
 
     private var tracker: AnalyticsTracking
+    private var isConfigured = false
 
     init(tracker: AnalyticsTracking = NoOpAnalytics()) {
         self.tracker = tracker
     }
 
     func configure() {
+        guard !isConfigured else { return }
+        isConfigured = true
         tracker = AmplitudeAnalytics()
     }
 
