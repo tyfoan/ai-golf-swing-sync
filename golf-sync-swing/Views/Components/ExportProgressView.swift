@@ -150,6 +150,7 @@ private extension ExportProgressView {
         let locked = quality.requiresPremium && !FeatureAccess.isUnlocked(.exportHD)
         return Button {
             guard !locked else {
+                Analytics.shared.track(.featureGateHit(feature: .exportHD))
                 showPaywall = true
                 return
             }
@@ -323,6 +324,10 @@ private extension ExportProgressView {
         switch result {
         case .success(let url):
             exportedURL = url
+            Analytics.shared.track(.exportCompleted(
+                aspectRatio: layoutConfig?.aspectRatio,
+                isHD: selectedQuality.requiresPremium
+            ))
         case .failure(.cancelled):
             // Cancel path: the view's Cancel button already triggered
             // onDismiss before this completion arrived. Nothing to do.
