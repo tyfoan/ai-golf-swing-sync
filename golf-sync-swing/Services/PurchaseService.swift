@@ -56,6 +56,7 @@ final class PurchaseService {
         for await info in Purchases.shared.customerInfoStream {
             customerInfo = info
             isPremium = info.entitlements[Self.entitlementID]?.isActive == true
+            Analytics.shared.identify(userId: Purchases.shared.appUserID)
             AppLogger.general.info("PurchaseService: premium=\(self.isPremium)")
         }
     }
