@@ -107,9 +107,10 @@ struct AnalyticsEventTests {
 
     @Test("comparison_opened uses the stable mode case name")
     func comparisonOpened() {
-        let event = AnalyticsEvent.comparisonOpened(mode: .stacked)
-        #expect(event.name == "comparison_opened")
-        #expect(event.properties == ["mode": "stacked"])
+        #expect(AnalyticsEvent.comparisonOpened(mode: .stacked).properties == ["mode": "stacked"])
+        let sbs = AnalyticsEvent.comparisonOpened(mode: .sideBySide)
+        #expect(sbs.name == "comparison_opened")
+        #expect(sbs.properties == ["mode": "sideBySide"])
     }
 
     @Test("feature_gate_hit uses the feature raw value")
@@ -121,11 +122,11 @@ struct AnalyticsEventTests {
 
     @Test("export_completed carries aspect ratio and HD flag as strings")
     func exportCompleted() {
-        let hd = AnalyticsEvent.exportCompleted(aspectRatio: "tikTokVertical", isHD: true)
+        let hd = AnalyticsEvent.exportCompleted(aspectRatio: .tikTokVertical, isHD: true)
         #expect(hd.name == "export_completed")
         #expect(hd.properties == ["aspect_ratio": "tikTokVertical", "is_hd": "true"])
-        let sd = AnalyticsEvent.exportCompleted(aspectRatio: "legacy", isHD: false)
-        #expect(sd.properties == ["aspect_ratio": "legacy", "is_hd": "false"])
+        let legacy = AnalyticsEvent.exportCompleted(aspectRatio: nil, isHD: false)
+        #expect(legacy.properties == ["aspect_ratio": "legacy", "is_hd": "false"])
     }
 }
 ```
@@ -157,7 +158,7 @@ struct AnalyticsEvent: Equatable {
     let name: String
     let properties: [String: String]
 
-    init(name: String, properties: [String: String] = [:]) {
+    private init(name: String, properties: [String: String] = [:]) {
         self.name = name
         self.properties = properties
     }
@@ -191,16 +192,16 @@ extension AnalyticsEvent {
         AnalyticsEvent(name: "feature_gate_hit", properties: ["feature": feature.rawValue])
     }
 
-    static func exportCompleted(aspectRatio: String, isHD: Bool) -> AnalyticsEvent {
+    static func exportCompleted(aspectRatio: ExportAspectRatio?, isHD: Bool) -> AnalyticsEvent {
         AnalyticsEvent(
             name: "export_completed",
-            properties: ["aspect_ratio": aspectRatio, "is_hd": isHD ? "true" : "false"]
+            properties: ["aspect_ratio": aspectRatio?.rawValue ?? "legacy", "is_hd": String(describing: isHD)]
         )
     }
 }
 ```
 
-> Note: `String(describing:)` on a raw-valued enum returns the **case name** (e.g. `"stacked"`), not the display raw value (`"Stacked"`). The test above pins this behavior — keep it.
+> Note: `exportCompleted` takes `ExportAspectRatio?` (not a raw `String`) for type safety, mapping `nil → "legacy"` to cover the non-`layoutConfig` (legacy) export path. `String(describing:)` on a raw-valued enum returns the **case name** (e.g. `"stacked"`), not the display raw value (`"Stacked"`). The test above pins this behavior — keep it.
 
 - [ ] **Step 4: Run the tests to verify they pass**
 
@@ -961,7 +962,7 @@ to:
         case .success(let url):
             exportedURL = url
             Analytics.shared.track(.exportCompleted(
-                aspectRatio: layoutConfig?.aspectRatio.rawValue ?? "legacy",
+                aspectRatio: layoutConfig?.aspectRatio,
                 isHD: selectedQuality.requiresPremium
             ))
 ```
