@@ -44,8 +44,8 @@ struct golf_sync_swingApp: App {
 
         self._showOnboarding = State(initialValue: !OnboardingService.shared.hasCompletedOnboarding)
 
-        PurchaseService.shared.configure()
         Analytics.shared.configure()
+        PurchaseService.shared.configure()
         VideoPathMigrationService.migrateIfNeeded(modelContainer: sharedModelContainer)
         VideoExportService.cleanupOrphanedExports()
         ProSwingSeeder.seedIfNeeded(container: sharedModelContainer)
