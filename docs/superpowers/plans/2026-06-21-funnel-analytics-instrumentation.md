@@ -549,8 +549,8 @@ In `golf_sync_swingApp.swift` `init()`, change:
 ```
 to:
 ```swift
-        PurchaseService.shared.configure()
         Analytics.shared.configure()
+        PurchaseService.shared.configure()
         VideoPathMigrationService.migrateIfNeeded(modelContainer: sharedModelContainer)
 ```
 

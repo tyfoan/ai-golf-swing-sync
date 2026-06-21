@@ -9,6 +9,9 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- **Funnel analytics (Amplitude)**: ~11-event funnel instrumented end-to-end — onboarding started/completed, paywall shown/dismissed/purchased (with source), main-app-reached, recording started, swing detected, video imported, comparison opened (with mode), feature-gate hits (advanced modes + HD export), export completed (aspect ratio + HD) — via a protocol-based `AnalyticsTracking` seam, a typed `AnalyticsEvent` taxonomy, an `AmplitudeAnalytics` wrapper (IDFV-only, session autocapture), and a `NoOpAnalytics` default. SDK isolated to a single file.
+- **Analytics identity linking**: Amplitude user id set from the RevenueCat App User ID so app events join RevenueCat's server-sent monetization events
+- **Amplitude-Swift SPM dependency** (1.18.5)
 - **Curated pro swing library expansion**: Bundled 19 dataset-derived pro reference clips trimmed from local GolfDB/YouTube labels with 2s setup/follow-through context
 - **Pro swing asset builder**: Added `scripts/build_pro_swing_assets.py` to regenerate bundled pro clips from local labeled training assets
 - **Pro swing 16:9 backups**: Preserved original generated wide clips under `backups/pro-swings-original-16x9/` before cropping app assets
@@ -23,6 +26,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Debug: Reset Onboarding**: Debug-only button in Settings to re-show onboarding
 
 ### Changed
+- **PrivacyInfo.xcprivacy**: Declares analytics data collection — Usage Data (Product Interaction) + Device ID, both anonymous (not linked) and not tracking, purpose Analytics; IDFV-only so no App Tracking Transparency prompt
 - **Pro swing video framing**: Bundled pro clips now use bbox-aware 3:2 landscape crops, with earlier 16:9 and 4:5 generated sets retained under `backups/`
 - **Pro swing cards**: Carousel thumbnails now fit the full contact frame over a blurred background instead of center-cropping off-edge players
 - **App entry point**: Shows OnboardingView on first launch, MainTabView on subsequent launches

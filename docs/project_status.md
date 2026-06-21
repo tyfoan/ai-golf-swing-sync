@@ -111,6 +111,15 @@
 
 ## Recent Updates
 
+### 2026-06-21 (Funnel Analytics Instrumentation)
+- Added end-to-end funnel analytics via Amplitude (free tier) + RevenueCat's native Amplitude integration to find where users drop off
+- Protocol-based `AnalyticsTracking` seam + typed `AnalyticsEvent` taxonomy + `AmplitudeAnalytics` wrapper (IDFV-only, session autocapture) + `NoOpAnalytics` default; Amplitude SDK isolated to one file
+- ~11 funnel events wired once each: onboarding started/completed, paywall shown/dismissed/purchased, main-app-reached, recording started, swing detected, video imported, comparison opened, feature-gate hits, export completed
+- Amplitude user id linked to RevenueCat App User ID so app events join server-sent monetization events
+- `PrivacyInfo.xcprivacy` declares Usage Data + Device ID (anonymous, analytics, IDFV → no ATT prompt)
+- Spec + plan in `docs/superpowers/`; delivered on branch `feat/funnel-analytics`
+- **Pending before release (manual)**: paste real key into `AmplitudeAnalytics.apiKey`; configure RevenueCat → Amplitude integration in dashboard; update App Store privacy nutrition labels; verify event stream on a device
+
 ### 2026-02-13 (Deployment Blockers + RevenueCat)
 - Fixed 6 deployment blockers identified by expert review panel
 - Added PrivacyInfo.xcprivacy (required for App Store submission since iOS 17)
