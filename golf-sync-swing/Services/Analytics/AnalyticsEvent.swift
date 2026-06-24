@@ -52,4 +52,56 @@ extension AnalyticsEvent {
             properties: ["aspect_ratio": aspectRatio?.rawValue ?? "legacy", "is_hd": String(describing: isHD)]
         )
     }
+
+    static func exportStarted(aspectRatio: ExportAspectRatio?, quality: String) -> AnalyticsEvent {
+        AnalyticsEvent(
+            name: "export_started",
+            properties: ["aspect_ratio": aspectRatio?.rawValue ?? "legacy", "quality": quality]
+        )
+    }
+
+    static func exportFailed(aspectRatio: ExportAspectRatio?, reason: String) -> AnalyticsEvent {
+        AnalyticsEvent(
+            name: "export_failed",
+            properties: ["aspect_ratio": aspectRatio?.rawValue ?? "legacy", "reason": reason]
+        )
+    }
+
+    static func swingSaved(saveType: String, count: Int) -> AnalyticsEvent {
+        AnalyticsEvent(
+            name: "swing_saved",
+            properties: ["save_type": saveType, "count": String(count)]
+        )
+    }
+
+    static func comparisonModeChanged(from: ComparisonMode, to: ComparisonMode) -> AnalyticsEvent {
+        AnalyticsEvent(
+            name: "comparison_mode_changed",
+            properties: ["from": String(describing: from), "to": String(describing: to)]
+        )
+    }
+
+    static func purchaseCompleted(revenue: PurchaseRevenue, plan: String, source: PaywallSource) -> AnalyticsEvent {
+        AnalyticsEvent(
+            name: "purchase_completed",
+            properties: [
+                "plan": plan,
+                "product_id": revenue.productId,
+                "price": String(revenue.price),
+                "currency": revenue.currency,
+                "source": source.rawValue
+            ]
+        )
+    }
+
+    static func trialStarted(plan: String, productId: String, source: PaywallSource) -> AnalyticsEvent {
+        AnalyticsEvent(
+            name: "trial_started",
+            properties: ["plan": plan, "product_id": productId, "source": source.rawValue]
+        )
+    }
+
+    static func purchaseRestored(source: PaywallSource) -> AnalyticsEvent {
+        AnalyticsEvent(name: "purchase_restored", properties: ["source": source.rawValue])
+    }
 }

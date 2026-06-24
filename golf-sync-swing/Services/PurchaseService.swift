@@ -57,6 +57,7 @@ final class PurchaseService {
             customerInfo = info
             isPremium = info.entitlements[Self.entitlementID]?.isActive == true
             Analytics.shared.identify(userId: Purchases.shared.appUserID)
+            Analytics.shared.setPremium(isPremium)
             AppLogger.general.info("PurchaseService: premium=\(self.isPremium)")
         }
     }

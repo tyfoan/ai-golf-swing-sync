@@ -119,6 +119,7 @@ final class ComparisonViewModel {
     }
 
     private func onModeChanged(from old: ComparisonMode) {
+        Analytics.shared.track(.comparisonModeChanged(from: old, to: comparisonMode))
         // If either side of the transition restructures the timeline (i.e.
         // sequential involved), full-rebuild. Otherwise it's a layer-only
         // change and a cheap videoComposition swap suffices.

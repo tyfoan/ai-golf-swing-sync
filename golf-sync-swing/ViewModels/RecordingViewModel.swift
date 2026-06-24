@@ -331,6 +331,10 @@ final class RecordingViewModel {
     }
 
     private func finalizeSave(with savedVideo: SwingVideo?, originalURL: URL) {
+        Analytics.shared.track(.swingSaved(
+            saveType: detectedSwings.isEmpty ? "full" : "clip",
+            count: detectedSwings.count
+        ))
         if let savedVideo {
             saveOutcome = SaveOutcome(videoID: savedVideo.id, swingCount: detectedSwings.count)
             try? FileManager.default.removeItem(at: originalURL)

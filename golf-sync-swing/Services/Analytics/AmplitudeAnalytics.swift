@@ -33,4 +33,17 @@ final class AmplitudeAnalytics: AnalyticsTracking {
     func identify(userId: String) {
         amplitude.setUserId(userId: userId)
     }
+
+    func record(_ revenue: PurchaseRevenue) {
+        let amplitudeRevenue = Revenue()
+        amplitudeRevenue.productId = revenue.productId
+        amplitudeRevenue.price = revenue.price
+        amplitudeRevenue.quantity = revenue.quantity
+        amplitudeRevenue.currency = revenue.currency
+        amplitude.revenue(revenue: amplitudeRevenue)
+    }
+
+    func setPremium(_ isPremium: Bool) {
+        amplitude.identify(userProperties: ["is_premium": isPremium])
+    }
 }

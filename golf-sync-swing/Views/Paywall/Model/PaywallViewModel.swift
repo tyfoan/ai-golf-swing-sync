@@ -22,7 +22,7 @@ final class PaywallViewModel {
     }
 
     enum PurchaseOutcome: Equatable {
-        case succeeded
+        case succeeded(PurchaseRecord)
         case cancelled
         case failed(String)
     }
@@ -80,11 +80,23 @@ final class PaywallViewModel {
             let result = try await purchases.purchase(package: plan.package)
             if result.userCancelled { return .cancelled }
             await PurchaseService.shared.refreshStatus()
-            return .succeeded
+            return .succeeded(purchaseRecord(for: plan, customerInfo: result.customerInfo))
         } catch {
             AppLogger.general.error("Paywall: purchase failed — \(error.localizedDescription)")
             return .failed("Couldn't complete purchase.")
         }
+    }
+
+    private func purchaseRecord(for plan: PaywallPlan, customerInfo: CustomerInfo) -> PurchaseRecord {
+        let product = plan.package.storeProduct
+        let isTrial = customerInfo.entitlements[entitlementID]?.periodType == .trial
+        return PurchaseRecord(
+            productId: product.productIdentifier,
+            plan: plan.kind.analyticsName,
+            price: NSDecimalNumber(decimal: product.price).doubleValue,
+            currency: product.currencyCode ?? "USD",
+            isTrial: isTrial
+        )
     }
 
     // MARK: - Restore
@@ -172,5 +184,27 @@ struct LivePurchases: PurchasesType {
         productIdentifiers: [String]
     ) async -> [String: IntroEligibility] {
         await Purchases.shared.checkTrialOrIntroDiscountEligibility(productIdentifiers: productIdentifiers)
+    }
+}
+
+// MARK: - Purchase analytics payload
+
+/// What the view needs to emit revenue analytics for a completed purchase.
+/// Decouples CustomPaywallView from RevenueCat: the view never touches a Package.
+struct PurchaseRecord: Equatable {
+    let productId: String
+    let plan: String        // "annual" / "weekly" / "lifetime"
+    let price: Double
+    let currency: String
+    let isTrial: Bool        // true = free trial started, no revenue yet
+}
+
+private extension PaywallPlan.Kind {
+    var analyticsName: String {
+        switch self {
+        case .lifetime: return "lifetime"
+        case .annual: return "annual"
+        case .weekly: return "weekly"
+        }
     }
 }

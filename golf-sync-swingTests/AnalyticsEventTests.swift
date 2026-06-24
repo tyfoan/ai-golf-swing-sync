@@ -47,4 +47,61 @@ struct AnalyticsEventTests {
         let legacy = AnalyticsEvent.exportCompleted(aspectRatio: nil, isHD: false)
         #expect(legacy.properties == ["aspect_ratio": "legacy", "is_hd": "false"])
     }
+
+    @Test("export_started carries aspect ratio and quality")
+    func exportStarted() {
+        let event = AnalyticsEvent.exportStarted(aspectRatio: .square, quality: "ultra")
+        #expect(event.name == "export_started")
+        #expect(event.properties == ["aspect_ratio": "square", "quality": "ultra"])
+        #expect(AnalyticsEvent.exportStarted(aspectRatio: nil, quality: "standard").properties["aspect_ratio"] == "legacy")
+    }
+
+    @Test("export_failed carries aspect ratio and a stable reason")
+    func exportFailed() {
+        let event = AnalyticsEvent.exportFailed(aspectRatio: .tikTokVertical, reason: "noVideoTrack")
+        #expect(event.name == "export_failed")
+        #expect(event.properties == ["aspect_ratio": "tikTokVertical", "reason": "noVideoTrack"])
+    }
+
+    @Test("swing_saved carries save type and count")
+    func swingSaved() {
+        let clip = AnalyticsEvent.swingSaved(saveType: "clip", count: 3)
+        #expect(clip.name == "swing_saved")
+        #expect(clip.properties == ["save_type": "clip", "count": "3"])
+    }
+
+    @Test("comparison_mode_changed carries stable from/to case names")
+    func comparisonModeChanged() {
+        let event = AnalyticsEvent.comparisonModeChanged(from: .sideBySide, to: .stacked)
+        #expect(event.name == "comparison_mode_changed")
+        #expect(event.properties == ["from": "sideBySide", "to": "stacked"])
+    }
+
+    @Test("purchase_completed carries plan, product, price, currency and source")
+    func purchaseCompleted() {
+        let revenue = PurchaseRevenue(productId: "golfswing.annual", price: 49.99, currency: "USD")
+        let event = AnalyticsEvent.purchaseCompleted(revenue: revenue, plan: "annual", source: .onboarding)
+        #expect(event.name == "purchase_completed")
+        #expect(event.properties == [
+            "plan": "annual",
+            "product_id": "golfswing.annual",
+            "price": "49.99",
+            "currency": "USD",
+            "source": "onboarding"
+        ])
+    }
+
+    @Test("trial_started carries plan, product and source — no revenue")
+    func trialStarted() {
+        let event = AnalyticsEvent.trialStarted(plan: "weekly", productId: "golfswing.weekly", source: .featureGate)
+        #expect(event.name == "trial_started")
+        #expect(event.properties == ["plan": "weekly", "product_id": "golfswing.weekly", "source": "featureGate"])
+    }
+
+    @Test("purchase_restored carries the source")
+    func purchaseRestored() {
+        let event = AnalyticsEvent.purchaseRestored(source: .settings)
+        #expect(event.name == "purchase_restored")
+        #expect(event.properties == ["source": "settings"])
+    }
 }

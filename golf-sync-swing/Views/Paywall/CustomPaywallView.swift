@@ -191,13 +191,24 @@ struct CustomPaywallView: View {
 
     private func handlePurchaseOutcome(_ outcome: PaywallViewModel.PurchaseOutcome) {
         switch outcome {
-        case .succeeded:
+        case .succeeded(let record):
             Analytics.shared.track(.paywallPurchased(source: source))
+            trackConversion(record)
             onDismiss()
         case .cancelled:
             break
         case .failed(let message):
             showToast(message)
+        }
+    }
+
+    private func trackConversion(_ record: PurchaseRecord) {
+        if record.isTrial {
+            Analytics.shared.track(.trialStarted(plan: record.plan, productId: record.productId, source: source))
+        } else {
+            let revenue = PurchaseRevenue(productId: record.productId, price: record.price, currency: record.currency)
+            Analytics.shared.record(revenue)
+            Analytics.shared.track(.purchaseCompleted(revenue: revenue, plan: record.plan, source: source))
         }
     }
 
@@ -216,6 +227,7 @@ struct CustomPaywallView: View {
     private func handleRestoreOutcome(_ outcome: PaywallViewModel.RestoreOutcome) {
         switch outcome {
         case .succeeded:
+            Analytics.shared.track(.purchaseRestored(source: source))
             onDismiss()
         case .noActiveEntitlement:
             showToast("No previous purchase found.")
