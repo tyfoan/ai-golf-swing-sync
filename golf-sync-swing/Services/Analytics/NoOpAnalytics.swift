@@ -11,4 +11,6 @@ import Foundation
 final class NoOpAnalytics: AnalyticsTracking {
     func track(_ event: AnalyticsEvent) {}
     func identify(userId: String) {}
+    func record(_ revenue: PurchaseRevenue) {}
+    func setPremium(_ isPremium: Bool) {}
 }

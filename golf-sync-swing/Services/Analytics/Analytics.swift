@@ -32,4 +32,12 @@ final class Analytics: AnalyticsTracking {
     func identify(userId: String) {
         tracker.identify(userId: userId)
     }
+
+    func record(_ revenue: PurchaseRevenue) {
+        tracker.record(revenue)
+    }
+
+    func setPremium(_ isPremium: Bool) {
+        tracker.setPremium(isPremium)
+    }
 }

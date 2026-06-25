@@ -20,11 +20,31 @@ struct AnalyticsFacadeTests {
         #expect(spy.identifiedUserIds == ["rc-user-123"])
     }
 
+    @Test("Facade routes record() revenue to the injected tracker")
+    func facadeRoutesRecord() {
+        let spy = AnalyticsSpy()
+        let analytics = Analytics(tracker: spy)
+        let revenue = PurchaseRevenue(productId: "golfswing.annual", price: 49.99, currency: "USD")
+        analytics.record(revenue)
+        #expect(spy.recordedRevenue == [revenue])
+    }
+
+    @Test("Facade routes setPremium() to the injected tracker")
+    func facadeRoutesSetPremium() {
+        let spy = AnalyticsSpy()
+        let analytics = Analytics(tracker: spy)
+        analytics.setPremium(true)
+        analytics.setPremium(false)
+        #expect(spy.premiumFlags == [true, false])
+    }
+
     @Test("NoOpAnalytics swallows calls without crashing")
     func noOpDoesNothing() {
         let noOp = NoOpAnalytics()
         noOp.track(.swingDetected)
         noOp.identify(userId: "x")
+        noOp.record(PurchaseRevenue(productId: "p", price: 1.0, currency: "USD"))
+        noOp.setPremium(true)
         // No assertion — the test's value is that these calls don't crash or throw.
     }
 }

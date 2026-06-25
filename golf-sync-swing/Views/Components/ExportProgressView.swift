@@ -294,6 +294,10 @@ private extension ExportProgressView {
         isExporting = true
         progress = 0
         errorMessage = nil
+        Analytics.shared.track(.exportStarted(
+            aspectRatio: layoutConfig?.aspectRatio,
+            quality: selectedQuality.rawValue
+        ))
 
         if let config = layoutConfig {
             exportHandle = VideoExportService.exportComparison(
@@ -333,6 +337,10 @@ private extension ExportProgressView {
             // onDismiss before this completion arrived. Nothing to do.
             break
         case .failure(let error):
+            Analytics.shared.track(.exportFailed(
+                aspectRatio: layoutConfig?.aspectRatio,
+                reason: String(describing: error)
+            ))
             errorMessage = error.localizedDescription
         }
     }
