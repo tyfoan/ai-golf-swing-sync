@@ -15,6 +15,7 @@ struct HomeView: View {
     @State private var selectedSwings: [SwingSelection] = []
     @State private var navigationPath = NavigationPath()
     @State private var showPaywall = false
+    @State private var hasKickedSeeder = false
 
     var body: some View {
         NavigationStack(path: $navigationPath) {
@@ -50,7 +51,21 @@ struct HomeView: View {
             .fullScreenCover(isPresented: $showPaywall) {
                 AppPaywallView(source: .featureGate, onDismiss: { showPaywall = false })
             }
+            .task { kickSeederIfNeeded() }
         }
+    }
+
+    /// Seeding lives here, not on the launch path: on a first launch it copies 19 bundled
+    /// clips (~59 MB) and decodes a thumbnail per clip, and doing that during onboarding
+    /// contended with the camera's first bring-up on disk and mediaserverd. The pro library
+    /// is only needed once this tab is seen; `@Query` streams the pros in as they land.
+    /// A plain call, not `Task.detached`: the seeder runs its own I/O in `@concurrent`
+    /// helpers — a detached hop would only bounce straight back to the main actor for
+    /// the SwiftData work.
+    private func kickSeederIfNeeded() {
+        guard !hasKickedSeeder else { return }
+        hasKickedSeeder = true
+        ProSwingSeeder.seedIfNeeded(container: modelContext.container)
     }
 
     private var swingPickerScroll: some View {
@@ -157,6 +172,7 @@ private extension HomeView {
               let v2 = videos.first(where: { $0.id == sel2.videoId }) else { return }
 
         if (v1.isPro || v2.isPro) && !FeatureAccess.isPremiumUser {
+            Analytics.shared.track(.featureGateHit(feature: .proSwingLibrary))
             showPaywall = true
             return
         }

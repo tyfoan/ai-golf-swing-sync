@@ -9,15 +9,15 @@ import SwiftData
 import os
 
 final class VideoStorageService {
-    static let shared = VideoStorageService()
-    private init() {}
+    nonisolated static let shared = VideoStorageService()
+    private nonisolated init() {}
 
-    private var documentsDirectory: URL {
+    private nonisolated var documentsDirectory: URL {
         // Safe: iOS sandbox guarantees documentDirectory exists
         FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
     }
 
-    private var videosDirectory: URL {
+    private nonisolated var videosDirectory: URL {
         let url = documentsDirectory.appendingPathComponent("Videos", isDirectory: true)
         if !FileManager.default.fileExists(atPath: url.path) {
             try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
@@ -25,8 +25,10 @@ final class VideoStorageService {
         return url
     }
 
-    /// Copy video from source URL to app's Documents directory
-    func copyVideoToStorage(from sourceURL: URL) throws -> URL {
+    /// Copy video from source URL to app's Documents directory.
+    /// `nonisolated` so background callers (the recording save path) do not hop to the
+    /// main actor for a whole-file copy; touches only local state and `FileManager`.
+    nonisolated func copyVideoToStorage(from sourceURL: URL) throws -> URL {
         let uniqueID = UUID().uuidString
         let fileExtension = sourceURL.pathExtension.isEmpty ? "mov" : sourceURL.pathExtension
         let destinationURL = videosDirectory.appendingPathComponent("\(uniqueID).\(fileExtension)")

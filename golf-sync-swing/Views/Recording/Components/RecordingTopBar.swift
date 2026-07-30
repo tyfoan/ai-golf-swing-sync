@@ -10,14 +10,26 @@ import SwiftUI
 struct RecordingTopBar: View {
     let state: RecordingState
     let isRecording: Bool
-    let isCountingDown: Bool
     let swingCount: Int
     let recordedDuration: TimeInterval
     let onCancel: () -> Void
 
+    /// Abandons the take in progress. Every state that accepts input and holds something to
+    /// abandon needs it — without it, recovery states like `.reviewing` after a failed save
+    /// stranded the user. `.idle` is deliberately excluded now that the capture UI lives on
+    /// the Camera tab: there is nothing to cancel on the ready screen and nowhere to dismiss
+    /// to. The blocking finalize/save overlays (and `.saved`, which navigates away) go
+    /// without because their work must not be interrupted half-done.
+    private var showsCancel: Bool {
+        switch state {
+        case .countdown, .recording, .reviewing: return true
+        case .idle, .finalizingVideo, .saving, .saved: return false
+        }
+    }
+
     var body: some View {
         HStack {
-            if isRecording || isCountingDown {
+            if showsCancel {
                 Button(action: onCancel) {
                     Image(systemName: "xmark")
                         .font(.title2.bold())

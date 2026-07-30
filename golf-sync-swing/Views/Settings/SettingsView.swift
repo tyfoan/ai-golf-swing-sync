@@ -23,6 +23,7 @@ struct SettingsView: View {
         NavigationStack {
             List {
                 subscriptionSection
+                CaptureSettingsSection()
                 aboutSection
             }
             .navigationTitle("Settings")

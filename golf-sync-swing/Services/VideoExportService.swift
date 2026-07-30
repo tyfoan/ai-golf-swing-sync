@@ -342,8 +342,10 @@ final class VideoExportService {
     }
 
     /// Remove orphaned export files from the temp directory.
-    /// Called at app launch to reclaim disk space.
-    static func cleanupOrphanedExports() {
+    /// Called at app launch (via `Task.detached`) and on backgrounding to reclaim disk
+    /// space. `nonisolated`, or the detached launch-path call would hop straight back to
+    /// this implicitly-main-actor class and walk tmp on the main thread mid-startup.
+    nonisolated static func cleanupOrphanedExports() {
         let tempDir = FileManager.default.temporaryDirectory
         guard let contents = try? FileManager.default.contentsOfDirectory(
             at: tempDir, includingPropertiesForKeys: nil
@@ -363,6 +365,8 @@ final class VideoExportService {
     /// Export with explicit per-video transforms and an aspect-ratio-driven render size.
     /// When `swingTrim` is provided (`(swing1, swing2)`), each video is trimmed to its
     /// SwingTimeRange before composition; otherwise full clips are exported.
+    /// `renderSize` overrides the aspect ratio's default canvas (quality tiers scale
+    /// it); it must keep the aspect ratio's proportions.
     @discardableResult
     static func exportComparison(
         layoutConfig: VideoLayoutConfig,
@@ -370,6 +374,7 @@ final class VideoExportService {
         video2URL: URL,
         syncOffset: TimeInterval,
         swingTrim: (SwingTimeRange, SwingTimeRange)? = nil,
+        renderSize: CGSize? = nil,
         progress: @escaping (Float) -> Void,
         completion: @escaping (Result<URL, ExportError>) -> Void
     ) -> ExportHandle {
@@ -382,6 +387,7 @@ final class VideoExportService {
                     video2URL: video2URL,
                     syncOffset: syncOffset,
                     swingTrim: swingTrim,
+                    renderSize: renderSize ?? layoutConfig.aspectRatio.exportSize,
                     handle: handle,
                     progress: progress
                 )
@@ -401,6 +407,7 @@ final class VideoExportService {
         video2URL: URL,
         syncOffset: TimeInterval,
         swingTrim: (SwingTimeRange, SwingTimeRange)?,
+        renderSize: CGSize,
         handle: ExportHandle,
         progress: @escaping (Float) -> Void
     ) async throws -> URL {
@@ -488,8 +495,7 @@ final class VideoExportService {
             try? audio2c.insertTimeRange(CMTimeRange(start: slice2.start, duration: slice2.duration), of: audio2, at: track2InsertAt)
         }
 
-        let renderSize = layoutConfig.aspectRatio.exportSize
-        let cells = cellRects(for: layoutConfig.aspectRatio)
+        let cells = cellRects(renderSize: renderSize, arrangement: layoutConfig.aspectRatio.arrangement)
         let size1 = try await track1.load(.naturalSize)
         let pref1 = try await track1.load(.preferredTransform)
         let size2 = try await track2.load(.naturalSize)
@@ -501,14 +507,23 @@ final class VideoExportService {
         let videoComposition: AVMutableVideoComposition
         switch layoutConfig.mode {
         case .sequential:
-            // Sequential mode uses the auto-derived composition (no custom compositor),
-            // so portrait clips render sideways unless we forward the source rotation
-            // onto the composition tracks. Parallel modes route through
-            // CollageVideoCompositor which applies preferredTransform per-pixel.
-            track1c.preferredTransform = pref1
-            track2c.preferredTransform = pref2
-            videoComposition = try await buildSequentialComposition(
-                composition: composition, renderSize: renderSize, frameDuration: frameDuration
+            // Built explicitly rather than via `videoComposition(withPropertiesOf:)`:
+            // the auto-derived instructions place each track at its native display size,
+            // so overriding `renderSize` alone cropped the output on a smaller canvas
+            // (Standard quality) and letterboxed it on a larger one (Full HD). Each clip
+            // now aspect-fits the full canvas for its back-to-back segment, with the
+            // source rotation applied on the layer instruction. Parallel modes route
+            // through CollageVideoCompositor, which applies preferredTransform per-pixel.
+            videoComposition = buildSequentialComposition(
+                first: SequentialSegment(
+                    track: track1c, naturalSize: size1, preferredTransform: pref1, duration: slice1.duration
+                ),
+                second: SequentialSegment(
+                    track: track2c, naturalSize: size2, preferredTransform: pref2, duration: slice2.duration
+                ),
+                renderSize: renderSize,
+                frameDuration: frameDuration,
+                totalDuration: composition.duration
             )
         case .sideBySide, .topBottom, .stacked:
             videoComposition = buildParallelComposition(
@@ -524,17 +539,59 @@ final class VideoExportService {
         return try await runExport(composition: composition, videoComposition: videoComposition, handle: handle, progress: progress)
     }
 
+    /// One back-to-back clip in a sequential export: the inserted composition track plus
+    /// the source geometry needed to aspect-fit it onto the full render canvas.
+    private struct SequentialSegment {
+        let track: AVMutableCompositionTrack
+        let naturalSize: CGSize
+        let preferredTransform: CGAffineTransform
+        let duration: CMTime
+    }
+
     private static func buildSequentialComposition(
-        composition: AVMutableComposition,
+        first: SequentialSegment,
+        second: SequentialSegment,
         renderSize: CGSize,
-        frameDuration: CMTime
-    ) async throws -> AVMutableVideoComposition {
-        // Tracks already inserted back-to-back by performLayoutExport.
-        // Standard composition handles single-track-at-a-time playback automatically.
-        let videoComposition = try await AVMutableVideoComposition.videoComposition(withPropertiesOf: composition)
+        frameDuration: CMTime,
+        totalDuration: CMTime
+    ) -> AVMutableVideoComposition {
+        let videoComposition = AVMutableVideoComposition()
         videoComposition.renderSize = renderSize
         videoComposition.frameDuration = frameDuration
+
+        let firstRange = CMTimeRange(start: .zero, duration: first.duration)
+        // The tail instruction stretches to the full composition duration (audio can
+        // outrun video by a rounding hair) — instructions must tile the timeline gap-free.
+        let secondEnd = CMTimeMaximum(totalDuration, CMTimeAdd(first.duration, second.duration))
+        let secondRange = CMTimeRange(start: first.duration, end: secondEnd)
+
+        videoComposition.instructions = [
+            fullCanvasInstruction(for: first, timeRange: firstRange, renderSize: renderSize),
+            fullCanvasInstruction(for: second, timeRange: secondRange, renderSize: renderSize)
+        ]
         return videoComposition
+    }
+
+    /// Renders one segment's track aspect-fit into the whole canvas — the same transform
+    /// math as the parallel cells, with the canvas as the only cell.
+    private static func fullCanvasInstruction(
+        for segment: SequentialSegment,
+        timeRange: CMTimeRange,
+        renderSize: CGSize
+    ) -> AVMutableVideoCompositionInstruction {
+        let instruction = AVMutableVideoCompositionInstruction()
+        instruction.timeRange = timeRange
+        instruction.backgroundColor = UIColor.black.cgColor
+
+        let layer = AVMutableVideoCompositionLayerInstruction(assetTrack: segment.track)
+        let transform = calculateTransform(
+            videoSize: segment.naturalSize,
+            preferredTransform: segment.preferredTransform,
+            cellRect: CGRect(origin: .zero, size: renderSize)
+        )
+        layer.setTransform(transform, at: timeRange.start)
+        instruction.layerInstructions = [layer]
+        return instruction
     }
 
     private static func buildParallelComposition(
@@ -618,20 +675,19 @@ final class VideoExportService {
     }
 
     /// Splits the export render canvas in half along the arrangement axis.
-    private static func cellRects(for aspectRatio: ExportAspectRatio) -> [CGRect] {
-        let size = aspectRatio.exportSize
-        switch aspectRatio.arrangement {
+    private static func cellRects(renderSize: CGSize, arrangement: VideoArrangement) -> [CGRect] {
+        switch arrangement {
         case .horizontal:
-            let halfW = size.width / 2
+            let halfW = renderSize.width / 2
             return [
-                CGRect(x: 0,     y: 0, width: halfW, height: size.height),
-                CGRect(x: halfW, y: 0, width: halfW, height: size.height)
+                CGRect(x: 0,     y: 0, width: halfW, height: renderSize.height),
+                CGRect(x: halfW, y: 0, width: halfW, height: renderSize.height)
             ]
         case .vertical:
-            let halfH = size.height / 2
+            let halfH = renderSize.height / 2
             return [
-                CGRect(x: 0, y: 0,     width: size.width, height: halfH),
-                CGRect(x: 0, y: halfH, width: size.width, height: halfH)
+                CGRect(x: 0, y: 0,     width: renderSize.width, height: halfH),
+                CGRect(x: 0, y: halfH, width: renderSize.width, height: halfH)
             ]
         }
     }

@@ -42,24 +42,29 @@ final class VideoPlayerViewModel {
         player.replaceCurrentItem(with: nil)
     }
 
-    func cleanup() {
-        player.pause()
-        player.replaceCurrentItem(with: nil)
-        if let observer = timeObserver {
-            player.removeTimeObserver(observer)
-            timeObserver = nil
-        }
-        cancellables.removeAll()
-    }
-
     // MARK: - Time Observer
+
+    /// Publish cadence for `currentTime`. The observer still ticks at 100 Hz so the swing-loop
+    /// bound stays precise, but `currentTime` is `@Observable`: writing it every tick invalidated
+    /// SwiftUI 100×/second for the whole of playback. ~30 Hz is already past what the eye
+    /// resolves and matches the source frame rate.
+    private static let publishInterval: TimeInterval = 1.0 / 30.0
+    private var lastPublishedTime: TimeInterval = -1
 
     private func setupTimeObserver() {
         let interval = CMTime(seconds: 0.01, preferredTimescale: 600)
         timeObserver = player.addPeriodicTimeObserver(forInterval: interval, queue: .main) { [weak self] time in
             guard let self else { return }
-            self.currentTime = CMTimeGetSeconds(time)
-            self.enforceSwingBounds()
+            let seconds = CMTimeGetSeconds(time)
+
+            // Bounds get the exact tick value — that is what the 100 Hz cadence is for. Reading
+            // the throttled `currentTime` here would compare against a stale value and overshoot
+            // the loop point.
+            self.enforceSwingBounds(at: seconds)
+
+            guard abs(seconds - self.lastPublishedTime) >= Self.publishInterval else { return }
+            self.lastPublishedTime = seconds
+            self.currentTime = seconds
         }
     }
 
@@ -74,9 +79,9 @@ final class VideoPlayerViewModel {
             .store(in: &cancellables)
     }
 
-    private func enforceSwingBounds() {
+    private func enforceSwingBounds(at time: TimeInterval) {
         guard let bounds = activeSwingBounds, isPlaying else { return }
-        guard currentTime >= bounds.end else { return }
+        guard time >= bounds.end else { return }
         seek(to: bounds.start)
         play()
     }
@@ -94,6 +99,14 @@ final class VideoPlayerViewModel {
 
     func pause() {
         player.pause()
+        // Re-sync exactly on pause. The observer stops firing once time stops advancing, so
+        // without this `currentTime` could sit up to one publish interval stale — and
+        // frame-stepping computes from it, which would land on the wrong frame.
+        let exact = CMTimeGetSeconds(player.currentTime())
+        if exact.isFinite {
+            currentTime = exact
+            lastPublishedTime = exact
+        }
         isPlaying = false
     }
 
@@ -101,6 +114,9 @@ final class VideoPlayerViewModel {
         let cmTime = CMTime(seconds: time, preferredTimescale: 600)
         player.seek(to: cmTime, toleranceBefore: .zero, toleranceAfter: .zero)
         currentTime = time
+        // Keep the invariant: lastPublishedTime always mirrors the last value written to
+        // currentTime, so the observer's throttle measures from where we actually are.
+        lastPublishedTime = time
     }
 
     func setPlaybackRate(_ rate: Float) {

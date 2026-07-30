@@ -18,14 +18,11 @@ Golf Sync Swing is an iOS app for golf swing video comparison with automatic mot
 
 ```bash
 # Build from command line
-xcodebuild -project golf-sync-swing.xcodeproj -scheme golf-sync-swing -destination 'platform=iOS Simulator,name=iPhone 16' build
-
-# Run tests
-xcodebuild -project golf-sync-swing.xcodeproj -scheme golf-sync-swing -destination 'platform=iOS Simulator,name=iPhone 16' test
-
-# Run single test
-xcodebuild -project golf-sync-swing.xcodeproj -scheme golf-sync-swing -destination 'platform=iOS Simulator,name=iPhone 16' -only-testing:golf-sync-swingTests/TestClassName/testMethodName test
+xcodebuild -project golf-sync-swing.xcodeproj -scheme golf-sync-swing -destination 'platform=iOS Simulator,name=iPhone 17' build
 ```
+
+There is no test suite — the project deliberately has no automated tests.
+Verify changes by building and exercising the app in the Simulator or on device.
 
 ## Technical Stack
 

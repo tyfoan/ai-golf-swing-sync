@@ -38,6 +38,16 @@ extension Color {
     static let onboardingGoldLight = Color(red: 0.953, green: 0.878, blue: 0.698)
     static let onboardingGoldDim   = Color(red: 0.569, green: 0.467, blue: 0.278)
 
+    // Onboarding hero backdrop — the bright "wallpaper" behind the mockup
+    static let onboardingHeroGlow  = Color(red: 0.192, green: 0.541, blue: 0.376)
+    static let onboardingHeroLift  = Color(red: 0.263, green: 0.678, blue: 0.451)
+    static let onboardingHeroDeep  = Color(red: 0.031, green: 0.114, blue: 0.086)
+
+    // Onboarding primary CTA — the single accent pair. Swap these two to
+    // re-tint every primary button in the onboarding flow.
+    static let onboardingCTATop    = Color(red: 0.208, green: 0.573, blue: 0.388)
+    static let onboardingCTABottom = Color(red: 0.094, green: 0.329, blue: 0.216)
+
     // Feature icon tints (per page)
     static let onboardingTealAccent  = Color(red: 0.318, green: 0.745, blue: 0.604)
     static let onboardingAmberAccent = Color(red: 0.918, green: 0.702, blue: 0.341)

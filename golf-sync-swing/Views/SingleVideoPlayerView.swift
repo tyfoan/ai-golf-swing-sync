@@ -30,7 +30,12 @@ struct SingleVideoPlayerView: View {
         .toolbar(.hidden, for: .navigationBar)
         .toolbar(.hidden, for: .tabBar)
         .onAppear(perform: handleAppear)
-        .onDisappear { viewModel?.cleanup() }
+        // Pause only — never tear the player down here. `onDisappear` also fires when this
+        // view merely presents the editor or export sheet, and `handleAppear` is guarded on
+        // `viewModel == nil`, so a teardown would strand a dead player behind the sheet.
+        // The time observer and player item are released in `VideoPlayerViewModel.deinit`,
+        // which is the correct place for them.
+        .onDisappear { viewModel?.pause() }
         .sheet(isPresented: $showSwingEditor) { swingEditorSheet }
         .sheet(isPresented: $showExportSheet) {
             SingleVideoExportSheet(
@@ -134,6 +139,7 @@ private extension SingleVideoPlayerView {
 
 private extension SingleVideoPlayerView {
     func handleAppear() {
+        guard viewModel == nil else { return }
         let vm = VideoPlayerViewModel(video: video)
         viewModel = vm
 

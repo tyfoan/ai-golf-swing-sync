@@ -50,9 +50,18 @@ final class ComparisonViewModel {
     }
     private(set) var isSwapped = false
 
+    /// Non-nil when the comparison composition could not be built; drives the
+    /// error overlay in ComparisonView. Cleared on the next successful build.
+    private(set) var buildError: String?
+
     nonisolated(unsafe) private var timeObserver: Any?
     private let builder = ComparisonCompositionBuilder()
     private var composition: ComparisonComposition?
+    private var rebuildTask: Task<Void, Never>?
+    /// Monotonic token guarding the async build window: each scheduled rebuild
+    /// bumps it, and a finished build only applies if its captured token is
+    /// still current — stale results are dropped instead of installed.
+    private var buildGeneration = 0
     private var isLooping = false
 
     static let playbackRates: [Float] = [0.125, 0.25, 0.5, 1.0]
@@ -73,7 +82,7 @@ final class ComparisonViewModel {
         self.swing2 = swing2
         self.player = AVPlayer()
         self.player.automaticallyWaitsToMinimizeStalling = false
-        rebuildComposition(seekToStart: true)
+        scheduleRebuild(seekToStart: true)
         setupTimeObserver()
     }
 
@@ -81,30 +90,84 @@ final class ComparisonViewModel {
         if let obs = timeObserver { player.removeTimeObserver(obs) }
     }
 
-    func cleanup() {
-        player.pause()
-        player.replaceCurrentItem(with: nil)
-        if let obs = timeObserver { player.removeTimeObserver(obs); timeObserver = nil }
-        isPlaying = false
-    }
-
     // MARK: - Composition Lifecycle
 
-    private func rebuildComposition(seekToStart: Bool) {
+    /// Serializes rebuilds: a newer request cancels the in-flight one so the
+    /// player only ever receives the composition for the latest state.
+    private func scheduleRebuild(seekToStart: Bool) {
+        buildGeneration += 1
+        let generation = buildGeneration
+        rebuildTask?.cancel()
+        rebuildTask = Task { [weak self] in
+            await self?.rebuildComposition(generation: generation, seekToStart: seekToStart)
+        }
+    }
+
+    /// Retry entry point for the error overlay's "Try Again" button.
+    func retryBuild() {
+        scheduleRebuild(seekToStart: true)
+    }
+
+    private func rebuildComposition(generation: Int, seekToStart: Bool) async {
         let preservedTime = seekToStart ? 0 : currentTime
-        let wasPlaying = isPlaying
-        guard let comp = builder.build(
+        let outcome = await builder.build(
             video1: video1, video2: video2, swing1: swing1, swing2: swing2,
             mode: comparisonMode, isSwapped: isSwapped, stackedOpacity: stackedOpacity
-        ) else {
-            AppLogger.detection.error("ComparisonViewModel: failed to build composition")
-            return
+        )
+        guard generation == buildGeneration, !Task.isCancelled else { return }
+        switch outcome {
+        case .success(let built):
+            buildError = nil
+            install(built, preservedTime: preservedTime)
+        case .failure(let failure):
+            report(failure)
         }
+    }
+
+    /// The user reads the same sentence whichever way the build failed — there is nothing
+    /// they can do about an AVFoundation insertion error — but the REASON has to survive
+    /// somewhere. A bare nil here is what made "comparison is broken" a report with no
+    /// possible follow-up: the log line and the DEBUG timeline now name the failing side
+    /// and say whether the file, the movie, or the marker was at fault.
+    private func report(_ failure: ComparisonBuildFailure) {
+        let detail = failure.diagnosticDetail ?? "none"
+        // `.public`: the point of a reason is reading it off a device log, and an
+        // interpolated string is redacted to <private> by default.
+        AppLogger.sync.error("ComparisonViewModel: build failed reason=\(failure.probeReason, privacy: .public) detail=\(detail, privacy: .public)")
+        #if DEBUG
+        DeviceProbe.event("comparison_build_failed", [
+            "reason": failure.probeReason,
+            "detail": detail,
+            "mode": comparisonMode.rawValue,
+            // The two inputs the reason has to be read against: whether each file is still
+            // there, and what its marker asked for.
+            "file1_exists": String(video1.fileExists),
+            "file2_exists": String(video2.fileExists),
+            "swing1_s": Self.rangeLabel(swing1),
+            "swing2_s": Self.rangeLabel(swing2)
+        ], ui: true)
+        #endif
+        buildError = String(localized: "Couldn't load these videos. They may have been moved or deleted.", comment: "Error shown on the comparison screen when the two swing videos fail to load for playback")
+    }
+
+    #if DEBUG
+    private static func rangeLabel(_ range: SwingTimeRange) -> String {
+        String(format: "%.2f/%.2f/%.2f", range.startTime, range.contactTime, range.endTime)
+    }
+    #endif
+
+    /// Installs a freshly built composition, then reconciles against LIVE
+    /// state: layer-only properties (mode/swap/opacity) mutated during the
+    /// async build window are re-applied via `updateVideoComposition()`, and
+    /// playback resume is gated on the current `isPlaying` so a pause tapped
+    /// mid-build sticks.
+    private func install(_ comp: ComparisonComposition, preservedTime: TimeInterval) {
         composition = comp
         player.replaceCurrentItem(with: comp.playerItem)
+        updateVideoComposition()
         seekPlayer(to: preservedTime)
         currentTime = preservedTime
-        if wasPlaying {
+        if isPlaying {
             player.rate = playbackRate
         }
     }
@@ -126,7 +189,7 @@ final class ComparisonViewModel {
         let needsRebuild = old.layoutStrategy.requiresStructuralRebuild
             || comparisonMode.layoutStrategy.requiresStructuralRebuild
         if needsRebuild {
-            rebuildComposition(seekToStart: true)
+            scheduleRebuild(seekToStart: true)
         } else {
             updateVideoComposition()
         }

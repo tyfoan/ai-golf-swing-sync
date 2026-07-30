@@ -2,9 +2,10 @@
 //  OnboardingPageView.swift
 //  golf-sync-swing
 //
-//  A single onboarding page: pre-headline label, three-line bold
-//  headline, subtitle, and a phone-frame hero mockup. Designed for
-//  full-screen presentation within a TabView.
+//  A single onboarding page: full-bleed hero artwork with the page indicator
+//  and centred title block sitting over its fading lower edge. The whole page
+//  is what cross-fades between steps — the CTA and top bar live above it and
+//  stay crisp.
 //
 
 import SwiftUI
@@ -12,61 +13,47 @@ import SwiftUI
 struct OnboardingPageView: View {
 
     let feature: OnboardingFeature
+    let pageCount: Int
+    let currentPage: Int
 
     @State private var visible = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            preHeadline
-            headline
-            subtitle
-            heroSection
-            Spacer(minLength: 0)
+        ZStack(alignment: .bottom) {
+            hero
+            caption
         }
-        .padding(.horizontal, 32)
         .onAppear { animateIn() }
     }
 
-    private var preHeadline: some View {
-        Text(feature.preHeadline)
-            .font(.caption2.weight(.bold))
-            .tracking(2)
-            .foregroundStyle(Color.onboardingGold)
-            .padding(.top, 8)
-    }
-
-    private var headline: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            ForEach(Array(feature.headlineLines.enumerated()), id: \.offset) { _, line in
-                Text(line)
-                    .font(.system(size: 34, weight: .heavy))
-                    .foregroundStyle(.white)
-                    .tracking(-0.6)
-            }
-        }
-    }
-
-    private var subtitle: some View {
-        Text(feature.subtitle)
-            .font(.subheadline)
-            .foregroundStyle(Color.white.opacity(0.7))
-            .lineLimit(2)
-    }
-
-    private var heroSection: some View {
-        HStack {
-            Spacer()
+    private var hero: some View {
+        OnboardingHeroStage(bottomReserve: Metrics.heroBottomReserve) {
             PhoneFrameView { feature.heroBuilder() }
                 .opacity(visible ? 1 : 0)
-                .scaleEffect(visible ? 1 : 0.92)
-            Spacer()
+                .scaleEffect(visible ? 1 : 0.94)
         }
-        .padding(.top, 8)
+    }
+
+    private var caption: some View {
+        VStack(spacing: Metrics.captionSpacing) {
+            OnboardingPageIndicator(pageCount: pageCount, currentPage: currentPage)
+            OnboardingTitleBlock(title: feature.title, subtitle: feature.subtitle)
+        }
+        .padding(.bottom, Metrics.captionBottomInset)
     }
 
     private func animateIn() {
-        withAnimation(.spring(response: 0.6, dampingFraction: 0.75).delay(0.1)) {
+        withAnimation(.spring(response: 0.6, dampingFraction: 0.78).delay(0.05)) {
             visible = true
         }
+    }
+
+    private enum Metrics {
+        static let captionSpacing: CGFloat = 18
+        /// Clears the CTA that OnboardingView pins below this page.
+        static let captionBottomInset: CGFloat = 150
+        /// captionBottomInset plus the caption's own height, so the hero
+        /// centres its mockup in the space actually left over.
+        static let heroBottomReserve: CGFloat = 256
     }
 }

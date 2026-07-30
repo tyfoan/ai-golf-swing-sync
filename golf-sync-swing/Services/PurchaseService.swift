@@ -29,7 +29,11 @@ final class PurchaseService {
     static let apiKey = "appl_SrTcnIuqMXaqoRYvaecigbeOOoW"
     #endif
 
-    private init() {}
+    private let revenueReporter: SubscriptionRevenueReporter
+
+    private init(revenueReporter: SubscriptionRevenueReporter = SubscriptionRevenueReporter()) {
+        self.revenueReporter = revenueReporter
+    }
 
     // MARK: - Configuration
 
@@ -54,16 +58,22 @@ final class PurchaseService {
 
     private func observeCustomerInfo() async {
         for await info in Purchases.shared.customerInfoStream {
-            customerInfo = info
-            isPremium = info.entitlements[Self.entitlementID]?.isActive == true
-            Analytics.shared.identify(userId: Purchases.shared.appUserID)
-            Analytics.shared.setPremium(isPremium)
-            AppLogger.general.info("PurchaseService: premium=\(self.isPremium)")
+            let premium = info.entitlements[Self.entitlementID]?.isActive == true
+            // @Observable state is read by SwiftUI on the main thread; publish it there.
+            await MainActor.run {
+                self.customerInfo = info
+                self.isPremium = premium
+                Analytics.shared.identify(userId: Purchases.shared.appUserID)
+                Analytics.shared.setPremium(premium)
+            }
+            AppLogger.general.info("PurchaseService: premium=\(premium)")
+            await revenueReporter.reportIfNeeded(entitlement: info.entitlements[Self.entitlementID])
         }
     }
 
     // MARK: - Actions
 
+    @MainActor
     func restorePurchases() async throws -> CustomerInfo {
         let info = try await Purchases.shared.restorePurchases()
         customerInfo = info
@@ -71,6 +81,7 @@ final class PurchaseService {
         return info
     }
 
+    @MainActor
     func refreshStatus() async {
         guard let info = try? await Purchases.shared.customerInfo() else { return }
         customerInfo = info

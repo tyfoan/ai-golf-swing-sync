@@ -113,14 +113,27 @@ final class PoseDetector: @unchecked Sendable {
 
     // MARK: - Joint Extraction
 
-    private static let trackedJoints: [VNHumanBodyPoseObservation.JointName] = [
-        .leftWrist, .rightWrist,
-        .leftShoulder, .rightShoulder,
-        .leftHip, .rightHip,
-        .leftElbow, .rightElbow,
-        .neck,
-        .leftAnkle, .rightAnkle
+    /// What the swing detector itself measures. Stated here independently of the skeleton so
+    /// that editing the bone list can never quietly blind detection: `PoseHeuristics` and
+    /// `ImpactDetector` read the wrists and nothing else.
+    private static let detectionJoints: Set<VNHumanBodyPoseObservation.JointName> = [
+        .leftWrist, .rightWrist
     ]
+
+    /// Everything a frame yields: what detection measures, plus every joint the skeleton hangs
+    /// a bone on. The drawn half is derived from `BodyJointMap.connections` rather than
+    /// restated — it was a second hand-maintained literal until it drifted, and the knees and
+    /// nose it was missing left both legs and the head undrawable. A joint may now be tracked
+    /// and not drawn, which is harmless; it can no longer be drawn and not tracked.
+    ///
+    /// Each name costs one `recognizedPoint` call per frame at 30 fps — a lookup into points
+    /// the pose network has already produced, not extra inference — plus one confidence test.
+    /// Cheap, but not an argument for tracking everything: the head stays a nose and a neck
+    /// rather than five facial points that would render as a single white blob at preview
+    /// scale, and the pelvis `root` is left out too. Neither earns a per-frame lookup for a
+    /// skeleton this size.
+    private static let trackedJoints: Set<VNHumanBodyPoseObservation.JointName> =
+        detectionJoints.union(BodyJointMap.skeletonJoints)
 
     private func extractJoints(
         from observation: VNHumanBodyPoseObservation

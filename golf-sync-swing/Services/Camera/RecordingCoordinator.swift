@@ -79,12 +79,11 @@ final class RecordingCoordinator: RecordingCoordinating {
         // spins up the encoder + file writer (100–300 ms); doing it here would
         // freeze the UI during the post-countdown beat. Errors from the writer
         // surface via the delegate's `didFinishRecordingTo:error:` callback.
+        // Stabilization is NOT set here: changing it on a running session's connection
+        // rebuilds the capture pipeline mid-recording-start (preview blanks). It is
+        // configured once, at session configure time, in CaptureSessionConfigurator.
         sessionQueue.async { [weak movieOutput, weak delegate] in
             guard let movieOutput, let delegate else { return }
-            if let connection = movieOutput.connection(with: .video),
-               connection.isVideoStabilizationSupported {
-                connection.preferredVideoStabilizationMode = .auto
-            }
             movieOutput.startRecording(to: outputURL, recordingDelegate: delegate)
         }
 

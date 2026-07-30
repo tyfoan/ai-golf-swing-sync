@@ -11,6 +11,10 @@ struct CountdownView: View {
     let count: Int
     let onCancel: () -> Void
     var silhouetteNamespace: Namespace.ID? = nil
+    /// The countdown does not tick until the capture session is actually running, so on a
+    /// cold bring-up the digit sits at 5 over a black screen for a few seconds. This flag
+    /// surfaces why: while false, a "Getting the camera ready…" caption shows under the digit.
+    var isCameraReady: Bool = true
 
     @State private var scale: CGFloat = 1.5
     @State private var opacity: Double = 0
@@ -21,6 +25,9 @@ struct CountdownView: View {
 
             VStack(spacing: 14) {
                 countdownDigit
+                if !isCameraReady {
+                    cameraPreparingCaption
+                }
                 Spacer()
                 cancelButton
             }
@@ -28,8 +35,24 @@ struct CountdownView: View {
             .padding(.top, 24)
             .padding(.bottom, 36)
         }
-        .onChange(of: count) { _, _ in animateCountdown() }
-        .onAppear { animateCountdown() }
+        .onChange(of: count) { _, _ in presentDigit() }
+        .onChange(of: isCameraReady) { _, _ in presentDigit() }
+        .onAppear { presentDigit() }
+    }
+
+    private var cameraPreparingCaption: some View {
+        HStack(spacing: 8) {
+            ProgressView()
+                .controlSize(.small)
+                .tint(.white)
+            Text(String(localized: "Getting the camera ready…", comment: "Caption under the recording countdown while the capture session is still starting up"))
+                .font(.subheadline.weight(.medium))
+                .foregroundStyle(.white.opacity(0.85))
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 6)
+        .background(Capsule().fill(Color.black.opacity(0.45)))
+        .transition(.opacity)
     }
 
     private var countdownDigit: some View {
@@ -58,6 +81,22 @@ struct CountdownView: View {
                 .background(.ultraThinMaterial, in: Capsule())
                 .overlay(Capsule().strokeBorder(.white.opacity(0.3), lineWidth: 1))
         }
+    }
+
+    /// The tick animation ends at opacity 0, which is right for a digit about to be replaced
+    /// by the next one — and wrong while the camera is still starting, because the count
+    /// does not tick then. The digit simply vanished within a second and never came back,
+    /// leaving a black screen with nothing on it. Hold it lit instead until the camera is
+    /// ready, then let it pulse per tick.
+    private func presentDigit() {
+        guard isCameraReady else {
+            withAnimation(.easeOut(duration: 0.25)) {
+                scale = 1.0
+                opacity = 1.0
+            }
+            return
+        }
+        animateCountdown()
     }
 
     private func animateCountdown() {

@@ -14,6 +14,8 @@ import os
 struct VideoPathMigrationService {
 
     private static let migrationKey = "VideoPathMigration_v1_completed"
+    private static let attemptsKey = "VideoPathMigration_v1_attempts"
+    private static let maxAttempts = 3
 
     static func migrateIfNeeded(modelContainer: ModelContainer) {
         guard !UserDefaults.standard.bool(forKey: migrationKey) else { return }
@@ -39,16 +41,33 @@ struct VideoPathMigrationService {
         }
 
         guard migratedCount > 0 else {
-            UserDefaults.standard.set(true, forKey: migrationKey)
+            markCompleted()
             return
         }
 
         do {
             try context.save()
-            UserDefaults.standard.set(true, forKey: migrationKey)
             AppLogger.storage.info("Path migration: converted \(migratedCount) video(s) to relative paths")
+            markCompleted()
         } catch {
-            AppLogger.storage.error("Path migration: save failed: \(error.localizedDescription)")
+            recordFailedAttempt(error)
         }
+    }
+
+    private static func markCompleted() {
+        UserDefaults.standard.set(true, forKey: migrationKey)
+        UserDefaults.standard.removeObject(forKey: attemptsKey)
+    }
+
+    /// Capped retry: a transient save failure gets `maxAttempts` launches to succeed
+    /// before the flag is set anyway — the anti-loop guard against re-running a full
+    /// fetch and mutation of every video at every launch, forever.
+    private static func recordFailedAttempt(_ error: Error) {
+        let attempts = UserDefaults.standard.integer(forKey: attemptsKey) + 1
+        UserDefaults.standard.set(attempts, forKey: attemptsKey)
+        AppLogger.storage.error("Path migration: save failed (attempt \(attempts)/\(maxAttempts)): \(error.localizedDescription)")
+        guard attempts >= maxAttempts else { return }
+        AppLogger.storage.error("Path migration: giving up after \(maxAttempts) failed attempts")
+        UserDefaults.standard.set(true, forKey: migrationKey)
     }
 }

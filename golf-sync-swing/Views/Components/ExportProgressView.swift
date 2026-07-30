@@ -99,9 +99,7 @@ private extension ExportProgressView {
                 .font(.headline)
                 .multilineTextAlignment(.center)
 
-            if layoutConfig == nil {
-                qualityPicker
-            }
+            qualityPicker
 
             if swingTrim != nil {
                 trimToggle
@@ -130,11 +128,25 @@ private extension ExportProgressView {
 
     var headlineText: String {
         guard let config = layoutConfig else {
-            return "Export side-by-side comparison video"
+            return String(localized: "Export side-by-side comparison video", comment: "Export sheet headline for the legacy stacked comparison export")
         }
-        let w = Int(config.aspectRatio.exportSize.width)
-        let h = Int(config.aspectRatio.exportSize.height)
-        return "Export at \(config.aspectRatio.displayName) (\(w)×\(h))"
+        let size = renderSize(for: effectiveQuality)
+        let w = Int(size.width)
+        let h = Int(size.height)
+        return String(localized: "Export at \(config.aspectRatio.displayName) (\(w)×\(h))", comment: "Export sheet headline: aspect-ratio name plus the output pixel dimensions of the selected quality")
+    }
+
+    /// The quality the export will actually render at. UI guards keep locked
+    /// tiers unselectable, but the render path must never trust view state
+    /// for entitlements — premium tiers fall back to .standard when locked.
+    var effectiveQuality: ExportQuality {
+        guard selectedQuality.requiresPremium else { return selectedQuality }
+        return FeatureAccess.isUnlocked(.exportHD) ? selectedQuality : .standard
+    }
+
+    func renderSize(for quality: ExportQuality) -> CGSize {
+        guard let config = layoutConfig else { return quality.resolution }
+        return quality.renderSize(for: config.aspectRatio.exportSize)
     }
 
     var qualityPicker: some View {
@@ -163,7 +175,7 @@ private extension ExportProgressView {
                     Text(quality.label)
                         .font(.subheadline).fontWeight(.medium)
                         .foregroundStyle(locked ? .secondary : .primary)
-                    Text(quality.detail)
+                    Text(quality.detail(renderSize: renderSize(for: quality)))
                         .font(.caption2).foregroundStyle(.secondary)
                 }
                 Spacer()
@@ -180,7 +192,6 @@ private extension ExportProgressView {
             )
             .clipShape(RoundedRectangle(cornerRadius: 8))
         }
-        .disabled(locked)
     }
 
     var exportButton: some View {
@@ -294,32 +305,35 @@ private extension ExportProgressView {
         isExporting = true
         progress = 0
         errorMessage = nil
+        let quality = effectiveQuality
         Analytics.shared.track(.exportStarted(
             aspectRatio: layoutConfig?.aspectRatio,
-            quality: selectedQuality.rawValue
+            quality: quality.rawValue
         ))
+        exportHandle = makeExportHandle(quality: quality)
+    }
 
+    func makeExportHandle(quality: ExportQuality) -> ExportHandle {
         if let config = layoutConfig {
-            exportHandle = VideoExportService.exportComparison(
+            return VideoExportService.exportComparison(
                 layoutConfig: config,
                 video1URL: video1URL,
                 video2URL: video2URL,
                 syncOffset: syncOffset,
                 swingTrim: trimToSwing ? swingTrim : nil,
-                progress: { p in Task { @MainActor in progress = p } },
-                completion: handleExportResult
-            )
-        } else {
-            let config = VideoExportService.ExportConfiguration(resolution: selectedQuality.resolution)
-            exportHandle = VideoExportService.exportComparison(
-                video1URL: video1URL,
-                video2URL: video2URL,
-                syncOffset: syncOffset,
-                config: config,
+                renderSize: quality.renderSize(for: config.aspectRatio.exportSize),
                 progress: { p in Task { @MainActor in progress = p } },
                 completion: handleExportResult
             )
         }
+        return VideoExportService.exportComparison(
+            video1URL: video1URL,
+            video2URL: video2URL,
+            syncOffset: syncOffset,
+            config: VideoExportService.ExportConfiguration(resolution: quality.resolution),
+            progress: { p in Task { @MainActor in progress = p } },
+            completion: handleExportResult
+        )
     }
 
     func handleExportResult(_ result: Result<URL, VideoExportService.ExportError>) {
@@ -330,7 +344,7 @@ private extension ExportProgressView {
             exportedURL = url
             Analytics.shared.track(.exportCompleted(
                 aspectRatio: layoutConfig?.aspectRatio,
-                isHD: selectedQuality.requiresPremium
+                isHD: effectiveQuality.requiresPremium
             ))
         case .failure(.cancelled):
             // Cancel path: the view's Cancel button already triggered
@@ -373,11 +387,13 @@ enum ExportQuality: String, CaseIterable, Identifiable {
         }
     }
 
-    var detail: String {
+    func detail(renderSize: CGSize) -> String {
+        let w = Int(renderSize.width)
+        let h = Int(renderSize.height)
         switch self {
-        case .standard: return String(localized: "720 x 1280 - Smaller file")
-        case .high:     return String(localized: "1080 x 1920 - Recommended")
-        case .ultra:    return String(localized: "1440 x 2560 - Best quality")
+        case .standard: return String(localized: "\(w) x \(h) - Smaller file", comment: "Export quality row subtitle: output resolution of the free Standard tier")
+        case .high:     return String(localized: "\(w) x \(h) - Recommended", comment: "Export quality row subtitle: output resolution of the premium HD tier")
+        case .ultra:    return String(localized: "\(w) x \(h) - Best quality", comment: "Export quality row subtitle: output resolution of the premium Full HD tier")
         }
     }
 
@@ -387,6 +403,29 @@ enum ExportQuality: String, CaseIterable, Identifiable {
         case .high:     return CGSize(width: 1080, height: 1920)
         case .ultra:    return CGSize(width: 1440, height: 2560)
         }
+    }
+
+    /// Multiplier applied to a layout's base export canvas. Derived from the
+    /// legacy fixed resolutions (720/1080/1440 wide on a 1080×1920 canvas) so
+    /// both export paths produce identical sizes for a 9:16 layout.
+    var renderScale: CGFloat {
+        switch self {
+        case .standard: return 720.0 / 1080.0
+        case .high:     return 1.0
+        case .ultra:    return 1440.0 / 1080.0
+        }
+    }
+
+    func renderSize(for exportSize: CGSize) -> CGSize {
+        CGSize(
+            width: evenPixels(exportSize.width * renderScale),
+            height: evenPixels(exportSize.height * renderScale)
+        )
+    }
+
+    /// Video encoders require even pixel dimensions.
+    private func evenPixels(_ value: CGFloat) -> CGFloat {
+        (value / 2).rounded() * 2
     }
 
     var requiresPremium: Bool {

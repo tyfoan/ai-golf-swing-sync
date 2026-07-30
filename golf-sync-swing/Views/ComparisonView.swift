@@ -32,7 +32,12 @@ struct ComparisonView: View {
         .toolbar(.hidden, for: .navigationBar)
         .toolbar(.hidden, for: .tabBar)
         .onAppear { onViewAppear() }
-        .onDisappear { viewModel?.cleanup() }
+        // Pause only — never tear the player down here. `onDisappear` also fires when this
+        // view merely presents the export sheet or the paywall, and `onViewAppear` is
+        // guarded on `viewModel == nil`, so a teardown could never be undone: the
+        // comparison screen came back permanently black. The time observer is released in
+        // `ComparisonViewModel.deinit`, which is the correct place for it.
+        .onDisappear { viewModel?.pause() }
         .onChange(of: scenePhase) { _, phase in
             if phase == .background { viewModel?.pause() }
         }
@@ -49,14 +54,22 @@ private extension ComparisonView {
     func contentStack(viewModel: ComparisonViewModel) -> some View {
         VStack(spacing: 0) {
             topBar(viewModel: viewModel)
-            ZStack(alignment: .bottomTrailing) {
-                ComparisonVideoAreaView(viewModel: viewModel)
-                circleButton(icon: "arrow.left.arrow.right", accessibilityLabel: "Swap videos") {
-                    viewModel.swapVideos()
-                }
-                .padding(16)
-            }
+            videoArea(viewModel: viewModel)
             controlsPanel(viewModel: viewModel)
+                .disabled(viewModel.buildError != nil)
+        }
+    }
+
+    func videoArea(viewModel: ComparisonViewModel) -> some View {
+        ZStack(alignment: .bottomTrailing) {
+            ComparisonVideoAreaView(viewModel: viewModel)
+            circleButton(icon: "arrow.left.arrow.right", accessibilityLabel: "Swap videos") {
+                viewModel.swapVideos()
+            }
+            .padding(16)
+            if let message = viewModel.buildError {
+                buildErrorOverlay(message: message, viewModel: viewModel)
+            }
         }
     }
 
@@ -67,6 +80,7 @@ private extension ComparisonView {
             circleButton(icon: "square.and.arrow.up", accessibilityLabel: "Export comparison") {
                 showExportSheet = true
             }
+            .disabled(viewModel.buildError != nil)
         }
         .padding(.horizontal, 16).padding(.top, 8)
     }
@@ -182,6 +196,41 @@ private extension ComparisonView {
             Text("Videos unavailable")
                 .padding()
                 .onAppear { showExportSheet = false }
+        }
+    }
+}
+
+// MARK: - Build Error State
+
+private extension ComparisonView {
+    /// Covers the video area (including the swap button) when the composition
+    /// could not be built, replacing the black screen with a retry path.
+    func buildErrorOverlay(message: String, viewModel: ComparisonViewModel) -> some View {
+        VStack(spacing: 16) {
+            Image(systemName: "exclamationmark.triangle")
+                .font(.largeTitle)
+                .foregroundStyle(.white.opacity(0.6))
+            Text(message)
+                .font(.subheadline)
+                .foregroundStyle(.white.opacity(0.7))
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 32)
+            retryButton(viewModel: viewModel)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.black)
+    }
+
+    func retryButton(viewModel: ComparisonViewModel) -> some View {
+        Button {
+            viewModel.retryBuild()
+        } label: {
+            Text(String(localized: "Try Again", comment: "Button that retries loading the comparison videos after a failure"))
+                .font(.subheadline).fontWeight(.semibold)
+                .foregroundStyle(.black)
+                .padding(.horizontal, 24).padding(.vertical, 10)
+                .background(Color.appTeal)
+                .clipShape(Capsule())
         }
     }
 }

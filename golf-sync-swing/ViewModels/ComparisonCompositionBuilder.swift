@@ -13,9 +13,79 @@
 //  Layouts (sideBySide, topBottom, stacked) compose at impact-aligned offsets.
 //  Sequential plays one then the other on a serial timeline.
 //
+//  TWO RULES THIS FILE EXISTS TO HOLD, both learned the hard way:
+//
+//  1. THE SOURCE ASSETS MUST OUTLIVE EVERY INSERT. `AVAssetTrack.asset` is a weak
+//     back-reference, so a track handed around without its `AVURLAsset` is orphaned the
+//     moment the loader returns — and `insertTimeRange(_:of:at:)` then fails against it
+//     with AVFoundationErrorDomain -11800 (-12780) for EVERY range, valid ones included.
+//     That is why `SourceTracks` carries the asset. (Afterwards the composition is
+//     self-sufficient: its segments reference the source by URL, so nothing needs to
+//     retain the assets once the build has returned.)
+//  2. A FAILURE MUST SAY WHY. The builder used to answer `nil`, which reached the user as
+//     one sentence and reached us as nothing at all. It now returns a
+//     `ComparisonBuildFailure`, which the view model logs and puts on the DEBUG timeline.
+//
 
 import AVFoundation
 import UIKit
+
+/// Which of the two swings a failure belongs to. Present in every per-side reason so a
+/// timeline line says WHICH video was missing, not merely that one was.
+enum ComparisonSide {
+    case first, second
+
+    var probeLabel: String {
+        switch self {
+        case .first: return "1"
+        case .second: return "2"
+        }
+    }
+}
+
+/// Why a comparison composition could not be built.
+///
+/// Replaces a bare `nil`. The builder can fail for reasons with nothing in common — a file
+/// deleted out from under a record, a movie with no video track, a marker that names
+/// footage the take does not contain, an AVFoundation insertion error — and collapsing all
+/// of them into one absent value is what made "comparison is broken" unanswerable without
+/// a device in hand. The user still reads one sentence; the reason goes to the log and the
+/// DEBUG timeline.
+enum ComparisonBuildFailure: Error {
+    case fileMissing(ComparisonSide)
+    case noVideoTrack(ComparisonSide)
+    /// Nothing of the marker's range survives inside the video's own footage.
+    case swingRangeOutsideVideo(ComparisonSide)
+    /// Both swings have zero lead-in AND zero follow-through: no timeline to align on.
+    case alignmentCollapsed
+    case trackAllocationFailed
+    /// AVFoundation refused an insert; the string is its own message.
+    case insertionFailed(String)
+
+    /// Anything raised below that is not already one of ours — in practice the
+    /// `insertTimeRange` errors `FreezeFrameInserter` propagates.
+    init(_ error: Error) {
+        self = error as? ComparisonBuildFailure ?? .insertionFailed(error.localizedDescription)
+    }
+
+    /// Stable, low-cardinality label for the log line and the DEBUG timeline.
+    var probeReason: String {
+        switch self {
+        case .fileMissing(let side): return "file_missing_\(side.probeLabel)"
+        case .noVideoTrack(let side): return "no_video_track_\(side.probeLabel)"
+        case .swingRangeOutsideVideo(let side): return "swing_range_outside_video_\(side.probeLabel)"
+        case .alignmentCollapsed: return "alignment_collapsed"
+        case .trackAllocationFailed: return "track_allocation_failed"
+        case .insertionFailed: return "insertion_failed"
+        }
+    }
+
+    /// The underlying framework message where there is one. Logged, never shown.
+    var diagnosticDetail: String? {
+        guard case .insertionFailed(let message) = self else { return nil }
+        return message
+    }
+}
 
 struct ComparisonComposition {
     let playerItem: AVPlayerItem
@@ -63,17 +133,71 @@ final class ComparisonCompositionBuilder {
 
     private let targetFrameRate: Int32 = 30
 
+    private var frameDuration: TimeInterval { 1.0 / Double(targetFrameRate) }
+
+    /// One source asset's tracks, loaded ONCE up front via the async
+    /// track-loading API so the insertion helpers never fall back to the
+    /// deprecated synchronous `tracks(withMediaType:)` parse.
+    private struct SourceTracks {
+        /// Retained ON PURPOSE, and it is the whole reason this type exists rather than a
+        /// bare pair of tracks: `AVAssetTrack.asset` is a WEAK back-reference. A track
+        /// whose asset has been released is still a live object that answers questions
+        /// about itself, but `insertTimeRange(_:of:at:)` fails against it with
+        /// AVFoundationErrorDomain -11800 (-12780) — every insert, including a perfectly
+        /// in-range one. Dropping the asset here made every single comparison fail.
+        let asset: AVURLAsset
+        let video: AVAssetTrack
+        let audio: AVAssetTrack?
+        /// The video track's real extent, so a marker asking for footage the file does not
+        /// contain can be trimmed to what exists.
+        let timeRange: CMTimeRange
+
+        /// `range` intersected with the footage that actually exists, or nil when less than
+        /// `minimumDuration` of it survives.
+        ///
+        /// AVFoundation does NOT reject an overrunning source range — it pads the
+        /// composition out to the length asked for — so an unclamped marker buys black tail
+        /// and a misplaced impact instead of an error. A range with nothing left inside the
+        /// track has to fail, though: a zero-length insert throws.
+        func footage(for range: SwingTimeRange, minimumDuration: TimeInterval) -> SwingTimeRange? {
+            let lower = max(0, CMTimeGetSeconds(timeRange.start))
+            let upper = CMTimeGetSeconds(timeRange.end)
+            let start = min(max(range.startTime, lower), upper)
+            let end = min(max(range.endTime, start), upper)
+            guard end - start >= minimumDuration else { return nil }
+            return SwingTimeRange(
+                startTime: start,
+                contactTime: min(max(range.contactTime, start), end),
+                endTime: end
+            )
+        }
+    }
+
+    /// Main-actor bound because SwingVideo is a SwiftData model; the awaited
+    /// track loads suspend (never block) the main actor while AVFoundation
+    /// parses the movies on its own queues.
+    @MainActor
     func build(
         video1: SwingVideo, video2: SwingVideo,
         swing1: SwingTimeRange, swing2: SwingTimeRange,
         mode: ComparisonMode, isSwapped: Bool, stackedOpacity: CGFloat
-    ) -> ComparisonComposition? {
-        guard let asset1 = loadAsset(video1), let asset2 = loadAsset(video2) else { return nil }
-        if mode == .sequential {
-            return buildSequential(asset1, asset2, swing1: swing1, swing2: swing2, isSwapped: isSwapped)
+    ) async -> Result<ComparisonComposition, ComparisonBuildFailure> {
+        do {
+            // Both sources stay in scope for the whole build — see SourceTracks.asset.
+            let source1 = try await loadSource(video1, side: .first)
+            let source2 = try await loadSource(video2, side: .second)
+            let range1 = try footage(of: source1, for: swing1, side: .first)
+            let range2 = try footage(of: source2, for: swing2, side: .second)
+            guard mode != .sequential else {
+                let sequential = try buildSequential(source1, source2, swing1: range1, swing2: range2, isSwapped: isSwapped)
+                return .success(sequential)
+            }
+            let synced = try buildSynced(source1, source2, swing1: range1, swing2: range2,
+                                         mode: mode, isSwapped: isSwapped, stackedOpacity: stackedOpacity)
+            return .success(synced)
+        } catch {
+            return .failure(ComparisonBuildFailure(error))
         }
-        return buildSynced(asset1, asset2, swing1: swing1, swing2: swing2,
-                           mode: mode, isSwapped: isSwapped, stackedOpacity: stackedOpacity)
     }
 
     /// Cheap update path for changes that don't restructure tracks (mode
@@ -93,16 +217,14 @@ final class ComparisonCompositionBuilder {
     // MARK: - Synced (impact-aligned)
 
     private func buildSynced(
-        _ asset1: AVAsset, _ asset2: AVAsset,
+        _ source1: SourceTracks, _ source2: SourceTracks,
         swing1: SwingTimeRange, swing2: SwingTimeRange,
         mode: ComparisonMode, isSwapped: Bool, stackedOpacity: CGFloat
-    ) -> ComparisonComposition? {
+    ) throws -> ComparisonComposition {
         let timing = SyncedTiming(swing1: swing1, swing2: swing2)
-        guard timing.totalDuration > 0 else { return nil }
+        guard timing.totalDuration > 0 else { throw ComparisonBuildFailure.alignmentCollapsed }
         let composition = AVMutableComposition()
-        guard let tracks = insertSyncedTracks(asset1, asset2, swing1: swing1, swing2: swing2, timing: timing, into: composition) else {
-            return nil
-        }
+        let tracks = try insertSyncedTracks(source1, source2, swing1: swing1, swing2: swing2, timing: timing, into: composition)
         let strategy = mode.layoutStrategy
         let layouts = syncedLayouts(tracks: tracks, strategy: strategy, isSwapped: isSwapped, stackedOpacity: stackedOpacity)
         let videoComposition = makeVideoComposition(canvas: strategy.canvasSize(for: tracks), totalDuration: timing.totalDuration, layouts: layouts)
@@ -111,16 +233,14 @@ final class ComparisonCompositionBuilder {
     }
 
     private func insertSyncedTracks(
-        _ asset1: AVAsset, _ asset2: AVAsset,
+        _ source1: SourceTracks, _ source2: SourceTracks,
         swing1: SwingTimeRange, swing2: SwingTimeRange,
         timing: SyncedTiming, into composition: AVMutableComposition
-    ) -> [AVCompositionTrack]? {
-        guard let videoTrack1 = insertSyncedVideoTrack(asset1, swing: swing1, preGap: timing.preGap1, postGap: timing.postGap1, into: composition),
-              let videoTrack2 = insertSyncedVideoTrack(asset2, swing: swing2, preGap: timing.preGap2, postGap: timing.postGap2, into: composition) else {
-            return nil
-        }
-        insertAudio(asset1, range: swing1, into: composition, atCompositionTime: timing.preGap1)
-        insertAudio(asset2, range: swing2, into: composition, atCompositionTime: timing.preGap2)
+    ) throws -> [AVCompositionTrack] {
+        let videoTrack1 = try insertSyncedVideoTrack(source1.video, swing: swing1, preGap: timing.preGap1, postGap: timing.postGap1, into: composition)
+        let videoTrack2 = try insertSyncedVideoTrack(source2.video, swing: swing2, preGap: timing.preGap2, postGap: timing.postGap2, into: composition)
+        insertAudio(source1.audio, range: swing1, into: composition, atCompositionTime: timing.preGap1)
+        insertAudio(source2.audio, range: swing2, into: composition, atCompositionTime: timing.preGap2)
         return [videoTrack1, videoTrack2]
     }
 
@@ -142,15 +262,15 @@ final class ComparisonCompositionBuilder {
     // MARK: - Sequential
 
     private func buildSequential(
-        _ asset1: AVAsset, _ asset2: AVAsset,
+        _ source1: SourceTracks, _ source2: SourceTracks,
         swing1: SwingTimeRange, swing2: SwingTimeRange, isSwapped: Bool
-    ) -> ComparisonComposition? {
+    ) throws -> ComparisonComposition {
         let composition = AVMutableComposition()
-        let (firstAsset, firstRange) = isSwapped ? (asset2, swing2) : (asset1, swing1)
-        let (secondAsset, secondRange) = isSwapped ? (asset1, swing1) : (asset2, swing2)
-        guard let tracks = insertSequentialTracks(
-            firstAsset, firstRange: firstRange, secondAsset, secondRange: secondRange, into: composition
-        ) else { return nil }
+        let (firstSource, firstRange) = isSwapped ? (source2, swing2) : (source1, swing1)
+        let (secondSource, secondRange) = isSwapped ? (source1, swing1) : (source2, swing2)
+        let tracks = try insertSequentialTracks(
+            firstSource, firstRange: firstRange, secondSource, secondRange: secondRange, into: composition
+        )
         let totalDuration = firstRange.duration + secondRange.duration
         let strategy = SequentialLayout()
         let canvas = strategy.canvasSize(for: tracks)
@@ -161,16 +281,14 @@ final class ComparisonCompositionBuilder {
     }
 
     private func insertSequentialTracks(
-        _ firstAsset: AVAsset, firstRange: SwingTimeRange,
-        _ secondAsset: AVAsset, secondRange: SwingTimeRange,
+        _ firstSource: SourceTracks, firstRange: SwingTimeRange,
+        _ secondSource: SourceTracks, secondRange: SwingTimeRange,
         into composition: AVMutableComposition
-    ) -> [AVCompositionTrack]? {
-        guard let videoTrack1 = insertVideo(firstAsset, range: firstRange, into: composition, atCompositionTime: 0),
-              let videoTrack2 = insertVideo(secondAsset, range: secondRange, into: composition, atCompositionTime: firstRange.duration) else {
-            return nil
-        }
-        insertAudio(firstAsset, range: firstRange, into: composition, atCompositionTime: 0)
-        insertAudio(secondAsset, range: secondRange, into: composition, atCompositionTime: firstRange.duration)
+    ) throws -> [AVCompositionTrack] {
+        let videoTrack1 = try insertVideo(firstSource.video, range: firstRange, into: composition, atCompositionTime: 0)
+        let videoTrack2 = try insertVideo(secondSource.video, range: secondRange, into: composition, atCompositionTime: firstRange.duration)
+        insertAudio(firstSource.audio, range: firstRange, into: composition, atCompositionTime: 0)
+        insertAudio(secondSource.audio, range: secondRange, into: composition, atCompositionTime: firstRange.duration)
         return [videoTrack1, videoTrack2]
     }
 
@@ -201,28 +319,42 @@ final class ComparisonCompositionBuilder {
         playerItem.preferredForwardBufferDuration = 2.0
         return ComparisonComposition(
             playerItem: playerItem, totalDuration: totalDuration,
-            contactTime: contactTime, frameDuration: 1.0 / Double(targetFrameRate),
+            contactTime: contactTime, frameDuration: frameDuration,
             videoTracks: tracks
         )
     }
 
     // MARK: - Track Insertion
 
-    private func loadAsset(_ video: SwingVideo) -> AVURLAsset? {
-        guard let url = video.validLocalURL else { return nil }
-        return AVURLAsset(url: url)
+    private func loadSource(_ video: SwingVideo, side: ComparisonSide) async throws -> SourceTracks {
+        guard let url = video.validLocalURL else { throw ComparisonBuildFailure.fileMissing(side) }
+        let asset = AVURLAsset(url: url)
+        guard let videoTrack = try? await asset.loadTracks(withMediaType: .video).first,
+              let timeRange = try? await videoTrack.load(.timeRange) else {
+            throw ComparisonBuildFailure.noVideoTrack(side)
+        }
+        let audioTrack = try? await asset.loadTracks(withMediaType: .audio).first
+        return SourceTracks(asset: asset, video: videoTrack, audio: audioTrack, timeRange: timeRange)
+    }
+
+    private func footage(of source: SourceTracks, for range: SwingTimeRange, side: ComparisonSide) throws -> SwingTimeRange {
+        guard let usable = source.footage(for: range, minimumDuration: frameDuration) else {
+            throw ComparisonBuildFailure.swingRangeOutsideVideo(side)
+        }
+        return usable
     }
 
     private func insertVideo(
-        _ asset: AVAsset, range: SwingTimeRange,
+        _ sourceTrack: AVAssetTrack, range: SwingTimeRange,
         into composition: AVMutableComposition, atCompositionTime time: TimeInterval
-    ) -> AVCompositionTrack? {
-        guard let sourceTrack = asset.tracks(withMediaType: .video).first,
-              let track = composition.addMutableTrack(withMediaType: .video, preferredTrackID: kCMPersistentTrackID_Invalid) else {
-            return nil
+    ) throws -> AVCompositionTrack {
+        guard let track = composition.addMutableTrack(withMediaType: .video, preferredTrackID: kCMPersistentTrackID_Invalid) else {
+            throw ComparisonBuildFailure.trackAllocationFailed
         }
         let sourceRange = cmTimeRange(from: range)
-        try? track.insertTimeRange(sourceRange, of: sourceTrack, at: CMTime(seconds: time, preferredTimescale: 600))
+        // Propagated, not swallowed: a failed insert used to leave an EMPTY track behind
+        // and play as black rather than saying anything.
+        try track.insertTimeRange(sourceRange, of: sourceTrack, at: CMTime(seconds: time, preferredTimescale: 600))
         track.preferredTransform = sourceTrack.preferredTransform
         return track
     }
@@ -230,24 +362,26 @@ final class ComparisonCompositionBuilder {
     /// Adapter from playback's (SwingTimeRange, TimeInterval) inputs to the
     /// shared FreezeFrameInserter's (CMTimeRange, CMTime) interface.
     private func insertSyncedVideoTrack(
-        _ asset: AVAsset, swing: SwingTimeRange,
+        _ sourceTrack: AVAssetTrack, swing: SwingTimeRange,
         preGap: TimeInterval, postGap: TimeInterval,
         into composition: AVMutableComposition
-    ) -> AVCompositionTrack? {
-        guard let sourceTrack = asset.tracks(withMediaType: .video).first else { return nil }
-        return try? FreezeFrameInserter.insertVideo(
+    ) throws -> AVCompositionTrack {
+        guard let track = try FreezeFrameInserter.insertVideo(
             sourceTrack: sourceTrack, sourceRange: cmTimeRange(from: swing),
             preGap: CMTime(seconds: preGap, preferredTimescale: 600),
             postGap: CMTime(seconds: postGap, preferredTimescale: 600),
             targetFrameRate: targetFrameRate, into: composition
-        )
+        ) else {
+            throw ComparisonBuildFailure.trackAllocationFailed
+        }
+        return track
     }
 
     private func insertAudio(
-        _ asset: AVAsset, range: SwingTimeRange,
+        _ sourceTrack: AVAssetTrack?, range: SwingTimeRange,
         into composition: AVMutableComposition, atCompositionTime time: TimeInterval
     ) {
-        guard let sourceTrack = asset.tracks(withMediaType: .audio).first,
+        guard let sourceTrack,
               let track = composition.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid) else {
             return
         }

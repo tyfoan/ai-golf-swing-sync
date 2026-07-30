@@ -17,6 +17,28 @@ import os
 
 final class SwingClassifier: SwingDetecting, @unchecked Sendable {
 
+    /// One CoreML load per process. Each RecordingViewModel construction creates a
+    /// classifier — SwiftUI re-evaluates the `@State` default value on every tab switch —
+    /// and re-loading the model per instance wasted exactly the first-launch I/O window
+    /// the camera bring-up competes in. `.utility`: the classifier is a confidence boost,
+    /// never on the critical path.
+    private static let sharedModelLoad = Task<MLModel?, Never>(priority: .utility) {
+        await loadModel()
+    }
+
+    /// Starts the shared load early. The first `MLModel.load` on a device pays a one-time
+    /// on-device specialization (ANE/Espresso compile, cached afterwards); left to first
+    /// access it lands mid-recording, when a stall costs a swing.
+    ///
+    /// Called from `RecordingViewModel.activate()` — the capture screen's appear — not from
+    /// `App.init`, where it competed with the camera's cold bring-up for the same launch
+    /// (on device the model reported "loaded successfully" *after* `startRunning` returned,
+    /// 15.5 s in). From `activate()` the compile overlaps the countdown instead, which is
+    /// time the app is already spending. Idempotent: repeated calls share one load.
+    static func warmUp() {
+        _ = sharedModelLoad
+    }
+
     private var _model: MLModel?
     private let modelLock = NSLock()
     private let windowSize: Int
@@ -31,12 +53,22 @@ final class SwingClassifier: SwingDetecting, @unchecked Sendable {
     init(windowSize: Int = 15, swingConfidenceThreshold: Double = 0.85) {
         self.windowSize = windowSize
         self.swingConfidenceThreshold = swingConfidenceThreshold
-        Task.detached(priority: .userInitiated) { [weak self] in
-            let loaded = await Self.loadModel()
+        Task { [weak self] in
+            let loaded = await Self.sharedModelLoad.value
             guard let self else { return }
             self.modelLock.lock()
             self._model = loaded
             self.modelLock.unlock()
+        }
+    }
+
+    /// Test seam: `init` populates the model asynchronously, so asserting `isAvailable`
+    /// right after construction is a race, not a test. Resolves once this instance's
+    /// reference is populated — or immediately if the bundle genuinely has no model.
+    func waitForModelLoad() async {
+        guard await Self.sharedModelLoad.value != nil else { return }
+        while model == nil {
+            await Task.yield()
         }
     }
 
