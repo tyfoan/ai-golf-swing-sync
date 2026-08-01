@@ -43,9 +43,9 @@ extension OnboardingFeature {
 
     static let tools = OnboardingFeature(
         id: 2,
-        title: String(localized: "Frame-by-Frame Tools", comment: "Onboarding page 3 title"),
-        subtitle: String(localized: "8× slow-mo, pro library, HD export.", comment: "Onboarding page 3 subtitle"),
+        title: String(localized: "Share Your Best Swings", comment: "Onboarding page 3 title"),
+        subtitle: String(localized: "Export a highlight reel or a side-by-side, in HD.", comment: "Onboarding page 3 subtitle"),
         ctaTitle: String(localized: "Get Started", comment: "Onboarding final-page button that dismisses onboarding"),
-        heroBuilder: { AnyView(SlowMoToolsMockup()) }
+        heroBuilder: { AnyView(ExportShareMockup()) }
     )
 }
