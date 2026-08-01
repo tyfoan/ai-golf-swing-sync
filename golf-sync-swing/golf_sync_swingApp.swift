@@ -77,7 +77,10 @@ struct golf_sync_swingApp: App {
         // as well. It no longer is: on device the model reported "loaded successfully" AFTER
         // the camera's `startRunning` returned 15.5 s in, so the ANE compile spent the cold
         // launch competing with the bring-up it was meant to stay clear of. It now starts
-        // from `RecordingViewModel.activate()`, where it overlaps the countdown instead.
+        // from the record tap (`RecordingViewModel.startRecording()` → `SwingClassifier
+        // .warmUp()`), where it overlaps the countdown instead — and `SwingClassifier`
+        // creates its load task only from `warmUp()`, so merely constructing a view model
+        // at tab mount starts nothing.
     }
 
     @Environment(\.scenePhase) private var scenePhase

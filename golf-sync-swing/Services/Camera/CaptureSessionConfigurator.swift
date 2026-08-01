@@ -2,8 +2,14 @@
 //  CaptureSessionConfigurator.swift
 //  golf-sync-swing
 //
-//  Configures AVCaptureSession with video/audio inputs, outputs, and device format.
-//  Handles format negotiation (1080p60 targeting), low-light boost, and stabilization.
+//  Builds the capture graph in two passes. `configure` is the PREVIEW pass — video input,
+//  format negotiation (1080p60 targeting), low-light boost, video-data output: everything a
+//  live frame needs and nothing more, because on device the full graph's cold `startRunning`
+//  measured 15.5–21.5 s while the audio route negotiated, and none of that work produces a
+//  pixel. `installRecordingPipeline` is the RECORDING pass — microphone input, movie file
+//  output, stabilization — installed against the RUNNING session during the record countdown
+//  (see `CameraService.armRecordingPipeline`), so its cost hides behind time a take already
+//  spends.
 //
 //  There is deliberately NO audio DATA output here: the movie file output records the
 //  microphone track on its own, and nothing in the app consumes raw audio sample buffers.
@@ -20,10 +26,16 @@ final class CaptureSessionConfigurator {
         var frameRate: Double = 60
     }
 
-    struct ConfiguredOutputs {
+    struct PreviewGraphOutputs {
         let videoDeviceInput: AVCaptureDeviceInput?
-        let audioDeviceInput: AVCaptureDeviceInput?
         let videoDataOutput: AVCaptureVideoDataOutput?
+    }
+
+    /// What the recording pass added. The microphone is best-effort — a device without one
+    /// records silent video, exactly as the single-pass configure always did. The movie
+    /// output is not: a take with nowhere to write is an error, not a degradation.
+    struct RecordingPipelineOutputs {
+        let audioDeviceInput: AVCaptureDeviceInput?
         let movieFileOutput: AVCaptureMovieFileOutput?
     }
 
@@ -42,13 +54,20 @@ final class CaptureSessionConfigurator {
         videoDelegate: AVCaptureVideoDataOutputSampleBufferDelegate,
         videoQueue: DispatchQueue,
         probe: (String) -> Void = { _ in }
-    ) -> (outputs: ConfiguredOutputs, error: CameraError?) {
+    ) -> (outputs: PreviewGraphOutputs, error: CameraError?) {
         var lastStamp = ProcessInfo.processInfo.systemUptime
         func stamp(_ phase: String) {
             let now = ProcessInfo.processInfo.systemUptime
             probe("configure.\(phase) \(String(format: "%.0fms", (now - lastStamp) * 1000))")
             lastStamp = now
         }
+
+        // Named before anything is built, so every timing below is attributable to the graph that
+        // actually got requested. `multitaskingSupported` rides along because the flag beneath it
+        // is one of the knobs, and "we skipped it" and "the device never offered it" are different
+        // facts that produce the same absent line.
+        let experiment = CaptureExperiment.current
+        probe("configure.experiment \(experiment.summary) multitaskingSupported=\(session.isMultitaskingCameraAccessSupported)")
 
         session.beginConfiguration()
         session.sessionPreset = .inputPriority
@@ -60,7 +79,7 @@ final class CaptureSessionConfigurator {
         // guarantees an active, correctly categorised audio session before it starts.
         session.automaticallyConfiguresApplicationAudioSession = false
 
-        if session.isMultitaskingCameraAccessSupported {
+        if session.isMultitaskingCameraAccessSupported, experiment.includesMultitaskingAccess {
             session.isMultitaskingCameraAccessEnabled = true
         }
 
@@ -91,23 +110,9 @@ final class CaptureSessionConfigurator {
         stamp("deviceFormat")
         probe("configure.format \(describe(choice))")
 
-        // Audio input. The microphone track is recorded by the movie file output and consumed
-        // downstream (export, comparison, Photos, the unmute control), so this input stays.
-        // It is added AFTER CameraService has configured AVAudioSession — with
-        // `automaticallyConfiguresApplicationAudioSession` off nothing else establishes the
-        // category, so that ordering is load-bearing. Do not reorder.
-        let audioDevice = AVCaptureDevice.default(for: .audio)
-        // Stamped outside the `if let` so a nil lookup still reports its cost instead of
-        // folding silently into the next phase.
-        stamp("audioDeviceDiscovery")
-
-        var audioInput: AVCaptureDeviceInput?
-        if let audioDevice, let input = try? AVCaptureDeviceInput(device: audioDevice),
-           session.canAddInput(input) {
-            session.addInput(input)
-            audioInput = input
-        }
-        stamp("audioInputAdd")
+        // NO microphone here, deliberately: it belongs to `installRecordingPipeline`. A mic
+        // input drags the whole audio stack into `startRunning` — the route negotiation the
+        // preview never needed and the user waited out behind "Preparing camera…".
 
         // Video data output
         let videoOutput = AVCaptureVideoDataOutput()
@@ -118,7 +123,7 @@ final class CaptureSessionConfigurator {
         ]
 
         var configuredVideoOutput: AVCaptureVideoDataOutput?
-        if session.canAddOutput(videoOutput) {
+        if experiment.includesVideoDataOutput, session.canAddOutput(videoOutput) {
             session.addOutput(videoOutput)
             configuredVideoOutput = videoOutput
 
@@ -130,41 +135,12 @@ final class CaptureSessionConfigurator {
         }
         stamp("videoDataOutputAdd")
 
-        // Movie file output
-        let movieOutput = AVCaptureMovieFileOutput()
-        // 1-second fragments keep the in-progress file readable for mid-recording
-        // replay playback. Larger intervals (e.g., 5s) leave SwingReplayView's
-        // AVURLAsset stuck waiting for the next moov flush when a swing finishes
-        // mid-fragment.
-        movieOutput.movieFragmentInterval = CMTime(seconds: 1, preferredTimescale: 1)
-        var configuredMovieOutput: AVCaptureMovieFileOutput?
-        if session.canAddOutput(movieOutput) {
-            session.addOutput(movieOutput)
-            configuredMovieOutput = movieOutput
-
-            if let connection = movieOutput.connection(with: .video) {
-                // Rotation is applied later by CaptureRotationSubject (device-correct angle).
-                if config.position == .front, connection.isVideoMirroringSupported {
-                    connection.isVideoMirrored = true
-                }
-                // Set here, inside begin/commitConfiguration, NOT at recording start:
-                // changing stabilization on a running session rebuilds the pipeline and
-                // blanks the preview at the exact moment recording begins.
-                if connection.isVideoStabilizationSupported {
-                    connection.preferredVideoStabilizationMode = .auto
-                }
-            }
-        }
-        stamp("movieFileOutputAdd")
-
         session.commitConfiguration()
         stamp("commit")
 
-        let outputs = ConfiguredOutputs(
+        let outputs = PreviewGraphOutputs(
             videoDeviceInput: videoInput,
-            audioDeviceInput: audioInput,
-            videoDataOutput: configuredVideoOutput,
-            movieFileOutput: configuredMovieOutput
+            videoDataOutput: configuredVideoOutput
         )
 
         return (outputs, nil)
@@ -172,10 +148,123 @@ final class CaptureSessionConfigurator {
 
     /// Closes an aborted configuration: the session has already been emptied, so it must be
     /// committed before returning or every later `beginConfiguration` nests against it.
-    private func abort(_ session: AVCaptureSession, with error: CameraError) -> (outputs: ConfiguredOutputs, error: CameraError?) {
+    private func abort(_ session: AVCaptureSession, with error: CameraError) -> (outputs: PreviewGraphOutputs, error: CameraError?) {
         session.commitConfiguration()
-        let empty = ConfiguredOutputs(videoDeviceInput: nil, audioDeviceInput: nil, videoDataOutput: nil, movieFileOutput: nil)
-        return (empty, error)
+        return (PreviewGraphOutputs(videoDeviceInput: nil, videoDataOutput: nil), error)
+    }
+
+    // MARK: - Recording Pipeline (second pass)
+
+    /// The recording pass, run against the RUNNING session during the record countdown. The
+    /// caller (`CameraService.armRecordingPipeline`) has already configured and activated
+    /// AVAudioSession — with `automaticallyConfiguresApplicationAudioSession` off nothing
+    /// else establishes the category, so that ordering is load-bearing. Do not reorder.
+    func installRecordingPipeline(
+        session: AVCaptureSession,
+        position: AVCaptureDevice.Position,
+        probe: (String) -> Void = { _ in }
+    ) -> (outputs: RecordingPipelineOutputs, error: CameraError?) {
+        var lastStamp = ProcessInfo.processInfo.systemUptime
+        func stamp(_ phase: String) {
+            let now = ProcessInfo.processInfo.systemUptime
+            probe("arm.\(phase) \(String(format: "%.0fms", (now - lastStamp) * 1000))")
+            lastStamp = now
+        }
+
+        let experiment = CaptureExperiment.current
+        session.beginConfiguration()
+
+        let audioInput = addMicrophoneInput(to: session, experiment: experiment)
+        stamp("audioInputAdd")
+
+        guard experiment.includesMovieOutput else {
+            // A measurement launch, not a session: the omission is the experiment's point.
+            session.commitConfiguration()
+            return (RecordingPipelineOutputs(audioDeviceInput: audioInput, movieFileOutput: nil), nil)
+        }
+
+        let movieOutput = makeMovieFileOutput()
+        guard session.canAddOutput(movieOutput) else {
+            // Self-cleaning: a failed arm must leave the graph EXACTLY as it found it. The
+            // mic input added above would otherwise ride along with
+            // `isRecordingPipelineArmed` still false — unreachable by
+            // `removeRecordingPipeline` (flag-gated) and dragging the audio stack into
+            // every later preview start.
+            if let audioInput { session.removeInput(audioInput) }
+            session.commitConfiguration()
+            return (
+                RecordingPipelineOutputs(audioDeviceInput: nil, movieFileOutput: nil),
+                .configurationFailed("movie file output rejected")
+            )
+        }
+        session.addOutput(movieOutput)
+        configureMovieConnection(of: movieOutput, position: position, experiment: experiment)
+        stamp("movieFileOutputAdd")
+
+        session.commitConfiguration()
+        stamp("commit")
+
+        return (RecordingPipelineOutputs(audioDeviceInput: audioInput, movieFileOutput: movieOutput), nil)
+    }
+
+    /// Strips what `installRecordingPipeline` added, so the next start is a minimal start
+    /// again. Parts are identified by shape rather than by held references: a filter cannot
+    /// go stale across the configure passes that rebuild the graph wholesale.
+    func removeRecordingPipeline(session: AVCaptureSession, probe: (String) -> Void = { _ in }) {
+        let t0 = ProcessInfo.processInfo.systemUptime
+        session.beginConfiguration()
+        session.inputs
+            .compactMap { $0 as? AVCaptureDeviceInput }
+            .filter { $0.device.hasMediaType(.audio) }
+            .forEach { session.removeInput($0) }
+        session.outputs
+            .filter { $0 is AVCaptureMovieFileOutput }
+            .forEach { session.removeOutput($0) }
+        session.commitConfiguration()
+        probe("arm.remove \(String(format: "%.0fms", (ProcessInfo.processInfo.systemUptime - t0) * 1000))")
+    }
+
+    /// The microphone track is recorded by the movie file output and consumed downstream
+    /// (export, comparison, Photos, the unmute control). Best-effort by design.
+    private func addMicrophoneInput(
+        to session: AVCaptureSession,
+        experiment: CaptureExperiment
+    ) -> AVCaptureDeviceInput? {
+        guard experiment.includesMicrophone,
+              let audioDevice = AVCaptureDevice.default(for: .audio),
+              let input = try? AVCaptureDeviceInput(device: audioDevice),
+              session.canAddInput(input) else { return nil }
+        session.addInput(input)
+        return input
+    }
+
+    private func makeMovieFileOutput() -> AVCaptureMovieFileOutput {
+        let movieOutput = AVCaptureMovieFileOutput()
+        // 1-second fragments keep the in-progress file readable for mid-recording
+        // replay playback. Larger intervals (e.g., 5s) leave SwingReplayView's
+        // AVURLAsset stuck waiting for the next moov flush when a swing finishes
+        // mid-fragment.
+        movieOutput.movieFragmentInterval = CMTime(seconds: 1, preferredTimescale: 1)
+        return movieOutput
+    }
+
+    private func configureMovieConnection(
+        of movieOutput: AVCaptureMovieFileOutput,
+        position: AVCaptureDevice.Position,
+        experiment: CaptureExperiment
+    ) {
+        guard let connection = movieOutput.connection(with: .video) else { return }
+        // Rotation is applied later by CaptureRotationSubject (device-correct angle).
+        if position == .front, connection.isVideoMirroringSupported {
+            connection.isVideoMirrored = true
+        }
+        // Set here, inside begin/commitConfiguration, NOT at recording start: changing
+        // stabilization outside a configuration pass rebuilds the pipeline and blanks the
+        // preview at the exact moment recording begins. Inside the countdown's pass, the
+        // rebuild hides behind the ticks.
+        if connection.isVideoStabilizationSupported, experiment.includesStabilization {
+            connection.preferredVideoStabilizationMode = .auto
+        }
     }
 
     // MARK: - Device Format

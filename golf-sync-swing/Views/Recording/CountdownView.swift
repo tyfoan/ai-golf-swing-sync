@@ -11,9 +11,11 @@ struct CountdownView: View {
     let count: Int
     let onCancel: () -> Void
     var silhouetteNamespace: Namespace.ID? = nil
-    /// The countdown does not tick until the capture session is actually running, so on a
-    /// cold bring-up the digit sits at 5 over a black screen for a few seconds. This flag
-    /// surfaces why: while false, a "Getting the camera ready…" caption shows under the digit.
+    /// Two waits surface here, and the caller folds both into this one flag. On a cold
+    /// bring-up the digit ticks over a black screen while the session starts; after the
+    /// last tick, the recording pipeline (audio route, microphone, movie output) may still
+    /// be installing and the digit sits on "1". While false, a "Getting the camera ready…"
+    /// caption shows under the digit and the digit holds lit instead of pulsing out.
     var isCameraReady: Bool = true
 
     @State private var scale: CGFloat = 1.5

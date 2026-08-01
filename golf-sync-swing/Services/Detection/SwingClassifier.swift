@@ -17,59 +17,65 @@ import os
 
 final class SwingClassifier: SwingDetecting, @unchecked Sendable {
 
-    /// One CoreML load per process. Each RecordingViewModel construction creates a
-    /// classifier — SwiftUI re-evaluates the `@State` default value on every tab switch —
-    /// and re-loading the model per instance wasted exactly the first-launch I/O window
-    /// the camera bring-up competes in. `.utility`: the classifier is a confidence boost,
-    /// never on the critical path.
-    private static let sharedModelLoad = Task<MLModel?, Never>(priority: .utility) {
-        await loadModel()
-    }
+    /// One CoreML load per process, created the first time something ASKS for it — never at
+    /// construction. Classifiers are built inside RecordingView's `@State` default, i.e. at
+    /// MainTabView mount; an eager load from `init` (the previous shape) materialized the
+    /// task milliseconds before the camera's cold bring-up and spent the one-time ANE/
+    /// Espresso specialization competing with `startRunning` — exactly the contention the
+    /// deferral exists to avoid. `.utility`: the classifier is a confidence boost, never on
+    /// the critical path. Lock-guarded rather than a `static let` because a `static let`
+    /// cannot distinguish "first access from `warmUp()`" from "first access from `init`".
+    private static let loadLock = NSLock()
+    nonisolated(unsafe) private static var loadTask: Task<MLModel?, Never>?
+    /// Snapshot of the finished load, so the frame path reads a pointer under a lock
+    /// instead of awaiting a task.
+    nonisolated(unsafe) private static var loadedModel: MLModel?
 
-    /// Starts the shared load early. The first `MLModel.load` on a device pays a one-time
+    /// Starts the shared load. The first `MLModel.load` on a device pays a one-time
     /// on-device specialization (ANE/Espresso compile, cached afterwards); left to first
     /// access it lands mid-recording, when a stall costs a swing.
     ///
-    /// Called from `RecordingViewModel.activate()` — the capture screen's appear — not from
-    /// `App.init`, where it competed with the camera's cold bring-up for the same launch
+    /// Called from `RecordingViewModel.startRecording()` — the record tap — not from
+    /// `App.init` or the tab's appear, where it competed with the camera's cold bring-up
     /// (on device the model reported "loaded successfully" *after* `startRunning` returned,
-    /// 15.5 s in). From `activate()` the compile overlaps the countdown instead, which is
+    /// 15.5 s in). From the record tap the compile overlaps the countdown instead, which is
     /// time the app is already spending. Idempotent: repeated calls share one load.
     static func warmUp() {
-        _ = sharedModelLoad
+        _ = startLoadIfNeeded()
     }
 
-    private var _model: MLModel?
-    private let modelLock = NSLock()
+    private static func startLoadIfNeeded() -> Task<MLModel?, Never> {
+        loadLock.lock()
+        defer { loadLock.unlock() }
+        if let task = loadTask { return task }
+        let task = Task<MLModel?, Never>(priority: .utility) {
+            let model = await loadModel()
+            loadLock.withLock { loadedModel = model }
+            return model
+        }
+        loadTask = task
+        return task
+    }
+
     private let windowSize: Int
     private let swingConfidenceThreshold: Double
 
+    /// Non-blocking: `analyze` runs per frame window and must never wait on a load. A nil
+    /// here simply routes the caller to the PoseHeuristics fallback until the load lands.
     private var model: MLModel? {
-        modelLock.lock()
-        defer { modelLock.unlock() }
-        return _model
+        Self.loadLock.withLock { Self.loadedModel }
     }
 
     init(windowSize: Int = 15, swingConfidenceThreshold: Double = 0.85) {
         self.windowSize = windowSize
         self.swingConfidenceThreshold = swingConfidenceThreshold
-        Task { [weak self] in
-            let loaded = await Self.sharedModelLoad.value
-            guard let self else { return }
-            self.modelLock.lock()
-            self._model = loaded
-            self.modelLock.unlock()
-        }
     }
 
-    /// Test seam: `init` populates the model asynchronously, so asserting `isAvailable`
-    /// right after construction is a race, not a test. Resolves once this instance's
-    /// reference is populated — or immediately if the bundle genuinely has no model.
+    /// Test seam: the model arrives asynchronously, so asserting `isAvailable` right after
+    /// `warmUp()` is a race, not a test. Starts the load if nothing has, and resolves once
+    /// the shared snapshot is populated — or immediately if the bundle has no model.
     func waitForModelLoad() async {
-        guard await Self.sharedModelLoad.value != nil else { return }
-        while model == nil {
-            await Task.yield()
-        }
+        _ = await Self.startLoadIfNeeded().value
     }
 
     func analyze(frames: [PoseFrame]) -> SwingEvent {

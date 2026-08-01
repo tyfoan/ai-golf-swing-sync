@@ -123,11 +123,13 @@ final class RecordingViewModel {
     /// app storage can legitimately take a while on an older device.
     private static let finalizeTimeout: TimeInterval = 20
 
-    /// How long the countdown waits for the capture session before giving up. A first
-    /// launch on device measured 7.2 s to configure plus 15.5 s inside `startRunning`
-    /// while StoreKit and CoreML competed for the same window — an unbounded wait parks
-    /// the countdown on a black screen with no way out. 8 s clears a healthy cold start
-    /// with room to spare and turns a pathological one into a retry prompt.
+    /// How long the countdown waits for the capture session AFTER its five ticks have run —
+    /// the bring-up is kicked at tick one and joined at the end, so this bounds only the
+    /// tail. A first launch on device measured 7.2 s to configure plus 15.5 s inside
+    /// `startRunning` while StoreKit and CoreML competed for the same window — an unbounded
+    /// wait parks the countdown on a black screen with no way out. With the ticks' own five
+    /// seconds in front, 8 s more clears even that pathological bring-up; a healthy one
+    /// resolves before the last tick lands.
     private static let sessionStartTimeout: TimeInterval = 8
 
     /// **Ceiling on the whole wait between a detected swing and its replay, and the number the
@@ -175,6 +177,11 @@ final class RecordingViewModel {
 
     var isCountingDown: Bool { if case .countdown = state { return true }; return false }
     var countdownValue: Int { if case .countdown(let v) = state { return v }; return 0 }
+    /// True only while the countdown's ticks have finished but the recording pipeline is
+    /// still installing (audio route, microphone, movie output). On a warm camera the veil
+    /// is long gone by then, so without this flag a slow arm after "1" reads as a hang —
+    /// `CountdownView` shows its "Getting the camera ready…" caption while it is set.
+    private(set) var isPreparingToRecord = false
     var isRecording: Bool { state == .recording }
     var isFinalizingVideo: Bool { state == .finalizingVideo }
     var isSaving: Bool { state == .saving }
@@ -471,6 +478,12 @@ final class RecordingViewModel {
         countdownTask?.cancel()
         countdownTask = nil
         state = .idle
+        isPreparingToRecord = false
+        // The countdown armed (or is still arming) the recording pipeline, and no take will
+        // consume it now. FIFO on the session queue means the strip lands AFTER an arm still
+        // in flight — without it the microphone stays live on an idle preview (orange
+        // indicator, and a backgrounding would activate audio after the app left the screen).
+        cameraService.disarmAbandonedRecordingPipeline()
     }
 
     /// Subscribes to (or unsubscribes from) per-frame skeletons. `onPoseDetected` is this
@@ -841,16 +854,13 @@ final class RecordingViewModel {
         state = .countdown(remaining: 5)
 
         countdownTask = Task {
-            let started = await ensureSessionRunning()
-            guard !Task.isCancelled else { return }
-            guard started else {
-                #if DEBUG
-                DeviceProbe.event("countdown_aborted", ["reason": "session_never_started"], ui: true, frame: true)
-                #endif
-                state = .idle
-                errorMessage = String(localized: "Camera could not start. Tap Start Recording to try again.", comment: "Error message shown when the capture session fails to start during the recording countdown; a retry from the same screen usually succeeds")
-                return
-            }
+            // The bring-up and the ticks share the same five seconds. `.recording` readiness
+            // installs the recording half of the graph (audio route, microphone, movie
+            // output) WHILE the countdown runs, so its cost — route negotiation is seconds
+            // with a Bluetooth device paired — hides behind time the take already spends
+            // instead of delaying the first tick. The countdown joins the slot at the end;
+            // on a warm camera that join resolves before the last tick lands.
+            let slot = startSessionBringUp()
 
             for i in stride(from: 5, through: 1, by: -1) {
                 guard !Task.isCancelled else { return }
@@ -859,30 +869,55 @@ final class RecordingViewModel {
                 DeviceProbe.event("countdown_tick", ["remaining": String(i)])
                 #endif
                 try? await Task.sleep(for: .seconds(1))
-                guard !Task.isCancelled else { return }
+            }
+
+            guard !Task.isCancelled else { return }
+            // Flagged only when the join actually has to wait, so the caption cannot
+            // flicker on the common path where the arm resolved under the ticks.
+            if slot.started == nil { isPreparingToRecord = true }
+            let started = await waitForSessionStart(slot)
+            isPreparingToRecord = false
+            guard !Task.isCancelled else { return }
+            guard started else {
+                #if DEBUG
+                DeviceProbe.event("countdown_aborted", ["reason": "session_never_started"], ui: true, frame: true)
+                #endif
+                state = .idle
+                // A specific failure (arm rejected the movie output, configuration failed)
+                // published `currentError` with its own alert text and analytics; only the
+                // anonymous timeout earns the generic message. The alert body prefers
+                // `errorMessage`, so setting it unconditionally would clobber the specific
+                // explanation with the vague one.
+                if cameraService.currentError == nil {
+                    errorMessage = String(localized: "Camera could not start. Tap Start Recording to try again.", comment: "Error message shown when the capture session fails to start during the recording countdown; a retry from the same screen usually succeeds")
+                }
+                return
             }
 
             beginRecording()
         }
     }
 
-    /// Bring the session up entirely on the camera's session queue and return once it is
-    /// actually running. Nothing here reads `captureSession`: a main-actor read serializes
-    /// against an in-flight configuration on the session queue, which is the
-    /// first-cold-launch freeze itself. The answer comes from the bring-up's own result.
+    /// Kick the full bring-up — `.recording` readiness, so the recording pipeline is armed —
+    /// on the camera's session queue, and hand back the slot the countdown joins at its end.
+    /// Nothing here reads `captureSession`: a main-actor read serializes against an
+    /// in-flight configuration on the session queue, which is the first-cold-launch freeze
+    /// itself. The answer comes from the bring-up's own result.
     ///
-    /// Bounded, because the bring-up can take 22 s on a cold first launch and an unbounded
-    /// await leaves the countdown frozen with no way out. Losing the race abandons the
-    /// *wait*, not the work: `prepareAndStartSession` suspends on a continuation only the
-    /// session queue resumes, so cancelling it does nothing — which is also why a
-    /// `withTaskGroup` race cannot express this. A group waits for every child before it
-    /// returns, so the slow child would still be waited on.
-    private func ensureSessionRunning() async -> Bool {
+    /// The join stays bounded (`waitForSessionStart`), because a cold bring-up can take many
+    /// seconds and an unbounded await leaves the countdown frozen with no way out. Losing
+    /// the race abandons the *wait*, not the work: `prepareAndStartSession` suspends on a
+    /// continuation only the session queue resumes, so cancelling it does nothing — which is
+    /// also why a `withTaskGroup` race cannot express this. A group waits for every child
+    /// before it returns, so the slow child would still be waited on.
+    private func startSessionBringUp() -> SessionStartSlot {
         let slot = SessionStartSlot()
         Task { [cameraService] in
-            slot.record(await cameraService.prepareAndStartSession(position: .front, frameRate: 30))
+            slot.record(
+                await cameraService.prepareAndStartSession(position: .front, frameRate: 30, readiness: .recording)
+            )
         }
-        return await waitForSessionStart(slot)
+        return slot
     }
 
     /// Polls the bring-up's own result slot — a main-written value, never the session.
@@ -915,7 +950,7 @@ final class RecordingViewModel {
         }
         // The @Observable mirror is main-written and never touches the session object;
         // reading `captureSession` state here would block the main thread against
-        // sessionQueue. `prepareAndStartSession` set the mirror before the countdown ran,
+        // sessionQueue. `prepareAndStartSession` set the mirror before the countdown finished,
         // and pauses (background) clear it — interruptions do not, hence the separate
         // `isInterrupted` check above — so it is current enough to catch "the session
         // died mid-countdown".
@@ -1172,8 +1207,15 @@ final class RecordingViewModel {
     /// back the black screen this restructure removed. `releaseCamera()` is what stops the
     /// session, for when the preview is going away too.
     func discardTake() {
+        // Captured before the state write below: a cancelled COUNTDOWN leaves an armed (or
+        // arming) recording pipeline that no take will consume, and that is the one case
+        // where stripping it is safe by construction — recording never began, so the movie
+        // output is idle. Every other route through here either finished its take or hands
+        // the file to the delegate, and the disarm must not race that write.
+        let abandonedCountdown = isCountingDown
         countdownTask?.cancel()
         countdownTask = nil
+        isPreparingToRecord = false
         cancelFinalizeWatchdog()
         detectionOrchestrator.stop()
         clearReplay()
@@ -1196,6 +1238,7 @@ final class RecordingViewModel {
         reviewNotice = nil
         saveOutcome = nil
         state = .idle
+        if abandonedCountdown { cameraService.disarmAbandonedRecordingPipeline() }
     }
 }
 

@@ -3,8 +3,12 @@
 //  golf-sync-swing
 //
 //  UIViewRepresentable wrapper for AVCaptureVideoPreviewLayer.
-//  Each instance owns its own preview-side rotation via a CaptureRotationSubject
-//  built by the caller (typically CameraService.makePreviewRotationSubject(for:)).
+//
+//  This view owns NO capture-graph state and performs no capture-graph writes of its own.
+//  Attaching a session, detaching it, and configuring the layer's connection all take the
+//  capture session's internal lock, so all three are handed to `CameraService`, which orders
+//  them against its session queue through `CaptureGraphGate`. What is left here is a layer, its
+//  frame, and the two signals worth re-asking on: the session starting, and a new configuration.
 //
 
 import SwiftUI
@@ -17,37 +21,39 @@ struct CameraPreviewView: UIViewRepresentable {
     /// view mid-bring-up, and every `previewLayer.session` (re)attach on the main thread
     /// serializes against the session queue — the first-cold-launch freeze.
     var configurationId: Int = 0
-    var rotationSubjectProvider: ((AVCaptureVideoPreviewLayer) -> CaptureRotationSubject?)?
     /// Runs the dismantle-time `previewLayer.session = nil`. Detaching takes the session's
-    /// internal lock — held by `startRunning` for its full duration — so doing it inline on
-    /// the main thread stalled dismissal against an in-flight cold-start bring-up. The
-    /// default sequences the detach behind `CameraService`'s session queue instead.
+    /// internal lock — held by `startRunning`/`stopRunning` for their full duration — so doing
+    /// it inline on the main thread stalled dismissal against an in-flight bring-up, and leaving
+    /// the Camera tab does both in the same turn. The default hands it to the graph gate.
     var sessionDetacher: (AVCaptureVideoPreviewLayer) -> Void = { CameraService.shared.detachPreviewLayer($0) }
-    /// Attach counterpart: `previewLayer.session = session` on a RUNNING session mutates the
-    /// capture graph, and the PiP mounts exactly when recording starts — inline it raced the
-    /// movie-output bootstrap on the session queue (whole preview went black on device).
+    /// Attach counterpart: `previewLayer.session = session` mutates the capture graph and takes
+    /// the same lock.
     var sessionAttacher: (AVCaptureVideoPreviewLayer, AVCaptureSession) -> Void = { CameraService.shared.attachPreviewLayer($0, session: $1) }
+    /// Mirroring and rotation for the layer's connection. Both setters take the capture
+    /// session's internal lock exactly as the attach does, so they are ordered against the
+    /// session queue by the same gate rather than issued inline from a layout pass.
+    var connectionConfigurator: (AVCaptureVideoPreviewLayer) -> Void = { CameraService.shared.configurePreviewConnection($0) }
 
     func makeUIView(context: Context) -> PreviewView {
         let view = PreviewView()
         view.backgroundColor = .black
-        view.rotationSubjectProvider = rotationSubjectProvider
         view.sessionDetacher = sessionDetacher
         view.sessionAttacher = sessionAttacher
+        view.connectionConfigurator = connectionConfigurator
         // Attach unconditionally. Gating this on "is the session running yet" left the layer
         // with NO session for the whole cold bring-up — a genuinely empty layer, which is
-        // exactly the black capture screen reported on device. The attach itself is already
-        // non-blocking (sessionQueue → main hop inside `attachPreviewLayer`), so there is
-        // nothing to defend against by waiting.
+        // exactly the black capture screen reported on device. Waiting defends against nothing:
+        // the graph gate is what decides when the assignment is safe, and on the cold path it
+        // is safe immediately, because the session has not been configured or started yet.
         view.configureSession(session)
         view.noteConfigurationId(configurationId)
         return view
     }
 
     func updateUIView(_ uiView: PreviewView, context: Context) {
-        uiView.rotationSubjectProvider = rotationSubjectProvider
         uiView.sessionDetacher = sessionDetacher
         uiView.sessionAttacher = sessionAttacher
+        uiView.connectionConfigurator = connectionConfigurator
         uiView.configureSession(session)
         uiView.noteConfigurationId(configurationId)
     }
@@ -59,8 +65,6 @@ struct CameraPreviewView: UIViewRepresentable {
 
 class PreviewView: UIView {
     private var sessionObserver: NSKeyValueObservation?
-    private var isConfigured = false
-    private var rotationSubject: CaptureRotationSubject?
     private var lastConfigurationId: Int?
     private var isDetachScheduled = false
     /// The session an attach has been requested for. The attach itself is deferred through
@@ -68,9 +72,9 @@ class PreviewView: UIView {
     /// every SwiftUI update in that window would re-request the attach and re-create the KVO.
     private var attachRequestedFor: ObjectIdentifier?
 
-    var rotationSubjectProvider: ((AVCaptureVideoPreviewLayer) -> CaptureRotationSubject?)?
     var sessionDetacher: ((AVCaptureVideoPreviewLayer) -> Void)?
     var sessionAttacher: ((AVCaptureVideoPreviewLayer, AVCaptureSession) -> Void)?
+    var connectionConfigurator: ((AVCaptureVideoPreviewLayer) -> Void)?
 
     override class var layerClass: AnyClass {
         AVCaptureVideoPreviewLayer.self
@@ -80,13 +84,14 @@ class PreviewView: UIView {
         layer as! AVCaptureVideoPreviewLayer
     }
 
+    /// Frame only. This used to reconfigure the connection on every pass, and connection
+    /// setters take the capture session's internal lock — so a layout triggered while the
+    /// session queue was mid-bring-up blocked the main thread for the rest of it. Layout is
+    /// not a signal that rotation or mirroring changed; `isRunning` and the configuration id
+    /// are, and both drive `configureConnection()` directly.
     override func layoutSubviews() {
         super.layoutSubviews()
         previewLayer.frame = bounds
-
-        if bounds.size != .zero && isConfigured {
-            configureConnection()
-        }
     }
 
     func configureSession(_ session: AVCaptureSession) {
@@ -95,7 +100,6 @@ class PreviewView: UIView {
 
         sessionObserver?.invalidate()
         sessionObserver = nil
-        rotationSubject = nil
 
         previewLayer.videoGravity = .resizeAspectFill
         // Deferred: attaching to a running session mutates the capture graph, so it must be
@@ -106,11 +110,10 @@ class PreviewView: UIView {
             previewLayer.session = session
         }
 
-        isConfigured = true
-
-        DispatchQueue.main.async { [weak self] in
-            self?.configureConnection()
-        }
+        // The connection does not exist until the session is both attached and configured, so
+        // this first ask is usually a no-op — it covers the case of a session already running
+        // when the preview mounts (returning to the tab), where no transition follows.
+        configureConnection()
 
         sessionObserver = session.observe(\.isRunning, options: [.new, .old]) { [weak self] _, change in
             if change.oldValue == false && change.newValue == true {
@@ -121,11 +124,13 @@ class PreviewView: UIView {
         }
     }
 
-    /// A bumped id means the session was reconfigured (e.g. camera switch), so the rotation
-    /// subject's captured device is stale. Only the subject is dropped here — no session
-    /// state is touched, because reading the session mid-configuration from the main thread
-    /// is what froze first launches. The `isRunning` KVO re-applies rotation once the
-    /// reconfigured session is running again.
+    /// A bumped id means the session was reconfigured (e.g. camera switch), so both the
+    /// mirroring and the rotation angle may have changed. No session state is read here — doing
+    /// that from the main thread mid-configuration is what froze first launches; the ask is
+    /// handed to the gate, which runs it once the session queue is idle.
+    ///
+    /// A reconfigure that does not end with the session running still gets its answer: the
+    /// `isRunning` KVO fires on the restart behind it and asks again.
     func noteConfigurationId(_ id: Int) {
         guard let previous = lastConfigurationId else {
             lastConfigurationId = id
@@ -133,33 +138,21 @@ class PreviewView: UIView {
         }
         guard previous != id else { return }
         lastConfigurationId = id
-        rotationSubject = nil
+        configureConnection()
     }
 
+    /// Delegated whole: mirroring and rotation are capture-graph writes, and this view is not
+    /// the object that knows when the graph is free. `CameraService` owns both the gate and the
+    /// rotation subject the angle comes from.
     private func configureConnection() {
-        guard let connection = previewLayer.connection else { return }
-
-        if connection.isVideoMirroringSupported {
-            connection.automaticallyAdjustsVideoMirroring = true
-        }
-
-        applyRotation()
-    }
-
-    private func applyRotation() {
-        if rotationSubject == nil {
-            rotationSubject = rotationSubjectProvider?(previewLayer)
-        }
-        rotationSubject?.applyPreviewAngle()
+        connectionConfigurator?(previewLayer)
     }
 
     func cleanup() {
         sessionObserver?.invalidate()
         sessionObserver = nil
-        rotationSubject = nil
-        rotationSubjectProvider = nil
+        connectionConfigurator = nil
         detachSession()
-        isConfigured = false
         attachRequestedFor = nil
     }
 

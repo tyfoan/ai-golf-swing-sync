@@ -137,6 +137,7 @@ struct RecordingView: View {
             Button("OK") {
                 showingError = false
                 viewModel.errorMessage = nil
+                relightCameraIfDark()
             }
         } message: {
             Text(viewModel.errorMessage
@@ -173,10 +174,7 @@ struct RecordingView: View {
     private var cameraPreview: some View {
         CameraPreviewView(
             session: viewModel.cameraService.captureSession,
-            configurationId: viewModel.cameraService.sessionConfigurationId,
-            rotationSubjectProvider: { [weak service = viewModel.cameraService] layer in
-                service?.makePreviewRotationSubject(for: layer)
-            }
+            configurationId: viewModel.cameraService.sessionConfigurationId
         )
         .ignoresSafeArea()
     }
@@ -277,7 +275,10 @@ struct RecordingView: View {
                 count: viewModel.countdownValue,
                 onCancel: viewModel.discardTake,
                 silhouetteNamespace: silhouetteAnimation,
-                isCameraReady: isCameraReady
+                // Two waits share one caption: the session still starting (cold bring-up)
+                // and the recording pipeline still installing after the ticks ran
+                // (`isPreparingToRecord`). Either way the digit must not sit mute.
+                isCameraReady: isCameraReady && !viewModel.isPreparingToRecord
             )
             .transition(.opacity)
         }
@@ -454,9 +455,37 @@ struct RecordingView: View {
         ])
         #endif
         guard hasCameraAccess, isCameraTabSelected, viewModel.state == .idle else { return }
-        Task {
-            _ = await viewModel.cameraService.prepareAndStartSession(position: .front, frameRate: 30)
-        }
+        Task { await startPreviewOrPromptRetry() }
+    }
+
+    /// One silent retry, then the alert. A cold `startRunning` can lose a transient race —
+    /// the audio route, mediaserverd under pressure — and succeed a beat later, so the first
+    /// failure is not worth a dialog. A second one is a state the user must be told about:
+    /// before this, the Bool was discarded and the screen sat behind the frost veil with a
+    /// disabled "Preparing camera…" button forever, indistinguishable from a hung app.
+    /// Dismissing the alert re-runs `warmUpCamera()` (see `relightCameraIfDark`), so OK IS
+    /// the retry affordance.
+    ///
+    /// A configuration failure surfaces through `currentError` — its own alert, analytics
+    /// already tracked — before `prepareAndStartSession` returns false; the last guard keeps
+    /// this vaguer message from replacing that specific one.
+    private func startPreviewOrPromptRetry() async {
+        let service = viewModel.cameraService
+        if await service.prepareAndStartSession(position: .front, frameRate: 30, readiness: .preview) { return }
+        try? await Task.sleep(for: .seconds(1))
+        guard isCameraTabSelected, viewModel.state == .idle else { return }
+        if await service.prepareAndStartSession(position: .front, frameRate: 30, readiness: .preview) { return }
+        guard service.currentError == nil else { return }
+        viewModel.errorMessage = String(localized: "Camera could not start. Tap OK to try again.", comment: "Alert body when the capture session fails to start while preparing the camera; dismissing the alert retries the bring-up")
+    }
+
+    /// Dismissing an error over a dark, idle camera IS the user's retry — nothing else
+    /// re-lights the preview until they leave and re-enter the tab, which nobody discovers.
+    /// Guarded off during an interruption: the session still counts as running there, and
+    /// `InterruptionOverlay` owns that recovery with its own Resume button.
+    private func relightCameraIfDark() {
+        guard !isCameraReady, !viewModel.cameraService.isInterrupted else { return }
+        warmUpCamera()
     }
 
     private var isCameraReady: Bool { viewModel.cameraService.isSessionRunning }
