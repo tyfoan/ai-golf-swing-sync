@@ -20,6 +20,14 @@ struct SwingEditorSheet: View {
     @State private var player: AVPlayer?
     @State private var currentFrame: UIImage?
 
+    /// One generator for the whole sheet. `onSeek` fires on every drag tick, and building a fresh
+    /// AVURLAsset + AVAssetImageGenerator per tick meant dozens of concurrent exact-frame decodes.
+    @State private var frameGenerator: AVAssetImageGenerator?
+
+    /// In-flight preview decode. Cancelled before each new one so a slow earlier request cannot
+    /// land after a newer one and jerk the preview backwards.
+    @State private var frameTask: Task<Void, Never>?
+
     init(video: SwingVideo, existingSwing: SwingMarker? = nil, onSave: @escaping (TimeInterval, TimeInterval, TimeInterval) -> Void, onCancel: @escaping () -> Void, onDelete: (() -> Void)? = nil) {
         self.video = video
         self.existingSwing = existingSwing
@@ -187,6 +195,11 @@ struct SwingEditorSheet: View {
                 player?.pause()
                 player?.replaceCurrentItem(with: nil)
                 player = nil
+                // Don't leave a decode running against a sheet that is gone.
+                frameTask?.cancel()
+                frameTask = nil
+                frameGenerator?.cancelAllCGImageGeneration()
+                frameGenerator = nil
             }
         }
     }
@@ -207,24 +220,37 @@ struct SwingEditorSheet: View {
     }
 
     private func generateFrame(at time: TimeInterval) {
-        let asset = AVURLAsset(url: video.localURL)
-        let generator = AVAssetImageGenerator(asset: asset)
-        generator.appliesPreferredTrackTransform = true
-        generator.requestedTimeToleranceBefore = .zero
-        generator.requestedTimeToleranceAfter = .zero
+        let generator = frameGenerator ?? makeFrameGenerator()
+        if frameGenerator == nil { frameGenerator = generator }
 
         let cmTime = CMTime(seconds: time, preferredTimescale: 600)
 
-        Task {
+        // Supersede the previous request. Without this every drag tick raced to assign
+        // `currentFrame`, and whichever decode happened to finish last won — which is how the
+        // preview ended up jumping backwards mid-drag.
+        frameTask?.cancel()
+        frameTask = Task {
             do {
                 let (image, _) = try await generator.image(at: cmTime)
-                await MainActor.run {
-                    currentFrame = UIImage(cgImage: image)
-                }
+                guard !Task.isCancelled else { return }
+                await MainActor.run { currentFrame = UIImage(cgImage: image) }
+            } catch is CancellationError {
+                // Expected: a newer seek superseded this one.
             } catch {
+                guard !Task.isCancelled else { return }
                 AppLogger.ui.error("Error generating frame: \(error.localizedDescription)")
             }
         }
+    }
+
+    private func makeFrameGenerator() -> AVAssetImageGenerator {
+        let generator = AVAssetImageGenerator(asset: AVURLAsset(url: video.localURL))
+        generator.appliesPreferredTrackTransform = true
+        // Exact-frame accuracy is the point of this editor — the user is picking the impact
+        // frame — so tolerance stays zero. Cost is controlled by reuse + cancellation instead.
+        generator.requestedTimeToleranceBefore = .zero
+        generator.requestedTimeToleranceAfter = .zero
+        return generator
     }
 
     private var isValidTimeOrder: Bool {

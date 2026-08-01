@@ -2,8 +2,8 @@
 //  OnboardingFeature.swift
 //  golf-sync-swing
 //
-//  Data model for a single onboarding page. Each page is a killer-first
-//  product showcase with a hero animation, bold headline, and CTA copy.
+//  Data model for a single onboarding page: a hero mockup, one centred
+//  title, a two-line subtitle, and the CTA copy for that step.
 //
 
 import SwiftUI
@@ -11,8 +11,9 @@ import SwiftUI
 struct OnboardingFeature: Identifiable {
 
     let id: Int
-    let preHeadline: String
-    let headlineLines: [String]
+    let title: String
+    /// One whole sentence, wrapped by the layout. Never pre-split into lines:
+    /// word order differs by language, so half-sentences cannot be translated.
     let subtitle: String
     let ctaTitle: String
     let heroBuilder: () -> AnyView
@@ -26,12 +27,7 @@ extension OnboardingFeature {
 
     static let killer = OnboardingFeature(
         id: 0,
-        preHeadline: String(localized: "BUILT FOR SERIOUS GOLFERS", comment: "Onboarding page 1 eyebrow (small uppercase line above headline)"),
-        headlineLines: [
-            String(localized: "Your swing", comment: "Onboarding page 1 headline, line 1 of 3"),
-            String(localized: "vs a pro's.", comment: "Onboarding page 1 headline, line 2 of 3"),
-            String(localized: "Auto-synced.", comment: "Onboarding page 1 headline, line 3 of 3")
-        ],
+        title: String(localized: "Your Swing vs a Pro's", comment: "Onboarding page 1 title"),
         subtitle: String(localized: "AI lines you up frame by frame at the moment of impact.", comment: "Onboarding page 1 subtitle under the headline"),
         ctaTitle: String(localized: "Continue", comment: "Onboarding primary button (advances to next page)"),
         heroBuilder: { AnyView(KillerSyncMockup()) }
@@ -39,12 +35,7 @@ extension OnboardingFeature {
 
     static let camera = OnboardingFeature(
         id: 1,
-        preHeadline: String(localized: "ZERO-TAP CAPTURE", comment: "Onboarding page 2 eyebrow"),
-        headlineLines: [
-            String(localized: "Just point.", comment: "Onboarding page 2 headline, line 1 of 3"),
-            String(localized: "It knows when", comment: "Onboarding page 2 headline, line 2 of 3"),
-            String(localized: "you swing.", comment: "Onboarding page 2 headline, line 3 of 3")
-        ],
+        title: String(localized: "Zero-Tap Capture", comment: "Onboarding page 2 title"),
         subtitle: String(localized: "Detects, trims, and saves every swing automatically.", comment: "Onboarding page 2 subtitle"),
         ctaTitle: String(localized: "Continue", comment: "Onboarding primary button (advances to next page)"),
         heroBuilder: { AnyView(SmartCameraMockup()) }
@@ -52,14 +43,9 @@ extension OnboardingFeature {
 
     static let tools = OnboardingFeature(
         id: 2,
-        preHeadline: String(localized: "FRAME BY FRAME", comment: "Onboarding page 3 eyebrow"),
-        headlineLines: [
-            String(localized: "Spot the fix.", comment: "Onboarding page 3 headline, line 1 of 3"),
-            String(localized: "Send it to", comment: "Onboarding page 3 headline, line 2 of 3"),
-            String(localized: "your coach.", comment: "Onboarding page 3 headline, line 3 of 3")
-        ],
-        subtitle: String(localized: "8× slow-mo, pro library, HD export.", comment: "Onboarding page 3 subtitle"),
+        title: String(localized: "Share Your Best Swings", comment: "Onboarding page 3 title"),
+        subtitle: String(localized: "Export a highlight reel or a side-by-side, in HD.", comment: "Onboarding page 3 subtitle"),
         ctaTitle: String(localized: "Get Started", comment: "Onboarding final-page button that dismisses onboarding"),
-        heroBuilder: { AnyView(SlowMoToolsMockup()) }
+        heroBuilder: { AnyView(ExportShareMockup()) }
     )
 }

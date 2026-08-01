@@ -9,7 +9,9 @@
 import Foundation
 import os
 
-enum AppLogger {
+/// `nonisolated`: `Logger` is `Sendable` and loggers are called from camera/detection
+/// queues and `@concurrent` code, so these statics must not be main-actor-isolated.
+nonisolated enum AppLogger {
 
     private static let subsystem = Bundle.main.bundleIdentifier ?? "com.golfsyncswing"
 

@@ -130,6 +130,9 @@ struct CustomPaywallView: View {
         VStack {
             HStack {
                 Button {
+                    // Inert mid-purchase: dismissing would fire paywall_dismissed
+                    // before paywall_purchased and run onDismiss twice.
+                    guard !isWorking else { return }
                     Analytics.shared.track(.paywallDismissed(source: source))
                     onDismiss()
                 } label: {
@@ -141,6 +144,7 @@ struct CustomPaywallView: View {
                             Circle().fill(Color.white.opacity(0.08))
                         )
                 }
+                .disabled(isWorking)
                 Spacer()
             }
             .padding(.horizontal, 16)
@@ -206,8 +210,8 @@ struct CustomPaywallView: View {
         if record.isTrial {
             Analytics.shared.track(.trialStarted(plan: record.plan, productId: record.productId, source: source))
         } else {
+            // Revenue recording is owned solely by SubscriptionRevenueReporter to prevent double counting.
             let revenue = PurchaseRevenue(productId: record.productId, price: record.price, currency: record.currency)
-            Analytics.shared.record(revenue)
             Analytics.shared.track(.purchaseCompleted(revenue: revenue, plan: record.plan, source: source))
         }
     }
@@ -230,7 +234,10 @@ struct CustomPaywallView: View {
             Analytics.shared.track(.purchaseRestored(source: source))
             onDismiss()
         case .noActiveEntitlement:
-            showToast("No previous purchase found.")
+            showToast(String(
+                localized: "No previous purchases found.",
+                comment: "Result of Restore Purchases when no prior purchase is associated with the user's Apple ID"
+            ))
         case .failed(let message):
             showToast(message)
         }

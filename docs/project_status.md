@@ -2,7 +2,7 @@
 
 > Current progress for Golf Sync Swing
 
-**Last Updated**: 2026-02-13
+**Last Updated**: 2026-08-01
 
 ---
 
@@ -10,7 +10,7 @@
 
 **Phase**: Monetization & Launch Prep
 **Status**: On Track
-**Current Focus**: RevenueCat integration, deployment blocker fixes, App Store readiness
+**Current Focus**: Shipping the recording-freeze + cold-start-latency release (phased camera bring-up, ~20 s → ~0.3 s to first preview frame, verified on device)
 
 ---
 

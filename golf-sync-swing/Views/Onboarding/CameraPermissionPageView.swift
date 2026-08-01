@@ -3,8 +3,8 @@
 //  golf-sync-swing
 //
 //  Final step of onboarding (after paywall). Requests camera +
-//  microphone permission and pre-warms the AVCaptureSession so
-//  the Recording tab opens with a live preview immediately.
+//  microphone permission. The capture session itself comes up on
+//  demand when the Camera tab appears.
 //
 
 import AVFoundation
@@ -132,18 +132,18 @@ struct CameraPermissionPageView: View {
             onContinue()
             return
         }
-        Task { await requestAndPrewarm() }
+        Task { await requestPermission() }
     }
 
+    /// Permission only — deliberately NO session pre-warm. Pre-warming here left the
+    /// camera running (green privacy indicator) behind screens that show no preview, and
+    /// raced `RecordingView`'s own bring-up: the tap on Start Recording then blocked the
+    /// main thread against the still-configuring session — the first-cold-launch freeze.
+    /// The Camera tab brings the session up on appear instead.
     @MainActor
-    private func requestAndPrewarm() async {
+    private func requestPermission() async {
         isRequesting = true
-        let granted = await CameraService.shared.requestPermissions()
-        if granted {
-            CameraService.shared.setupSession(position: .front, frameRate: 30)
-            try? await Task.sleep(for: .milliseconds(300))
-            CameraService.shared.resumeSession()
-        }
+        _ = await CameraService.shared.requestPermissions()
         permissionResolved = true
         isRequesting = false
     }

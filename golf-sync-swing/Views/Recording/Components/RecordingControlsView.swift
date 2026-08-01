@@ -10,6 +10,10 @@ import SwiftUI
 struct RecordingControlsView: View {
     @Bindable var viewModel: RecordingViewModel
 
+    /// Injected rather than read off the camera: the button's only job is to say whether it
+    /// can be pressed, and the tab already knows.
+    let isCameraReady: Bool
+
     var body: some View {
         VStack(spacing: 20) {
             if viewModel.state == .idle {
@@ -25,18 +29,36 @@ struct RecordingControlsView: View {
 
     // MARK: - Button Variants
 
+    /// Disabled until the session is actually running. The countdown starts in place on this
+    /// screen, and a countdown that ticks against a session still coming up would sit at "5"
+    /// over a black preview — the wait belongs here, where there is a live preview and a
+    /// positioning guide to look at.
     private var startRecordingButton: some View {
         Button(action: viewModel.startRecording) {
-            Text("Start Recording")
+            startRecordingLabel
                 .font(.headline)
                 .fontWeight(.semibold)
                 .foregroundStyle(.white)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
-                .background(Color.fairwayGreen)
+                .background(isCameraReady ? Color.fairwayGreen : Color.fairwayGreen.opacity(0.5))
                 .clipShape(RoundedRectangle(cornerRadius: 16))
+                .shadow(color: Color.fairwayGreen.opacity(0.35), radius: 12, y: 4)
         }
+        .disabled(!isCameraReady)
         .padding(.horizontal, 40)
+    }
+
+    @ViewBuilder
+    private var startRecordingLabel: some View {
+        if isCameraReady {
+            Text("Start Recording")
+        } else {
+            HStack(spacing: 8) {
+                ProgressView().tint(.white)
+                Text("Preparing camera…")
+            }
+        }
     }
 
     private var stopRecordingButton: some View {
@@ -66,7 +88,7 @@ struct RecordingControlsView: View {
             }
 
             Button {
-                Task { await viewModel.saveToPhotos() }
+                Task { await viewModel.saveRecording() }
             } label: {
                 Text(viewModel.swingCount > 0 ? "Save (\(viewModel.swingCount))" : "Save")
                     .font(.headline)

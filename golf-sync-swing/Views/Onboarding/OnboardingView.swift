@@ -15,6 +15,7 @@ struct OnboardingView: View {
     let onComplete: () -> Void
 
     @State private var currentPage = 0
+    @State private var contentBlur: CGFloat = 0
     @State private var sheet: OnboardingSheet?
     @State private var skipVisible = false
 
@@ -22,13 +23,9 @@ struct OnboardingView: View {
 
     var body: some View {
         ZStack {
-            background
-            VStack(spacing: 0) {
-                skipButton
-                pageContent
-                pageIndicator
-                actionButton
-            }
+            Color.onboardingDark.ignoresSafeArea()
+            pageContent
+            chrome
         }
         .fullScreenCover(item: $sheet) { sheet in
             switch sheet {
@@ -52,20 +49,6 @@ struct OnboardingView: View {
         var id: Self { self }
     }
 
-    // MARK: - Skip
-
-    private var skipButton: some View {
-        HStack {
-            Spacer()
-            Button("Skip") { skipAll() }
-                .font(.caption)
-                .foregroundStyle(Color.white.opacity(0.3))
-                .padding(.trailing, 24)
-                .padding(.top, 12)
-                .opacity(skipVisible ? 1 : 0)
-        }
-    }
-
     private func revealSkipAfterDelay() {
         guard !skipVisible else { return }
         Task {
@@ -76,79 +59,49 @@ struct OnboardingView: View {
         }
     }
 
-    // MARK: - Background
-
-    private var background: some View {
-        MeshGradient(
-            width: 3,
-            height: 3,
-            points: [
-                [0.0, 0.0], [0.5, 0.0], [1.0, 0.0],
-                [0.0, 0.5], [0.5, 0.5], [1.0, 0.5],
-                [0.0, 1.0], [0.5, 1.0], [1.0, 1.0]
-            ],
-            colors: [
-                .onboardingDark,      .onboardingDeepGreen, .onboardingDark,
-                .onboardingDeepGreen, .onboardingMidGreen,  .onboardingDeepGreen,
-                .onboardingDark,      .onboardingDeepGreen, .onboardingDark
-            ]
-        )
-        .ignoresSafeArea()
-    }
-
     // MARK: - Pages
 
+    /// The cross-fading layer. Blurring on the way out and back in is what
+    /// makes one page dissolve into the next instead of sliding.
     private var pageContent: some View {
-        TabView(selection: $currentPage) {
-            ForEach(pages) { page in
-                OnboardingPageView(feature: page)
-                    .tag(page.id)
+        OnboardingPageView(
+            feature: pages[currentPage],
+            pageCount: pages.count,
+            currentPage: currentPage
+        )
+        .id(currentPage)
+        .transition(.opacity)
+        .blur(radius: contentBlur)
+        .ignoresSafeArea()
+        .contentShape(Rectangle())
+        .gesture(swipe)
+    }
+
+    private var swipe: some Gesture {
+        DragGesture(minimumDistance: Metrics.swipeMinimum)
+            .onEnded { drag in
+                guard abs(drag.translation.width) > Metrics.swipeThreshold else { return }
+                go(to: currentPage + (drag.translation.width < 0 ? 1 : -1))
             }
-        }
-        .tabViewStyle(.page(indexDisplayMode: .never))
-        .animation(.easeInOut(duration: 0.3), value: currentPage)
     }
 
-    // MARK: - Page Indicator
+    // MARK: - Chrome
 
-    private var pageIndicator: some View {
-        HStack(spacing: 8) {
-            ForEach(pages) { page in
-                Capsule()
-                    .fill(page.id == currentPage ? Color.onboardingGold : Color.white.opacity(0.2))
-                    .frame(width: page.id == currentPage ? 24 : 8, height: 8)
-                    .animation(.easeInOut(duration: 0.25), value: currentPage)
-            }
+    /// Top bar and CTA sit above the blurred layer, so they stay sharp while
+    /// the page behind them dissolves.
+    private var chrome: some View {
+        VStack(spacing: 0) {
+            OnboardingTopBar(
+                canGoBack: currentPage > 0,
+                skipVisible: skipVisible,
+                onBack: { go(to: currentPage - 1) },
+                onSkip: skipAll
+            )
+            Spacer()
+            OnboardingPrimaryButton(title: pages[currentPage].ctaTitle, action: advancePage)
+                .padding(.horizontal, Metrics.ctaHorizontalPadding)
+                .padding(.bottom, Metrics.ctaBottomPadding)
         }
-        .padding(.bottom, 24)
-    }
-
-    // MARK: - Action Button
-
-    private var actionButton: some View {
-        Button(action: advancePage) {
-            Text(buttonTitle)
-                .font(.headline)
-                .fontWeight(.semibold)
-                .foregroundStyle(.white)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 16)
-                .background(
-                    LinearGradient(
-                        colors: [Color.onboardingRichGreen, Color.fairwayGreen],
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    ),
-                    in: RoundedRectangle(cornerRadius: 14)
-                )
-                .shadow(color: Color.fairwayGreen.opacity(0.4), radius: 12, y: 4)
-        }
-        .padding(.horizontal, 32)
-        .padding(.bottom, 48)
-    }
-
-    private var buttonTitle: String {
-        pages[currentPage].ctaTitle
     }
 
     // MARK: - Navigation
@@ -162,9 +115,15 @@ struct OnboardingView: View {
             sheet = .paywall
             return
         }
-        withAnimation {
-            currentPage += 1
-        }
+        go(to: currentPage + 1)
+    }
+
+    /// Blur out, swap the page underneath the blur, then sharpen back up.
+    private func go(to page: Int) {
+        guard pages.indices.contains(page), page != currentPage else { return }
+        withAnimation(.easeIn(duration: Metrics.blurOut)) { contentBlur = Metrics.blurRadius }
+        withAnimation(.easeInOut(duration: Metrics.crossFade)) { currentPage = page }
+        withAnimation(.easeOut(duration: Metrics.blurIn).delay(Metrics.blurOut)) { contentBlur = 0 }
     }
 
     /// Skip goes directly to paywall (skipping remaining onboarding pages).
@@ -177,5 +136,18 @@ struct OnboardingView: View {
         OnboardingService.shared.completeOnboarding()
         Analytics.shared.track(.onboardingCompleted)
         onComplete()
+    }
+
+    // MARK: - Metrics
+
+    private enum Metrics {
+        static let blurRadius: CGFloat = 18
+        static let blurOut: TimeInterval = 0.16
+        static let blurIn: TimeInterval = 0.30
+        static let crossFade: TimeInterval = 0.34
+        static let swipeMinimum: CGFloat = 24
+        static let swipeThreshold: CGFloat = 60
+        static let ctaHorizontalPadding: CGFloat = 28
+        static let ctaBottomPadding: CGFloat = 34
     }
 }

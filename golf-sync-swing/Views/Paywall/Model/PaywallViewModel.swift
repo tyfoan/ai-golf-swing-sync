@@ -59,7 +59,10 @@ final class PaywallViewModel {
         do {
             let offerings = try await purchases.offerings()
             guard let current = offerings.current else {
-                state = .failed("No paywall offering configured.")
+                state = .failed(String(
+                    localized: "No paywall offering configured.",
+                    comment: "Paywall error banner when no subscription offering is set up on the server; tapping it retries"
+                ))
                 return
             }
             let mapped = await mapPlans(from: current)
@@ -68,14 +71,22 @@ final class PaywallViewModel {
             state = .ready
         } catch {
             AppLogger.general.error("Paywall: load offerings failed — \(error.localizedDescription)")
-            state = .failed("Couldn't load plans. Tap to retry.")
+            state = .failed(String(
+                localized: "Couldn't load plans. Tap to retry.",
+                comment: "Paywall error banner when subscription plans fail to load, usually offline; tapping it retries"
+            ))
         }
     }
 
     // MARK: - Purchase
 
     func purchaseSelected() async -> PurchaseOutcome {
-        guard let plan = selectedPlan() else { return .failed("No plan selected.") }
+        guard let plan = selectedPlan() else {
+            return .failed(String(
+                localized: "No plan selected.",
+                comment: "Paywall toast when the buy button is tapped before choosing a subscription plan"
+            ))
+        }
         do {
             let result = try await purchases.purchase(package: plan.package)
             if result.userCancelled { return .cancelled }
@@ -83,7 +94,10 @@ final class PaywallViewModel {
             return .succeeded(purchaseRecord(for: plan, customerInfo: result.customerInfo))
         } catch {
             AppLogger.general.error("Paywall: purchase failed — \(error.localizedDescription)")
-            return .failed("Couldn't complete purchase.")
+            return .failed(String(
+                localized: "Couldn't complete purchase.",
+                comment: "Paywall toast when the App Store purchase fails for any reason other than the user cancelling"
+            ))
         }
     }
 
@@ -112,7 +126,10 @@ final class PaywallViewModel {
             return .noActiveEntitlement
         } catch {
             AppLogger.general.error("Paywall: restore failed — \(error.localizedDescription)")
-            return .failed("Restore failed. Check your connection.")
+            return .failed(String(
+                localized: "Restore failed. Check your connection.",
+                comment: "Paywall toast when restoring previous purchases fails due to a network or App Store error"
+            ))
         }
     }
 

@@ -13,6 +13,8 @@ enum PremiumFeature: String, CaseIterable {
     case poseEstimation
     case exportHD
     case exportNoWatermark
+    case proSwingLibrary
+    case unlimitedLibrary
 }
 
 struct FeatureAccess {
