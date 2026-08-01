@@ -8,6 +8,38 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Changed (cold-start latency, 2026-08-01)
+- **Camera bring-up is two orders of magnitude faster**: the capture graph now comes up
+  in two phases. The preview pass builds only what a live frame needs (video input +
+  video-data output — no microphone, no movie output, no AVAudioSession activation);
+  the recording half is installed during the 5-second countdown against the already-
+  running session. On-device probe: configure 56 ms + `startRunning` 217 ms (previously
+  measured 7.2 s + 15.5–21.5 s on a cold launch), arm pass 350 ms hidden behind the
+  first tick.
+- **The CoreML classifier load is genuinely lazy**: `SwingClassifier` no longer starts
+  the model load at construction (i.e. at tab mount, where the one-time ANE
+  specialization competed with the camera bring-up); the load kicks off from the record
+  tap only.
+- **The idle preview no longer holds the microphone**: the mic joins the graph only for
+  a take, and a cancelled or backgrounded countdown hands it straight back — the orange
+  privacy indicator now appears during a take, not on the ready screen.
+- **Onboarding page 3 hero swapped**: the export/share mockup replaces the slow-mo
+  tools mockup, per the 2026-07-26 export-hero spec.
+
+### Fixed (cold-start latency, 2026-08-01)
+- **A failed `startRunning` no longer strands the screen on "Preparing camera…"
+  forever**: the bring-up result is finally consumed — one silent retry a second later,
+  then an alert whose OK re-attempts the bring-up. The failure also counts in analytics
+  now (`camera_config_failed: start_running`); it was invisible in production.
+- **Countdown tail feedback**: the ticks run while the recording pipeline installs; if
+  the install outlives them, the digit no longer sits mute at "1" — the "Getting the
+  camera ready…" caption covers the wait.
+- **An arm failure's specific error is no longer clobbered** by the countdown's generic
+  "Camera could not start" message.
+- **A failed arm leaves the graph exactly as it found it**: previously a rejected movie
+  output stranded an orphan microphone input in the session with no path that could
+  ever remove it.
+
 ### Fixed (audit close-out, 2026-07-29)
 - **The "off-main" save copy actually ran on the main thread**: under this project's
   `SWIFT_DEFAULT_ACTOR_ISOLATION=MainActor` + `NonisolatedNonsendingByDefault` build
