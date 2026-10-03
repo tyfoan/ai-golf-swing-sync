@@ -8,6 +8,12 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Changed — 1.3.4 (1) candidate, 2026-10-03
+
+- Onboarding reaches camera access directly. One own video may be compared with pro references for free and reopened; successful playback records the allowance. Pro cards preserve the full frame, with refreshed thumbnails and corrected source FPS.
+- Upload provenance and release configuration are enforced by `bin/preflight-ios`; the reviewed current branch is recorded in [the release plan](release-2026-10-03.md).
+
+
 ### Changed (cold-start latency, 2026-08-01)
 - **Camera bring-up is two orders of magnitude faster**: the capture graph now comes up
   in two phases. The preview pass builds only what a live frame needs (video input +
