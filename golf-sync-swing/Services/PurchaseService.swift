@@ -38,7 +38,7 @@ final class PurchaseService {
     // MARK: - Configuration
 
     func configure() {
-        guard !isConfigured else { return }
+        guard !isConfigured, !ActivationPreview.isEnabled else { return }
         isConfigured = true
 
         #if DEBUG
@@ -75,6 +75,7 @@ final class PurchaseService {
 
     @MainActor
     func restorePurchases() async throws -> CustomerInfo {
+        guard Purchases.isConfigured else { throw CancellationError() }
         let info = try await Purchases.shared.restorePurchases()
         customerInfo = info
         isPremium = info.entitlements[Self.entitlementID]?.isActive == true
@@ -83,6 +84,7 @@ final class PurchaseService {
 
     @MainActor
     func refreshStatus() async {
+        guard Purchases.isConfigured else { return }
         guard let info = try? await Purchases.shared.customerInfo() else { return }
         customerInfo = info
         isPremium = info.entitlements[Self.entitlementID]?.isActive == true

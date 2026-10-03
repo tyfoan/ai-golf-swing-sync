@@ -657,3 +657,9 @@ raced the in-flight configure (CA fence timeout in the log). Hardened:
 - Complete project specification with PRD and engineering design
 - Initial Xcode project scaffolding
 - SwiftData model setup
+
+## 2026-10-03 — activation preview (unreleased)
+
+Paywall убран из onboarding. Одно собственное видео можно бесплатно сравнивать с профессиональными образцами и повторно открывать. Право закрепляется только после начала успешного воспроизведения, а не при выборе файлов или ошибке сборки. Два профессиональных видео не расходуют и не обходят это правило. Остальные premium-функции сохранены. Карточки профессионалов показывают полный кадр 3:2 вместо портретного crop; миниатюры обновляются до 600×400. FPS существующих 19 ресурсов исправлен с 30 на проверенные 59.94.
+
+See [2026-10-03-activation-preview.md](2026-10-03-activation-preview.md).

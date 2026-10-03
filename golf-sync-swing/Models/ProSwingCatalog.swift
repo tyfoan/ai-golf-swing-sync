@@ -15,6 +15,7 @@ struct ProSwingDescriptor {
     let displayName: String
     let bundleFilename: String
     let club: String
+    let framesPerSecond: Double
     let duration: TimeInterval
     let coreStartTime: TimeInterval
     let contactTime: TimeInterval
@@ -37,8 +38,10 @@ struct ProSwingDescriptor {
         coreStartTime: TimeInterval,
         contactTime: TimeInterval,
         coreEndTime: TimeInterval,
-        contextPadding: TimeInterval = Self.defaultContextPadding
+        contextPadding: TimeInterval = Self.defaultContextPadding,
+        framesPerSecond: Double = 60000.0 / 1001
     ) {
+        self.framesPerSecond = framesPerSecond
         self.displayName = displayName
         self.bundleFilename = bundleFilename
         self.club = club

@@ -106,6 +106,13 @@ private extension HomeView {
             Text("Select 2 swings to compare side-by-side.")
                 .font(.subheadline).foregroundStyle(Color.charcoal.opacity(0.6))
                 .multilineTextAlignment(.center)
+            if !FeatureAccess.isPremiumUser {
+                Text("Compare your first video with a pro for free. Upgrade for additional videos.")
+                    .font(.caption)
+                    .foregroundStyle(Color.pineGreen)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+            }
         }
         .padding(.top)
         .padding(.horizontal)
@@ -171,7 +178,8 @@ private extension HomeView {
         guard let v1 = videos.first(where: { $0.id == sel1.videoId }),
               let v2 = videos.first(where: { $0.id == sel2.videoId }) else { return }
 
-        if (v1.isPro || v2.isPro) && !FeatureAccess.isPremiumUser {
+        if (v1.isPro || v2.isPro) && !FeatureAccess.isPremiumUser
+            && !FirstComparisonAccess().allows(v1, v2) {
             Analytics.shared.track(.featureGateHit(feature: .proSwingLibrary))
             showPaywall = true
             return

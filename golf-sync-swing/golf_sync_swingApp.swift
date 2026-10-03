@@ -26,7 +26,7 @@ struct golf_sync_swingApp: App {
         if let container = try? ModelContainer(
             for: schema,
             migrationPlan: SwingDataMigrationPlan.self,
-            configurations: [ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)]
+            configurations: [ModelConfiguration(schema: schema, isStoredInMemoryOnly: ActivationPreview.isEnabled)]
         ) {
             self.sharedModelContainer = container
         } else {
@@ -46,6 +46,9 @@ struct golf_sync_swingApp: App {
             self._dataErrorMessage = State(initialValue: String(localized: "Unable to save data permanently. Your recordings may not persist between sessions.", comment: "Alert shown at launch when persistent SwiftData storage fails and the app falls back to in-memory storage"))
         }
 
+        #if DEBUG
+        try? ActivationPreview.seed(in: sharedModelContainer)
+        #endif
         self._showOnboarding = State(initialValue: !OnboardingService.shared.hasCompletedOnboarding)
 
         // First line the timeline ever gets, so `t` is measured from here.
@@ -115,6 +118,19 @@ struct golf_sync_swingApp: App {
 
     @ViewBuilder
     private var rootView: some View {
+        #if DEBUG
+        if ActivationPreview.isEnabled && ProcessInfo.processInfo.arguments.contains("--preview-comparison") {
+            ActivationComparisonPreview()
+        } else {
+            appFlow
+        }
+        #else
+        appFlow
+        #endif
+    }
+
+    @ViewBuilder
+    private var appFlow: some View {
         if showOnboarding {
             OnboardingView {
                 withAnimation {

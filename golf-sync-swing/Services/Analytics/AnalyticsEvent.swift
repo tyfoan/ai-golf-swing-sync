@@ -89,6 +89,8 @@ extension AnalyticsEvent {
         AnalyticsEvent(name: "paywall_purchased", properties: ["source": source.rawValue])
     }
 
+    static let firstProComparisonPlayed = AnalyticsEvent(name: "first_pro_comparison_played")
+
     static func comparisonOpened(mode: ComparisonMode) -> AnalyticsEvent {
         AnalyticsEvent(name: "comparison_opened", properties: ["mode": String(describing: mode)])
     }

@@ -2,10 +2,10 @@
 //  OnboardingView.swift
 //  golf-sync-swing
 //
-//  Full-screen onboarding flow: 3 benefit pages → paywall →
+//  Full-screen onboarding flow: 3 benefit pages →
 //  camera permission. Dismisses into the main app on completion.
 //
-//  Flow: Welcome → Auto-Sync → Pro Benefits → Paywall → Camera Access → Main App
+//  Flow: Welcome → Auto-Sync → Pro Benefits → Camera Access → Main App
 //
 
 import SwiftUI
@@ -29,11 +29,6 @@ struct OnboardingView: View {
         }
         .fullScreenCover(item: $sheet) { sheet in
             switch sheet {
-            case .paywall:
-                AppPaywallView(
-                    source: .onboarding,
-                    onDismiss: { self.sheet = .cameraPermission }
-                )
             case .cameraPermission:
                 CameraPermissionPageView { finishOnboarding() }
             }
@@ -45,7 +40,7 @@ struct OnboardingView: View {
     }
 
     private enum OnboardingSheet: Identifiable {
-        case paywall, cameraPermission
+        case cameraPermission
         var id: Self { self }
     }
 
@@ -112,7 +107,7 @@ struct OnboardingView: View {
 
     private func advancePage() {
         guard !isLastPage else {
-            sheet = .paywall
+            sheet = .cameraPermission
             return
         }
         go(to: currentPage + 1)
@@ -126,9 +121,9 @@ struct OnboardingView: View {
         withAnimation(.easeOut(duration: Metrics.blurIn).delay(Metrics.blurOut)) { contentBlur = 0 }
     }
 
-    /// Skip goes directly to paywall (skipping remaining onboarding pages).
+    /// Skip goes straight to the camera permission explanation.
     private func skipAll() {
-        sheet = .paywall
+        sheet = .cameraPermission
     }
 
     private func finishOnboarding() {
