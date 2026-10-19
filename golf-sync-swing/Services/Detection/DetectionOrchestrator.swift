@@ -132,6 +132,14 @@ final class DetectionOrchestrator: @unchecked Sendable {
         isActiveLock.withLock { isActive && session == sessionID }
     }
 
+    #if DEBUG
+    /// True when no frame is queued or being analysed. Lets the DEBUG video importer hand
+    /// frames over one at a time, so a slow simulator CPU doesn't drop frames the phone keeps.
+    var isIdle: Bool {
+        inFlightLock.withLock { inFlight == 0 }
+    }
+    #endif
+
     // MARK: - Frame Processing
 
     func processFrame(pixelBuffer: CVPixelBuffer, timestamp: TimeInterval) {
