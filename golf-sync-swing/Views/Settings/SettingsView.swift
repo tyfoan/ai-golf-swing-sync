@@ -78,6 +78,7 @@ struct SettingsView: View {
         legalSection
 
         #if DEBUG
+        DebugVideoImportSection()
         DebugSettingsSection()
         #endif
     }
