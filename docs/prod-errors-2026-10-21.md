@@ -20,8 +20,8 @@ review "Golpe" ("scam", BRA, Oct 16) is almost certainly this buyer.
 The only launch-time code that runs only in the 48 h after a paid, non-trial purchase is
 `SubscriptionRevenueReporter.reportIfNeeded → report()`. It stored its dedup date only after the
 StoreKit product lookup and the Amplitude revenue call, so a crash anywhere inside it repeats on
-every launch until the window closes. Trials never enter it, and this was the first non-trial sale
-in production. **The exact crashing frame is not confirmed** — see the manual step below.
+every launch until the window closes. Free-trial periods never enter it. **The exact crashing frame
+is not confirmed** — see the manual step below.
 
 Fix on branch `fix/lifetime-purchase-crash-loop`: the client-side reporter is removed; recognised
 revenue already reaches Amplitude from RevenueCat's server-side integration (`rc_*` events).
@@ -39,9 +39,12 @@ revenue already reaches Amplitude from RevenueCat's server-side integration (`rc
 
 ## Findings
 
-1. **Launch crash loop for 48 h after a paid purchase (P0, money).** Evidence as above. Every paid,
-   non-trial purchase (Lifetime, or a subscription bought without a trial) is exposed in 1.3.3 and
-   1.3.4; the reporter shipped in 1.3.3.
+1. **Launch crash loop for 48 h after a paid purchase (P0, money).** Evidence as above. The reporter
+   shipped in 1.3.3 and runs on launch for every paid, standard-period charge it has not reported:
+   a Lifetime purchase, a subscription bought without a trial, a trial→paid conversion or a renewal
+   (the first report on a device only within 48 h of the charge). Whether subscription charges
+   crashed too depends on the unconfirmed frame; Organizer's 1.3.3 and 1.3.4 crash counts will show
+   how many users were hit.
 2. **The promotional grant may reopen the window.** It gives the entitlement a new
    `latestPurchaseDate` (Oct 20 16:57 UTC). Its product id has no App Store product, so the
    lookup probably returns nothing and exits early, but that is unverified.
