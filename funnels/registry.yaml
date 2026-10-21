@@ -119,7 +119,8 @@ funnels:
   data_source: in_app
   status: awaiting_data
   auto_chart: false
-  notes: Post-ship. Revenue via Amplitude Revenue API (Analytics.record(revenue)).
+  notes: Post-ship. Recognised revenue comes from RevenueCat's server-side Amplitude integration (rc_* events); the client-side
+    revenue reporter and Analytics.record(revenue) were removed on 2026-10-21 after the lifetime crash loop.
 synced_at: '2026-10-03'
 source_revision: worktree@195145ff7286481f7817149353af700c9a8744ff (unreleased)
 ingestion_verification:

@@ -29,11 +29,7 @@ final class PurchaseService {
     static let apiKey = "appl_SrTcnIuqMXaqoRYvaecigbeOOoW"
     #endif
 
-    private let revenueReporter: SubscriptionRevenueReporter
-
-    private init(revenueReporter: SubscriptionRevenueReporter = SubscriptionRevenueReporter()) {
-        self.revenueReporter = revenueReporter
-    }
+    private init() {}
 
     // MARK: - Configuration
 
@@ -56,6 +52,10 @@ final class PurchaseService {
 
     // MARK: - Observation
 
+    /// Publishes premium state only. Revenue reaches Amplitude from RevenueCat's server-side
+    /// integration (the rc_* events), never from here. The client-side reporter that used to
+    /// run in this loop was the only launch path active for 48 h after a paid purchase, the
+    /// exact window in which 1.3.4 crashed on every launch after its first lifetime sale.
     private func observeCustomerInfo() async {
         for await info in Purchases.shared.customerInfoStream {
             let premium = info.entitlements[Self.entitlementID]?.isActive == true
@@ -67,7 +67,6 @@ final class PurchaseService {
                 Analytics.shared.setPremium(premium)
             }
             AppLogger.general.info("PurchaseService: premium=\(premium)")
-            await revenueReporter.reportIfNeeded(entitlement: info.entitlements[Self.entitlementID])
         }
     }
 

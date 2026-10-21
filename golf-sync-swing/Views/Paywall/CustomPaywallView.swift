@@ -210,7 +210,8 @@ struct CustomPaywallView: View {
         if record.isTrial {
             Analytics.shared.track(.trialStarted(plan: record.plan, productId: record.productId, source: source))
         } else {
-            // Revenue recording is owned solely by SubscriptionRevenueReporter to prevent double counting.
+            // Marks the conversion only. Revenue itself reaches Amplitude from RevenueCat's
+            // server-side integration, so nothing here records money.
             let revenue = PurchaseRevenue(productId: record.productId, price: record.price, currency: record.currency)
             Analytics.shared.track(.purchaseCompleted(revenue: revenue, plan: record.plan, source: source))
         }
