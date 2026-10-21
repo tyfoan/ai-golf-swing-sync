@@ -14,7 +14,7 @@ reported that they never got access. Production build: **1.3.4 (1)**, READY_FOR_
 configuration is correct. On the device, the purchase screen never reported success
 (`paywall_purchased` never arrived), and from 14:46:04 the app crashed within 1–3 s of every launch:
 more than ten launches in half a minute, each followed by a MetricKit `crash_detected`, and again
-on Oct 16 (iOS 27.0.1). The buyer's Oct 20 session, past the 48-hour mark, ran normally. The 1★
+on Oct 16. The buyer's Oct 20 session, past the 48-hour mark, ran normally. The 1★
 review "Golpe" ("scam", BRA, Oct 16) is almost certainly this buyer.
 
 The only launch-time code that runs only in the 48 h after a paid, non-trial purchase is
@@ -31,7 +31,7 @@ revenue already reaches Amplitude from RevenueCat's server-side integration (`rc
 | Source | Status | Detail |
 |---|---|---|
 | RevenueCat dashboard | **checked — 1 finding** | Customer profile and activity: purchase granted `Golf Swing Sync Premium` at purchase time; a promotional lifetime grant was added on Oct 20 16:57 UTC, after the buyer's last session. |
-| Amplitude — buyer timeline | **checked — 1 finding** | 185 events. Crash loop on Oct 15 right after the purchase and on Oct 16; normal session on Oct 20. Device iPhone 13 Pro Max, iOS 26.6.2 → 27.0.1. |
+| Amplitude — buyer timeline | **checked — 1 finding** | 185 events. Crash loop on Oct 15 right after the purchase and on Oct 16; normal session on Oct 20. |
 | Amplitude — `crash_detected` properties | **could not check** | The Chrome extension disconnected before the signal / exception / termination-reason properties were read, and the Amplitude MCP is not authenticated in this session. |
 | App Store Connect | **checked — 1 finding** | 3 reviews; the Oct 16 1★ "Golpe" from Brazil. Hang / disk-write / launch signatures for the latest build: empty. Crash signatures are not offered by the API (`crashes_supported: false`). |
 | Simulator reproduction | **checked — clean (weak)** | The production reporter ran with a synthetic lifetime entitlement. With an injected BRL lifetime product it finished without crashing; with the real lookup the simulator returned no product, so the StoreKit path on a device was not exercised. |
