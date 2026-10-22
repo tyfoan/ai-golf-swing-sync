@@ -33,11 +33,14 @@ struct PaywallPlanCard: View {
     let isSelected: Bool
     let onTap: () -> Void
 
+    /// Indicator width plus its spacing, so badge and detail line up with the title.
+    private static let textInset: CGFloat = 34
+
     var body: some View {
         Button(action: onTap) {
             content
                 .padding(.horizontal, 16)
-                .padding(.vertical, 14)
+                .padding(.vertical, 12)
                 .background(
                     RoundedRectangle(cornerRadius: 14)
                         .fill(Color.white.opacity(isSelected ? 0.06 : 0.03))
@@ -48,20 +51,29 @@ struct PaywallPlanCard: View {
                 )
         }
         .buttonStyle(.plain)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
+    // Badge, then title and price, then detail and trial: each on its own full-width
+    // row, so nothing wraps on a 4.7-inch screen and the pinned panel stays short.
     private var content: some View {
-        HStack(alignment: .center, spacing: 12) {
-            selectionIndicator
-            VStack(alignment: .leading, spacing: 4) {
-                if let badge = plan.savingsBadge {
-                    badgeLabel(badge)
-                }
-                titleRow
-                detailRow
+        VStack(alignment: .leading, spacing: 4) {
+            if let badge = plan.savingsBadge {
+                badgeLabel(badge)
+                    .padding(.leading, Self.textInset)
             }
-            Spacer(minLength: 0)
-            trailingPrice
+            HStack(alignment: .center, spacing: 12) {
+                selectionIndicator
+                titleRow
+                Spacer(minLength: 8)
+                priceLabel
+            }
+            HStack(alignment: .firstTextBaseline, spacing: 8) {
+                detailRow
+                Spacer(minLength: 8)
+                trailingNote
+            }
+            .padding(.leading, Self.textInset)
         }
     }
 
@@ -80,37 +92,38 @@ struct PaywallPlanCard: View {
 
     private var titleRow: some View {
         Text(planTitle)
-            .font(.system(size: 17, weight: .bold))
+            .font(.headline.weight(.bold))
+            .foregroundStyle(.white)
+    }
+
+    private var priceLabel: some View {
+        Text(plan.priceString)
+            .font(.subheadline.weight(.semibold))
             .foregroundStyle(.white)
     }
 
     private var detailRow: some View {
         Text(plan.lineUnderPrice)
             .font(.footnote)
-            .foregroundStyle(Color.white.opacity(0.65))
+            .foregroundStyle(Color.white.opacity(0.7))
     }
 
     @ViewBuilder
-    private var trailingPrice: some View {
-        VStack(alignment: .trailing, spacing: 2) {
-            Text(plan.priceString)
-                .font(.system(size: 15, weight: .semibold))
-                .foregroundStyle(.white)
-            if let trial = plan.trialString {
-                Text(trial)
-                    .font(.caption2.weight(.medium))
-                    .foregroundStyle(Color.onboardingGold)
-            } else if let equivalent = plan.equivalentString {
-                Text(equivalent)
-                    .font(.caption2)
-                    .foregroundStyle(Color.white.opacity(0.5))
-            }
+    private var trailingNote: some View {
+        if let trial = plan.trialString {
+            Text(trial)
+                .font(.caption2.weight(.medium))
+                .foregroundStyle(Color.onboardingGold)
+        } else if let equivalent = plan.equivalentString {
+            Text(equivalent)
+                .font(.caption2)
+                .foregroundStyle(Color.white.opacity(0.6))
         }
     }
 
     private func badgeLabel(_ text: String) -> some View {
         Text(text)
-            .font(.system(size: 10, weight: .heavy))
+            .font(.caption2.weight(.heavy))
             .tracking(0.8)
             .foregroundStyle(Color.onboardingDeepGreen)
             .padding(.horizontal, 8)

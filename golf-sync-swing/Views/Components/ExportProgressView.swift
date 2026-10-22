@@ -39,17 +39,19 @@ struct ExportProgressView: View {
     @State private var errorMessage: String?
     @State private var showShareSheet = false
     @State private var savedToPhotos = false
-    @State private var selectedQuality: ExportQuality = .standard
+    @State private var selectedQuality: ExportQuality = .defaultChoice
     @State private var showPaywall = false
     @State private var trimToSwing: Bool = true
     @State private var exportHandle: ExportHandle?
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 24) {
+            // Scrolls so the Export button stays reachable on a 4.7-inch screen,
+            // where the quality rows and the trim toggle outgrow a half sheet.
+            ScrollView {
                 currentStage
+                    .padding()
             }
-            .padding()
             .navigationTitle("Export Video")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -61,7 +63,7 @@ struct ExportProgressView: View {
                 }
             }
         }
-        .presentationDetents([.medium])
+        .presentationDetents([.medium, .large])
         .fullScreenCover(isPresented: $showPaywall) {
             AppPaywallView(source: .featureGate, onDismiss: { showPaywall = false })
         }
@@ -92,14 +94,19 @@ private extension ExportProgressView {
     var preExportView: some View {
         VStack(spacing: 20) {
             Image(systemName: "film.stack")
-                .font(.system(size: 60))
+                .font(.system(size: 36))
                 .foregroundStyle(.secondary)
+                .accessibilityHidden(true)
 
             Text(headlineText)
                 .font(.headline)
                 .multilineTextAlignment(.center)
 
-            qualityPicker
+            ExportQualityPicker(
+                selection: $selectedQuality,
+                renderSize: renderSize(for:),
+                onLockedTap: showLockedQualityPaywall
+            )
 
             if swingTrim != nil {
                 trimToggle
@@ -130,10 +137,8 @@ private extension ExportProgressView {
         guard let config = layoutConfig else {
             return String(localized: "Export side-by-side comparison video", comment: "Export sheet headline for the legacy stacked comparison export")
         }
-        let size = renderSize(for: effectiveQuality)
-        let w = Int(size.width)
-        let h = Int(size.height)
-        return String(localized: "Export at \(config.aspectRatio.displayName) (\(w)×\(h))", comment: "Export sheet headline: aspect-ratio name plus the output pixel dimensions of the selected quality")
+        let dimensions = ExportQuality.dimensions(of: renderSize(for: effectiveQuality))
+        return [config.aspectRatio.displayName, dimensions].joined(separator: " · ")
     }
 
     /// The quality the export will actually render at. UI guards keep locked
@@ -149,49 +154,9 @@ private extension ExportProgressView {
         return quality.renderSize(for: config.aspectRatio.exportSize)
     }
 
-    var qualityPicker: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Quality").font(.subheadline).foregroundStyle(.secondary)
-            ForEach(ExportQuality.allCases) { quality in
-                qualityRow(quality)
-            }
-        }
-    }
-
-    func qualityRow(_ quality: ExportQuality) -> some View {
-        let locked = quality.requiresPremium && !FeatureAccess.isUnlocked(.exportHD)
-        return Button {
-            guard !locked else {
-                Analytics.shared.track(.featureGateHit(feature: .exportHD))
-                showPaywall = true
-                return
-            }
-            selectedQuality = quality
-        } label: {
-            HStack {
-                Image(systemName: selectedQuality == quality ? "checkmark.circle.fill" : "circle")
-                    .foregroundStyle(selectedQuality == quality ? Color.fairwayGreen : .secondary)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(quality.label)
-                        .font(.subheadline).fontWeight(.medium)
-                        .foregroundStyle(locked ? .secondary : .primary)
-                    Text(quality.detail(renderSize: renderSize(for: quality)))
-                        .font(.caption2).foregroundStyle(.secondary)
-                }
-                Spacer()
-                if locked {
-                    Image(systemName: "lock.fill")
-                        .font(.caption).foregroundStyle(.secondary)
-                }
-            }
-            .padding(.vertical, 6).padding(.horizontal, 12)
-            .background(
-                selectedQuality == quality
-                    ? Color.fairwayGreen.opacity(0.1)
-                    : Color.clear
-            )
-            .clipShape(RoundedRectangle(cornerRadius: 8))
-        }
+    func showLockedQualityPaywall() {
+        Analytics.shared.track(.featureGateHit(feature: .exportHD))
+        showPaywall = true
     }
 
     var exportButton: some View {
@@ -368,83 +333,4 @@ private extension ExportProgressView {
             }
         }
     }
-}
-
-// MARK: - Export Quality
-
-enum ExportQuality: String, CaseIterable, Identifiable {
-    case standard
-    case high
-    case ultra
-
-    var id: String { rawValue }
-
-    var label: String {
-        switch self {
-        case .standard: return String(localized: "Standard")
-        case .high:     return String(localized: "HD")
-        case .ultra:    return String(localized: "Full HD")
-        }
-    }
-
-    func detail(renderSize: CGSize) -> String {
-        let w = Int(renderSize.width)
-        let h = Int(renderSize.height)
-        switch self {
-        case .standard: return String(localized: "\(w) x \(h) - Smaller file", comment: "Export quality row subtitle: output resolution of the free Standard tier")
-        case .high:     return String(localized: "\(w) x \(h) - Recommended", comment: "Export quality row subtitle: output resolution of the premium HD tier")
-        case .ultra:    return String(localized: "\(w) x \(h) - Best quality", comment: "Export quality row subtitle: output resolution of the premium Full HD tier")
-        }
-    }
-
-    var resolution: CGSize {
-        switch self {
-        case .standard: return CGSize(width: 720, height: 1280)
-        case .high:     return CGSize(width: 1080, height: 1920)
-        case .ultra:    return CGSize(width: 1440, height: 2560)
-        }
-    }
-
-    /// Multiplier applied to a layout's base export canvas. Derived from the
-    /// legacy fixed resolutions (720/1080/1440 wide on a 1080×1920 canvas) so
-    /// both export paths produce identical sizes for a 9:16 layout.
-    var renderScale: CGFloat {
-        switch self {
-        case .standard: return 720.0 / 1080.0
-        case .high:     return 1.0
-        case .ultra:    return 1440.0 / 1080.0
-        }
-    }
-
-    func renderSize(for exportSize: CGSize) -> CGSize {
-        CGSize(
-            width: evenPixels(exportSize.width * renderScale),
-            height: evenPixels(exportSize.height * renderScale)
-        )
-    }
-
-    /// Video encoders require even pixel dimensions.
-    private func evenPixels(_ value: CGFloat) -> CGFloat {
-        (value / 2).rounded() * 2
-    }
-
-    var requiresPremium: Bool {
-        switch self {
-        case .standard: return false
-        case .high:     return true
-        case .ultra:    return true
-        }
-    }
-}
-
-// MARK: - Share Sheet
-
-struct ShareSheet: UIViewControllerRepresentable {
-    let items: [Any]
-
-    func makeUIViewController(context: Context) -> UIActivityViewController {
-        UIActivityViewController(activityItems: items, applicationActivities: nil)
-    }
-
-    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }

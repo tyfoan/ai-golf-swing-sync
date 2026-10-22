@@ -234,6 +234,391 @@
         }
       }
     },
+    "%@ a week" : {
+      "comment" : "Paywall subline under the annual plan price when a trial is offered — placeholder is the annual price divided by 52, e.g. \"$0.58 a week\". Keep it short",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ pro Woche"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ a la semana"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ par semaine"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ a settimana"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "週あたり%@"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "주당 %@"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ por semana"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ в неделю"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ i veckan"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "สัปดาห์ละ %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ на тиждень"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "每周 %@"
+          }
+        }
+      }
+    },
+    "%@, then %@. Renews automatically until cancelled." : {
+      "comment" : "Line under the paywall buy button for a subscription with a free trial — first placeholder is the trial, e.g. \"1-week free trial\"; second is the price with its period, e.g. \"$29.99/yr\"",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, danach %2$@. Verlängert sich automatisch bis zur Kündigung."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ y después %2$@. Se renueva automáticamente hasta que canceles."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, puis %2$@. Renouvellement automatique jusqu'à résiliation."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, poi %2$@. Si rinnova automaticamente fino alla disdetta."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@、その後は%2$@。解約するまで自動更新されます。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ 후 %2$@. 해지할 때까지 자동 갱신돼요."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, depois %2$@. Renova automaticamente até você cancelar."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, затем %2$@. Продлевается автоматически, пока не отменишь."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, sedan %2$@. Förnyas automatiskt tills du säger upp."
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ จากนั้น %2$@ ต่ออายุอัตโนมัติจนกว่าจะยกเลิก"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, потім %2$@. Подовжується автоматично, доки не скасуєш."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@，之后 %2$@。自动续订，直至取消。"
+          }
+        }
+      }
+    },
+    "%@. Renews automatically until cancelled." : {
+      "comment" : "Line under the paywall buy button for a subscription without a trial — placeholder is the price with its period, e.g. \"$29.99/yr\"",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@. Verlängert sich automatisch bis zur Kündigung."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@. Se renueva automáticamente hasta que canceles."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@. Renouvellement automatique jusqu'à résiliation."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@. Si rinnova automaticamente fino alla disdetta."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@。解約するまで自動更新されます。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@. 해지할 때까지 자동 갱신돼요."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@. Renova automaticamente até você cancelar."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@. Продлевается автоматически, пока не отменишь."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@. Förnyas automatiskt tills du säger upp."
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ ต่ออายุอัตโนมัติจนกว่าจะยกเลิก"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@. Подовжується автоматично, доки не скасуєш."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@。自动续订，直至取消。"
+          }
+        }
+      }
+    },
+    "%@/wk" : {
+      "comment" : "Weekly plan price with its billing period, e.g. \"$4.99/wk\"",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@/Woche"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@/sem."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@/sem."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@/sett."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@/週"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@/주"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@/sem."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@/нед."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@/v."
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@/สัปดาห์"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@/тиж."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@/周"
+          }
+        }
+      }
+    },
+    "%@/yr" : {
+      "comment" : "Annual plan price with its billing period, e.g. \"$29.99/yr\"",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@/Jahr"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@/año"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@/an"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@/anno"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@/年"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@/년"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@/ano"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@/год"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@/år"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@/ปี"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@/рік"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@/年"
+          }
+        }
+      }
+    },
     "%@s" : {
       "comment" : "Swing duration in seconds, e.g. \"1.23s\"",
       "localizations" : {
@@ -928,237 +1313,6 @@
                 }
               }
             }
-          }
-        }
-      }
-    },
-    "%lld x %lld - Best quality" : {
-      "comment" : "Export quality row subtitle: output resolution of the premium Full HD tier",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld × %lld – Beste Qualität"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld × %lld – Mejor calidad"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld × %lld – Meilleure qualité"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld × %lld – Qualità migliore"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld × %lld - 最高画質"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld × %lld - 최고 화질"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld × %lld – Melhor qualidade"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld × %lld — лучшее качество"
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld × %lld – Bästa kvalitet"
-          }
-        },
-        "th" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld × %lld - คุณภาพสูงสุด"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld × %lld — найвища якість"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld × %lld - 最佳画质"
-          }
-        }
-      }
-    },
-    "%lld x %lld - Recommended" : {
-      "comment" : "Export quality row subtitle: output resolution of the premium HD tier",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld × %lld – Empfohlen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld × %lld – Recomendado"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld × %lld – Recommandé"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld × %lld – Consigliato"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld × %lld - 推奨"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld × %lld - 권장"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld × %lld – Recomendado"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld × %lld — рекомендуемое"
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld × %lld – Rekommenderad"
-          }
-        },
-        "th" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld × %lld - แนะนำ"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld × %lld — рекомендоване"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld × %lld - 推荐"
-          }
-        }
-      }
-    },
-    "%lld x %lld - Smaller file" : {
-      "comment" : "Export quality row subtitle: output resolution of the free Standard tier",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld × %lld – Kleinere Datei"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld × %lld – Archivo más pequeño"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld × %lld – Fichier plus petit"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld × %lld – File più piccolo"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld × %lld - ファイル小"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld × %lld - 작은 파일"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld × %lld – Arquivo menor"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld × %lld — меньше файл"
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld × %lld – Mindre fil"
-          }
-        },
-        "th" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld × %lld - ไฟล์เล็กกว่า"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld × %lld — менший файл"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld × %lld - 文件较小"
           }
         }
       }
@@ -2513,6 +2667,83 @@
         }
       }
     },
+    "≈ %@/wk" : {
+      "comment" : "Annual price divided into weeks, shown under the annual plan price, e.g. \"≈ $0.58/wk\"",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "≈ %@/Woche"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "≈ %@/sem."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "≈ %@/sem."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "≈ %@/sett."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "≈ %@/週"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "≈ %@/주"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "≈ %@/sem."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "≈ %@/нед."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "≈ %@/v."
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "≈ %@/สัปดาห์"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "≈ %@/тиж."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "≈ %@/周"
+          }
+        }
+      }
+    },
     "0:00.34  IMPACT" : {
       "comment" : "A time label displayed below the two video tiles in the mockup.",
       "isCommentAutoGenerated" : true,
@@ -3290,6 +3521,83 @@
         }
       }
     },
+    "An unlimited swing library, every comparison mode and HD export." : {
+      "comment" : "Paywall subheadline when opened from Settings",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unbegrenzte Schwungbibliothek, alle Vergleichsmodi und HD-Export."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Biblioteca de swings ilimitada, todos los modos de comparación y exportación en HD."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bibliothèque de swings illimitée, tous les modes de comparaison et export HD."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Libreria di swing illimitata, tutte le modalità di confronto ed esportazione HD."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スイングライブラリ無制限、すべての比較モード、HD書き出し。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "무제한 스윙 라이브러리, 모든 비교 모드, HD 내보내기."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Biblioteca de swings ilimitada, todos os modos de comparação e exportação em HD."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Безлимитная библиотека свингов, все режимы сравнения и экспорт в HD."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obegränsat svingbibliotek, alla jämförelselägen och HD-export."
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "คลังวงสวิงไม่จำกัด ทุกโหมดเปรียบเทียบ และส่งออกแบบ HD"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Безлімітна бібліотека свінгів, усі режими порівняння та експорт у HD."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无限挥杆库、所有对比模式和高清导出。"
+          }
+        }
+      }
+    },
     "Analysis failed: %@" : {
       "comment" : "SyncEngineError: motion-sync analysis failure — placeholder is the underlying reason",
       "localizations" : {
@@ -3443,83 +3751,6 @@
         }
       }
     },
-    "Auto-sync at impact" : {
-      "comment" : "Paywall feature row 1 title",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Auto-Sync beim Treffer"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sincronización automática en el impacto"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Synchronisation auto à l'impact"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sincronizzazione automatica all’impatto"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "インパクトで自動同期"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "임팩트 자동 동기화"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sincronização automática no impacto"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Авто-синхронизация по удару"
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Auto-synk vid träff"
-          }
-        },
-        "th" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ซิงก์อัตโนมัติที่อิมแพค"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Авто-синхронізація за ударом"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "击球瞬间自动同步"
-          }
-        }
-      }
-    },
     "Best Practices" : {
       "comment" : "The title of a section that provides tips for recording golf swings.",
       "isCommentAutoGenerated" : true,
@@ -3594,6 +3825,83 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "最佳实践"
+          }
+        }
+      }
+    },
+    "Best quality" : {
+      "comment" : "Export quality row: the 1440p tier",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beste Qualität"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Máxima calidad"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meilleure qualité"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qualità migliore"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最高画質"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "최고 화질"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Melhor qualidade"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Лучшее качество"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bästa kvalitet"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "คุณภาพดีที่สุด"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Найкраща якість"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最佳画质"
           }
         }
       }
@@ -5067,83 +5375,6 @@
         }
       }
     },
-    "Cancel anytime." : {
-      "comment" : "Subline under paywall CTA for subscription plans",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Jederzeit kündbar."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cancela cuando quieras."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Annulation à tout moment."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Disdici quando vuoi."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "いつでもキャンセル可能。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "언제든지 해지 가능."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cancele a qualquer momento."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Отменить можно в любой момент."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Avbryt när som helst."
-          }
-        },
-        "th" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ยกเลิกได้ทุกเมื่อ"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Скасувати можна будь-коли."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "随时可取消。"
-          }
-        }
-      }
-    },
     "Cinemascope" : {
       "comment" : "Description of a video arrangement when the video is in a \"cinemascope\" format.",
       "isCommentAutoGenerated" : true,
@@ -5454,6 +5685,83 @@
         }
       }
     },
+    "Close" : {
+      "comment" : "Accessibility label of the paywall's close button",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schließen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerrar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fermer"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chiudi"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "閉じる"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "닫기"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fechar"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Закрыть"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stäng"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ปิด"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Закрити"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "关闭"
+          }
+        }
+      }
+    },
     "Close comparison" : {
       "comment" : "Accessibility label for the close button on the comparison view.",
       "localizations" : {
@@ -5686,6 +5994,83 @@
         }
       }
     },
+    "Compare all your swings with the pro library, synced at impact." : {
+      "comment" : "Paywall feature row subtitle under 'Every swing vs every pro'",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vergleiche alle deine Schwünge mit der Profi-Bibliothek, synchron beim Treffer."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compara todos tus swings con la biblioteca de profesionales, sincronizados en el impacto."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compare tous tes swings à la bibliothèque des pros, synchronisés à l'impact."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confronta tutti i tuoi swing con la libreria dei professionisti, sincronizzati all’impatto."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべてのスイングをプロのライブラリと比較。インパクトで同期。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "모든 스윙을 프로 라이브러리와 비교하세요. 임팩트에 맞춰 동기화돼요."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compare todos os seus swings com a biblioteca de profissionais, sincronizados no impacto."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сравнивай все свои свинги с библиотекой профи — синхронно в момент удара."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jämför alla dina svingar med proffsbiblioteket, synkade vid träffen."
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "เปรียบเทียบทุกวงสวิงของคุณกับคลังของมือโปร ซิงก์ที่จังหวะอิมแพค"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Порівнюй усі свої свінги з бібліотекою профі — синхронно в момент удару."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "将你的所有挥杆与职业选手库对比，在击球瞬间同步。"
+          }
+        }
+      }
+    },
     "Compare Swings" : {
       "comment" : "A title for the view that lets users compare swings.",
       "isCommentAutoGenerated" : true,
@@ -5760,159 +6145,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "对比挥杆"
-          }
-        }
-      }
-    },
-    "Compare to pros in onion-skin & 8× slow-mo." : {
-      "comment" : "Paywall feature row 2 subtitle (onion-skin = transparency overlay comparison mode)",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vergleiche dich mit Profis in Onion-Skin und 8× Zeitlupe."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Compárate con profesionales con superposición y cámara lenta 8×."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Compare-toi aux pros en onion-skin et ralenti 8×."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Confrontati con i pro in sovrapposizione e rallentatore 8×."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "オニオンスキンと8倍スローでプロと比較。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "어니언스킨과 8배 슬로모션으로 프로와 비교하세요."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Compare com profissionais com onion-skin e slow-mo 8×."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Сравнивай с профи через наложение и замедление 8×."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Jämför med proffs i onion-skin och 8× slow-mo."
-          }
-        },
-        "th" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "เทียบกับโปรด้วยภาพซ้อนและสโลว์โม 8×"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Порівнюй із профі через накладання та уповільнення 8×."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "使用洋葱皮叠加和 8× 慢动作与职业选手对比。"
-          }
-        }
-      }
-    },
-    "comparison." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vergleich."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "comparación."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "comparaison."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "confronto."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "比較。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "비교 기능."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "comparação."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "сравнения."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "jämförelse."
-          }
-        },
-        "th" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "การเปรียบเทียบ"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "порівняння."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "完整对比。"
           }
         }
       }
@@ -8089,78 +8321,79 @@
         }
       }
     },
-    "Every feature." : {
+    "Every swing vs every pro" : {
+      "comment" : "Paywall feature row title: premium lifts the one-free-comparison limit",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Alle Funktionen."
+            "value" : "Jeder Schwung gegen jeden Profi"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Todas las funciones."
+            "value" : "Cada swing frente a cada pro"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Toutes les fonctions."
+            "value" : "Chaque swing face à chaque pro"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tutte le funzioni."
+            "value" : "Ogni swing contro ogni pro"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "全機能。"
+            "value" : "すべてのスイングをすべてのプロと"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "모든 기능."
+            "value" : "모든 스윙을 모든 프로와"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Todos os recursos."
+            "value" : "Cada swing contra cada pro"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Все функции."
+            "value" : "Любой свинг против любого профи"
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Alla funktioner."
+            "value" : "Varje sving mot varje proffs"
           }
         },
         "th" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ครบทุกฟีเจอร์"
+            "value" : "ทุกวงสวิงเทียบกับมือโปรทุกคน"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Усі функції."
+            "value" : "Будь-який свінг проти будь-якого профі"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "全部功能。"
+            "value" : "每次挥杆对比任意职业选手"
           }
         }
       }
@@ -8393,83 +8626,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "导出所有挥杆"
-          }
-        }
-      }
-    },
-    "Export at %@ (%lld×%lld)" : {
-      "comment" : "Export sheet headline: aspect-ratio name plus the output pixel dimensions of the selected quality",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Exportieren als %@ (%lld×%lld)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Exportar en %@ (%lld×%lld)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Exporter en %@ (%lld×%lld)"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Esporta in %@ (%lld×%lld)"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@（%lld×%lld）で書き出し"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ (%lld×%lld) 형식으로 내보내기"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Exportar em %@ (%lld×%lld)"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Экспорт в формате %@ (%lld×%lld)"
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Exportera som %@ (%lld×%lld)"
-          }
-        },
-        "th" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ส่งออกเป็น %@ (%lld×%lld)"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Експорт у форматі %@ (%lld×%lld)"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "以 %@（%lld×%lld）导出"
           }
         }
       }
@@ -9869,235 +10025,6 @@
         }
       }
     },
-    "Forever." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Für immer."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Para siempre."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pour toujours."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Per sempre."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "永続的に。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "평생 사용."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Para sempre."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Навсегда."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "För alltid."
-          }
-        },
-        "th" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ตลอดไป"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Назавжди."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "永久使用。"
-          }
-        }
-      }
-    },
-    "Frame-locked." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bildgenau."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ajustado al fotograma."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Image par image."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bloccato al fotogramma."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "フレーム単位で固定。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "프레임 단위 고정."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Travado por quadro."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Покадрово."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Låst bildruta för bildruta."
-          }
-        },
-        "th" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ล็อกทีละเฟรม"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Покадрово."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "逐帧锁定。"
-          }
-        }
-      }
-    },
-    "Frame-perfect alignment with any pro." : {
-      "comment" : "Paywall feature row 1 subtitle",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bildgenaue Ausrichtung an jedem Profi."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alineación exacta a cada fotograma con cualquier profesional."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alignement précis à l’image près avec n’importe quel pro."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Allineamento perfetto fotogramma per fotogramma con qualsiasi pro."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "どのプロにもフレーム単位で正確に整列。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "어떤 프로와도 프레임 단위로 정확히 정렬."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alinhamento perfeito quadro a quadro com qualquer pro."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Покадровое совпадение с любым профи."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Exakt linjering bildruta för bildruta med vilken pro som helst."
-          }
-        },
-        "th" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "จัดเฟรมตรงเป๊ะกับโปรคนไหนก็ได้"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Покадрове вирівнювання з будь-яким профі."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "与任何职业选手的逐帧精准对齐。"
-          }
-        }
-      }
-    },
     "Full body in frame" : {
       "localizations" : {
         "de" : {
@@ -10170,84 +10097,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "全身入镜"
-          }
-        }
-      }
-    },
-    "Full HD" : {
-      "comment" : "Label for the \"Full HD\" export quality option.",
-      "isCommentAutoGenerated" : true,
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Full HD"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Full HD"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Full HD"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Full HD"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "フル HD"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "풀 HD"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Full HD"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Full HD"
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Full HD"
-          }
-        },
-        "th" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Full HD"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Full HD"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "全高清"
           }
         }
       }
@@ -10483,78 +10332,79 @@
         }
       }
     },
-    "Go Pro." : {
+    "Go Pro.\nEvery mode.\nEvery swing." : {
+      "comment" : "Paywall headline when opened from Settings. Three short lines; place the line breaks where they read naturally",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Werde Pro."
+            "value" : "Werde Pro.\nJeder Modus.\nJeder Schwung."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hazte Pro."
+            "value" : "Hazte Pro.\nTodos los modos.\nTodos los swings."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Passe à Pro."
+            "value" : "Passe Pro.\nTous les modes.\nTous les swings."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Diventa Pro."
+            "value" : "Passa a Pro.\nOgni modalità.\nOgni swing."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pro になる。"
+            "value" : "Proにしよう。\nすべてのモード。\nすべてのスイング。"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pro 시작."
+            "value" : "Pro로 업그레이드.\n모든 모드.\n모든 스윙."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vire Pro."
+            "value" : "Seja Pro.\nTodos os modos.\nTodos os swings."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Стань Pro."
+            "value" : "Стань Pro.\nВсе режимы.\nВсе свинги."
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bli Pro."
+            "value" : "Bli Pro.\nAlla lägen.\nAlla svingar."
           }
         },
         "th" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "อัปเป็น Pro"
+            "value" : "อัปเกรดเป็น Pro\nทุกโหมด\nทุกวงสวิง"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Стань Pro."
+            "value" : "Стань Pro.\nУсі режими.\nУсі свінги."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "升级 Pro。"
+            "value" : "升级 Pro。\n所有模式。\n每一次挥杆。"
           }
         }
       }
@@ -11330,6 +11180,83 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "铁杆"
+          }
+        }
+      }
+    },
+    "Keep every recording. Free accounts keep 3." : {
+      "comment" : "Paywall feature row subtitle under 'Unlimited swing library'",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Behalte alle Aufnahmen. Kostenlos sind es 3."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guarda todas tus grabaciones. La versión gratuita guarda 3."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Garde tous tes enregistrements. La version gratuite en garde 3."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conserva tutte le registrazioni. La versione gratuita ne conserva 3."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべての録画を保存。無料版は3件まで。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "모든 녹화를 보관하세요. 무료 버전은 3개까지예요."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guarde todas as gravações. A versão gratuita guarda 3."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Храни все записи. В бесплатной версии — до 3."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spara alla inspelningar. Gratisversionen sparar 3."
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "เก็บทุกวิดีโอที่บันทึกไว้ เวอร์ชันฟรีเก็บได้ 3 รายการ"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Зберігай усі записи. У безкоштовній версії — до 3."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保留所有录制。免费版最多保留 3 个。"
           }
         }
       }
@@ -13653,79 +13580,79 @@
         }
       }
     },
-    "One-time payment." : {
-      "comment" : "Subline under paywall CTA for the lifetime plan",
+    "One-time payment of %@. No subscription." : {
+      "comment" : "Line under the paywall buy button for the lifetime plan — placeholder is the price, e.g. \"$79.99\"",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Einmalige Zahlung."
+            "value" : "Einmalzahlung von %@. Kein Abo."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pago único."
+            "value" : "Pago único de %@. Sin suscripción."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Paiement unique."
+            "value" : "Paiement unique de %@. Sans abonnement."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pagamento unico."
+            "value" : "Pagamento unico di %@. Nessun abbonamento."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "買い切り。"
+            "value" : "%@の1回払い。サブスクリプションではありません。"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "일회성 결제."
+            "value" : "%@ 1회 결제. 구독이 아니에요."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pagamento único."
+            "value" : "Pagamento único de %@. Sem assinatura."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Разовая оплата."
+            "value" : "Разовый платёж %@. Без подписки."
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Engångsbetalning."
+            "value" : "Engångsbetalning på %@. Ingen prenumeration."
           }
         },
         "th" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "จ่ายครั้งเดียว"
+            "value" : "ชำระครั้งเดียว %@ ไม่ใช่การสมัครสมาชิก"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Одноразова оплата."
+            "value" : "Разовий платіж %@. Без підписки."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "一次性付款。"
+            "value" : "一次性付款 %@。非订阅。"
           }
         }
       }
@@ -13882,6 +13809,83 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "打开“设置”"
+          }
+        }
+      }
+    },
+    "Overlay your swing on a pro's, or play them back to back." : {
+      "comment" : "Paywall feature row subtitle explaining the Stacked and Sequential modes",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lege deinen Schwung über den eines Profis oder spiele beide nacheinander ab."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Superpón tu swing al de un profesional o reprodúcelos uno tras otro."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Superpose ton swing à celui d'un pro, ou lis-les l'un après l'autre."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sovrapponi il tuo swing a quello di un professionista o riproducili uno dopo l’altro."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自分のスイングをプロに重ねたり、続けて再生したりできます。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "내 스윙을 프로 스윙에 겹치거나 차례로 재생하세요."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sobreponha seu swing ao de um profissional ou reproduza um após o outro."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Наложи свой свинг на свинг профи или проиграй их друг за другом."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lägg din sving över ett proffs sving eller spela upp dem efter varandra."
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ซ้อนวงสวิงของคุณบนวงสวิงของมือโปร หรือเล่นต่อกันทีละวง"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Наклади свій свінг на свінг профі або програй їх один за одним."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "将你的挥杆叠加在职业选手的挥杆上，或依次播放。"
           }
         }
       }
@@ -15050,6 +15054,83 @@
         }
       }
     },
+    "Pro" : {
+      "comment" : "Export quality row: this tier needs a Pro subscription",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pro"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pro"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pro"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pro"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pro"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pro"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pro"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pro"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pro"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pro"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pro"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pro"
+          }
+        }
+      }
+    },
     "PRO" : {
       "comment" : "Onboarding page 3 hero: label on the pro's swing in the side-by-side",
       "localizations" : {
@@ -15123,83 +15204,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "职业选手"
-          }
-        }
-      }
-    },
-    "Pro swing library" : {
-      "comment" : "Paywall feature row 2 title",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Profi-Schwungbibliothek"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Biblioteca de swings pro"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bibliothèque de swings pros"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Libreria di swing pro"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "プロのスイングライブラリ"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "프로 스윙 라이브러리"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Biblioteca de swings pro"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Библиотека свингов профи"
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pro-svingbibliotek"
-          }
-        },
-        "th" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "คลังสวิงของโปร"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Бібліотека свінгів профі"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "职业挥杆库"
           }
         }
       }
@@ -15510,6 +15514,83 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "录制"
+          }
+        }
+      }
+    },
+    "Recommended" : {
+      "comment" : "Export quality row: the 1080p tier is the recommended one",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Empfohlen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recomendado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recommandé"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consigliato"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "おすすめ"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "추천"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recomendado"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Рекомендуется"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rekommenderas"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "แนะนำ"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Рекомендовано"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "推荐"
           }
         }
       }
@@ -17455,83 +17536,6 @@
         }
       }
     },
-    "Save 81% vs weekly" : {
-      "comment" : "Paywall subline under the annual plan price when a trial is offered",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "81 % günstiger als wöchentlich"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ahorra 81 % vs semanal"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "81 % d’économie vs hebdomadaire"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Risparmi l’81 % rispetto al settimanale"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "週払いより 81% お得"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "주간 결제 대비 81% 절약"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Economize 81% em relação ao semanal"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Экономия 81 % против еженедельной"
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Spara 81 % jämfört med per vecka"
-          }
-        },
-        "th" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ประหยัด 81% เทียบกับรายสัปดาห์"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Економія 81 % проти щотижневої"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "比按周购买省 81%"
-          }
-        }
-      }
-    },
     "Save this recording, or delete it and record another." : {
       "comment" : "Body of the capture review panel prompting the user to choose between the Save and Delete buttons below it",
       "localizations" : {
@@ -18465,79 +18469,79 @@
         }
       }
     },
-    "Share-ready, no watermark, multi-aspect." : {
-      "comment" : "Paywall feature row 3 subtitle",
+    "Share-ready 1080p and 1440p clips." : {
+      "comment" : "Paywall feature row subtitle under 'HD export'; 1080p and 1440p are video resolutions",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Teilbereit, ohne Wasserzeichen, mehrere Formate."
+            "value" : "Teilbare Clips in 1080p und 1440p."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Listo para compartir, sin marca de agua, varias proporciones."
+            "value" : "Clips en 1080p y 1440p listos para compartir."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Prêt à partager, sans filigrane, multi-format."
+            "value" : "Clips en 1080p et 1440p prêts à partager."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pronto da condividere, senza filigrana, formati multipli."
+            "value" : "Clip in 1080p e 1440p pronte da condividere."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "シェア対応・ウォーターマークなし・複数のアスペクト比。"
+            "value" : "共有しやすい1080p・1440pのクリップ。"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "공유 준비 완료, 워터마크 없음, 다양한 비율 지원."
+            "value" : "바로 공유할 수 있는 1080p·1440p 클립."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pronto para compartilhar, sem marca-d’água, várias proporções."
+            "value" : "Clipes em 1080p e 1440p prontos para compartilhar."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Готово для шеринга, без водяного знака, разные форматы."
+            "value" : "Готовые к отправке ролики в 1080p и 1440p."
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Klart att dela, utan vattenstämpel, flera bildförhållanden."
+            "value" : "Klipp i 1080p och 1440p, redo att delas."
           }
         },
         "th" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "พร้อมแชร์ ไม่มีลายน้ำ หลายอัตราส่วน"
+            "value" : "คลิปความละเอียด 1080p และ 1440p พร้อมแชร์"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Готово до поширення, без водяного знаку, різні формати."
+            "value" : "Готові до надсилання ролики в 1080p і 1440p."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "可直接分享、无水印、多种比例。"
+            "value" : "可直接分享的 1080p 和 1440p 视频。"
           }
         }
       }
@@ -18697,82 +18701,6 @@
         }
       }
     },
-    "Side-by-side, onion-skin, overlay — and HD export." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nebeneinander, Onion-Skin, Overlay — und HD-Export."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "En paralelo, onion-skin, superposición — y exportación HD."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Côte à côte, onion-skin, superposition — et export HD."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Affiancato, onion-skin, sovrapposizione — ed esportazione HD."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "横並び、オニオンスキン、オーバーレイ、そして HD で書き出し。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "나란히, 어니언스킨, 오버레이 — 그리고 HD 내보내기."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lado a lado, onion-skin, sobreposição — e exportação HD."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Рядом, наложение, оверлей — и экспорт HD."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sida vid sida, onion-skin, överlägg — och HD-export."
-          }
-        },
-        "th" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "คู่ขนาน ภาพซ้อน โอเวอร์เลย์ — และส่งออก HD"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Поруч, накладання, оверлей — і експорт HD."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "并排、洋葱皮、叠加——以及 HD 导出。"
-          }
-        }
-      }
-    },
     "Skip" : {
       "comment" : "Onboarding button that jumps straight to the paywall",
       "localizations" : {
@@ -18846,6 +18774,83 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "跳过"
+          }
+        }
+      }
+    },
+    "Smaller file" : {
+      "comment" : "Export quality row: what the free 720p tier is good for",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kleinere Datei"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Archivo más pequeño"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fichier plus léger"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File più leggero"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ファイルサイズ小"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "작은 파일"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arquivo menor"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Меньше размер файла"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mindre fil"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ไฟล์เล็กกว่า"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Менший розмір файлу"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "文件更小"
           }
         }
       }
@@ -19005,6 +19010,160 @@
         }
       }
     },
+    "Stacked & sequential modes" : {
+      "comment" : "Paywall feature row title. Stacked and Sequential are the names of two comparison modes in the app",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modi „Gestapelt“ & „Nacheinander“"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modos Apilado y Secuencial"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modes Empilé et Séquentiel"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modalità Sovrapposto e Sequenziale"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重ね合わせ・連続再生モード"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "겹치기·순차 모드"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modos Empilhado e Sequencial"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Режимы «Наложение» и «Последовательно»"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lägena Staplad och Sekventiell"
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "โหมดซ้อนทับและตามลำดับ"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Режими «Накладання» і «Послідовно»"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "叠加和连续播放模式"
+          }
+        }
+      }
+    },
+    "Stacked and sequential modes, every swing against every pro, and HD export." : {
+      "comment" : "Paywall subheadline under the locked-feature headline. Stacked and Sequential are the names of two comparison modes in the app",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Modi „Gestapelt“ und „Nacheinander“, jeder Schwung gegen jeden Profi und HD-Export."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modos Apilado y Secuencial, cada swing frente a cada profesional y exportación en HD."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modes Empilé et Séquentiel, chaque swing face à chaque pro, et export HD."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modalità Sovrapposto e Sequenziale, ogni swing contro ogni professionista ed esportazione HD."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重ね合わせ・連続再生モード、すべてのスイングをすべてのプロと比較、HD書き出し。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "겹치기·순차 모드, 모든 스윙을 모든 프로와 비교, HD 내보내기."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modos Empilhado e Sequencial, cada swing contra cada profissional e exportação em HD."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Режимы «Наложение» и «Последовательно», любой свинг против любого профи и экспорт в HD."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lägena Staplad och Sekventiell, varje sving mot varje proffs och HD-export."
+          }
+        },
+        "th" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "โหมดซ้อนทับและตามลำดับ เปรียบเทียบทุกวงสวิงกับมือโปรทุกคน และส่งออกแบบ HD"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Режими «Накладання» і «Послідовно», будь-який свінг проти будь-якого профі та експорт у HD."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "叠加和连续播放模式，每次挥杆都能对比任意职业选手，还能导出高清视频。"
+          }
+        }
+      }
+    },
     "Stand 8-12 feet from the camera for optimal pose tracking." : {
       "comment" : "Recording tip 3 body — short sheet version",
       "localizations" : {
@@ -19155,84 +19314,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "距离相机 2.5–3.5 米站立，并确保整个挥杆动作中全身都在画面内。"
-          }
-        }
-      }
-    },
-    "Standard" : {
-      "comment" : "Label for the \"Standard\" export quality option.",
-      "isCommentAutoGenerated" : true,
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Standard"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Estándar"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Standard"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Standard"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "標準"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "표준"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Padrão"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Стандарт"
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Standard"
-          }
-        },
-        "th" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "มาตรฐาน"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Стандарт"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "标准"
           }
         }
       }
@@ -20632,82 +20713,6 @@
         }
       }
     },
-    "the full" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "den vollen"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "la"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "la"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "il"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "すべての"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "전체"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "a"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "все возможности"
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "den fullständiga"
-          }
-        },
-        "th" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "แบบเต็ม"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "усі можливості"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "完整的"
-          }
-        }
-      }
-    },
     "The full recorded clips, end to end" : {
       "comment" : "A description of what happens when a user opts to export full clips instead of trimmed ones.",
       "isCommentAutoGenerated" : true,
@@ -21725,154 +21730,156 @@
         }
       }
     },
-    "Unlock" : {
+    "Unlimited swing library" : {
+      "comment" : "Paywall feature row title: premium removes the 3-recording cap",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Freischalten"
+            "value" : "Unbegrenzte Schwungbibliothek"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Desbloquea"
+            "value" : "Biblioteca de swings ilimitada"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Débloque"
+            "value" : "Bibliothèque de swings illimitée"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sblocca"
+            "value" : "Libreria di swing illimitata"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "解除する"
+            "value" : "スイングライブラリ無制限"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "잠금 해제"
+            "value" : "무제한 스윙 라이브러리"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Desbloqueie"
+            "value" : "Biblioteca de swings ilimitada"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Открой"
+            "value" : "Безлимитная библиотека свингов"
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lås upp"
+            "value" : "Obegränsat svingbibliotek"
           }
         },
         "th" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ปลดล็อก"
+            "value" : "คลังวงสวิงไม่จำกัด"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Відкрий"
+            "value" : "Безлімітна бібліотека свінгів"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "解锁"
+            "value" : "无限挥杆库"
           }
         }
       }
     },
-    "Unlock every comparison mode and pro tool." : {
+    "Unlock\nthe full\ncomparison." : {
+      "comment" : "Paywall headline shown when a locked feature is tapped. Three short lines; place the line breaks where they read naturally",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Schalte jeden Vergleichsmodus und jedes Profi-Tool frei."
+            "value" : "Schalte den\nvollen Vergleich\nfrei."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Desbloquea todos los modos de comparación y herramientas pro."
+            "value" : "Desbloquea\nla comparación\ncompleta."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Débloque tous les modes de comparaison et outils pro."
+            "value" : "Débloque\nla comparaison\ncomplète."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sblocca ogni modalità di confronto e strumento pro."
+            "value" : "Sblocca\nil confronto\ncompleto."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "すべての比較モードとプロ機能を解除。"
+            "value" : "すべての\n比較機能を\n解除。"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "모든 비교 모드와 프로 도구를 잠금 해제하세요."
+            "value" : "모든 비교\n기능을\n잠금 해제하세요."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Desbloqueie todos os modos de comparação e ferramentas pro."
+            "value" : "Desbloqueie\na comparação\ncompleta."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Открой все режимы сравнения и профи-инструменты."
+            "value" : "Открой\nполное\nсравнение."
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lås upp varje jämförelseläge och pro-verktyg."
+            "value" : "Lås upp\nhela\njämförelsen."
           }
         },
         "th" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ปลดล็อกทุกโหมดเปรียบเทียบและเครื่องมือระดับโปร"
+            "value" : "ปลดล็อก\nการเปรียบเทียบ\nแบบเต็ม"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Відкрий усі режими порівняння та профі-інструменти."
+            "value" : "Відкрий\nповне\nпорівняння."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "解锁所有对比模式和专业工具。"
+            "value" : "解锁\n完整的\n对比功能。"
           }
         }
       }
@@ -22423,83 +22430,6 @@
         }
       }
     },
-    "vs a pro's." : {
-      "comment" : "Onboarding page 1 headline, line 2 of 3",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "gegen einen Profi."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "frente al de un pro."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "contre celui d’un pro."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "rispetto a quello di un pro."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "プロと並べて。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "프로와 비교."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "comparado ao de um pro."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "против свинга профи."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "mot ett proffs."
-          }
-        },
-        "th" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "เทียบกับสวิงของโปร"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "проти свінгу профі."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "与职业选手对比。"
-          }
-        }
-      }
-    },
     "We couldn't find a swing in this take. Keep the full clip anyway, or delete it and record another." : {
       "comment" : "Body of the capture review panel when no swing was detected; the user chooses between the Save and Delete buttons below it",
       "localizations" : {
@@ -22881,83 +22811,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "你"
-          }
-        }
-      }
-    },
-    "Your swing" : {
-      "comment" : "Onboarding page 1 headline, line 1 of 3",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dein Schwung"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tu swing"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ton swing"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Il tuo swing"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "あなたのスイング"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "당신의 스윙"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Seu swing"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Твой свинг"
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Din sving"
-          }
-        },
-        "th" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "สวิงของคุณ"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Твій свінг"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "你的挥杆"
           }
         }
       }

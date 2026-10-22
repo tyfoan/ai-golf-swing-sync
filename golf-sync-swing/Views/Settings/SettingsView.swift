@@ -86,7 +86,7 @@ struct SettingsView: View {
         Section {
             externalLinkRow(
                 "Contact Support",
-                url: "mailto:examply.app@gmail.com?subject=Golf%20Sync%20Swing%20Support"
+                url: URL(string: "mailto:examply.app@gmail.com?subject=Golf%20Sync%20Swing%20Support")!
             )
         } header: {
             Text("Support")
@@ -95,15 +95,15 @@ struct SettingsView: View {
 
     private var legalSection: some View {
         Section {
-            externalLinkRow("Terms of Use", url: "https://www.withcoach.app/terms")
-            externalLinkRow("Privacy Policy", url: "https://www.withcoach.app/privacy")
+            externalLinkRow("Terms of Use", url: LegalLinks.termsOfUse)
+            externalLinkRow("Privacy Policy", url: LegalLinks.privacyPolicy)
         } header: {
             Text("Legal")
         }
     }
 
-    private func externalLinkRow(_ title: LocalizedStringKey, url: String) -> some View {
-        Link(destination: URL(string: url)!) {
+    private func externalLinkRow(_ title: LocalizedStringKey, url: URL) -> some View {
+        Link(destination: url) {
             HStack {
                 Text(title)
                 Spacer()

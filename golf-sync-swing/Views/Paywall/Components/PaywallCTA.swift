@@ -2,9 +2,9 @@
 //  PaywallCTA.swift
 //  golf-sync-swing
 //
-//  Full-width call-to-action button + small sub-line. Label and sub-line
-//  adapt to the selected plan (trial wording for subs, "buy forever" for
-//  lifetime). Disabled while a purchase is in flight.
+//  Full-width call-to-action button with the plan's disclosure under it:
+//  the trial, the price that follows and the renewal, or the one-time
+//  payment for lifetime. Disabled while a purchase is in flight.
 //
 
 import SwiftUI
@@ -16,9 +16,9 @@ struct PaywallCTA: View {
     let onTap: () -> Void
 
     var body: some View {
-        VStack(spacing: 6) {
-            subline
+        VStack(spacing: 8) {
             actionButton
+            disclosure
         }
     }
 
@@ -32,6 +32,8 @@ struct PaywallCTA: View {
                         .font(.headline)
                         .fontWeight(.semibold)
                         .foregroundStyle(.white)
+                        .multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
             }
             .frame(maxWidth: .infinity)
@@ -50,10 +52,12 @@ struct PaywallCTA: View {
         .opacity(plan == nil ? 0.5 : 1)
     }
 
-    private var subline: some View {
-        Text(sublineText)
-            .font(.caption2)
-            .foregroundStyle(Color.white.opacity(0.5))
+    private var disclosure: some View {
+        Text(plan?.disclosure ?? " ")
+            .font(.caption)
+            .foregroundStyle(Color.white.opacity(0.75))
+            .multilineTextAlignment(.center)
+            .fixedSize(horizontal: false, vertical: true)
     }
 
     private var label: String {
@@ -70,12 +74,5 @@ struct PaywallCTA: View {
         case .weekly:
             return String(localized: "Subscribe — \(plan.priceString)", comment: "Paywall weekly subscribe CTA with price")
         }
-    }
-
-    private var sublineText: String {
-        guard let plan else { return " " }
-        return plan.kind == .lifetime
-            ? String(localized: "One-time payment.", comment: "Subline under paywall CTA for the lifetime plan")
-            : String(localized: "Cancel anytime.", comment: "Subline under paywall CTA for subscription plans")
     }
 }
