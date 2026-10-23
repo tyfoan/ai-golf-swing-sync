@@ -21,18 +21,22 @@ struct PaywallToast: View {
         if let toast {
             VStack {
                 Spacer()
-                Text(toast.text)
-                    .font(.footnote.weight(.semibold))
-                    .foregroundStyle(.white)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 18)
-                    .padding(.vertical, 12)
-                    .background(Capsule().fill(Color.charcoal.opacity(0.92)))
+                capsule(toast.text)
                     .padding(.horizontal, 24)
                     .padding(.bottom, 28)
                     .transition(.opacity.combined(with: .move(edge: .bottom)))
             }
             .id(toast.id)
         }
+    }
+
+    private func capsule(_ text: String) -> some View {
+        Text(text)
+            .font(.footnote.weight(.semibold))
+            .foregroundStyle(.white)
+            .multilineTextAlignment(.center)
+            .padding(.horizontal, 18)
+            .padding(.vertical, 12)
+            .background(Capsule().fill(Color.charcoal.opacity(0.92)))
     }
 }

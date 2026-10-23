@@ -33,18 +33,9 @@ struct ExportQualityPicker: View {
 
     private func rowLabel(_ quality: ExportQuality) -> some View {
         let isSelected = selection == quality
-        let size = renderSize(quality)
         return HStack {
-            Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                .foregroundStyle(isSelected ? Color.fairwayGreen : .secondary)
-                .accessibilityHidden(true)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(verbatim: quality.title(renderSize: size))
-                    .font(.subheadline).fontWeight(.medium)
-                    .foregroundStyle(quality.isLocked ? .secondary : .primary)
-                Text(quality.detail(renderSize: size))
-                    .font(.caption).foregroundStyle(.secondary)
-            }
+            selectionMark(isSelected)
+            titles(quality)
             Spacer()
             lockBadge(quality)
         }
@@ -53,6 +44,23 @@ struct ExportQualityPicker: View {
         .background(isSelected ? Color.fairwayGreen.opacity(0.1) : Color.clear)
         .clipShape(RoundedRectangle(cornerRadius: 8))
         .contentShape(Rectangle())
+    }
+
+    private func selectionMark(_ isSelected: Bool) -> some View {
+        Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+            .foregroundStyle(isSelected ? Color.fairwayGreen : .secondary)
+            .accessibilityHidden(true)
+    }
+
+    private func titles(_ quality: ExportQuality) -> some View {
+        let size = renderSize(quality)
+        return VStack(alignment: .leading, spacing: 2) {
+            Text(verbatim: quality.title(renderSize: size))
+                .font(.subheadline).fontWeight(.medium)
+                .foregroundStyle(quality.isLocked ? .secondary : .primary)
+            Text(quality.detail(renderSize: size))
+                .font(.caption).foregroundStyle(.secondary)
+        }
     }
 
     @ViewBuilder

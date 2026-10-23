@@ -46,22 +46,7 @@ struct ExportProgressView: View {
 
     var body: some View {
         NavigationStack {
-            // Scrolls so the Export button stays reachable on a 4.7-inch screen,
-            // where the quality rows and the trim toggle outgrow a half sheet.
-            ScrollView {
-                currentStage
-                    .padding()
-            }
-            .navigationTitle("Export Video")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
-                        exportHandle?.cancel()
-                        onDismiss()
-                    }
-                }
-            }
+            sheetContent
         }
         .presentationDetents([.medium, .large])
         .fullScreenCover(isPresented: $showPaywall) {
@@ -74,6 +59,27 @@ struct ExportProgressView: View {
 // MARK: - Stage Router
 
 private extension ExportProgressView {
+    /// Scrolls so the Export button stays reachable on a 4.7-inch screen,
+    /// where the quality rows and the trim toggle outgrow a half sheet.
+    var sheetContent: some View {
+        ScrollView {
+            currentStage
+                .padding()
+        }
+        .navigationTitle("Export Video")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) { cancelButton }
+        }
+    }
+
+    var cancelButton: some View {
+        Button("Cancel") {
+            exportHandle?.cancel()
+            onDismiss()
+        }
+    }
+
     @ViewBuilder
     var currentStage: some View {
         if isExporting {
@@ -93,27 +99,32 @@ private extension ExportProgressView {
 private extension ExportProgressView {
     var preExportView: some View {
         VStack(spacing: 20) {
-            Image(systemName: "film.stack")
-                .font(.system(size: 36))
-                .foregroundStyle(.secondary)
-                .accessibilityHidden(true)
-
-            Text(headlineText)
-                .font(.headline)
-                .multilineTextAlignment(.center)
-
-            ExportQualityPicker(
-                selection: $selectedQuality,
-                renderSize: renderSize(for:),
-                onLockedTap: showLockedQualityPaywall
-            )
-
+            preExportHeader
+            qualityPicker
             if swingTrim != nil {
                 trimToggle
             }
-
             exportButton
         }
+    }
+
+    @ViewBuilder
+    var preExportHeader: some View {
+        Image(systemName: "film.stack")
+            .font(.system(size: 36))
+            .foregroundStyle(.secondary)
+            .accessibilityHidden(true)
+        Text(headlineText)
+            .font(.headline)
+            .multilineTextAlignment(.center)
+    }
+
+    var qualityPicker: some View {
+        ExportQualityPicker(
+            selection: $selectedQuality,
+            renderSize: renderSize(for:),
+            onLockedTap: showLockedQualityPaywall
+        )
     }
 
     var trimToggle: some View {

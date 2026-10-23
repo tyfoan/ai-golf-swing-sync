@@ -32,15 +32,20 @@ struct PaywallCloseButton: View {
             guard !isWorking else { return }
             onClose()
         } label: {
-            Image(systemName: "xmark")
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(Color.white.opacity(0.55))
-                .frame(width: 32, height: 32)
-                .background(Circle().fill(Color.white.opacity(0.08)))
-                .frame(width: 44, height: 44)
-                .contentShape(Rectangle())
+            glyph
         }
         .disabled(isWorking)
         .accessibilityLabel(Text("Close", comment: "Accessibility label of the paywall's close button"))
+    }
+
+    /// The 32 pt circle, centred in its 44 pt tap target.
+    private var glyph: some View {
+        Image(systemName: "xmark")
+            .font(.system(size: 14, weight: .semibold))
+            .foregroundStyle(Color.white.opacity(0.55))
+            .frame(width: 32, height: 32)
+            .background(Circle().fill(Color.white.opacity(0.08)))
+            .frame(width: 44, height: 44)
+            .contentShape(Rectangle())
     }
 }

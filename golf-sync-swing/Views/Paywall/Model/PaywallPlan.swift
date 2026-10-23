@@ -18,15 +18,22 @@ struct PaywallPlan: Identifiable, Equatable {
         case weekly
     }
 
-    let id: String                  // RC product identifier
+    /// What the plan's card shows.
+    struct Card {
+        let priceString: String         // e.g. "$29.99/yr"
+        let trialString: String?        // e.g. "1-week free trial" — nil for lifetime
+        let savingsBadge: String?       // e.g. "BEST VALUE · SAVE 88%" — computed from live prices
+        let equivalentString: String?   // e.g. "≈ $0.58/wk" — annual only
+        let lineUnderPrice: String      // e.g. "Pay once, yours forever"
+    }
+
     let kind: Kind
-    let priceString: String         // e.g. "$29.99/yr"
-    let trialString: String?        // e.g. "1-week free trial" — nil for lifetime
-    let savingsBadge: String?       // e.g. "BEST VALUE · SAVE 88%" — computed from live prices
-    let equivalentString: String?   // e.g. "≈ $0.58/wk" — annual only
-    let lineUnderPrice: String      // e.g. "Pay once, yours forever"
-    let disclosure: String          // what the buy button commits to, shown under it
+    let card: Card
+    let disclosure: String              // what the buy button commits to, shown under it
     let package: Package
+
+    /// RC product identifier.
+    var id: String { package.identifier }
 
     static func == (lhs: PaywallPlan, rhs: PaywallPlan) -> Bool {
         lhs.id == rhs.id
@@ -39,51 +46,41 @@ extension PaywallPlan {
 
     static func lifetime(from package: Package) -> PaywallPlan {
         let price = package.storeProduct.localizedPriceString
-        return PaywallPlan(
-            id: package.identifier,
-            kind: .lifetime,
+        let card = Card(
             priceString: price,
             trialString: nil,
             savingsBadge: String(localized: "ONE-TIME · FOREVER", comment: "Paywall badge above the lifetime plan card"),
             equivalentString: nil,
-            lineUnderPrice: String(localized: "Pay once, yours forever", comment: "Paywall subline under the lifetime plan price"),
-            disclosure: String(localized: "One-time payment of \(price). No subscription.", comment: "Line under the paywall buy button for the lifetime plan — placeholder is the price, e.g. \"$79.99\""),
-            package: package
+            lineUnderPrice: String(localized: "Pay once, yours forever", comment: "Paywall subline under the lifetime plan price")
         )
+        let disclosure = String(localized: "One-time payment of \(price). No subscription.", comment: "Line under the paywall buy button for the lifetime plan — placeholder is the price, e.g. \"$79.99\"")
+        return PaywallPlan(kind: .lifetime, card: card, disclosure: disclosure, package: package)
     }
 
     static func annual(from package: Package, weekly: Package?, trialEligible: Bool) -> PaywallPlan {
         let price = String(localized: "\(package.storeProduct.localizedPriceString)/yr", comment: "Annual plan price with its billing period, e.g. \"$29.99/yr\"")
         let trial = trialEligible ? trial(for: package) : nil
-        return PaywallPlan(
-            id: package.identifier,
-            kind: .annual,
+        let card = Card(
             priceString: price,
             trialString: trial,
             savingsBadge: savingsBadge(annual: package, weekly: weekly),
             equivalentString: equivalentWeekly(for: package),
-            lineUnderPrice: annualLine(for: package, trialEligible: trialEligible),
-            disclosure: renewalDisclosure(price: price, trial: trial),
-            package: package
+            lineUnderPrice: annualLine(for: package, trialEligible: trialEligible)
         )
+        return PaywallPlan(kind: .annual, card: card, disclosure: renewalDisclosure(price: price, trial: trial), package: package)
     }
 
     static func weekly(from package: Package, trialEligible: Bool) -> PaywallPlan {
         let price = String(localized: "\(package.storeProduct.localizedPriceString)/wk", comment: "Weekly plan price with its billing period, e.g. \"$4.99/wk\"")
         let trial = trialEligible ? trial(for: package) : nil
-        return PaywallPlan(
-            id: package.identifier,
-            kind: .weekly,
+        let card = Card(
             priceString: price,
             trialString: trial,
             savingsBadge: nil,
             equivalentString: nil,
-            lineUnderPrice: trialEligible
-                ? String(localized: "Most flexible", comment: "Paywall subline under the weekly plan price when a trial is offered")
-                : String(localized: "Billed weekly", comment: "Paywall subline under the weekly plan price when no trial is offered"),
-            disclosure: renewalDisclosure(price: price, trial: trial),
-            package: package
+            lineUnderPrice: weeklyLine(trialEligible: trialEligible)
         )
+        return PaywallPlan(kind: .weekly, card: card, disclosure: renewalDisclosure(price: price, trial: trial), package: package)
     }
 }
 
@@ -142,6 +139,12 @@ private extension PaywallPlan {
             return String(localized: "Billed yearly", comment: "Paywall subline under the annual plan price when no trial is offered")
         }
         return String(localized: "\(perWeek) a week", comment: "Paywall subline under the annual plan price when a trial is offered — placeholder is the annual price divided by 52, e.g. \"$0.58 a week\". Keep it short")
+    }
+
+    static func weeklyLine(trialEligible: Bool) -> String {
+        trialEligible
+            ? String(localized: "Most flexible", comment: "Paywall subline under the weekly plan price when a trial is offered")
+            : String(localized: "Billed weekly", comment: "Paywall subline under the weekly plan price when no trial is offered")
     }
 
     static func weeklyShare(of annual: Package) -> String? {

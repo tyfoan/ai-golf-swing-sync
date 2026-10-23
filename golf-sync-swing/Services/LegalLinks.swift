@@ -13,6 +13,6 @@ enum LegalLinks {
     /// Apple's standard EULA, which covers the auto-renewing plans (App Review 3.1.2).
     static let termsOfUse = URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!
 
-    /// Golf Sync Swing's own privacy policy. App Store Connect must list the same URL.
-    static let privacyPolicy = URL(string: "https://withcoach.app/golf-sync-swing/privacy")!
+    /// The developer's privacy policy on withcoach.app. App Store Connect must list the same URL.
+    static let privacyPolicy = URL(string: "https://withcoach.app/privacy")!
 }

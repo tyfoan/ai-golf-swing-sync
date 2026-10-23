@@ -45,23 +45,32 @@ struct CustomPaywallView: View {
 
     private var content: some View {
         ScrollView(showsIndicators: false) {
-            VStack(alignment: .leading, spacing: 22) {
-                PaywallHero(source: source)
-                PaywallFeatureList()
-                if !pinsPurchasePanel {
-                    purchasePanel
-                }
-            }
-            .padding(.horizontal, 24)
-            .padding(.top, 56)
-            .padding(.bottom, 24)
+            page
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {
-            if pinsPurchasePanel {
+            pinnedPanel
+        }
+    }
+
+    private var page: some View {
+        VStack(alignment: .leading, spacing: 22) {
+            PaywallHero(source: source)
+            PaywallFeatureList()
+            if !pinsPurchasePanel {
                 purchasePanel
-                    .padding(.horizontal, 24)
-                    .paywallPinnedBackdrop()
             }
+        }
+        .padding(.horizontal, 24)
+        .padding(.top, 56)
+        .padding(.bottom, 24)
+    }
+
+    @ViewBuilder
+    private var pinnedPanel: some View {
+        if pinsPurchasePanel {
+            purchasePanel
+                .padding(.horizontal, 24)
+                .paywallPinnedBackdrop()
         }
     }
 

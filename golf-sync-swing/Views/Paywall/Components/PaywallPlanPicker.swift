@@ -58,22 +58,30 @@ struct PaywallPlanCard: View {
     // row, so nothing wraps on a 4.7-inch screen and the pinned panel stays short.
     private var content: some View {
         VStack(alignment: .leading, spacing: 4) {
-            if let badge = plan.savingsBadge {
+            if let badge = plan.card.savingsBadge {
                 badgeLabel(badge)
                     .padding(.leading, Self.textInset)
             }
-            HStack(alignment: .center, spacing: 12) {
-                selectionIndicator
-                titleRow
-                Spacer(minLength: 8)
-                priceLabel
-            }
-            HStack(alignment: .firstTextBaseline, spacing: 8) {
-                detailRow
-                Spacer(minLength: 8)
-                trailingNote
-            }
-            .padding(.leading, Self.textInset)
+            headline
+            detailLine
+                .padding(.leading, Self.textInset)
+        }
+    }
+
+    private var headline: some View {
+        HStack(alignment: .center, spacing: 12) {
+            selectionIndicator
+            titleRow
+            Spacer(minLength: 8)
+            priceLabel
+        }
+    }
+
+    private var detailLine: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 8) {
+            detailRow
+            Spacer(minLength: 8)
+            trailingNote
         }
     }
 
@@ -97,24 +105,24 @@ struct PaywallPlanCard: View {
     }
 
     private var priceLabel: some View {
-        Text(plan.priceString)
+        Text(plan.card.priceString)
             .font(.subheadline.weight(.semibold))
             .foregroundStyle(.white)
     }
 
     private var detailRow: some View {
-        Text(plan.lineUnderPrice)
+        Text(plan.card.lineUnderPrice)
             .font(.footnote)
             .foregroundStyle(Color.white.opacity(0.7))
     }
 
     @ViewBuilder
     private var trailingNote: some View {
-        if let trial = plan.trialString {
+        if let trial = plan.card.trialString {
             Text(trial)
                 .font(.caption2.weight(.medium))
                 .foregroundStyle(Color.onboardingGold)
-        } else if let equivalent = plan.equivalentString {
+        } else if let equivalent = plan.card.equivalentString {
             Text(equivalent)
                 .font(.caption2)
                 .foregroundStyle(Color.white.opacity(0.6))
