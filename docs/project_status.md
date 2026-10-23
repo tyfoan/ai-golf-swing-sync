@@ -299,7 +299,18 @@
 
 ## 2026-10-23 — Release 1.3.5
 
-1.3.5 (1) is 1.3.4 plus the lifetime-purchase crash-loop fix (PR #13: `SubscriptionRevenueReporter` removed). The debug video import from PR #12 also sits on `main`, but it compiles only into Debug builds. Built from `main`; 1.3.4 came from `analytics/repo-local-funnels`, which PR #13 brought into `main`.
+1.3.5 (2) is 1.3.4 plus:
+- the lifetime-purchase crash-loop fix (PR #13: `SubscriptionRevenueReporter` removed);
+- the App Review batch (PR #15: legal links, renewal disclosure, honest paywall copy, portrait only, localized permission prompts);
+- the comparison redesign with the cream export canvas (PR #16);
+- the cream single-video player (PR #17).
 
-- Source: `main` @ `2466061`, tagged `v1.3.5`. The version was passed to `xcodebuild` as `MARKETING_VERSION=1.3.5`; `project.pbxproj` still reads 1.3.4 until the next bump (1.3.6) is made in Xcode.
-- Uploaded 23/10/2026; App Store Connect processed the build as `VALID`. The version record has build 1 attached, the export-compliance answer "no non-exempt encryption", and "Bug fixes and stability improvements." in all 39 App Store locales.
+The debug video import from PR #12 is also on `main`, but it compiles only into Debug builds. 1.3.4 came from `analytics/repo-local-funnels`, which PR #13 brought into `main`.
+
+- Source: `main` @ `1fd6592`, tagged `v1.3.5`. Version and build were passed to `xcodebuild` as `MARKETING_VERSION=1.3.5 CURRENT_PROJECT_VERSION=2`; `project.pbxproj` still reads 1.3.4 (1) until the next bump is made in Xcode.
+- Build 1 (`2466061`, crash fix only) went to App Review first. On the owner's call it was pulled before approval and replaced by build 2.
+- App Store Connect, 23/10/2026:
+  - build 2 is `VALID`;
+  - export compliance is "no non-exempt encryption";
+  - all 39 locales have "Bug fixes and stability improvements.";
+  - the privacy policy URL in every locale is `https://withcoach.app/privacy`, the same as the in-app link (`LegalLinks`). Before, it was `examply.app/privacy_policy`, which no longer loads.
