@@ -3,8 +3,7 @@
 //  golf-sync-swing
 //
 //  Turns one source frame into one cell of an export frame: the swing upright, scaled
-//  and panned the way the user framed its editor tile, clipped to the cell — and the
-//  blurred fill that goes under it.
+//  and panned the way the user framed its editor tile, and cut to its card.
 //
 //  ⚠️ The pan mapping mirrors ZoomableVideoTile, which renders `.offset()` BEFORE
 //  `.scaleEffect()`: the visible shift is `offset × scale` in tile points, carried into
@@ -40,22 +39,37 @@ nonisolated struct CellRenderer {
         return CIImage(cvPixelBuffer: pixelBuffer).transformed(by: flip)
     }
 
-    func backdrop(from upright: CIImage) -> CIImage {
-        CellBackdrop.image(from: upright, filling: flippedCellRect)
+    /// The swing placed and cut to its card — and to any `outer` frames, such as the
+    /// first swing's card under a blended second one. Clipping is why the custom
+    /// compositor exists: a zoomed swing must not bleed into its neighbour.
+    func video(from upright: CIImage, within outer: [RoundedFrame] = []) -> CIImage {
+        let placed = place(upright)
+        return CardMask.cut(placed, to: [card(of: placed), cellFrame] + outer).cropped(to: clipRect)
     }
 
-    /// The swing scaled, centred on the cell plus the user's pan, and clipped to the cell —
-    /// clipping is why the custom compositor exists: a zoomed swing must not bleed into
-    /// its neighbour.
-    func video(from upright: CIImage) -> CIImage {
+    /// The swing's card where it lands on the canvas.
+    func cardFrame(of upright: CIImage) -> RoundedFrame {
+        card(of: place(upright))
+    }
+
+    /// The swing scaled and centred on the cell plus the user's pan.
+    private func place(_ upright: CIImage) -> CIImage {
         let scaled = upright.transformed(by: CGAffineTransform(scaleX: cell.finalScale, y: cell.finalScale))
         let pan = exportPan
         let cellRect = flippedCellRect
         let dx = cellRect.midX + pan.x - scaled.extent.midX
         let dy = cellRect.midY + pan.y - scaled.extent.midY
-        return scaled
-            .transformed(by: CGAffineTransform(translationX: dx, y: dy))
-            .cropped(to: clipRect)
+        return scaled.transformed(by: CGAffineTransform(translationX: dx, y: dy))
+    }
+
+    /// The swing's own rounded frame, rounded more as it is zoomed — the editor rounds the
+    /// tile's video before `.scaleEffect()`.
+    private func card(of placed: CIImage) -> RoundedFrame {
+        RoundedFrame(rect: placed.extent, radius: cell.cornerRadius * cell.userScale)
+    }
+
+    private var cellFrame: RoundedFrame {
+        RoundedFrame(rect: clipRect, radius: cell.cornerRadius)
     }
 
     /// The cell, kept inside the canvas.

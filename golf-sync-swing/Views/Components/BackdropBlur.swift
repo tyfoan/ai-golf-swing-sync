@@ -3,8 +3,8 @@
 //  golf-sync-swing
 //
 //  The look of the bars around a fitted swing: the clip itself, cropped to cover,
-//  blurred and dimmed under a dark material. Shared by the comparison panes and the
-//  export editor's tiles, and matched by CellBackdrop in exported files.
+//  blurred and dimmed under a dark material. Only the Stacked comparison pane uses it:
+//  both swings must share one frame there, so the card cannot take a swing's shape.
 //
 
 import SwiftUI

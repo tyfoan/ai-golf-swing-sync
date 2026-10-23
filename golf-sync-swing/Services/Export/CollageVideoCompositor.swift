@@ -9,7 +9,7 @@
 //  we explicitly cropped(to: cellRect) each frame so cells respect their bounds.
 //
 //  Port of video-collage's CollageVideoCompositor, simplified to video-only
-//  (no photos, stickers, watermarks, borders, or corner radius). CellRenderer draws
+//  (no photos, stickers, watermarks or borders). CellRenderer draws
 //  each cell; this class is the AVFoundation plumbing and the layering.
 //
 
@@ -135,19 +135,22 @@ final class CollageVideoCompositor: NSObject, AVVideoCompositing {
         return outputBuffer
     }
 
-    /// The canvas colour, then each cell that has a frame at this time — its blurred
-    /// fill first where it gets one. A track with nothing at this time (the waiting
-    /// swing of a sequential export) has no frame and draws nothing.
+    /// The cream canvas, then each cell that has a frame at this time, cut to its card;
+    /// a blended swing only inside the first swing's card. A track with nothing at this
+    /// time (the waiting swing of a sequential export) has no frame and draws nothing,
+    /// and in sequential the swing whose turn it is replaces the one before it.
     private func composedFrame(for request: AVAsynchronousVideoCompositionRequest, canvas: CGRect) -> CIImage {
-        var output = CIImage(color: ExportCanvasColor.ciColor).cropped(to: canvas)
+        let background = CIImage(color: ExportCanvasColor.ciColor).cropped(to: canvas)
+        var output = background
+        var firstCard: [RoundedFrame] = []
         for (index, cell) in cells.enumerated() {
             guard let pixelBuffer = request.sourceFrame(byTrackID: cell.videoTrackID) else { continue }
             let renderer = CellRenderer(cell: cell, canvasSize: canvas.size)
             let upright = renderer.uprightImage(of: pixelBuffer)
-            if cell.drawsBackdrop {
-                output = renderer.backdrop(from: upright).composited(over: output)
-            }
-            output = applyLayoutFilter(renderer.video(from: upright), cellIndex: index).composited(over: output)
+            let video = renderer.video(from: upright, within: layout.isBlended(cellAt: index) ? firstCard : [])
+            if index == 0 { firstCard = [renderer.cardFrame(of: upright)] }
+            if layout.showsOneSwingAtATime { output = background }
+            output = applyLayoutFilter(video, cellIndex: index).composited(over: output)
         }
         return output.cropped(to: canvas)
     }

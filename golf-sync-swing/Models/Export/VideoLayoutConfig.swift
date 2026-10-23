@@ -37,9 +37,13 @@ struct VideoLayoutConfig: Equatable {
         ExportCanvasLayout(canvas: renderSize, arrangement: arrangement)
     }
 
-    /// How the compositor layers the two cells: blended in stacked mode, apart otherwise.
+    /// How the compositor layers the two cells: blended in stacked mode, one at a time in
+    /// sequential, apart otherwise.
     var compositorLayout: CompositorLayout {
-        guard mode == .stacked else { return .sideBySide }
-        return .stacked(opacity: stackedOpacity ?? 0.5)
+        switch mode {
+        case .sideBySide, .topBottom: return .sideBySide
+        case .sequential:             return .sequential
+        case .stacked:                return .stacked(opacity: stackedOpacity ?? 0.5)
+        }
     }
 }

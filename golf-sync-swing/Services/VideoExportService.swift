@@ -533,7 +533,7 @@ final class VideoExportService {
             CellConfiguration(
                 cellRect: rects[index], source: sources[index],
                 framing: layoutConfig.transforms[index],
-                drawsBackdrop: layoutConfig.compositorLayout.drawsBackdrop(cellAt: index)
+                cornerRadius: canvas.cornerRadius
             )
         }
     }

@@ -25,8 +25,8 @@ nonisolated struct CellConfiguration {
     /// The pinch and pan the user set on this swing's editor tile.
     let framing: VideoTransform
 
-    /// Whether the blurred copy of the swing fills the cell around it (CellBackdrop).
-    let drawsBackdrop: Bool
+    /// The rounding of the swing's card in canvas pixels, before the user's zoom.
+    let cornerRadius: CGFloat
 
     var videoTrackID: CMPersistentTrackID { source.trackID }
     var naturalSize: CGSize { source.naturalSize }

@@ -26,42 +26,72 @@ struct EditorCanvas: View {
     }
 
     private func canvas(size: CGSize) -> some View {
-        let cells = ExportCanvasLayout(canvas: size, arrangement: viewModel.arrangement).cellRects
+        let layout = ExportCanvasLayout(canvas: size, arrangement: viewModel.arrangement)
         return ZStack(alignment: .topLeading) {
             Color.exportCanvas
             ForEach(viewModel.visiblePositions, id: \.self) { position in
-                tile(at: position)
-                    .frame(width: cells[position].width, height: cells[position].height)
-                    .offset(x: cells[position].minX, y: cells[position].minY)
+                placedTile(at: position, cell: layout.cellRects[position], cornerRadius: layout.cornerRadius)
             }
         }
-        .clipShape(.rect(cornerRadius: Self.cornerRadius, style: .continuous))
-        .overlay {
-            RoundedRectangle(cornerRadius: Self.cornerRadius, style: .continuous)
-                .strokeBorder(Color.black.opacity(0.06))
-        }
-        .background {
-            RoundedRectangle(cornerRadius: Self.cornerRadius, style: .continuous)
-                .fill(Color.exportCanvas)
-                .shadow(color: .black.opacity(0.16), radius: 14, y: 6)
-        }
+        .modifier(CanvasCard(cornerRadius: Self.cornerRadius))
     }
 
-    private func tile(at position: Int) -> some View {
+    private func placedTile(at position: Int, cell: CGRect, cornerRadius: CGFloat) -> some View {
+        tile(at: position, cornerRadius: cornerRadius)
+            .frame(width: cell.width, height: cell.height)
+            .mask(alignment: .topLeading) {
+                firstSwingMask(at: position, tile: cell.size, cornerRadius: cornerRadius)
+            }
+            .offset(x: cell.minX, y: cell.minY)
+    }
+
+    private func tile(at position: Int, cornerRadius: CGFloat) -> some View {
         let layout = viewModel.buildLayoutConfig().compositorLayout
         return ZoomableVideoTile(
             player: viewModel.comparison.player,
             cutout: atlas.cutout(forTrack: viewModel.comparison.trackOrder[position]),
             transform: $viewModel.transforms[position],
-            showsBackdrop: layout.drawsBackdrop(cellAt: position)
+            cornerRadius: cornerRadius
         )
         .opacity(layout.opacity(ofCellAt: position))
         .allowsHitTesting(viewModel.isFramable(position))
+    }
+
+    /// A blended swing shows only inside the first swing's card; any other tile is whole.
+    @ViewBuilder
+    private func firstSwingMask(at position: Int, tile: CGSize, cornerRadius: CGFloat) -> some View {
+        if viewModel.buildLayoutConfig().compositorLayout.isBlended(cellAt: position) {
+            TileCard(
+                aspect: atlas.cutout(forTrack: viewModel.comparison.trackOrder[0]).slot.size,
+                tile: tile,
+                transform: viewModel.transforms[0],
+                cornerRadius: cornerRadius
+            ).shape
+        } else {
+            Rectangle()
+        }
     }
 
     private func fittedSize(ratio: CGFloat, in size: CGSize) -> CGSize {
         guard size.width > 0, size.height > 0 else { return .zero }
         let width = min(size.width, size.height * ratio)
         return CGSize(width: width, height: width / ratio)
+    }
+}
+
+/// The canvas as a raised card on the cream sheet: rounded, with a hairline and a shadow,
+/// so its own cream still reads as the file's edge.
+private struct CanvasCard: ViewModifier {
+    let cornerRadius: CGFloat
+
+    func body(content: Content) -> some View {
+        let shape = RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+        content
+            .clipShape(shape)
+            .overlay { shape.strokeBorder(Color.black.opacity(0.06)) }
+            .background {
+                shape.fill(Color.exportCanvas)
+                    .shadow(color: .black.opacity(0.16), radius: 14, y: 6)
+            }
     }
 }
