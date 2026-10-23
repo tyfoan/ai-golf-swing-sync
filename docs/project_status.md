@@ -292,3 +292,7 @@
 - Export watermark disabled (was causing issues)
 - Auto-detection accuracy depends on camera angle and lighting
 - Accessibility labels missing on custom controls (timeline, playback, recording)
+
+## 2026-10-03 — Release candidate
+
+1.3.4 (1) contains the reviewed activation changes. Implementation and local checks passed; archive/export/upload verification is tracked separately. No App Review submission is included in this upload request.

@@ -89,6 +89,8 @@ extension AnalyticsEvent {
         AnalyticsEvent(name: "paywall_purchased", properties: ["source": source.rawValue])
     }
 
+    static let firstProComparisonPlayed = AnalyticsEvent(name: "first_pro_comparison_played")
+
     static func comparisonOpened(mode: ComparisonMode) -> AnalyticsEvent {
         AnalyticsEvent(name: "comparison_opened", properties: ["mode": String(describing: mode)])
     }
@@ -154,21 +156,5 @@ extension AnalyticsEvent {
 
     static func purchaseRestored(source: PaywallSource) -> AnalyticsEvent {
         AnalyticsEvent(name: "purchase_restored", properties: ["source": source.rawValue])
-    }
-
-    /// Money actually recognised, observed from the entitlement stream rather than the
-    /// paywall. The paywall can only see the tap that starts a subscription — and since
-    /// every plan offers a free trial, its paid branch never ran and no revenue reached
-    /// Amplitude at all. This fires for trial→paid conversions and renewals too.
-    static func revenueRecognized(revenue: PurchaseRevenue, isRenewal: Bool) -> AnalyticsEvent {
-        AnalyticsEvent(
-            name: "revenue_recognized",
-            properties: [
-                "product_id": revenue.productId,
-                "price": String(revenue.price),
-                "currency": revenue.currency,
-                "is_renewal": String(isRenewal)
-            ]
-        )
     }
 }

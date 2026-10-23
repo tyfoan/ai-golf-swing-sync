@@ -27,9 +27,6 @@ struct ProSwingsCarouselView: View {
             Text("PRO SWINGS")
                 .font(.headline).fontWeight(.bold)
                 .foregroundStyle(Color.charcoal)
-            Text("(PREMIUM)")
-                .font(.caption).fontWeight(.semibold)
-                .foregroundStyle(Color.appTeal)
         }
         .padding(.horizontal)
     }
@@ -75,13 +72,15 @@ private struct ProSwingCard: View {
     let swing: SwingMarker
     let selectionNumber: Int?
 
-    private let cardWidth: CGFloat = 130
-    private let cardHeight: CGFloat = 200
+    private let cardWidth: CGFloat = 180
+    private let cardHeight: CGFloat = 178
 
     var body: some View {
         ZStack(alignment: .topTrailing) {
-            thumbnailLayer
-            nameOverlay
+            VStack(spacing: 0) {
+                thumbnailLayer
+                nameOverlay
+            }
             if let number = selectionNumber {
                 selectionBadge(number: number)
             }
@@ -97,39 +96,29 @@ private struct ProSwingCard: View {
             if let data = video.thumbnailData, let image = UIImage(data: data) {
                 Image(uiImage: image)
                     .resizable()
-                    .scaledToFill()
+                    .scaledToFit()
             } else {
                 Color.charcoal.opacity(0.2)
             }
         }
-        .frame(width: cardWidth, height: cardHeight)
+        .frame(width: cardWidth, height: 120)
+        .background(Color.black)
         .clipped()
     }
 
     private var nameOverlay: some View {
-        VStack {
-            Spacer()
-            HStack {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(video.proDisplayName ?? "Pro")
-                        .font(.headline).fontWeight(.bold)
-                        .foregroundStyle(.white)
-                    if let club = video.proClub {
-                        Text(club)
-                            .font(.caption).fontWeight(.medium)
-                            .foregroundStyle(.white.opacity(0.85))
-                    }
-                }
-                Spacer()
+        VStack(alignment: .leading, spacing: 3) {
+            Text(video.proDisplayName ?? "Pro")
+                .font(.subheadline).fontWeight(.bold)
+                .lineLimit(1).minimumScaleFactor(0.8)
+            if let club = video.proClub {
+                Text(club).font(.caption).foregroundStyle(.white.opacity(0.85))
             }
-            .padding(10)
-            .background(
-                LinearGradient(
-                    colors: [.black.opacity(0), .black.opacity(0.55)],
-                    startPoint: .top, endPoint: .bottom
-                )
-            )
         }
+        .foregroundStyle(.white)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+        .padding(.horizontal, 10)
+        .background(Color.charcoal)
     }
 
     private func selectionBadge(number: Int) -> some View {

@@ -1,0 +1,130 @@
+app: golf-sync-swing
+amplitude_app_id: '831534'
+taxonomy_style: snake_case
+notes: 'Widest code-vs-data gap: 6+2 funnels defined, only onboarding has data. Most events coded but not ingesting — a new instrumented build
+  hasn''t shipped/accumulated, and recording/swing events only fire on physical devices.'
+funnels:
+- name: onboarding
+  type: conversion
+  question: How many users bail mid-onboarding?
+  steps:
+  - onboarding_started
+  - onboarding_completed
+  data_source: in_app
+  status: live
+  auto_chart: true
+  notes: Healthy (~92%).
+- name: paywall_outcome
+  type: conversion
+  question: Does the first paywall convert or repel?
+  steps:
+  - onboarding_completed
+  - paywall_shown
+  - purchase_completed
+  segment_by:
+  - source
+  - plan
+  data_source: in_app
+  status: awaiting_data
+  auto_chart: true
+  notes: onboarding_completed -> paywall_shown is live (~83% reach paywall); purchase_completed / trial_started / paywall_purchased NOT ingesting
+    yet, so conversion unmeasurable.
+  pending_definition:
+    status: unreleased
+    effective_from:
+      app_version: 1.3.4
+      build_number: '1'
+    source_revision: worktree@195145ff7286481f7817149353af700c9a8744ff (unreleased)
+    steps:
+    - main_app_reached
+    - paywall_shown
+    - paywall_purchased
+    notes: first_pro_comparison_played — новый одноразовый клиентский сигнал первой пользы. paywall_shown.source=onboarding больше не испускается;
+      feature_gate/settings остаются. Точки этапов и версия должны быть разделены при анализе. A new source/version baseline is required; SDK
+      success is not necessarily a paid charge.
+- name: activation
+  type: conversion
+  question: Do users ever actually use the app?
+  steps:
+  - main_app_reached
+  - recording_started
+  data_source: in_app
+  status: awaiting_data
+  auto_chart: true
+  notes: recording_started OR video_imported is the first core action. Neither ingesting yet.
+- name: aha_moment
+  type: conversion
+  question: Do users reach the value moment after first core action?
+  steps:
+  - recording_started
+  - swing_detected
+  data_source: in_app
+  status: awaiting_data
+  auto_chart: true
+  notes: swing_detected OR comparison_opened. Not ingesting (swing_detected requires on-device Vision).
+  pending_definition:
+    status: unreleased
+    effective_from:
+      app_version: 1.3.4
+      build_number: '1'
+    source_revision: worktree@195145ff7286481f7817149353af700c9a8744ff (unreleased)
+    steps:
+    - comparison_opened
+    - first_pro_comparison_played
+    notes: Scope to the first free own-video versus pro comparison. A positive playback clock after composition success triggers the event; pro-only
+      demos and subscribers do not consume the free allowance.
+- name: output_completion
+  type: conversion
+  question: Do users finish a comparison and export?
+  steps:
+  - recording_started
+  - export_started
+  - export_completed
+  data_source: in_app
+  status: awaiting_data
+  auto_chart: true
+  notes: export_failed is the failure branch. Not ingesting yet.
+- name: feature_gate_intent
+  type: conversion
+  question: Does hitting a feature lock drive a purchase?
+  steps:
+  - feature_gate_hit
+  - paywall_shown
+  - purchase_completed
+  data_source: mixed
+  status: awaiting_data
+  auto_chart: true
+  notes: 'Gates: advancedComparisonModes, exportHD. Depends on RevenueCat<->Amplitude identity link.'
+- name: activation_chain
+  type: conversion
+  question: Where do users drop within the recording workflow?
+  steps:
+  - recording_started
+  - swing_detected
+  - swing_saved
+  data_source: in_app
+  status: awaiting_data
+  auto_chart: false
+  notes: Post-ship analysis (2026-06-24 spec). swing_saved added there.
+- name: monetization_by_source_plan
+  type: segmentation
+  question: Which plan converts and which source drives revenue?
+  steps:
+  - paywall_shown
+  - paywall_purchased
+  - purchase_completed
+  segment_by:
+  - source
+  - plan
+  data_source: in_app
+  status: awaiting_data
+  auto_chart: false
+  notes: Post-ship. Recognised revenue comes from RevenueCat's server-side Amplitude integration (rc_* events); the client-side
+    revenue reporter and Analytics.record(revenue) were removed on 2026-10-21 after the lifetime crash loop.
+synced_at: '2026-10-03'
+source_revision: worktree@195145ff7286481f7817149353af700c9a8744ff (unreleased)
+ingestion_verification:
+  status: unverified
+  checked_at: '2026-10-03'
+  reason: Reconciled against current unreleased code. Connected Amplitude tools are unavailable; preserve last-known live/no_data statuses and
+    historical definitions.

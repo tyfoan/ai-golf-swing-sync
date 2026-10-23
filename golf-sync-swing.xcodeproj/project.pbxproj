@@ -7,14 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		88649EED2F32386700DB5D4D /* changelog.md in Resources */ = {isa = PBXBuildFile; fileRef = 88649EE52F32386700DB5D4D /* changelog.md */; };
-		88649EEE2F32386700DB5D4D /* milestone-2-recording.md in Resources */ = {isa = PBXBuildFile; fileRef = 88649EE92F32386700DB5D4D /* milestone-2-recording.md */; };
-		88649EEF2F32386700DB5D4D /* CLAUDE.md in Resources */ = {isa = PBXBuildFile; fileRef = 88649EE32F32386700DB5D4D /* CLAUDE.md */; };
-		88649EF02F32386700DB5D4D /* architecture.md in Resources */ = {isa = PBXBuildFile; fileRef = 88649EE42F32386700DB5D4D /* architecture.md */; };
-		88649EF12F32386700DB5D4D /* camera-optimization-plan.md in Resources */ = {isa = PBXBuildFile; fileRef = 88649EE82F32386700DB5D4D /* camera-optimization-plan.md */; };
-		88649EF22F32386700DB5D4D /* milestone-4-monetization.md in Resources */ = {isa = PBXBuildFile; fileRef = 88649EEA2F32386700DB5D4D /* milestone-4-monetization.md */; };
-		88649EF32F32386700DB5D4D /* project_status.md in Resources */ = {isa = PBXBuildFile; fileRef = 88649EE62F32386700DB5D4D /* project_status.md */; };
-		88649EF42F32386700DB5D4D /* project_spec.md in Resources */ = {isa = PBXBuildFile; fileRef = 88649EEC2F32386700DB5D4D /* project_spec.md */; };
 		88B37B602F3FDF6700DDB85A /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 886500012F35A00100DB5D4D /* RevenueCat */; };
 		88B37B612F3FDF6700DDB85A /* RevenueCatUI in Frameworks */ = {isa = PBXBuildFile; productRef = 886500022F35A00100DB5D4D /* RevenueCatUI */; };
 		AE17A11D0000000000000001 /* AmplitudeSwift in Frameworks */ = {isa = PBXBuildFile; productRef = AE17A11D0000000000000003 /* AmplitudeSwift */; };
@@ -280,14 +272,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				88649EED2F32386700DB5D4D /* changelog.md in Resources */,
-				88649EEE2F32386700DB5D4D /* milestone-2-recording.md in Resources */,
-				88649EEF2F32386700DB5D4D /* CLAUDE.md in Resources */,
-				88649EF02F32386700DB5D4D /* architecture.md in Resources */,
-				88649EF12F32386700DB5D4D /* camera-optimization-plan.md in Resources */,
-				88649EF22F32386700DB5D4D /* milestone-4-monetization.md in Resources */,
-				88649EF32F32386700DB5D4D /* project_status.md in Resources */,
-				88649EF42F32386700DB5D4D /* project_spec.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -491,7 +475,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.3.3;
+				MARKETING_VERSION = 1.3.4;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.tyfoan.golf-sync-swing";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -533,7 +517,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.3.3;
+				MARKETING_VERSION = 1.3.4;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.tyfoan.golf-sync-swing";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;

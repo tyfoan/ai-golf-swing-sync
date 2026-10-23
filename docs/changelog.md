@@ -8,6 +8,16 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Fixed — lifetime purchase crash loop, 2026-10-21
+
+- **A paid, non-trial purchase no longer sends the app into a launch crash loop.** The first production lifetime sale (1.3.4, 2026-10-15) was granted correctly by RevenueCat, yet the app died during the purchase and then within 1–3 s of every launch on Oct 15 and 16; the buyer's Oct 20 session, past the 48-hour mark, ran normally. The only launch-time code limited to the 48 h after a paid purchase was the client-side `SubscriptionRevenueReporter`, and it persisted its dedup date only after its StoreKit product lookup and Amplitude revenue call, so a crash inside it repeats on every launch. It has been removed together with `Analytics.record(_:)` and `revenue_recognized`; recognised revenue now comes only from RevenueCat's server-side Amplitude integration (`rc_*` events), which was already live. Trials never entered that path. The exact crashing frame is not confirmed yet (no symbolicated stack; see Xcode Organizer → Crashes → 1.3.4).
+
+### Changed — 1.3.4 (1) candidate, 2026-10-03
+
+- Onboarding reaches camera access directly. One own video may be compared with pro references for free and reopened; successful playback records the allowance. Pro cards preserve the full frame, with refreshed thumbnails and corrected source FPS.
+- Upload provenance and release configuration are enforced by `bin/preflight-ios`; the reviewed current branch is recorded in [the release plan](release-2026-10-03.md).
+
+
 ### Changed (cold-start latency, 2026-08-01)
 - **Camera bring-up is two orders of magnitude faster**: the capture graph now comes up
   in two phases. The preview pass builds only what a live frame needs (video input +
@@ -657,3 +667,9 @@ raced the in-flight configure (CA fence timeout in the log). Hardened:
 - Complete project specification with PRD and engineering design
 - Initial Xcode project scaffolding
 - SwiftData model setup
+
+## 2026-10-03 — activation preview (unreleased)
+
+Paywall убран из onboarding. Одно собственное видео можно бесплатно сравнивать с профессиональными образцами и повторно открывать. Право закрепляется только после начала успешного воспроизведения, а не при выборе файлов или ошибке сборки. Два профессиональных видео не расходуют и не обходят это правило. Остальные premium-функции сохранены. Карточки профессионалов показывают полный кадр 3:2 вместо портретного crop; миниатюры обновляются до 600×400. FPS существующих 19 ресурсов исправлен с 30 на проверенные 59.94.
+
+See [2026-10-03-activation-preview.md](2026-10-03-activation-preview.md).

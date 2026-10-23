@@ -262,3 +262,7 @@ AVMutableComposition → AVAssetExportSession → Photos library
 - [Changelog](./changelog.md)
 - [Project Status](./project_status.md)
 - [Milestone 2 Research](../plans/milestone-2-research.md)
+
+## 2026-10-03 — Activation flow
+
+FirstComparisonAccess persists the first successfully played own-video ID. ComparisonView records the result after playback progresses; HomeView reuses the same eligibility rule. DEBUG-only offline preview helpers do not create production analytics or RevenueCat customers.

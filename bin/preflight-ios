@@ -1,0 +1,81 @@
+#!/usr/bin/env ruby
+# Verifies release configuration and all inputs that can enter this synchronized Xcode project.
+require 'json'
+require 'open3'
+require 'rexml/document'
+
+def check(condition, message)
+  abort "FAIL  #{message}" unless condition
+end
+
+def run(*args)
+  output, error, status = Open3.capture3(*args)
+  check(status.success?, "#{args.first} failed: #{error.strip}")
+  output
+end
+
+def plist(path)
+  JSON.parse(run('plutil', '-convert', 'json', '-o', '-', path))
+end
+
+check(ARGV.empty? || ARGV == ['--check-config'], 'usage: bin/preflight-ios [--check-config]')
+config_only = !ARGV.empty?
+Dir.chdir(File.expand_path('..', __dir__))
+app = 'golf-sync-swing'
+bundle = 'com.tyfoan.golf-sync-swing'
+project_path = "#{app}.xcodeproj"
+roots = [app, "#{app}Tests", "#{app}UITests"]
+project = plist("#{project_path}/project.pbxproj")
+objects = project.fetch('objects')
+groups = objects.values.select { |object| object['isa'] == 'PBXFileSystemSynchronizedRootGroup' }
+check(groups.map { |group| group['path'] }.sort == roots.sort, 'source roots changed; review shipping-input policy')
+check(groups.all? { |group| group['sourceTree'] == '<group>' }, 'external synchronized source root')
+objects.each_value do |object|
+  check(!%w[PBXShellScriptBuildPhase XCLocalSwiftPackageReference].include?(object['isa']), 'new script/local package needs a shipping-input review')
+  check(!object.key?('baseConfigurationReference'), 'new xcconfig needs a shipping-input review')
+  next unless object['isa'] == 'PBXBuildFile' && object['fileRef']
+  reference = objects.fetch(object['fileRef'])
+  check(%w[SDKROOT BUILT_PRODUCTS_DIR].include?(reference['sourceTree']), 'explicit external file enters a build phase')
+end
+shipping = roots + [project_path, 'bin']
+unless config_only
+  branch = ENV.fetch('ASC_RELEASE_BRANCH', 'main')
+  check(run('git', 'branch', '--show-current').strip == branch, 'unexpected release branch')
+  check(run('git', 'rev-parse', 'HEAD') == run('git', 'rev-parse', "origin/#{branch}"), 'source differs from fetched release tip')
+  check(run('git', 'status', '--porcelain', '--', *shipping).empty?, 'uncommitted build inputs')
+  ignored = run('git', 'ls-files', '--others', '--ignored', '--exclude-standard', '-z', '--', *roots).split("\0")
+  check(ignored.all? { |path| File.basename(path) == '.DS_Store' }, 'ignored files inside synchronized source roots')
+  check(!run('git', 'ls-files', '--stage', '--', *roots).lines.any? { |line| line.start_with?('120000 ') }, 'source symlinks need a shipping-input review')
+  puts "PASS  exact pushed #{branch}; all build inputs committed; outside-root drafts cannot enter the app"
+end
+settings_for = lambda do |owner, name|
+  objects.fetch(owner.fetch('buildConfigurationList')).fetch('buildConfigurations')
+    .map { |id| objects.fetch(id) }.find { |config| config['name'] == name }.fetch('buildSettings')
+end
+project_settings = settings_for.call(objects.fetch(project.fetch('rootObject')), 'Release')
+target = objects.values.find { |object| object['isa'] == 'PBXNativeTarget' && object['name'] == app }
+check(target && target['productType'] == 'com.apple.product-type.application', 'expected iOS application target')
+release = project_settings.merge(settings_for.call(target, 'Release'))
+debug = settings_for.call(target, 'Debug')
+check(release['PRODUCT_BUNDLE_IDENTIFIER'] == bundle, 'wrong bundle identifier')
+check(release['DEVELOPMENT_TEAM'] == 'J2R9272WYX', 'wrong signing team')
+check(release['SDKROOT'] == 'iphoneos', 'Release SDK must be iphoneos')
+check(release['CODE_SIGNING_ALLOWED'] != 'NO' && release['CODE_SIGNING_REQUIRED'] != 'NO', 'signing disabled')
+check(release['ENABLE_TESTABILITY'] != 'YES', 'Release testability enabled')
+check(release['SKIP_INSTALL'] != 'YES', 'app would be omitted from archive')
+check(release['DEBUG_INFORMATION_FORMAT'] == 'dwarf-with-dsym', 'Release dSYMs required')
+flags = release.values_at('SWIFT_ACTIVE_COMPILATION_CONDITIONS', 'GCC_PREPROCESSOR_DEFINITIONS', 'OTHER_SWIFT_FLAGS').flatten.join(' ')
+check(!flags.match?(/\bDEBUG\b/), 'DEBUG must not be enabled in Release')
+version, build = release.values_at('MARKETING_VERSION', 'CURRENT_PROJECT_VERSION')
+check(version.to_s.match?(/\A\d+\.\d+\.\d+\z/) && build.to_s.match?(/\A[1-9]\d*\z/), 'invalid version/build')
+check(debug.values_at('MARKETING_VERSION', 'CURRENT_PROJECT_VERSION') == [version, build], 'Debug/Release version mismatch')
+scheme = REXML::Document.new(File.read("#{project_path}/xcshareddata/xcschemes/#{app}.xcscheme"))
+check(scheme.elements['Scheme/ArchiveAction'].attributes['buildConfiguration'] == 'Release', 'Archive must use Release')
+lock = JSON.parse(File.read("#{project_path}/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"))
+check(!lock.fetch('pins').empty?, 'package dependencies must be pinned')
+purchases = File.read('golf-sync-swing/Services/PurchaseService.swift')
+check(purchases.match?(/(?:apiKey|REVENUECAT_API_KEY)\s*=\s*"appl_/), 'production RevenueCat key missing')
+Dir.glob("#{app}/**/*.{plist,entitlements,xcprivacy}").each { |path| plist(path) }
+Dir.glob("#{app}/**/*.xcstrings").each { |path| JSON.parse(File.read(path)) }
+puts "PASS  Release configuration, dependencies, production purchase key and signing metadata: #{version} (#{build})"
+puts 'INFO  configuration-only check; not an upload gate' if config_only

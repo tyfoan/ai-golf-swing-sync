@@ -336,3 +336,7 @@ N/A - Fully offline app, no backend API.
 - [ ] Should free tier allow export with watermark or no export at all?
 - [ ] Pro swing library - curate ourselves or license from somewhere?
 - [ ] Do we need a "swing library" to save past swings, or just recent videos?
+
+## 2026-10-03 — Activation behavior
+
+Onboarding reaches camera access directly. One own video may be compared with pro references for free and reopened; successful playback records the allowance. Pro cards preserve the full frame, with refreshed thumbnails and corrected source FPS.

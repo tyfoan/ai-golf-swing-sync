@@ -186,21 +186,25 @@ protocol PurchasesType: Sendable {
 struct LivePurchases: PurchasesType {
 
     func offerings() async throws -> Offerings {
-        try await Purchases.shared.offerings()
+        guard Purchases.isConfigured else { throw CancellationError() }
+        return try await Purchases.shared.offerings()
     }
 
     func purchase(package: Package) async throws -> PurchaseResultData {
-        try await Purchases.shared.purchase(package: package)
+        guard Purchases.isConfigured else { throw CancellationError() }
+        return try await Purchases.shared.purchase(package: package)
     }
 
     func restorePurchases() async throws -> CustomerInfo {
-        try await Purchases.shared.restorePurchases()
+        guard Purchases.isConfigured else { throw CancellationError() }
+        return try await Purchases.shared.restorePurchases()
     }
 
     func checkTrialOrIntroDiscountEligibility(
         productIdentifiers: [String]
     ) async -> [String: IntroEligibility] {
-        await Purchases.shared.checkTrialOrIntroDiscountEligibility(productIdentifiers: productIdentifiers)
+        guard Purchases.isConfigured else { return [:] }
+        return await Purchases.shared.checkTrialOrIntroDiscountEligibility(productIdentifiers: productIdentifiers)
     }
 }
 

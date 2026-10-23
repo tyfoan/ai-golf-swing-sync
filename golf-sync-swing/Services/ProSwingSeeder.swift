@@ -26,7 +26,7 @@ enum ProSwingSeeder {
     static let proPathPrefix = "Videos/Pros/"
 
     private static let seedVersionKey = "proSwingSeedVersion"
-    private static let currentSeedVersion = 5
+    private static let currentSeedVersion = 6
     private static var inFlightSeed: Task<Void, Never>?
 
     /// Cheap to call from the main actor: schedules the pass and returns immediately.
@@ -49,7 +49,7 @@ enum ProSwingSeeder {
         if stored >= currentSeedVersion, allProsSeeded(context: context) {
             return
         }
-        await seed(context: context)
+        await seed(context: context, refreshThumbnails: stored < currentSeedVersion)
         UserDefaults.standard.set(currentSeedVersion, forKey: seedVersionKey)
     }
 
@@ -73,18 +73,18 @@ enum ProSwingSeeder {
 
     // MARK: - Seeding
 
-    private static func seed(context: ModelContext) async {
+    private static func seed(context: ModelContext, refreshThumbnails: Bool) async {
         await prepareProsDirectory()
 
         for descriptor in ProSwingCatalog.all {
-            await seedOne(descriptor, context: context)
+            await seedOne(descriptor, context: context, refreshThumbnail: refreshThumbnails)
         }
 
         do { try context.save() }
         catch { AppLogger.general.error("ProSwingSeeder save failed: \(error.localizedDescription)") }
     }
 
-    private static func seedOne(_ descriptor: ProSwingDescriptor, context: ModelContext) async {
+    private static func seedOne(_ descriptor: ProSwingDescriptor, context: ModelContext, refreshThumbnail: Bool) async {
         guard let bundleURL = Bundle.main.url(forResource: descriptor.bundleFilename, withExtension: "mp4") else {
             AppLogger.general.error("ProSwing missing in bundle: \(descriptor.bundleFilename).mp4")
             return
@@ -95,6 +95,9 @@ enum ProSwingSeeder {
 
         // Record AND file present: metadata refresh only, no ~59 MB of pointless copy I/O.
         if let existing, FileManager.default.fileExists(atPath: destURL.path) {
+            if refreshThumbnail || existing.thumbnailData == nil {
+                existing.thumbnailData = await renderThumbnail(for: destURL, at: descriptor.contactTime)
+            }
             update(existing, with: descriptor)
             return
         }
@@ -124,7 +127,7 @@ enum ProSwingSeeder {
 
     private static func insertFresh(_ descriptor: ProSwingDescriptor, mediaURL: URL, context: ModelContext) async {
         let thumbnail = await renderThumbnail(for: mediaURL, at: descriptor.contactTime)
-        let video = SwingVideo(localURL: mediaURL, duration: descriptor.duration, fps: 30, thumbnailData: thumbnail)
+        let video = SwingVideo(localURL: mediaURL, duration: descriptor.duration, fps: descriptor.framesPerSecond, thumbnailData: thumbnail)
         update(video, with: descriptor)
         context.insert(video)
     }
@@ -170,23 +173,23 @@ enum ProSwingSeeder {
     }
 
     /// Inlined rather than routed through `ThumbnailService`: that service is main-actor-
-    /// isolated, and this decode must stay on the global executor. Same 300x400 / 0.7 JPEG
+    /// isolated, and this decode must stay on the global executor. 600x400 / 0.85 JPEG
     /// contract as `ThumbnailService.generateThumbnail(for:at:)`.
     @concurrent
     private nonisolated static func renderThumbnail(for url: URL, at time: TimeInterval) async -> Data? {
         let generator = AVAssetImageGenerator(asset: AVURLAsset(url: url))
         generator.appliesPreferredTrackTransform = true
-        generator.maximumSize = CGSize(width: 300, height: 400)
+        generator.maximumSize = CGSize(width: 600, height: 400)
         let cmTime = CMTime(seconds: time, preferredTimescale: 600)
         guard let image = try? await generator.image(at: cmTime).image else {
             return nil
         }
-        return UIImage(cgImage: image).jpegData(compressionQuality: 0.7)
+        return UIImage(cgImage: image).jpegData(compressionQuality: 0.85)
     }
 
     private static func update(_ video: SwingVideo, with descriptor: ProSwingDescriptor) {
         video.duration = descriptor.duration
-        video.fps = 30
+        video.fps = descriptor.framesPerSecond
         video.hasBeenAnalyzed = true
         video.analysisDate = Date()
 

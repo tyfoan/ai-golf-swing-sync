@@ -15,6 +15,7 @@ struct ComparisonView: View {
 
     @Environment(\.dismiss) private var dismiss
     @State private var viewModel: ComparisonViewModel?
+    @State private var recordedPlayback = false
     @State private var showExportSheet = false
     @State private var showPaywall = false
     @Environment(\.scenePhase) private var scenePhase
@@ -38,6 +39,11 @@ struct ComparisonView: View {
         // comparison screen came back permanently black. The time observer is released in
         // `ComparisonViewModel.deinit`, which is the correct place for it.
         .onDisappear { viewModel?.pause() }
+        .onChange(of: viewModel?.currentTime) { _, time in
+            guard !recordedPlayback, let time, time > 0, viewModel?.buildError == nil else { return }
+            recordedPlayback = true
+            FirstComparisonAccess().recordPlayback(video1, video2)
+        }
         .onChange(of: scenePhase) { _, phase in
             if phase == .background { viewModel?.pause() }
         }
