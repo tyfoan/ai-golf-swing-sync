@@ -419,18 +419,19 @@ final class VideoExportService {
             throw ExportError.missingVideoTrack
         }
 
-        let fullDuration1 = try await asset1.load(.duration)
-        let fullDuration2 = try await asset2.load(.duration)
+        let footage1 = try await TrackFootage.range(of: track1)
+        let footage2 = try await TrackFootage.range(of: track2)
 
         // Compute per-video source slice (start + duration) — either the swing range or the full clip.
-        let slice1 = sliceFor(swing: swingTrim?.0, fullDuration: fullDuration1)
-        let slice2 = sliceFor(swing: swingTrim?.1, fullDuration: fullDuration2)
+        let slice1 = sliceFor(swing: swingTrim?.0, footage: footage1)
+        let slice2 = sliceFor(swing: swingTrim?.1, footage: footage2)
 
-        // When trimming, slices have new timelines starting at zero, so the
-        // absolute-time syncOffset (= s1.contactTime - s2.contactTime) is wrong.
-        // Convert it to slice-relative: (s1.contact - s1.start) - (s2.contact - s2.start).
+        // Slices have new timelines starting at zero, so the absolute-time
+        // syncOffset (= s1.contactTime - s2.contactTime) is wrong.
+        // Convert it to slice-relative: (s1.contact - slice1.start) - (s2.contact - slice2.start).
         let effectiveSync = effectiveSyncOffset(
-            originalSyncOffset: syncOffset, swingTrim: swingTrim
+            originalSyncOffset: syncOffset, swingTrim: swingTrim,
+            sliceStarts: (slice1.start.seconds, slice2.start.seconds)
         )
 
         let (v1Start, v2Start, effectiveDuration) = applySyncOffset(
@@ -495,7 +496,6 @@ final class VideoExportService {
             try? audio2c.insertTimeRange(CMTimeRange(start: slice2.start, duration: slice2.duration), of: audio2, at: track2InsertAt)
         }
 
-        let cells = cellRects(renderSize: renderSize, arrangement: layoutConfig.aspectRatio.arrangement)
         let size1 = try await track1.load(.naturalSize)
         let pref1 = try await track1.load(.preferredTransform)
         let size2 = try await track2.load(.naturalSize)
@@ -504,192 +504,95 @@ final class VideoExportService {
         let frameRate2 = try await track2.load(.nominalFrameRate)
         let frameDuration = CMTime(value: 1, timescale: CMTimeScale(max(frameRate1, frameRate2, 30)))
 
-        let videoComposition: AVMutableVideoComposition
-        switch layoutConfig.mode {
-        case .sequential:
-            // Built explicitly rather than via `videoComposition(withPropertiesOf:)`:
-            // the auto-derived instructions place each track at its native display size,
-            // so overriding `renderSize` alone cropped the output on a smaller canvas
-            // (Standard quality) and letterboxed it on a larger one (Full HD). Each clip
-            // now aspect-fits the full canvas for its back-to-back segment, with the
-            // source rotation applied on the layer instruction. Parallel modes route
-            // through CollageVideoCompositor, which applies preferredTransform per-pixel.
-            videoComposition = buildSequentialComposition(
-                first: SequentialSegment(
-                    track: track1c, naturalSize: size1, preferredTransform: pref1, duration: slice1.duration
-                ),
-                second: SequentialSegment(
-                    track: track2c, naturalSize: size2, preferredTransform: pref2, duration: slice2.duration
-                ),
-                renderSize: renderSize,
-                frameDuration: frameDuration,
-                totalDuration: composition.duration
-            )
-        case .sideBySide, .topBottom, .stacked:
-            videoComposition = buildParallelComposition(
-                layoutConfig: layoutConfig,
-                track1c: track1c, track2c: track2c,
-                cells: cells,
-                size1: size1, pref1: pref1, size2: size2, pref2: pref2,
-                renderSize: renderSize, frameDuration: frameDuration,
-                effectiveDuration: effectiveDuration
-            )
-        }
+        // Every mode routes through CollageVideoCompositor, sequential included: it applies
+        // each source's rotation per pixel, honours the editor's framing, and fills each
+        // cell around its swing — none of which plain layer instructions could do.
+        let layout = layoutConfig.compositorLayout
+        let sources = [
+            CellSource(trackID: track1c.trackID, naturalSize: size1, preferredTransform: pref1),
+            CellSource(trackID: track2c.trackID, naturalSize: size2, preferredTransform: pref2)
+        ]
+        let videoComposition = buildLayoutComposition(
+            cells: cellConfigurations(
+                layoutConfig, sources: sources, canvas: layoutConfig.canvasLayout(renderSize: renderSize)
+            ),
+            layout: layout,
+            renderSize: renderSize,
+            frameDuration: frameDuration,
+            instruction: wholeTimelineInstruction(drawing: [track1c, track2c], end: composition.duration)
+        )
 
         return try await runExport(composition: composition, videoComposition: videoComposition, handle: handle, progress: progress)
     }
 
-    /// One back-to-back clip in a sequential export: the inserted composition track plus
-    /// the source geometry needed to aspect-fit it onto the full render canvas.
-    private struct SequentialSegment {
-        let track: AVMutableCompositionTrack
-        let naturalSize: CGSize
-        let preferredTransform: CGAffineTransform
-        let duration: CMTime
-    }
-
-    private static func buildSequentialComposition(
-        first: SequentialSegment,
-        second: SequentialSegment,
-        renderSize: CGSize,
-        frameDuration: CMTime,
-        totalDuration: CMTime
-    ) -> AVMutableVideoComposition {
-        let videoComposition = AVMutableVideoComposition()
-        videoComposition.renderSize = renderSize
-        videoComposition.frameDuration = frameDuration
-
-        let firstRange = CMTimeRange(start: .zero, duration: first.duration)
-        // The tail instruction stretches to the full composition duration (audio can
-        // outrun video by a rounding hair) — instructions must tile the timeline gap-free.
-        let secondEnd = CMTimeMaximum(totalDuration, CMTimeAdd(first.duration, second.duration))
-        let secondRange = CMTimeRange(start: first.duration, end: secondEnd)
-
-        videoComposition.instructions = [
-            fullCanvasInstruction(for: first, timeRange: firstRange, renderSize: renderSize),
-            fullCanvasInstruction(for: second, timeRange: secondRange, renderSize: renderSize)
-        ]
-        return videoComposition
-    }
-
-    /// Renders one segment's track aspect-fit into the whole canvas — the same transform
-    /// math as the parallel cells, with the canvas as the only cell.
-    private static func fullCanvasInstruction(
-        for segment: SequentialSegment,
-        timeRange: CMTimeRange,
-        renderSize: CGSize
-    ) -> AVMutableVideoCompositionInstruction {
-        let instruction = AVMutableVideoCompositionInstruction()
-        instruction.timeRange = timeRange
-        instruction.backgroundColor = UIColor.black.cgColor
-
-        let layer = AVMutableVideoCompositionLayerInstruction(assetTrack: segment.track)
-        let transform = calculateTransform(
-            videoSize: segment.naturalSize,
-            preferredTransform: segment.preferredTransform,
-            cellRect: CGRect(origin: .zero, size: renderSize)
-        )
-        layer.setTransform(transform, at: timeRange.start)
-        instruction.layerInstructions = [layer]
-        return instruction
-    }
-
-    private static func buildParallelComposition(
-        layoutConfig: VideoLayoutConfig,
-        track1c: AVMutableCompositionTrack,
-        track2c: AVMutableCompositionTrack,
-        cells: [CGRect],
-        size1: CGSize,
-        pref1: CGAffineTransform,
-        size2: CGSize,
-        pref2: CGAffineTransform,
-        renderSize: CGSize,
-        frameDuration: CMTime,
-        effectiveDuration: CMTime
-    ) -> AVMutableVideoComposition {
-        let cellRectsForLayout: [CGRect] = (layoutConfig.mode == .stacked)
-            ? [CGRect(origin: .zero, size: renderSize), CGRect(origin: .zero, size: renderSize)]
-            : cells
-
-        let cellConfigs: [CellConfiguration] = [
+    private static func cellConfigurations(
+        _ layoutConfig: VideoLayoutConfig, sources: [CellSource], canvas: ExportCanvasLayout
+    ) -> [CellConfiguration] {
+        let rects = canvas.cellRects
+        return sources.indices.map { index in
             CellConfiguration(
-                cellRect: cellRectsForLayout[0], videoTrackID: track1c.trackID,
-                naturalSize: size1, preferredTransform: pref1,
-                userScale: layoutConfig.transforms[0].scale,
-                userOffset: layoutConfig.transforms[0].offset,
-                containerSize: layoutConfig.transforms[0].containerSize
-            ),
-            CellConfiguration(
-                cellRect: cellRectsForLayout[1], videoTrackID: track2c.trackID,
-                naturalSize: size2, preferredTransform: pref2,
-                userScale: layoutConfig.transforms[1].scale,
-                userOffset: layoutConfig.transforms[1].offset,
-                containerSize: layoutConfig.transforms[1].containerSize
+                cellRect: rects[index], source: sources[index],
+                framing: layoutConfig.transforms[index],
+                cornerRadius: canvas.cornerRadius
             )
-        ]
-        let compositorLayout: CompositorLayout = (layoutConfig.mode == .stacked)
-            ? .stacked(opacity: layoutConfig.stackedOpacity ?? 0.5)
-            : .sideBySide
-        CollageVideoCompositor.configureShared(cells: cellConfigs, layout: compositorLayout)
+        }
+    }
 
+    private static func buildLayoutComposition(
+        cells: [CellConfiguration],
+        layout: CompositorLayout,
+        renderSize: CGSize,
+        frameDuration: CMTime,
+        instruction: AVMutableVideoCompositionInstruction
+    ) -> AVMutableVideoComposition {
+        CollageVideoCompositor.configureShared(cells: cells, layout: layout)
         let videoComposition = AVMutableVideoComposition()
         videoComposition.customVideoCompositorClass = CollageVideoCompositor.self
         videoComposition.renderSize = renderSize
         videoComposition.frameDuration = frameDuration
-
-        let layer1 = AVMutableVideoCompositionLayerInstruction(assetTrack: track1c)
-        let layer2 = AVMutableVideoCompositionLayerInstruction(assetTrack: track2c)
-        let instruction = AVMutableVideoCompositionInstruction()
-        instruction.timeRange = CMTimeRange(start: .zero, duration: effectiveDuration)
-        instruction.backgroundColor = UIColor.black.cgColor
-        instruction.layerInstructions = [layer1, layer2]
         videoComposition.instructions = [instruction]
         return videoComposition
     }
 
-    /// When the export trims each video to its swing range, the `syncOffset`
-    /// passed in (absolute = `s1.contactTime - s2.contactTime`) no longer aligns
-    /// the contact frames in the new slice-local timelines. This converts it.
-    /// When NOT trimming, the original offset is correct.
-    static func effectiveSyncOffset(
-        originalSyncOffset: TimeInterval,
-        swingTrim: (SwingTimeRange, SwingTimeRange)?
-    ) -> TimeInterval {
-        guard let trim = swingTrim else { return originalSyncOffset }
-        let s1ContactInSlice = trim.0.contactTime - trim.0.startTime
-        let s2ContactInSlice = trim.1.contactTime - trim.1.startTime
-        return s1ContactInSlice - s2ContactInSlice
+    /// Both tracks for the whole timeline, in every mode — sequential's waiting swing
+    /// simply has no frame, and the compositor draws nothing for it. Never one track
+    /// alone: a stock instruction with a single bare layer can report that track as
+    /// `passthroughTrackID`, and AVFoundation then skips the compositor for its range.
+    /// Runs to the composition's own end (audio can outrun video by a rounding hair).
+    private static func wholeTimelineInstruction(
+        drawing tracks: [AVMutableCompositionTrack], end: CMTime
+    ) -> AVMutableVideoCompositionInstruction {
+        let instruction = AVMutableVideoCompositionInstruction()
+        instruction.timeRange = CMTimeRange(start: .zero, end: end)
+        instruction.layerInstructions = tracks.map { AVMutableVideoCompositionLayerInstruction(assetTrack: $0) }
+        return instruction
     }
 
-    /// Returns (start, duration) in source-asset time. With a SwingTimeRange we
-    /// clamp to [0, fullDuration] to defend against stale ranges; otherwise we
-    /// return the entire asset.
-    private static func sliceFor(swing: SwingTimeRange?, fullDuration: CMTime) -> (start: CMTime, duration: CMTime) {
-        guard let swing else { return (.zero, fullDuration) }
-        let fullSeconds = max(0, fullDuration.seconds)
-        let startSec = min(max(0, swing.startTime), fullSeconds)
-        let endSec = min(max(startSec, swing.endTime), fullSeconds)
+    /// The `syncOffset` passed in (absolute = `s1.contactTime - s2.contactTime`)
+    /// no longer aligns the contact frames in the slice-local timelines, which
+    /// start at each slice's start. This converts it. When trimming, the contact
+    /// gap comes from the swings themselves; when not, from the original offset.
+    static func effectiveSyncOffset(
+        originalSyncOffset: TimeInterval,
+        swingTrim: (SwingTimeRange, SwingTimeRange)?,
+        sliceStarts: (TimeInterval, TimeInterval)
+    ) -> TimeInterval {
+        let contactGap = swingTrim.map { $0.0.contactTime - $0.1.contactTime } ?? originalSyncOffset
+        return contactGap - sliceStarts.0 + sliceStarts.1
+    }
+
+    /// Returns (start, duration) in source-asset time, inside the track's footage:
+    /// the swing range clamped to it, defending against stale ranges and an opening
+    /// empty edit (a blank first frame), or without a swing, the whole footage.
+    private static func sliceFor(swing: SwingTimeRange?, footage: CMTimeRange) -> (start: CMTime, duration: CMTime) {
+        guard let swing else { return (footage.start, footage.duration) }
+        let lower = max(0, footage.start.seconds)
+        let upper = max(lower, footage.end.seconds)
+        let startSec = min(max(lower, swing.startTime), upper)
+        let endSec = min(max(startSec, swing.endTime), upper)
         let start = CMTime(seconds: startSec, preferredTimescale: 600)
         let duration = CMTime(seconds: endSec - startSec, preferredTimescale: 600)
         return (start, duration)
-    }
-
-    /// Splits the export render canvas in half along the arrangement axis.
-    private static func cellRects(renderSize: CGSize, arrangement: VideoArrangement) -> [CGRect] {
-        switch arrangement {
-        case .horizontal:
-            let halfW = renderSize.width / 2
-            return [
-                CGRect(x: 0,     y: 0, width: halfW, height: renderSize.height),
-                CGRect(x: halfW, y: 0, width: halfW, height: renderSize.height)
-            ]
-        case .vertical:
-            let halfH = renderSize.height / 2
-            return [
-                CGRect(x: 0, y: 0,     width: renderSize.width, height: halfH),
-                CGRect(x: 0, y: halfH, width: renderSize.width, height: halfH)
-            ]
-        }
     }
 
     private static func applySyncOffset(

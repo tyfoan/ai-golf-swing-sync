@@ -9,7 +9,8 @@
 //  we explicitly cropped(to: cellRect) each frame so cells respect their bounds.
 //
 //  Port of video-collage's CollageVideoCompositor, simplified to video-only
-//  (no photos, stickers, watermarks, borders, or corner radius).
+//  (no photos, stickers, watermarks or borders). CellRenderer draws
+//  each cell; this class is the AVFoundation plumbing and the layering.
 //
 
 import AVFoundation
@@ -127,101 +128,40 @@ final class CollageVideoCompositor: NSObject, AVVideoCompositing {
             throw NSError(domain: "CollageVideoCompositor", code: -3,
                           userInfo: [NSLocalizedDescriptionKey: "Could not create output pixel buffer"])
         }
-
         let canvasRect = CGRect(origin: .zero, size: renderContext.size)
-        var output = CIImage(color: CIColor.black).cropped(to: canvasRect)
-
-        for (index, cell) in cells.enumerated() {
-            guard let cellImage = renderCell(cell, request: request, canvasSize: renderContext.size) else { continue }
-            let toComposite = applyLayoutFilter(cellImage, cellIndex: index)
-            output = toComposite.composited(over: output)
-        }
-
-        output = output.cropped(to: canvasRect)
+        let output = composedFrame(for: request, canvas: canvasRect)
         ciContext.render(output, to: outputBuffer, bounds: canvasRect, colorSpace: CGColorSpaceCreateDeviceRGB())
         ciContext.clearCaches()
         return outputBuffer
     }
 
-    private func renderCell(_ cell: CellConfiguration,
-                            request: AVAsynchronousVideoCompositionRequest,
-                            canvasSize: CGSize) -> CIImage? {
-        guard let pixelBuffer = request.sourceFrame(byTrackID: cell.videoTrackID) else {
-            return nil
+    /// The cream canvas, then each cell that has a frame at this time, cut to its card;
+    /// a blended swing only inside the first swing's card. A track with nothing at this
+    /// time (the waiting swing of a sequential export) has no frame and draws nothing,
+    /// and in sequential the swing whose turn it is replaces the one before it.
+    private func composedFrame(for request: AVAsynchronousVideoCompositionRequest, canvas: CGRect) -> CIImage {
+        let background = CIImage(color: ExportCanvasColor.ciColor).cropped(to: canvas)
+        var output = background
+        var firstCard: [RoundedFrame] = []
+        for (index, cell) in cells.enumerated() {
+            guard let pixelBuffer = request.sourceFrame(byTrackID: cell.videoTrackID) else { continue }
+            let renderer = CellRenderer(cell: cell, canvasSize: canvas.size)
+            let upright = renderer.uprightImage(of: pixelBuffer)
+            let video = renderer.video(from: upright, within: layout.isBlended(cellAt: index) ? firstCard : [])
+            if index == 0 { firstCard = [renderer.cardFrame(of: upright)] }
+            if layout.showsOneSwingAtATime { output = background }
+            output = applyLayoutFilter(video, cellIndex: index).composited(over: output)
         }
-        var image = CIImage(cvPixelBuffer: pixelBuffer)
-
-        // Y-flip + rotate + Y-flip dance to bring source pixels into Core Image's
-        // bottom-up coords, with the video's metadata rotation applied.
-        var rotationOnly = cell.preferredTransform
-        rotationOnly.tx = 0
-        rotationOnly.ty = 0
-
-        let naturalSize = cell.naturalSize
-        var flip = CGAffineTransform(scaleX: 1, y: -1)
-        flip = flip.translatedBy(x: 0, y: -naturalSize.height)
-        flip = flip.concatenating(rotationOnly)
-        let rotatedHeight = abs(naturalSize.applying(rotationOnly).height)
-        flip = flip.concatenating(CGAffineTransform(scaleX: 1, y: -1))
-        flip = flip.translatedBy(x: 0, y: -rotatedHeight)
-        image = image.transformed(by: flip)
-
-        // Pan: the editor renders `.offset(x).scaleEffect(s)` so the visible shift
-        // is `userOffset × userScale` in tile points. Map that fractional shift
-        // into export pixels via `mediaInExport / mediaInScreen`.
-        let mediaDisplay = cell.displaySize.absoluteSize()
-        let screenBaseScale: CGFloat
-        if cell.containerSize.width > 0, cell.containerSize.height > 0,
-           mediaDisplay.width > 0, mediaDisplay.height > 0 {
-            screenBaseScale = min(cell.containerSize.width / mediaDisplay.width,
-                                  cell.containerSize.height / mediaDisplay.height)
-        } else {
-            screenBaseScale = cell.baseScale
-        }
-        let mediaInScreen = CGSize(width: mediaDisplay.width * screenBaseScale,
-                                   height: mediaDisplay.height * screenBaseScale)
-        let mediaInExport = CGSize(width: mediaDisplay.width * cell.baseScale,
-                                   height: mediaDisplay.height * cell.baseScale)
-
-        let contentX = cell.userOffset.x * cell.userScale
-        let contentY = cell.userOffset.y * cell.userScale
-        let panX = mediaInScreen.width  > 0 ? contentX  * (mediaInExport.width  / mediaInScreen.width)  : 0
-        let panY = mediaInScreen.height > 0 ? -contentY * (mediaInExport.height / mediaInScreen.height) : 0
-
-        // Apply scale.
-        image = image.transformed(by: CGAffineTransform(scaleX: cell.finalScale, y: cell.finalScale))
-
-        // Position so video center lands in the cell center (with pan).
-        let imgCenter = CGPoint(x: image.extent.midX, y: image.extent.midY)
-        let flippedCellY = canvasSize.height - cell.cellRect.origin.y - cell.cellRect.height
-        let targetX = cell.cellRect.origin.x + cell.cellRect.width / 2 + panX
-        let targetY = flippedCellY + cell.cellRect.height / 2 + panY
-        image = image.transformed(by: CGAffineTransform(translationX: targetX - imgCenter.x,
-                                                        y: targetY - imgCenter.y))
-
-        // CRITICAL: clip to cell rect. Without this, zoomed video bleeds into
-        // neighboring cells. This is the whole reason the custom compositor exists.
-        let cropRect = CGRect(
-            x: max(0, cell.cellRect.origin.x),
-            y: max(0, min(flippedCellY, canvasSize.height - 1)),
-            width: min(cell.cellRect.width, canvasSize.width),
-            height: min(cell.cellRect.height, canvasSize.height)
-        )
-        return image.cropped(to: cropRect)
+        return output.cropped(to: canvas)
     }
 
     /// For stacked layout, video 2 is rendered with reduced alpha so video 1
-    /// shows through. Video 1 (cellIndex 0) renders fully opaque. Side-by-side
-    /// is identity (no filter).
+    /// shows through; every other cell is drawn as is.
     private func applyLayoutFilter(_ image: CIImage, cellIndex: Int) -> CIImage {
-        switch layout {
-        case .sideBySide:
-            return image
-        case .stacked(let opacity):
-            guard cellIndex == 1 else { return image }
-            return image.applyingFilter("CIColorMatrix", parameters: [
-                "inputAVector": CIVector(x: 0, y: 0, z: 0, w: opacity)
-            ])
-        }
+        let opacity = layout.opacity(ofCellAt: cellIndex)
+        guard opacity < 1 else { return image }
+        return image.applyingFilter("CIColorMatrix", parameters: [
+            "inputAVector": CIVector(x: 0, y: 0, z: 0, w: opacity)
+        ])
     }
 }

@@ -7,7 +7,7 @@
 
 import CoreGraphics
 
-struct VideoTransform: Equatable {
+nonisolated struct VideoTransform: Equatable {
     var scale: CGFloat = 1.0
     var offset: CGPoint = .zero
     var containerSize: CGSize = .zero

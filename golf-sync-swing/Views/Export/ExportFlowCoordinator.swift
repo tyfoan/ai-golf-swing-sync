@@ -15,6 +15,8 @@ struct ExportFlowCoordinator: View {
     let swing2: SwingTimeRange
     let syncOffset: TimeInterval
     let comparisonViewModel: ComparisonViewModel
+    /// Whose swing is which, in the same (swap-aware) order as the URLs.
+    let labels: [PaneLabel]
     let onDismiss: () -> Void
 
     @State private var step: Step = .editor
@@ -37,22 +39,14 @@ struct ExportFlowCoordinator: View {
         }
     }
 
+    /// The editor previews on the comparison's player; once the export renders, the
+    /// comparison lets go of its decoders until the sheet is gone.
     private func editor() -> some View {
-        let defaultAspect = comparisonViewModel.comparisonMode.defaultExportAspect
-        let vm = ExportEditorViewModel(
-            aspectRatio: defaultAspect,
-            mode: comparisonViewModel.comparisonMode,
-            stackedOpacity: comparisonViewModel.stackedOpacity,
-            video1URL: video1URL,
-            video2URL: video2URL,
-            swing1: swing1,
-            swing2: swing2,
-            syncOffset: syncOffset
-        )
-        return ExportEditorView(
-            viewModel: vm,
+        ExportEditorView(
+            viewModel: ExportEditorViewModel(comparison: comparisonViewModel, labels: labels),
             onCancel: onDismiss,
             onExport: { config in
+                comparisonViewModel.releaseForExport()
                 step = .progress(config)
             }
         )

@@ -71,12 +71,17 @@ final class SwingVideo {
         localURLString.hasPrefix(ProSwingSeeder.proPathPrefix)
     }
 
-    /// Display name for pro swings; nil for user recordings.
-    /// Looked up from the catalog by bundle filename (the file's basename on disk).
-    var proDisplayName: String? {
+    /// Catalog entry for a pro swing; nil for user recordings.
+    /// Looked up by bundle filename (the file's basename on disk).
+    var proDescriptor: ProSwingDescriptor? {
         guard isPro else { return nil }
         let basename = localURL.deletingPathExtension().lastPathComponent
-        return ProSwingCatalog.all.first { $0.bundleFilename == basename }?.displayName
+        return ProSwingCatalog.all.first { $0.bundleFilename == basename }
+    }
+
+    /// Display name for pro swings; nil for user recordings.
+    var proDisplayName: String? {
+        proDescriptor?.displayName
     }
 
     var proClub: String? {

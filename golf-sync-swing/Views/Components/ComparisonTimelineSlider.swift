@@ -2,7 +2,7 @@
 //  ComparisonTimelineSlider.swift
 //  golf-sync-swing
 //
-//  Dark-themed timeline scrubber for the comparison view.
+//  Timeline scrubber for the comparison view, with the impact mark.
 //
 
 import SwiftUI
@@ -26,6 +26,7 @@ struct ComparisonTimelineSlider: View {
             ZStack(alignment: .leading) {
                 trackBackground
                 trackProgress(width: geometry.size.width)
+                impactMark(width: geometry.size.width)
                 handle(containerWidth: geometry.size.width)
             }
             .frame(height: 20)
@@ -37,7 +38,7 @@ struct ComparisonTimelineSlider: View {
 
     private var trackBackground: some View {
         RoundedRectangle(cornerRadius: 2)
-            .fill(Color.white.opacity(0.2))
+            .fill(Color.primary.opacity(0.12))
             .frame(height: 4)
     }
 
@@ -47,9 +48,21 @@ struct ComparisonTimelineSlider: View {
             .frame(width: width * viewModel.progress, height: 4)
     }
 
+    /// Where the two impacts line up — the frame the whole comparison is built around.
+    @ViewBuilder
+    private func impactMark(width: CGFloat) -> some View {
+        if let impact = viewModel.impactProgress {
+            Capsule()
+                .fill(Color.onboardingGoldDim)
+                .frame(width: 3, height: 12)
+                .offset(x: width * impact - 1.5)
+                .accessibilityHidden(true)
+        }
+    }
+
     private func handle(containerWidth: CGFloat) -> some View {
         Circle()
-            .fill(Color.white)
+            .fill(Color.fairwayGreen)
             .frame(width: isDragging ? 14 : 10, height: isDragging ? 14 : 10)
             .shadow(radius: 2)
             .offset(x: containerWidth * viewModel.progress - (isDragging ? 7 : 5))
@@ -81,7 +94,7 @@ struct ComparisonTimelineSlider: View {
             Text(formatTime(viewModel.totalDuration))
         }
         .font(.caption2).monospacedDigit()
-        .foregroundStyle(.white.opacity(isDragging ? 0.5 : 0.3))
+        .foregroundStyle(Color.primary.opacity(isDragging ? 0.6 : 0.4))
         .animation(.easeInOut(duration: 0.2), value: isDragging)
     }
 
