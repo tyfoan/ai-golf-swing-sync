@@ -2,8 +2,8 @@
 //  SingleVideoPlayerView.swift
 //  golf-sync-swing
 //
-//  Dark immersive video player with mode picker,
-//  floating actions, and swing thumbnail strip.
+//  One recording on the cream stage, like the comparison: mode picker, the swing in a
+//  dark card with floating actions, the shared transport, and the swing thumbnail strip.
 //
 
 import SwiftUI
@@ -20,16 +20,18 @@ struct SingleVideoPlayerView: View {
     @State private var showSwingEditor = false
     @State private var editingSwing: SwingMarker?
     @State private var showExportSheet = false
+    @State private var videoAspect: CGFloat?
 
     var body: some View {
         ZStack {
-            Color.black.ignoresSafeArea()
+            StageBackdrop()
             mainContent
         }
-        .preferredColorScheme(.dark)
+        .preferredColorScheme(.light)
         .toolbar(.hidden, for: .navigationBar)
         .toolbar(.hidden, for: .tabBar)
         .onAppear(perform: handleAppear)
+        .task(id: video.id) { videoAspect = await VideoDisplaySize.aspectRatio(of: video.validLocalURL) }
         // Pause only — never tear the player down here. `onDisappear` also fires when this
         // view merely presents the editor or export sheet, and `handleAppear` is guarded on
         // `viewModel == nil`, so a teardown would strand a dead player behind the sheet.
@@ -66,37 +68,31 @@ private extension SingleVideoPlayerView {
                 swingsSection(vm: vm)
             }
         } else {
-            ProgressView().tint(.white)
+            ProgressView()
         }
     }
 
     func videoArea(vm: VideoPlayerViewModel) -> some View {
-        ZStack {
-            VideoPlayerView(player: vm.player)
-                .background(Color.black)
-                .onTapGesture { vm.togglePlayPause() }
-            VStack {
-                Spacer()
-                HStack {
-                    Spacer()
-                    VideoFloatingActionsView(
-                        isFavorite: selectedSwing?.isFavorite ?? false,
-                        isMuted: vm.isMuted,
-                        showFavorite: playbackMode == .swingsOnly,
-                        onToggleFavorite: { selectedSwing?.isFavorite.toggle() },
-                        onToggleMute: { vm.toggleMute() }
-                    )
-                }
-                .padding(.trailing, 4)
-            }
+        SingleVideoCard(player: vm.player, aspectRatio: videoAspect) {
+            VideoFloatingActionsView(
+                isFavorite: selectedSwing?.isFavorite ?? false,
+                isMuted: vm.isMuted,
+                showFavorite: playbackMode == .swingsOnly,
+                onToggleFavorite: { selectedSwing?.isFavorite.toggle() },
+                onToggleMute: { vm.toggleMute() }
+            )
+            .padding(.trailing, 4)
         }
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .contentShape(Rectangle())
+        .onTapGesture { vm.togglePlayPause() }
+        // The card keeps the video's shape; the space around it stays the stage's.
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(.horizontal, 12)
     }
 
     func controlsSection(vm: VideoPlayerViewModel) -> some View {
         VStack(spacing: 6) {
-            PlaybackControlsView(viewModel: vm)
+            TransportControlsView(model: vm)
             TimelineSlider(
                 viewModel: vm,
                 swings: video.swings,

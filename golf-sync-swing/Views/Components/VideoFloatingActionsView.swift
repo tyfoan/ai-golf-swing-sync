@@ -3,7 +3,7 @@
 //  golf-sync-swing
 //
 //  Floating action buttons on the right side of the video player.
-//  Favorite (swings only), mute toggle, pose placeholder.
+//  Favorite (swings only) and mute toggle, in dark glass over the video.
 //
 
 import SwiftUI
@@ -30,15 +30,18 @@ struct VideoFloatingActionsView: View {
     private var favoriteButton: some View {
         FloatingCircleButton(
             icon: isFavorite ? "star.fill" : "star",
-            tint: isFavorite ? .yellow : .white.opacity(0.6),
+            tint: isFavorite ? .yellow : .white.opacity(0.8),
+            label: Text("Favorite", comment: "Accessibility label of the star button that marks a swing as a favorite"),
             action: onToggleFavorite
         )
+        .accessibilityAddTraits(isFavorite ? .isSelected : [])
     }
 
     private var muteButton: some View {
         FloatingCircleButton(
             icon: isMuted ? "speaker.slash.fill" : "speaker.wave.2.fill",
-            tint: .white.opacity(0.6),
+            tint: .white.opacity(0.8),
+            label: isMuted ? Text("Muted") : Text("Sound on"),
             action: onToggleMute
         )
     }
@@ -46,9 +49,12 @@ struct VideoFloatingActionsView: View {
 
 // MARK: - Reusable Circle Button
 
+/// Dark-tinted glass, because it always sits on the video: plain glass over a white sky
+/// turns white itself and swallows the icon.
 private struct FloatingCircleButton: View {
     let icon: String
     let tint: Color
+    let label: Text
     let action: () -> Void
 
     var body: some View {
@@ -56,9 +62,11 @@ private struct FloatingCircleButton: View {
             Image(systemName: icon)
                 .font(.body)
                 .foregroundStyle(tint)
-                .frame(width: 40, height: 40)
-                .background(Color.white.opacity(0.1))
-                .clipShape(Circle())
+                .frame(width: 44, height: 44)
+                .glassEffect(.regular.tint(.black.opacity(0.35)).interactive(), in: .circle)
         }
+        .buttonStyle(.plain)
+        .environment(\.colorScheme, .dark)
+        .accessibilityLabel(label)
     }
 }

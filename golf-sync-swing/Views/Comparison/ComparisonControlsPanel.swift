@@ -18,7 +18,7 @@ struct ComparisonControlsPanel: View {
                     .transition(.opacity.combined(with: .move(edge: .bottom)))
             }
             ComparisonTimelineSlider(viewModel: viewModel)
-            ComparisonControlsView(viewModel: viewModel)
+            TransportControlsView(model: viewModel)
         }
         .padding(.horizontal, 20)
         .padding(.top, 4)

@@ -1,14 +1,15 @@
 //
-//  ComparisonControlsView.swift
+//  TransportControlsView.swift
 //  golf-sync-swing
 //
-//  Round glass playback controls for the comparison view; play is the green one.
+//  Round glass playback controls under a video, play the green one. One row for the
+//  comparison and the single-video player alike (see PlaybackTransport).
 //
 
 import SwiftUI
 
-struct ComparisonControlsView: View {
-    @Bindable var viewModel: ComparisonViewModel
+struct TransportControlsView<Model: PlaybackTransport>: View {
+    let model: Model
 
     var body: some View {
         HStack(spacing: 0) {
@@ -29,7 +30,7 @@ struct ComparisonControlsView: View {
     }
 
     private func frameStepButton(forward: Bool) -> some View {
-        Button { viewModel.stepFrame(forward: forward) } label: {
+        Button { model.stepFrame(forward: forward) } label: {
             Image(systemName: forward ? "forward.frame.fill" : "backward.frame.fill")
                 .font(.body)
                 .foregroundStyle(.primary)
@@ -41,35 +42,35 @@ struct ComparisonControlsView: View {
     }
 
     private var playPauseButton: some View {
-        Button { viewModel.togglePlayPause() } label: {
-            Image(systemName: viewModel.isPlaying ? "pause.fill" : "play.fill")
+        Button { model.togglePlayPause() } label: {
+            Image(systemName: model.isPlaying ? "pause.fill" : "play.fill")
                 .font(.title3)
                 .foregroundStyle(.white)
                 .frame(width: 52, height: 52)
                 .glassEffect(.regular.tint(.fairwayGreen).interactive(), in: .circle)
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(viewModel.isPlaying ? Text("Pause") : Text("Play"))
+        .accessibilityLabel(model.isPlaying ? Text("Pause") : Text("Play"))
     }
 
     // MARK: - Speed Pill
 
     private var speedPill: some View {
         Menu {
-            ForEach(ComparisonViewModel.playbackRates, id: \.self) { rate in
+            ForEach(Model.playbackRates, id: \.self) { rate in
                 Button {
-                    viewModel.setPlaybackRate(rate)
+                    model.setPlaybackRate(rate)
                 } label: {
                     HStack {
                         Text(formatRate(rate))
-                        if rate == viewModel.playbackRate {
+                        if rate == model.playbackRate {
                             Image(systemName: "checkmark")
                         }
                     }
                 }
             }
         } label: {
-            Text(formatRate(viewModel.playbackRate))
+            Text(formatRate(model.playbackRate))
                 .font(.subheadline).fontWeight(.semibold)
                 .foregroundStyle(.primary)
                 .padding(.horizontal, 14)
@@ -77,6 +78,7 @@ struct ComparisonControlsView: View {
                 .glassEffect(.regular.interactive(), in: .capsule)
         }
         .accessibilityLabel("Playback speed")
+        .accessibilityValue(Text(verbatim: formatRate(model.playbackRate)))
     }
 
     // MARK: - Formatting
