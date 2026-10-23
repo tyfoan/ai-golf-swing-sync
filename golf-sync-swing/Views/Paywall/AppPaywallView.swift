@@ -3,9 +3,9 @@
 //  golf-sync-swing
 //
 //  Public paywall entry point. Hosts CustomPaywallView (hand-built
-//  SwiftUI). The wrapper exists so the three call sites (Onboarding /
-//  FeatureGate / Settings) keep an unchanging API even if we swap the
-//  underlying paywall implementation again.
+//  SwiftUI). The wrapper exists so the call sites (feature gates and
+//  Settings) keep an unchanging API even if we swap the underlying
+//  paywall implementation again.
 //
 
 import SwiftUI

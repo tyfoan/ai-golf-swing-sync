@@ -9,6 +9,7 @@ import SwiftUI
 
 @main
 struct golf_sync_swingApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @State private var showDataError = false
     @State private var dataErrorMessage = ""
     @State private var showOnboarding: Bool

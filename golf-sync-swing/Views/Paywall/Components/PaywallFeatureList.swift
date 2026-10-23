@@ -2,8 +2,10 @@
 //  PaywallFeatureList.swift
 //  golf-sync-swing
 //
-//  Three icon-title-subtitle rows under the hero. Same three benefits the
-//  onboarding teaches, restated compact for the paywall.
+//  Icon-title-subtitle rows under the hero. Each row is something the free
+//  tier really lacks — the library cap, the one free pro comparison, the
+//  locked modes and the HD export tiers — so the paywall never sells a perk
+//  the user already has.
 //
 
 import SwiftUI
@@ -20,22 +22,28 @@ struct PaywallFeatureList: View {
 
     static let rows: [PaywallFeatureRow.Model] = [
         .init(
-            id: "auto-sync",
+            id: "every-comparison",
             symbol: "figure.golf",
-            title: String(localized: "Auto-sync at impact", comment: "Paywall feature row 1 title"),
-            subtitle: String(localized: "Frame-perfect alignment with any pro.", comment: "Paywall feature row 1 subtitle")
+            title: String(localized: "Every swing vs every pro", comment: "Paywall feature row title: premium lifts the one-free-comparison limit"),
+            subtitle: String(localized: "Compare all your swings with the pro library, synced at impact.", comment: "Paywall feature row subtitle under 'Every swing vs every pro'")
         ),
         .init(
-            id: "pro-library",
-            symbol: "rectangle.stack.fill",
-            title: String(localized: "Pro swing library", comment: "Paywall feature row 2 title"),
-            subtitle: String(localized: "Compare to pros in onion-skin & 8× slow-mo.", comment: "Paywall feature row 2 subtitle (onion-skin = transparency overlay comparison mode)")
+            id: "unlimited-library",
+            symbol: "square.stack.3d.up.fill",
+            title: String(localized: "Unlimited swing library", comment: "Paywall feature row title: premium removes the 3-recording cap"),
+            subtitle: String(localized: "Keep every recording. Free accounts keep 3.", comment: "Paywall feature row subtitle under 'Unlimited swing library'")
+        ),
+        .init(
+            id: "comparison-modes",
+            symbol: "square.on.square",
+            title: String(localized: "Stacked & sequential modes", comment: "Paywall feature row title. Stacked and Sequential are the names of two comparison modes in the app"),
+            subtitle: String(localized: "Overlay your swing on a pro's, or play them back to back.", comment: "Paywall feature row subtitle explaining the Stacked and Sequential modes")
         ),
         .init(
             id: "hd-export",
             symbol: "square.and.arrow.up.fill",
             title: String(localized: "HD export", comment: "Paywall feature row 3 title"),
-            subtitle: String(localized: "Share-ready, no watermark, multi-aspect.", comment: "Paywall feature row 3 subtitle")
+            subtitle: String(localized: "Share-ready 1080p and 1440p clips.", comment: "Paywall feature row subtitle under 'HD export'; 1080p and 1440p are video resolutions")
         )
     ]
 }
@@ -65,6 +73,7 @@ struct PaywallFeatureRow: View {
             }
             Spacer(minLength: 0)
         }
+        .accessibilityElement(children: .combine)
     }
 
     private var icon: some View {
@@ -72,5 +81,6 @@ struct PaywallFeatureRow: View {
             .font(.system(size: 22, weight: .semibold))
             .foregroundStyle(Color.onboardingGold)
             .frame(width: 28, height: 28)
+            .accessibilityHidden(true)
     }
 }

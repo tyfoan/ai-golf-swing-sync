@@ -2,8 +2,8 @@
 //  PaywallHero.swift
 //  golf-sync-swing
 //
-//  Top section of the custom paywall: gold pre-headline, three-line bold
-//  headline (varies by source), subheadline, and a phone-frame mockup
+//  Top section of the custom paywall: gold pre-headline, the source's pitch
+//  (a three-line headline and a subheadline), and a phone-frame mockup
 //  reused from onboarding for visual continuity.
 //
 
@@ -14,6 +14,8 @@ struct PaywallHero: View {
     let source: PaywallSource
 
     @State private var visible = false
+
+    private var pitch: PaywallPitch { .of(source) }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -34,21 +36,19 @@ struct PaywallHero: View {
     }
 
     private var headline: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            ForEach(Array(headlineLines.enumerated()), id: \.offset) { _, line in
-                Text(line)
-                    .font(.system(size: 28, weight: .heavy))
-                    .foregroundStyle(.white)
-                    .tracking(-0.6)
-            }
-        }
+        Text(pitch.headline)
+            .font(.title.weight(.heavy))
+            .foregroundStyle(.white)
+            .tracking(-0.6)
+            .fixedSize(horizontal: false, vertical: true)
+            .accessibilityAddTraits(.isHeader)
     }
 
     private var subheadline: some View {
-        Text(subheadlineText)
+        Text(pitch.subheadline)
             .font(.subheadline)
-            .foregroundStyle(Color.white.opacity(0.7))
-            .lineLimit(2)
+            .foregroundStyle(Color.white.opacity(0.75))
+            .fixedSize(horizontal: false, vertical: true)
     }
 
     private var mockup: some View {
@@ -60,28 +60,7 @@ struct PaywallHero: View {
             Spacer()
         }
         .padding(.top, 4)
-    }
-
-    private var headlineLines: [LocalizedStringKey] {
-        switch source {
-        case .onboarding:
-            return ["Your swing", "vs a pro's.", "Frame-locked."]
-        case .featureGate:
-            return ["Unlock", "the full", "comparison."]
-        case .settings:
-            return ["Go Pro.", "Every feature.", "Forever."]
-        }
-    }
-
-    private var subheadlineText: LocalizedStringKey {
-        switch source {
-        case .onboarding:
-            return "AI lines you up frame by frame at the moment of impact."
-        case .featureGate:
-            return "Side-by-side, onion-skin, overlay — and HD export."
-        case .settings:
-            return "Unlock every comparison mode and pro tool."
-        }
+        .accessibilityHidden(true)
     }
 
     private func animateIn() {
