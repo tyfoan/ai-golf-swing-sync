@@ -36,18 +36,11 @@ final class ComparisonViewModel {
     /// composition's track offsets).
     var syncOffset: TimeInterval { swing1.contactTime - swing2.contactTime }
 
-    var comparisonMode: ComparisonMode = .sideBySide {
-        didSet {
-            guard oldValue != comparisonMode else { return }
-            onModeChanged(from: oldValue)
-        }
-    }
-    var stackedOpacity: CGFloat = 0.5 {
-        didSet {
-            guard oldValue != stackedOpacity, comparisonMode == .stacked else { return }
-            updateVideoComposition()
-        }
-    }
+    /// Changed by the user through `select(_:)`, which is what reports the switch; the
+    /// arrangement a comparison opens in is set once, silently, by `init`.
+    private(set) var comparisonMode: ComparisonMode
+    /// The overlay pane's opacity in stacked mode — the stage reads it directly.
+    var stackedOpacity: CGFloat = 0.5
     private(set) var isSwapped = false
 
     /// Non-nil when the comparison composition could not be built; drives the
@@ -56,13 +49,16 @@ final class ComparisonViewModel {
 
     nonisolated(unsafe) private var timeObserver: Any?
     private let builder = ComparisonCompositionBuilder()
-    private var composition: ComparisonComposition?
+    private(set) var composition: ComparisonComposition?
     private var rebuildTask: Task<Void, Never>?
     /// Monotonic token guarding the async build window: each scheduled rebuild
     /// bumps it, and a finished build only applies if its captured token is
     /// still current — stale results are dropped instead of installed.
     private var buildGeneration = 0
     private var isLooping = false
+    /// True while an export renders: the item is detached so its hardware decoders are
+    /// free. A build finishing meanwhile is stored, not attached.
+    private var isReleased = false
 
     static let playbackRates: [Float] = [0.125, 0.25, 0.5, 1.0]
 
@@ -73,13 +69,38 @@ final class ComparisonViewModel {
         return max(0, min(1, currentTime / totalDuration))
     }
 
+    /// Where each swing sits in the composition's frames; nil until the first build lands.
+    var atlas: ComparisonAtlas? { composition?.atlas }
+
+    /// Where the two impacts coincide on the timeline, from 0 to 1. Nil in sequential mode.
+    var impactProgress: Double? {
+        guard let contact = composition?.contactTime, totalDuration > 0 else { return nil }
+        return contact / totalDuration
+    }
+
+    /// In sequential mode, the composition track on screen: 0 until the split, then 1.
+    var sequentialSegment: Int {
+        guard let split = composition?.sequentialSplit, currentTime >= split else { return 0 }
+        return 1
+    }
+
+    /// The video that segment shows — the swapped order plays the second video first.
+    var sequentialVideo: Int {
+        isSwapped ? 1 - sequentialSegment : sequentialSegment
+    }
+
     // MARK: - Init
 
-    init(video1: SwingVideo, video2: SwingVideo, swing1: SwingTimeRange, swing2: SwingTimeRange) {
+    init(
+        video1: SwingVideo, video2: SwingVideo,
+        swing1: SwingTimeRange, swing2: SwingTimeRange,
+        initialMode: ComparisonMode = .sideBySide
+    ) {
         self.video1 = video1
         self.video2 = video2
         self.swing1 = swing1
         self.swing2 = swing2
+        self.comparisonMode = initialMode
         self.player = AVPlayer()
         self.player.automaticallyWaitsToMinimizeStalling = false
         scheduleRebuild(seekToStart: true)
@@ -103,6 +124,10 @@ final class ComparisonViewModel {
         }
     }
 
+    private var failureLog: ComparisonBuildFailureLog {
+        ComparisonBuildFailureLog(video1: video1, video2: video2, swing1: swing1, swing2: swing2)
+    }
+
     /// Retry entry point for the error overlay's "Try Again" button.
     func retryBuild() {
         scheduleRebuild(seekToStart: true)
@@ -112,7 +137,7 @@ final class ComparisonViewModel {
         let preservedTime = seekToStart ? 0 : currentTime
         let outcome = await builder.build(
             video1: video1, video2: video2, swing1: swing1, swing2: swing2,
-            mode: comparisonMode, isSwapped: isSwapped, stackedOpacity: stackedOpacity
+            mode: comparisonMode, isSwapped: isSwapped
         )
         guard generation == buildGeneration, !Task.isCancelled else { return }
         switch outcome {
@@ -120,79 +145,53 @@ final class ComparisonViewModel {
             buildError = nil
             install(built, preservedTime: preservedTime)
         case .failure(let failure):
-            report(failure)
+            failureLog.record(failure, mode: comparisonMode)
+            buildError = ComparisonBuildFailureLog.userMessage
         }
     }
 
-    /// The user reads the same sentence whichever way the build failed — there is nothing
-    /// they can do about an AVFoundation insertion error — but the REASON has to survive
-    /// somewhere. A bare nil here is what made "comparison is broken" a report with no
-    /// possible follow-up: the log line and the DEBUG timeline now name the failing side
-    /// and say whether the file, the movie, or the marker was at fault.
-    private func report(_ failure: ComparisonBuildFailure) {
-        let detail = failure.diagnosticDetail ?? "none"
-        // `.public`: the point of a reason is reading it off a device log, and an
-        // interpolated string is redacted to <private> by default.
-        AppLogger.sync.error("ComparisonViewModel: build failed reason=\(failure.probeReason, privacy: .public) detail=\(detail, privacy: .public)")
-        #if DEBUG
-        DeviceProbe.event("comparison_build_failed", [
-            "reason": failure.probeReason,
-            "detail": detail,
-            "mode": comparisonMode.rawValue,
-            // The two inputs the reason has to be read against: whether each file is still
-            // there, and what its marker asked for.
-            "file1_exists": String(video1.fileExists),
-            "file2_exists": String(video2.fileExists),
-            "swing1_s": Self.rangeLabel(swing1),
-            "swing2_s": Self.rangeLabel(swing2)
-        ], ui: true)
-        #endif
-        buildError = String(localized: "Couldn't load these videos. They may have been moved or deleted.", comment: "Error shown on the comparison screen when the two swing videos fail to load for playback")
-    }
-
-    #if DEBUG
-    private static func rangeLabel(_ range: SwingTimeRange) -> String {
-        String(format: "%.2f/%.2f/%.2f", range.startTime, range.contactTime, range.endTime)
-    }
-    #endif
-
-    /// Installs a freshly built composition, then reconciles against LIVE
-    /// state: layer-only properties (mode/swap/opacity) mutated during the
-    /// async build window are re-applied via `updateVideoComposition()`, and
-    /// playback resume is gated on the current `isPlaying` so a pause tapped
-    /// mid-build sticks.
+    /// Installs a freshly built composition. Mode, swap and opacity need no reconciling —
+    /// the atlas does not depend on them — and playback resume is gated on the current
+    /// `isPlaying`, so a pause tapped mid-build sticks.
     private func install(_ comp: ComparisonComposition, preservedTime: TimeInterval) {
         composition = comp
-        player.replaceCurrentItem(with: comp.playerItem)
-        updateVideoComposition()
-        seekPlayer(to: preservedTime)
         currentTime = preservedTime
+        guard !isReleased else { return }
+        player.replaceCurrentItem(with: comp.playerItem)
+        seekPlayer(to: preservedTime)
         if isPlaying {
             player.rate = playbackRate
         }
     }
 
-    private func updateVideoComposition() {
-        guard let comp = composition,
-              let videoComposition = builder.makeVideoComposition(
-                  forTracks: comp.videoTracks, totalDuration: comp.totalDuration,
-                  mode: comparisonMode, isSwapped: isSwapped, stackedOpacity: stackedOpacity
-              ) else { return }
-        comp.playerItem.videoComposition = videoComposition
+    /// The user's own mode switch: reported, and rebuilt only when the timeline changes
+    /// (sequential involved). Between the parallel modes the stage just re-arranges.
+    func select(_ mode: ComparisonMode) {
+        guard mode != comparisonMode else { return }
+        let old = comparisonMode
+        comparisonMode = mode
+        Analytics.shared.track(.comparisonModeChanged(from: old, to: mode))
+        guard old.playsSequentially != mode.playsSequentially else { return }
+        scheduleRebuild(seekToStart: true)
     }
 
-    private func onModeChanged(from old: ComparisonMode) {
-        Analytics.shared.track(.comparisonModeChanged(from: old, to: comparisonMode))
-        // If either side of the transition restructures the timeline (i.e.
-        // sequential involved), full-rebuild. Otherwise it's a layer-only
-        // change and a cheap videoComposition swap suffices.
-        let needsRebuild = old.layoutStrategy.requiresStructuralRebuild
-            || comparisonMode.layoutStrategy.requiresStructuralRebuild
-        if needsRebuild {
-            scheduleRebuild(seekToStart: true)
-        } else {
-            updateVideoComposition()
-        }
+    // MARK: - Export Hand-off
+
+    /// Frees the hardware decoders while an export session decodes both clips again: a
+    /// paused item still holds them. (The editor before it previews on this player.)
+    func releaseForExport() {
+        pause()
+        isReleased = true
+        player.replaceCurrentItem(with: nil)
+    }
+
+    /// Re-attaches the composition where it stopped once the export sheet is gone.
+    func reclaimAfterExport() {
+        guard isReleased else { return }
+        isReleased = false
+        guard let comp = composition else { return }
+        player.replaceCurrentItem(with: comp.playerItem)
+        seekPlayer(to: currentTime)
     }
 
     private func setupTimeObserver() {
@@ -203,6 +202,8 @@ final class ComparisonViewModel {
     }
 
     private func onTick(_ time: TimeInterval) {
+        // A detached item reports zero; the position to come back to is the last real one.
+        guard !isReleased else { return }
         currentTime = time
         guard isPlaying, !isLooping, totalDuration > 0, time >= totalDuration - 0.01 else { return }
         loopToStart()
@@ -266,12 +267,11 @@ final class ComparisonViewModel {
         seek(to: forward ? currentTime + step : currentTime - step)
     }
 
-    /// Swap is purely visual — flips which slot each track renders in. Track
-    /// insertion offsets (and thus impact alignment) are unchanged.
+    /// Swap is purely visual — the stage flips the pane order. Track insertion offsets
+    /// (and thus impact alignment) and the audio mix are unchanged.
     func swapVideos() {
         guard comparisonMode != .sequential else { return }
         isSwapped.toggle()
-        updateVideoComposition()
     }
 
     // MARK: - Private Helpers

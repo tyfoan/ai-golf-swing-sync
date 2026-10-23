@@ -2,7 +2,7 @@
 //  ComparisonControlsView.swift
 //  golf-sync-swing
 //
-//  Dark circular playback controls for the comparison view.
+//  Round glass playback controls for the comparison view; play is the green one.
 //
 
 import SwiftUI
@@ -32,11 +32,11 @@ struct ComparisonControlsView: View {
         Button { viewModel.stepFrame(forward: forward) } label: {
             Image(systemName: forward ? "forward.frame.fill" : "backward.frame.fill")
                 .font(.body)
-                .foregroundStyle(.white.opacity(0.8))
-                .frame(width: 40, height: 40)
-                .background(Color.white.opacity(0.1))
-                .clipShape(Circle())
+                .foregroundStyle(.primary)
+                .frame(width: 44, height: 44)
+                .glassEffect(.regular.interactive(), in: .circle)
         }
+        .buttonStyle(.plain)
         .accessibilityLabel(forward ? Text("Next frame") : Text("Previous frame"))
     }
 
@@ -45,10 +45,10 @@ struct ComparisonControlsView: View {
             Image(systemName: viewModel.isPlaying ? "pause.fill" : "play.fill")
                 .font(.title3)
                 .foregroundStyle(.white)
-                .frame(width: 48, height: 48)
-                .background(Color.white.opacity(0.15))
-                .clipShape(Circle())
+                .frame(width: 52, height: 52)
+                .glassEffect(.regular.tint(.fairwayGreen).interactive(), in: .circle)
         }
+        .buttonStyle(.plain)
         .accessibilityLabel(viewModel.isPlaying ? Text("Pause") : Text("Play"))
     }
 
@@ -71,10 +71,10 @@ struct ComparisonControlsView: View {
         } label: {
             Text(formatRate(viewModel.playbackRate))
                 .font(.subheadline).fontWeight(.semibold)
-                .foregroundStyle(.white)
-                .padding(.horizontal, 12).padding(.vertical, 6)
-                .background(Color.white.opacity(0.1))
-                .clipShape(RoundedRectangle(cornerRadius: 14))
+                .foregroundStyle(.primary)
+                .padding(.horizontal, 14)
+                .frame(minWidth: 44, minHeight: 44)
+                .glassEffect(.regular.interactive(), in: .capsule)
         }
         .accessibilityLabel("Playback speed")
     }

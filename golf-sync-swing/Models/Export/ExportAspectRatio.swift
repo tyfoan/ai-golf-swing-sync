@@ -40,6 +40,24 @@ enum ExportAspectRatio: String, CaseIterable, Identifiable {
         }
     }
 
+    /// The proportion itself, "9:16" — the same in every language, so it never
+    /// truncates in a three-way picker the way "Vertical (TikTok)" does.
+    var ratioLabel: String {
+        switch self {
+        case .sideBySide:        return "16:9"
+        case .tikTokVertical:    return "9:16"
+        case .square:            return "1:1"
+        case .instagramPortrait: return "4:5"
+        case .classicLandscape:  return "4:3"
+        case .classicPortrait:   return "3:4"
+        case .photoPortrait:     return "2:3"
+        case .photoLandscape:    return "3:2"
+        case .cinemascope:       return "2.35:1"
+        case .ultraWide:         return "2:1"
+        case .tallBanner:        return "1:2"
+        }
+    }
+
     var exportSize: CGSize {
         switch self {
         case .sideBySide:        return CGSize(width: 1920, height: 1080)
@@ -57,10 +75,6 @@ enum ExportAspectRatio: String, CaseIterable, Identifiable {
     }
 
     var ratio: CGFloat { exportSize.width / exportSize.height }
-
-    var arrangement: VideoArrangement {
-        exportSize.width >= exportSize.height ? .horizontal : .vertical
-    }
 
     var isPrimary: Bool {
         switch self {

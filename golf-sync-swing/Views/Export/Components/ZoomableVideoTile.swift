@@ -2,12 +2,14 @@
 //  ZoomableVideoTile.swift
 //  golf-sync-swing
 //
-//  SwiftUI tile that renders a video with pinch-to-zoom + drag-to-pan.
-//  Pattern ported from video-collage's AdjustCellView.
+//  One swing on the export canvas, cut out of the comparison's own player, with
+//  pinch-to-zoom + drag-to-pan. Behind it, unless it is blended over another swing, the
+//  blurred fill the exported cell gets too (CellBackdrop) — still while the swing moves,
+//  as in the file.
 //
 //  ⚠️ Modifier order: .offset() BEFORE .scaleEffect(). The offset is
 //  multiplied by scale when rendered, which matches the
-//  ExportLayoutRenderer formula `panX = offset × scale × (export/screen)`.
+//  CellRenderer formula `panX = offset × scale × (export/screen)`.
 //  Do NOT change the order without updating the renderer.
 //
 
@@ -16,14 +18,16 @@ import AVFoundation
 
 struct ZoomableVideoTile: View {
     let player: AVPlayer
+    let cutout: SlotCutout
     @Binding var transform: VideoTransform
+    var showsBackdrop = true
 
     var body: some View {
         GeometryReader { geo in
             ZStack {
-                Color.black
+                backdrop
 
-                EditorVideoPlayerView(player: player)
+                CompositionSlotView(player: player, cutout: cutout, gravity: .fit)
                     .offset(x: transform.offset.x, y: transform.offset.y)
                     .scaleEffect(transform.scale)
 
@@ -41,6 +45,14 @@ struct ZoomableVideoTile: View {
             .onChange(of: geo.size) { _, newSize in syncContainerSize(newSize) }
             .onChange(of: transform.scale) { _, _ in syncContainerSize(geo.size) }
             .onChange(of: transform.offset) { _, _ in syncContainerSize(geo.size) }
+        }
+    }
+
+    @ViewBuilder
+    private var backdrop: some View {
+        if showsBackdrop {
+            CompositionSlotView(player: player, cutout: cutout, gravity: .fill)
+                .backdropBlurred()
         }
     }
 

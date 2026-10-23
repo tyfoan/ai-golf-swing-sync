@@ -2,8 +2,8 @@
 //  CellConfiguration.swift
 //  golf-sync-swing
 //
-//  One cell in the export composition. Built per export from a VideoTransform
-//  + the composition track that the compositor will pull pixels from.
+//  One cell in the export composition: where it sits on the canvas, the composition
+//  track it pulls pixels from, and how the user framed it in the editor.
 //
 //  Simplified port of video-collage's CellConfiguration: video-only (no photos,
 //  no thumbnails, no audio routing — audio is on its own composition track and
@@ -14,29 +14,33 @@ import Foundation
 import CoreGraphics
 import AVFoundation
 
-struct CellConfiguration {
+nonisolated struct CellConfiguration {
 
     /// Cell's position and size in the export render canvas (UIKit-style top-left origin).
     let cellRect: CGRect
 
-    /// Composition track ID the compositor will request pixel buffers from.
-    let videoTrackID: CMPersistentTrackID
+    /// The track this cell draws and how its pixels are oriented.
+    let source: CellSource
 
-    /// Source video natural size (pre-rotation).
-    let naturalSize: CGSize
+    /// The pinch and pan the user set on this swing's editor tile.
+    let framing: VideoTransform
 
-    /// Source video rotation transform.
-    let preferredTransform: CGAffineTransform
+    /// Whether the blurred copy of the swing fills the cell around it (CellBackdrop).
+    let drawsBackdrop: Bool
+
+    var videoTrackID: CMPersistentTrackID { source.trackID }
+    var naturalSize: CGSize { source.naturalSize }
+    var preferredTransform: CGAffineTransform { source.preferredTransform }
 
     /// User pinch zoom level (1.0 = identity).
-    let userScale: CGFloat
+    var userScale: CGFloat { framing.scale }
 
     /// User pan offset in editor-tile points (PRE-scale; visible shift = offset × userScale).
-    let userOffset: CGPoint
+    var userOffset: CGPoint { framing.offset }
 
     /// Editor tile size in points where the user did the gestures. The compositor
     /// uses this to map preview-space pan into export pixels.
-    let containerSize: CGSize
+    var containerSize: CGSize { framing.containerSize }
 
     var displaySize: CGSize {
         naturalSize.applying(preferredTransform)
@@ -52,8 +56,17 @@ struct CellConfiguration {
     var finalScale: CGFloat { baseScale * userScale }
 }
 
+/// A composition video track as the compositor reads it.
+nonisolated struct CellSource {
+    let trackID: CMPersistentTrackID
+    /// Source video natural size (pre-rotation).
+    let naturalSize: CGSize
+    /// Source video rotation transform.
+    let preferredTransform: CGAffineTransform
+}
+
 extension CGSize {
-    func absoluteSize() -> CGSize {
+    nonisolated func absoluteSize() -> CGSize {
         CGSize(width: Swift.abs(width), height: Swift.abs(height))
     }
 }

@@ -46,6 +46,15 @@ enum ComparisonMode: String, CaseIterable, Identifiable {
         return FeatureAccess.isUnlocked(feature)
     }
 
+    /// Sequential lays the swings end to end; every other mode plays them together,
+    /// impact-aligned. Switching between the two kinds rebuilds the composition.
+    var playsSequentially: Bool {
+        switch self {
+        case .sequential:                           return true
+        case .sideBySide, .topBottom, .stacked:     return false
+        }
+    }
+
     /// Whether the opacity slider control should be visible.
     /// Only stacked has a user-tunable opacity blend.
     var showsOpacitySlider: Bool {
@@ -64,12 +73,13 @@ enum ComparisonMode: String, CaseIterable, Identifiable {
         }
     }
 
-    /// Whether the editor should expose a "Swing 1 / Swing 2" picker.
-    /// Only sequential mode edits one swing at a time.
-    var showsSequentialPicker: Bool {
+    /// How this mode shares an export canvas when the swings' shapes leave the choice
+    /// open (ExportArrangementAdvisor decides the rest).
+    var exportArrangement: VideoArrangement {
         switch self {
-        case .sequential:                          return true
-        case .sideBySide, .topBottom, .stacked:    return false
+        case .sideBySide:           return .horizontal
+        case .topBottom:            return .vertical
+        case .stacked, .sequential: return .overlaid
         }
     }
 }
