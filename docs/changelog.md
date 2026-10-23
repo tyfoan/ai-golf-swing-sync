@@ -8,7 +8,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
-### Fixed — lifetime purchase crash loop, 2026-10-21
+### Fixed — 1.3.5 (1), lifetime purchase crash loop, 2026-10-21
 
 - **A paid, non-trial purchase no longer sends the app into a launch crash loop.** The first production lifetime sale (1.3.4, 2026-10-15) was granted correctly by RevenueCat, yet the app died during the purchase and then within 1–3 s of every launch on Oct 15 and 16; the buyer's Oct 20 session, past the 48-hour mark, ran normally. The only launch-time code limited to the 48 h after a paid purchase was the client-side `SubscriptionRevenueReporter`, and it persisted its dedup date only after its StoreKit product lookup and Amplitude revenue call, so a crash inside it repeats on every launch. It has been removed together with `Analytics.record(_:)` and `revenue_recognized`; recognised revenue now comes only from RevenueCat's server-side Amplitude integration (`rc_*` events), which was already live. Trials never entered that path. The exact crashing frame is not confirmed yet (no symbolicated stack; see Xcode Organizer → Crashes → 1.3.4).
 

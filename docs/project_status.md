@@ -296,3 +296,7 @@
 ## 2026-10-03 — Release candidate
 
 1.3.4 (1) contains the reviewed activation changes. Implementation and local checks passed; archive/export/upload verification is tracked separately. No App Review submission is included in this upload request.
+
+## 2026-10-23 — Release 1.3.5
+
+1.3.5 (1) is 1.3.4 plus the lifetime-purchase crash-loop fix (PR #13: `SubscriptionRevenueReporter` removed). The debug video import from PR #12 also sits on `main`, but it compiles only into Debug builds. Built from `main`; 1.3.4 came from `analytics/repo-local-funnels`, which PR #13 brought into `main`.
