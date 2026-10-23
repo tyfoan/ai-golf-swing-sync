@@ -31,7 +31,7 @@ struct SwingDetectionPanel: View {
         HStack(spacing: 12) {
             Text("Swings")
                 .font(.subheadline).fontWeight(.semibold)
-                .foregroundStyle(.white)
+                .foregroundStyle(.primary)
 
             Spacer()
 
@@ -100,7 +100,7 @@ struct SwingDetectionPanel: View {
     private var emptySwingsView: some View {
         Text("No swings detected. Tap \u{201C}+ ADD\u{201D} to mark one manually.")
             .font(.caption)
-            .foregroundStyle(.white.opacity(0.4))
+            .foregroundStyle(.secondary)
             .multilineTextAlignment(.center)
             .padding(.horizontal, 24)
             .padding(.vertical, 12)
@@ -118,7 +118,7 @@ struct SwingDetectionPanel: View {
             HStack(spacing: 6) {
                 ProgressView().scaleEffect(0.7)
                 Text(analysisStatus.isEmpty ? "Analyzing swing..." : analysisStatus)
-                    .font(.caption).foregroundStyle(.white.opacity(0.5))
+                    .font(.caption).foregroundStyle(.secondary)
             }
         }
         .padding(.horizontal)

@@ -2,7 +2,8 @@
 //  TimelineSlider.swift
 //  golf-sync-swing
 //
-//  Dark-themed timeline with swing range markers and impact dots.
+//  Timeline on the cream stage: each swing's range, and a gold mark at its impact as on
+//  the comparison timeline.
 //
 
 import SwiftUI
@@ -39,7 +40,7 @@ struct TimelineSlider: View {
 
     private var trackBackground: some View {
         RoundedRectangle(cornerRadius: 2)
-            .fill(Color.white.opacity(0.2))
+            .fill(Color.primary.opacity(0.12))
             .frame(height: 4)
     }
 
@@ -52,7 +53,7 @@ struct TimelineSlider: View {
     private func handle(width: CGFloat) -> some View {
         let size: CGFloat = isDragging ? 14 : 10
         return Circle()
-            .fill(Color.white)
+            .fill(Color.fairwayGreen)
             .frame(width: size, height: size)
             .shadow(radius: 2)
             .offset(x: width * viewModel.progress - size / 2)
@@ -78,13 +79,13 @@ struct TimelineSlider: View {
 
             ZStack {
                 RoundedRectangle(cornerRadius: 2)
-                    .fill(Color.mintMist)
+                    .fill(Color.fairwayGreen.opacity(0.18))
                     .frame(width: markerWidth, height: 12)
                     .offset(x: startX + markerWidth / 2 - width / 2)
 
-                Circle()
-                    .fill(Color.sand)
-                    .frame(width: 8, height: 8)
+                Capsule()
+                    .fill(Color.onboardingGoldDim)
+                    .frame(width: 3, height: 12)
                     .offset(x: impactX - width / 2)
             }
             .frame(width: width)
@@ -98,13 +99,13 @@ struct TimelineSlider: View {
         HStack {
             Text(formatTime(viewModel.currentTime))
                 .font(.caption2).monospacedDigit()
-                .foregroundStyle(.white.opacity(isDragging ? 0.5 : 0.3))
+                .foregroundStyle(Color.primary.opacity(isDragging ? 0.6 : 0.4))
 
             Spacer()
 
             Text(formatTime(viewModel.duration))
                 .font(.caption2).monospacedDigit()
-                .foregroundStyle(.white.opacity(isDragging ? 0.5 : 0.3))
+                .foregroundStyle(Color.primary.opacity(isDragging ? 0.6 : 0.4))
         }
     }
 

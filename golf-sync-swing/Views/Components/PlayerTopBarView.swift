@@ -2,8 +2,8 @@
 //  PlayerTopBarView.swift
 //  golf-sync-swing
 //
-//  Custom top bar for the immersive single video player.
-//  Teal circle buttons (back, share) with center mode picker.
+//  Top bar of the single video player: glass circle buttons (back, share), as on the
+//  comparison, with the mode picker in a glass capsule between them.
 //
 
 import SwiftUI
@@ -29,14 +29,7 @@ struct PlayerTopBarView: View {
     // MARK: - Back
 
     private var backButton: some View {
-        Button(action: onDismiss) {
-            Image(systemName: "chevron.backward")
-                .font(.body).fontWeight(.semibold)
-                .foregroundStyle(.white)
-                .frame(width: 36, height: 36)
-                .background(Color.appTeal)
-                .clipShape(Circle())
-        }
+        StageIconButton(symbol: "chevron.backward", label: "Back", action: onDismiss)
     }
 
     // MARK: - Mode Picker
@@ -62,21 +55,16 @@ struct PlayerTopBarView: View {
                 Image(systemName: "chevron.down")
                     .font(.caption2)
             }
-            .foregroundStyle(.white)
+            .foregroundStyle(.primary)
+            .padding(.horizontal, 16)
+            .frame(minHeight: 44)
+            .glassEffect(.regular.interactive(), in: .capsule)
         }
     }
 
     // MARK: - Share
 
     private var shareButton: some View {
-        Button(action: onExport) {
-            Image(systemName: "square.and.arrow.up")
-                .font(.body)
-                .foregroundStyle(.white)
-                .frame(width: 36, height: 36)
-                .background(Color.appTeal)
-                .clipShape(Circle())
-        }
-        .accessibilityLabel("Export video")
+        StageIconButton(symbol: "square.and.arrow.up", label: "Export video", action: onExport)
     }
 }
