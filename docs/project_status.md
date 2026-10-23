@@ -296,3 +296,10 @@
 ## 2026-10-03 — Release candidate
 
 1.3.4 (1) contains the reviewed activation changes. Implementation and local checks passed; archive/export/upload verification is tracked separately. No App Review submission is included in this upload request.
+
+## 2026-10-23 — Release 1.3.5
+
+1.3.5 (1) is 1.3.4 plus the lifetime-purchase crash-loop fix (PR #13: `SubscriptionRevenueReporter` removed). The debug video import from PR #12 also sits on `main`, but it compiles only into Debug builds. Built from `main`; 1.3.4 came from `analytics/repo-local-funnels`, which PR #13 brought into `main`.
+
+- Source: `main` @ `2466061`, tagged `v1.3.5`. The version was passed to `xcodebuild` as `MARKETING_VERSION=1.3.5`; `project.pbxproj` still reads 1.3.4 until the next bump (1.3.6) is made in Xcode.
+- Uploaded 23/10/2026; App Store Connect processed the build as `VALID`. The version record has build 1 attached, the export-compliance answer "no non-exempt encryption", and "Bug fixes and stability improvements." in all 39 App Store locales.
