@@ -314,3 +314,4 @@ The debug video import from PR #12 is also on `main`, but it compiles only into 
   - export compliance is "no non-exempt encryption";
   - all 39 locales have "Bug fixes and stability improvements.";
   - the privacy policy URL in every locale is `https://withcoach.app/privacy`, the same as the in-app link (`LegalLinks`). Before, it was `examply.app/privacy_policy`, which no longer loads.
+- Approved and live (`READY_FOR_SALE`) by 24/10/2026. The first production check is in `docs/prod-errors-2026-10-25.md`.
